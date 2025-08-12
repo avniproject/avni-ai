@@ -1,0 +1,61 @@
+[Unit]
+Description=Avni MCP Server - AI-powered health data management server
+Documentation=https://github.com/your-org/avni-mcp-server
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=avni
+Group=avni
+WorkingDirectory=/opt/avni-mcp-server/current
+Environment=PATH=/opt/avni-mcp-server/current/.venv/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/opt/avni-mcp-server/current/.env
+
+# Start command using uv to run the server
+ExecStart=/home/avni/.local/bin/uv run python main.py
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/avni-mcp-server/current /var/log
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+# Network security
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+
+# System call filtering
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+# Process limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Memory and CPU limits (adjust based on your server capacity)
+MemoryLimit=1G
+CPUQuota=200%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=avni-mcp-server
+
+# Health check (optional - requires systemd 229+)
+# ExecStartPost=/bin/sleep 10
+# ExecStartPost=/bin/sh -c 'curl -f http://localhost:8000/health || exit 1'
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,173 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@2.1.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/python:3.13
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASH_ENV"
+      
+      # Cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pyproject.toml" }}
+            - v1-dependencies-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            uv sync --group dev
+      
+      # Save dependency cache
+      - save_cache:
+          paths:
+            - .venv
+          key: v1-dependencies-{{ checksum "pyproject.toml" }}
+      
+      # Run linting
+      - run:
+          name: Run linting
+          command: |
+            uv run ruff check .
+            uv run ruff format --check .
+      
+      # Type checking
+      - run:
+          name: Type checking
+          command: |
+            uv run mypy avni/ --ignore-missing-imports
+          when: always
+      
+      # Create build artifact
+      - run:
+          name: Create build artifact
+          command: |
+            mkdir -p /tmp/artifacts
+            tar -czf /tmp/artifacts/avni-mcp-server.tar.gz \
+              --exclude='.git' \
+              --exclude='.venv' \
+              --exclude='__pycache__' \
+              --exclude='*.pyc' \
+              --exclude='.pytest_cache' \
+              .
+      
+      # Store artifacts
+      - store_artifacts:
+          path: /tmp/artifacts
+      
+      # Persist to workspace
+      - persist_to_workspace:
+          root: /tmp/artifacts
+          paths:
+            - avni-mcp-server.tar.gz
+
+  test:
+    docker:
+      - image: cimg/python:3.13
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASH_ENV"
+      
+      # Restore dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pyproject.toml" }}
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            uv sync --group test
+      
+      # Run tests
+      - run:
+          name: Run tests
+          command: |
+            uv run pytest tests/ -v --cov=avni --cov-report=xml --cov-report=html
+          environment:
+            AVNI_BASE_URL: "https://staging.avniproject.org"
+            OPENAI_API_KEY: "test_key_for_unit_tests"
+      
+      # Store test results
+      - store_test_results:
+          path: test-results
+      
+      # Store coverage reports
+      - store_artifacts:
+          path: htmlcov
+          destination: coverage-report
+
+  staging_deploy:
+    docker:
+      - image: cimg/python:3.13
+    steps:
+      - attach_workspace:
+          at: /tmp/artifacts
+      
+      # Add SSH key
+      - add_ssh_keys:
+          fingerprints:
+            - "${SSH_FINGERPRINT}"
+      
+      # Deploy to remote server
+      - run:
+          name: Deploy to server
+          command: |
+            # Copy deployment script and artifact to server
+            scp -o StrictHostKeyChecking=no \
+                /tmp/artifacts/avni-mcp-server.tar.gz \
+                scripts/deploy.sh \
+                systemd/avni-mcp-server.service \
+                ${DEPLOY_USER}@${DEPLOY_HOST}:/tmp/
+            
+            # Execute deployment script on remote server
+            ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} \
+                "chmod +x /tmp/deploy.sh && /tmp/deploy.sh"
+      
+      # Health check
+      - run:
+          name: Health check
+          command: |
+            sleep 10
+            ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} \
+                "curl -f http://localhost:8000/health || exit 1"
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - staging_approve:
+          type: approval
+          requires:
+            - test
+      - staging_deploy:
+          requires:
+            - staging_approve
+          filters:
+            branches:
+              only:
+                - main
+                - production
+          context:
+            - deployment-secrets
