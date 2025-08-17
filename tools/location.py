@@ -4,8 +4,6 @@ from typing import Optional, List
 from mcp.server.fastmcp import FastMCP
 from client import make_avni_request
 from utils import format_list_response, format_creation_response
-from context import get_api_key
-
 
 def register_location_tools(mcp: FastMCP) -> None:
     """Register location-related tools with the MCP server."""
@@ -14,7 +12,7 @@ def register_location_tools(mcp: FastMCP) -> None:
     async def get_location_types() -> str:
         """Retrieve a list of location types for an organization to find IDs for creating locations or sub-location types."""
         result = await make_avni_request(
-            "GET", "/addressLevelType", api_key=get_api_key()
+            "GET", "/addressLevelType"
         )
 
         if not result.success:
@@ -28,7 +26,7 @@ def register_location_tools(mcp: FastMCP) -> None:
     @mcp.tool()
     async def get_catchments() -> str:
         """Retrieve a list of catchments for an organization to find IDs for assigning users."""
-        result = await make_avni_request("GET", "/catchment", api_key=get_api_key())
+        result = await make_avni_request("GET", "/catchment")
 
         if not result.success:
             return result.format_error("retrieve catchments")
@@ -54,7 +52,7 @@ def register_location_tools(mcp: FastMCP) -> None:
             payload["parentId"] = parent_id
 
         result = await make_avni_request(
-            "POST", "/addressLevelType", payload, api_key=get_api_key()
+            "POST", "/addressLevelType", payload
         )
 
         if not result.success:
@@ -80,7 +78,7 @@ def register_location_tools(mcp: FastMCP) -> None:
         ]
 
         result = await make_avni_request(
-            "POST", "/locations", payload, api_key=get_api_key()
+            "POST", "/locations", payload
         )
 
         if not result.success:
@@ -99,7 +97,7 @@ def register_location_tools(mcp: FastMCP) -> None:
         payload = {"deleteFastSync": False, "name": name, "locationIds": location_ids}
 
         result = await make_avni_request(
-            "POST", "/catchment", payload, api_key=get_api_key()
+            "POST", "/catchment", payload
         )
 
         if not result.success:

@@ -4,7 +4,6 @@ from typing import Optional, List
 from mcp.server.fastmcp import FastMCP
 from client import make_avni_request
 from utils import format_list_response, format_creation_response
-from context import get_api_key
 
 
 def register_user_tools(mcp: FastMCP) -> None:
@@ -13,7 +12,7 @@ def register_user_tools(mcp: FastMCP) -> None:
     @mcp.tool()
     async def get_groups() -> str:
         """Retrieve a list of user groups for an organization to find IDs for assigning users."""
-        result = await make_avni_request("GET", "/web/groups", api_key=get_api_key())
+        result = await make_avni_request("GET", "/web/groups")
 
         if not result.success:
             return result.format_error("retrieve user groups")
@@ -67,7 +66,7 @@ def register_user_tools(mcp: FastMCP) -> None:
         }
 
         result = await make_avni_request(
-            "POST", "/user", payload, api_key=get_api_key()
+            "POST", "/user", payload
         )
 
         if not result.success:
@@ -136,7 +135,7 @@ def register_user_tools(mcp: FastMCP) -> None:
         }
 
         result = await make_avni_request(
-            "POST", "/user", payload, api_key=get_api_key()
+            "POST", "/user", payload
         )
 
         if not result.success:
@@ -154,7 +153,7 @@ def register_user_tools(mcp: FastMCP) -> None:
         payload = {"name": name}
 
         result = await make_avni_request(
-            "POST", "/web/groups", payload, api_key=get_api_key()
+            "POST", "/web/groups", payload
         )
 
         if not result.success:

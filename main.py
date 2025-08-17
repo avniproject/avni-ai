@@ -11,6 +11,11 @@ import os
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 from openai import OpenAI
+from openai.types.responses.tool_param import Mcp
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+
+from context import set_auth_token
 
 from tools.location import register_location_tools
 from tools.organization import register_organization_tools
@@ -26,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 # OpenAI configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+AVNI_MCP_SERVER_URL = os.getenv("AVNI_MCP_SERVER_URL")
 
 # Initialize OpenAI client
 openai_client = OpenAI()
@@ -51,13 +57,77 @@ def create_server():
     """Create and configure the MCP server with Avni tools."""
 
     # Initialize the FastMCP server
-    mcp = FastMCP(name="Avni MCP Server", instructions=server_instructions)
+    mcp = FastMCP(name="Avni_MCP_Server", instructions=server_instructions)
 
     # Register all Avni tool modules
     register_organization_tools(mcp)
     register_location_tools(mcp)
     register_user_tools(mcp)
     register_program_tools(mcp)
+
+    # Add health check endpoint
+    @mcp.custom_route("/health", methods=["GET"])
+    async def health_check(request: Request):
+        """Health check endpoint for monitoring."""
+        return JSONResponse({"status": "healthy", "service": "Avni MCP Server"})
+
+    # Add chat endpoint for OpenAI Responses API integration
+    @mcp.custom_route("/chat", methods=["POST"])
+    async def chat_endpoint(request: Request):
+        """Chat endpoint that integrates with OpenAI Responses API."""
+        try:
+            # Parse request body
+            body = await request.json()
+            message = body.get("message", "")
+            
+            if not message:
+                return JSONResponse(
+                    {"error": "Message is required"}, 
+                    status_code=400
+                )
+
+            # Extract auth-token from request headers
+            auth_token = request.headers.get("auth-token")
+            if not auth_token:
+                return JSONResponse(
+                    {"error": "auth-token header is required"}, 
+                    status_code=401
+                )
+
+            # Set the auth token in context for tools to use
+            set_auth_token(auth_token)
+
+            # Get MCP server URL from environment variable
+            if not AVNI_MCP_SERVER_URL:
+                return JSONResponse(
+                    {"error": "AVNI_MCP_SERVER_URL environment variable not set"}, 
+                    status_code=500
+                )
+
+            # Call OpenAI Responses API with MCP integration
+            mcp_tool: Mcp = {
+                "type": "mcp",
+                "server_label": "Avni_MCP_Server",
+                "server_url": AVNI_MCP_SERVER_URL,
+                "require_approval": "never"
+            }
+            
+            response = openai_client.responses.create(
+                model="gpt-4o",
+                tools=[mcp_tool],
+                input=message
+            )
+
+            return JSONResponse({
+                "response": response.output_text
+            })
+
+        except Exception as e:
+            logger.error(f"Chat endpoint error: {e}")
+            return JSONResponse(
+                {"error": "Internal server error"},
+                status_code=500
+            )
 
     return mcp
 

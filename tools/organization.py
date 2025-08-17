@@ -3,7 +3,6 @@
 from mcp.server.fastmcp import FastMCP
 from client import make_avni_request
 from utils import format_creation_response
-from context import get_api_key
 
 
 def register_organization_tools(mcp: FastMCP) -> None:
@@ -28,7 +27,7 @@ def register_organization_tools(mcp: FastMCP) -> None:
         }
 
         result = await make_avni_request(
-            "POST", "/organisation", payload, api_key=get_api_key()
+            "POST", "/organisation", payload
         )
 
         if not result.success:

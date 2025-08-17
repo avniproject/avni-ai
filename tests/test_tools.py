@@ -6,7 +6,7 @@ from pathlib import Path
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from context import set_api_key, get_api_key
+from context import set_auth_token, get_auth_token
 
 
 class TestContextManagement:
@@ -15,16 +15,16 @@ class TestContextManagement:
     def test_set_and_get_api_key(self):
         """Test setting and getting API key from context."""
         test_key = "test_api_key_123"
-        set_api_key(test_key)
-        assert get_api_key() == test_key
+        set_auth_token(test_key)
+        assert get_auth_token() == test_key
 
     def test_get_api_key_returns_none_when_not_set(self):
         """Test that get_api_key returns None when no key is set."""
         # Reset context
-        from context import api_key_context
+        from context import auth_token_context
 
-        api_key_context.set(None)
-        assert get_api_key() is None
+        auth_token_context.set(None)
+        assert get_auth_token() is None
 
 
 # class TestApiResult:

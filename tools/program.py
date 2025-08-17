@@ -5,7 +5,6 @@ from typing import Optional
 from mcp.server.fastmcp import FastMCP
 
 from client import make_avni_request
-from context import get_api_key
 from utils import format_creation_response
 
 
@@ -42,7 +41,7 @@ def register_program_tools(mcp: FastMCP) -> None:
         }
 
         result = await make_avni_request(
-            "POST", "/web/subjectType", payload, api_key=get_api_key()
+            "POST", "/web/subjectType", payload
         )
 
         if not result.success:
@@ -73,7 +72,7 @@ def register_program_tools(mcp: FastMCP) -> None:
         }
 
         result = await make_avni_request(
-            "POST", "/web/program", payload, api_key=get_api_key()
+            "POST", "/web/program", payload
         )
 
         if not result.success:
@@ -101,7 +100,7 @@ def register_program_tools(mcp: FastMCP) -> None:
         }
 
         result = await make_avni_request(
-            "POST", "/web/encounterType", payload, api_key=get_api_key()
+            "POST", "/web/encounterType", payload
         )
 
         if not result.success:

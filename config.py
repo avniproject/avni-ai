@@ -3,18 +3,23 @@
 import os
 
 from dotenv import load_dotenv
+from context import get_auth_token
 
 # Load environment variables
 load_dotenv()
 
 # Configuration from environment variables
-BASE_URL = os.getenv("AVNI_BASE_URL", "https://staging.avniproject.org")
+BASE_URL = os.getenv("AVNI_BASE_URL")
 
 
-def get_headers(api_key: str) -> dict:
-    """Get headers for API requests with provided API key."""
+def get_headers() -> dict:
+    """Get headers for API requests using auth token from context."""
+    auth_token = get_auth_token()
+    if not auth_token:
+        raise ValueError("No auth token found in context")
+    
     return {
-        "auth-token": api_key,
+        "auth-token": auth_token,
         "Accept": "application/json",
         "Content-Type": "application/json",
     }

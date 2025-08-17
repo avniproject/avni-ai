@@ -6,14 +6,15 @@ from utils import ApiResult
 
 
 async def make_avni_request(
-    method: str, endpoint: str, data: dict = None, api_key: str = None
+    method: str, endpoint: str, data: dict = None
 ) -> ApiResult:
     """Make a request to the Avni API with proper error handling."""
-    if not api_key:
-        return ApiResult.error_result("API key is required")
-
     url = f"{BASE_URL}{endpoint}"
-    headers = get_headers(api_key)
+    
+    try:
+        headers = get_headers()
+    except ValueError as e:
+        return ApiResult.error_result(str(e))
 
     async with httpx.AsyncClient() as client:
         try:
