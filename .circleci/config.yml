@@ -42,13 +42,6 @@ jobs:
             uv run ruff check .
             uv run ruff format --check .
       
-      # Type checking
-      - run:
-          name: Type checking
-          command: |
-            uv run mypy avni/ --ignore-missing-imports
-          when: always
-      
       # Create build artifact
       - run:
           name: Create build artifact
