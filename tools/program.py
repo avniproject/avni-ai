@@ -40,9 +40,7 @@ def register_program_tools(mcp: FastMCP) -> None:
             "locationTypeUUIDs": [location_type_uuid] if location_type_uuid else [],
         }
 
-        result = await make_avni_request(
-            "POST", "/web/subjectType", payload
-        )
+        result = await make_avni_request("POST", "/web/subjectType", payload)
 
         if not result.success:
             return result.format_error("create subject type")
@@ -71,9 +69,7 @@ def register_program_tools(mcp: FastMCP) -> None:
             "manualEnrolmentEligibilityCheckRule": "",
         }
 
-        result = await make_avni_request(
-            "POST", "/web/program", payload
-        )
+        result = await make_avni_request("POST", "/web/program", payload)
 
         if not result.success:
             return result.format_error("create program")
@@ -99,9 +95,7 @@ def register_program_tools(mcp: FastMCP) -> None:
             "programUuid": program_uuid,
         }
 
-        result = await make_avni_request(
-            "POST", "/web/encounterType", payload
-        )
+        result = await make_avni_request("POST", "/web/encounterType", payload)
 
         if not result.success:
             return result.format_error("create encounter type")

@@ -65,9 +65,7 @@ def register_user_tools(mcp: FastMCP) -> None:
             "settings": settings,
         }
 
-        result = await make_avni_request(
-            "POST", "/user", payload
-        )
+        result = await make_avni_request("POST", "/user", payload)
 
         if not result.success:
             return result.format_error("create admin user")
@@ -134,9 +132,7 @@ def register_user_tools(mcp: FastMCP) -> None:
             "settings": settings,
         }
 
-        result = await make_avni_request(
-            "POST", "/user", payload
-        )
+        result = await make_avni_request("POST", "/user", payload)
 
         if not result.success:
             return result.format_error("create user")
@@ -152,9 +148,7 @@ def register_user_tools(mcp: FastMCP) -> None:
         """
         payload = {"name": name}
 
-        result = await make_avni_request(
-            "POST", "/web/groups", payload
-        )
+        result = await make_avni_request("POST", "/web/groups", payload)
 
         if not result.success:
             return result.format_error("create user group")

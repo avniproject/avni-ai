@@ -5,15 +5,14 @@ from mcp.server.fastmcp import FastMCP
 from client import make_avni_request
 from utils import format_list_response, format_creation_response
 
+
 def register_location_tools(mcp: FastMCP) -> None:
     """Register location-related tools with the MCP server."""
 
     @mcp.tool()
     async def get_location_types() -> str:
         """Retrieve a list of location types for an organization to find IDs for creating locations or sub-location types."""
-        result = await make_avni_request(
-            "GET", "/addressLevelType"
-        )
+        result = await make_avni_request("GET", "/addressLevelType")
 
         if not result.success:
             return result.format_error("retrieve location types")
@@ -51,9 +50,7 @@ def register_location_tools(mcp: FastMCP) -> None:
         if parent_id is not None:
             payload["parentId"] = parent_id
 
-        result = await make_avni_request(
-            "POST", "/addressLevelType", payload
-        )
+        result = await make_avni_request("POST", "/addressLevelType", payload)
 
         if not result.success:
             return result.format_error("create location type")
@@ -77,9 +74,7 @@ def register_location_tools(mcp: FastMCP) -> None:
             {"name": name, "level": level, "type": location_type, "parents": parents}
         ]
 
-        result = await make_avni_request(
-            "POST", "/locations", payload
-        )
+        result = await make_avni_request("POST", "/locations", payload)
 
         if not result.success:
             return result.format_error("create location")
@@ -96,9 +91,7 @@ def register_location_tools(mcp: FastMCP) -> None:
         """
         payload = {"deleteFastSync": False, "name": name, "locationIds": location_ids}
 
-        result = await make_avni_request(
-            "POST", "/catchment", payload
-        )
+        result = await make_avni_request("POST", "/catchment", payload)
 
         if not result.success:
             return result.format_error("create catchment")

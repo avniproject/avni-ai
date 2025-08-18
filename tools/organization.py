@@ -26,9 +26,7 @@ def register_organization_tools(mcp: FastMCP) -> None:
             "statusId": 1,
         }
 
-        result = await make_avni_request(
-            "POST", "/organisation", payload
-        )
+        result = await make_avni_request("POST", "/organisation", payload)
 
         if not result.success:
             return result.format_error("create organization")

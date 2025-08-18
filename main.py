@@ -79,19 +79,15 @@ def create_server():
             # Parse request body
             body = await request.json()
             message = body.get("message", "")
-            
+
             if not message:
-                return JSONResponse(
-                    {"error": "Message is required"}, 
-                    status_code=400
-                )
+                return JSONResponse({"error": "Message is required"}, status_code=400)
 
             # Extract auth-token from request headers
             auth_token = request.headers.get("auth-token")
             if not auth_token:
                 return JSONResponse(
-                    {"error": "auth-token header is required"}, 
-                    status_code=401
+                    {"error": "auth-token header is required"}, status_code=401
                 )
 
             # Set the auth token in context for tools to use
@@ -100,8 +96,8 @@ def create_server():
             # Get MCP server URL from environment variable
             if not AVNI_MCP_SERVER_URL:
                 return JSONResponse(
-                    {"error": "AVNI_MCP_SERVER_URL environment variable not set"}, 
-                    status_code=500
+                    {"error": "AVNI_MCP_SERVER_URL environment variable not set"},
+                    status_code=500,
                 )
 
             # Call OpenAI Responses API with MCP integration
@@ -109,25 +105,18 @@ def create_server():
                 "type": "mcp",
                 "server_label": "Avni_MCP_Server",
                 "server_url": AVNI_MCP_SERVER_URL,
-                "require_approval": "never"
+                "require_approval": "never",
             }
-            
+
             response = openai_client.responses.create(
-                model="gpt-4o",
-                tools=[mcp_tool],
-                input=message
+                model="gpt-4o", tools=[mcp_tool], input=message
             )
 
-            return JSONResponse({
-                "response": response.output_text
-            })
+            return JSONResponse({"response": response.output_text})
 
         except Exception as e:
             logger.error(f"Chat endpoint error: {e}")
-            return JSONResponse(
-                {"error": "Internal server error"},
-                status_code=500
-            )
+            return JSONResponse({"error": "Internal server error"}, status_code=500)
 
     return mcp
 

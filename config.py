@@ -17,7 +17,7 @@ def get_headers() -> dict:
     auth_token = get_auth_token()
     if not auth_token:
         raise ValueError("No auth token found in context")
-    
+
     return {
         "auth-token": auth_token,
         "Accept": "application/json",
