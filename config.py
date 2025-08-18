@@ -19,7 +19,7 @@ def get_headers() -> dict:
         raise ValueError("No auth token found in context")
 
     return {
-        "auth-token": auth_token,
+        "AUTH-TOKEN": auth_token,
         "Accept": "application/json",
         "Content-Type": "application/json",
     }

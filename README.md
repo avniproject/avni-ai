@@ -76,6 +76,9 @@ uv run main.py
 ```
 
 ```bash
+# Run linting
+uv run ruff format .
+
 # Run tests
 uv run pytest
 
@@ -123,7 +126,7 @@ export PORT=8023
 
 ```bash
 # Check server logs
-tail -f /var/log/avni_mcp_server/server.log
+sudo journalctl -u avni-mcp-server -f
 
 # Development debugging
 uv run python main.py --log-level DEBUG
