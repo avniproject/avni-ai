@@ -60,7 +60,6 @@ def create_server():
     mcp = FastMCP(
         name="Avni_MCP_Server",
         instructions=server_instructions,
-        middleware=[create_cors_middleware()],
     )
 
     # Register all Avni tool modules
@@ -137,28 +136,39 @@ async def process_chat_request(request: Request) -> JSONResponse:
         return create_error_response("Internal server error", 500)
 
 
+# Verify OpenAI client is initialized
+if not openai_client:
+    logger.error(
+        "OpenAI API key not found. Please set OPENAI_API_KEY environment variable."
+    )
+    raise ValueError("OpenAI API key is required")
+
+logger.info("Initializing Avni MCP Server for production deployment...")
+
+# Create the MCP server
+mcp_server = create_server()
+
+# Create ASGI application with proper HTTP middleware
+app = mcp_server.http_app(middleware=[create_cors_middleware()])
+
+logger.info("ASGI application created successfully")
+logger.info("Deploy with: uvicorn main:app --host 0.0.0.0 --port 8023")
+
+
 def main():
-    """Main function to start the MCP server."""
-    # Verify OpenAI client is initialized
-    if not openai_client:
-        logger.error(
-            "OpenAI API key not found. Please set OPENAI_API_KEY environment variable."
-        )
-        raise ValueError("OpenAI API key is required")
-
-    logger.info("Initializing Avni MCP Server...")
-
-    # Create the MCP server
-    server = create_server()
-
-    # Configure and start the server
+    """Main function for direct execution (development mode)."""
     port = int(os.getenv("PORT", 8023))
     logger.info(f"Starting Avni MCP server on 0.0.0.0:{port}")
-    logger.info("Server will be accessible via SSE transport")
+    logger.info("Server will be accessible via HTTP transport")
 
     try:
-        # Use FastMCP's built-in run method with SSE transport
-        server.run(transport="sse", host="0.0.0.0", port=port)
+        # Use modern HTTP transport with proper CORS middleware
+        mcp_server.run(
+            transport="http",
+            host="0.0.0.0",
+            port=port,
+            middleware=[create_cors_middleware()],
+        )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
     except Exception as e:
