@@ -5,7 +5,7 @@ orbs:
   aws-cli: circleci/aws-cli@4.1.1
 
 commands:
-  deploy_ansible:
+  deploy_as_service:
     description: "Deployment of mvp server using ansible"
     parameters:
       env:
