@@ -159,7 +159,7 @@ jobs:
 
   staging_deploy:
     docker:
-      - image: cimg/python:3.13
+      - image: cimg/deploy:2025.01
     steps:
       - attach_workspace:
           at: /tmp/artifacts
