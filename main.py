@@ -60,6 +60,7 @@ def create_server():
     mcp = FastMCP(
         name="Avni_MCP_Server",
         instructions=server_instructions,
+        stateless_http=True
     )
 
     # Register all Avni tool modules
