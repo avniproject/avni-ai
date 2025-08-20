@@ -58,9 +58,7 @@ Important: All operations require the user to have provided their Avni API key w
 def create_server():
     """Create and configure the MCP server with Avni tools."""
     mcp = FastMCP(
-        name="Avni_MCP_Server",
-        instructions=server_instructions,
-        stateless_http=True
+        name="Avni_MCP_Server", instructions=server_instructions, stateless_http=True
     )
 
     # Register all Avni tool modules
