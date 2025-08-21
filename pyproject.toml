@@ -9,6 +9,7 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "openai>=1.99.9",
     "fastmcp>=2.11.3",
+    "sentence-transformers>=5.1.0",
 ]
 
 [dependency-groups]
