@@ -32,7 +32,8 @@ logger = logging.getLogger(__name__)
 
 # OpenAI configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-AVNI_MCP_SERVER_URL = os.getenv("AVNI_MCP_SERVER_URL")
+base_url = os.getenv("AVNI_MCP_SERVER_URL")
+AVNI_MCP_SERVER_URL = base_url + "/mcp"
 AVNI_BASE_URL = os.getenv("AVNI_BASE_URL")
 
 # Initialize OpenAI client
