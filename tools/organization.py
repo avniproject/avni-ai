@@ -9,7 +9,7 @@ def register_organization_tools(mcp: FastMCP) -> None:
     """Register organization-related tools with the MCP server."""
 
     @mcp.tool()
-    async def create_organization(name: str) -> str:
+    async def create_organization(auth_token: str, name: str) -> str:
         """Create a new organization in Avni with default settings, enabling data entry app setup.
 
         Args:
@@ -26,7 +26,7 @@ def register_organization_tools(mcp: FastMCP) -> None:
             "statusId": 1,
         }
 
-        result = await make_avni_request("POST", "/organisation", payload)
+        result = await make_avni_request("POST", "/organisation", auth_token, payload)
 
         if not result.success:
             return result.format_error("create organization")

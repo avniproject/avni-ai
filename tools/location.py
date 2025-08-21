@@ -10,9 +10,9 @@ def register_location_tools(mcp: FastMCP) -> None:
     """Register location-related tools with the MCP server."""
 
     @mcp.tool()
-    async def get_location_types() -> str:
+    async def get_location_types(auth_token: str) -> str:
         """Retrieve a list of location types for an organization to find IDs for creating locations or sub-location types."""
-        result = await make_avni_request("GET", "/addressLevelType")
+        result = await make_avni_request("GET", "/addressLevelType", auth_token)
 
         if not result.success:
             return result.format_error("retrieve location types")
@@ -23,9 +23,9 @@ def register_location_tools(mcp: FastMCP) -> None:
         return format_list_response(result.data, extra_key="level")
 
     @mcp.tool()
-    async def get_catchments() -> str:
+    async def get_catchments(auth_token: str) -> str:
         """Retrieve a list of catchments for an organization to find IDs for assigning users."""
-        result = await make_avni_request("GET", "/catchment")
+        result = await make_avni_request("GET", "/catchment", auth_token)
 
         if not result.success:
             return result.format_error("retrieve catchments")
@@ -37,7 +37,7 @@ def register_location_tools(mcp: FastMCP) -> None:
 
     @mcp.tool()
     async def create_location_type(
-        name: str, level: float, parent_id: Optional[int] = None
+        auth_token: str, name: str, level: float, parent_id: Optional[int] = None
     ) -> str:
         """Create a location type (e.g., State, District) for hierarchical location setup in Avni.
 
@@ -50,7 +50,9 @@ def register_location_tools(mcp: FastMCP) -> None:
         if parent_id is not None:
             payload["parentId"] = parent_id
 
-        result = await make_avni_request("POST", "/addressLevelType", payload)
+        result = await make_avni_request(
+            "POST", "/addressLevelType", auth_token, payload
+        )
 
         if not result.success:
             return result.format_error("create location type")
@@ -59,7 +61,11 @@ def register_location_tools(mcp: FastMCP) -> None:
 
     @mcp.tool()
     async def create_location(
-        name: str, level: int, location_type: str, parent_id: Optional[int] = None
+        auth_token: str,
+        name: str,
+        level: int,
+        location_type: str,
+        parent_id: Optional[int] = None,
     ) -> str:
         """Create a real location (e.g., Himachal Pradesh, Kullu) in Avni's location hierarchy.
 
@@ -74,7 +80,7 @@ def register_location_tools(mcp: FastMCP) -> None:
             {"name": name, "level": level, "type": location_type, "parents": parents}
         ]
 
-        result = await make_avni_request("POST", "/locations", payload)
+        result = await make_avni_request("POST", "/locations", auth_token, payload)
 
         if not result.success:
             return result.format_error("create location")
@@ -82,7 +88,9 @@ def register_location_tools(mcp: FastMCP) -> None:
         return format_creation_response("Location", name, "id", result.data)
 
     @mcp.tool()
-    async def create_catchment(name: str, location_ids: List[int]) -> str:
+    async def create_catchment(
+        auth_token: str, name: str, location_ids: List[int]
+    ) -> str:
         """Create a catchment grouping locations for data collection in Avni.
 
         Args:
@@ -91,7 +99,7 @@ def register_location_tools(mcp: FastMCP) -> None:
         """
         payload = {"deleteFastSync": False, "name": name, "locationIds": location_ids}
 
-        result = await make_avni_request("POST", "/catchment", payload)
+        result = await make_avni_request("POST", "/catchment", auth_token, payload)
 
         if not result.success:
             return result.format_error("create catchment")

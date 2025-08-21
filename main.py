@@ -15,7 +15,6 @@ from openai.types.responses.tool_param import Mcp
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from context import set_auth_token
 from utils import create_error_response, create_success_response, create_cors_middleware
 
 from tools.location import register_location_tools
@@ -114,9 +113,6 @@ async def process_chat_request(request: Request) -> JSONResponse:
                 "AVNI_MCP_SERVER_URL environment variable not set", 500
             )
 
-        # Set auth token in context for tools
-        set_auth_token(auth_token)
-
         # Configure and call OpenAI Responses API with MCP integration
         mcp_tool: Mcp = {
             "type": "mcp",
@@ -126,7 +122,10 @@ async def process_chat_request(request: Request) -> JSONResponse:
         }
 
         response = openai_client.responses.create(
-            model="gpt-4o", tools=[mcp_tool], input=message
+            model="gpt-4o",
+            tools=[mcp_tool],
+            input=message,
+            instructions=f"Use this auth token when calling MCP tools: {auth_token}",
         )
 
         return create_success_response({"response": response.output_text})

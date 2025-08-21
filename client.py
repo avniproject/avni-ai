@@ -5,14 +5,14 @@ from config import BASE_URL, get_headers
 from utils import ApiResult
 
 
-async def make_avni_request(method: str, endpoint: str, data: dict = None) -> ApiResult:
+async def make_avni_request(
+    method: str, endpoint: str, auth_token: str, data: dict = None
+) -> ApiResult:
     """Make a request to the Avni API with proper error handling."""
     url = f"{BASE_URL}{endpoint}"
 
-    try:
-        headers = get_headers()
-    except ValueError as e:
-        return ApiResult.error_result(str(e))
+    headers = get_headers()
+    headers["AUTH-TOKEN"] = auth_token
 
     async with httpx.AsyncClient() as client:
         try:

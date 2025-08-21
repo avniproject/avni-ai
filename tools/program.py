@@ -13,7 +13,10 @@ def register_program_tools(mcp: FastMCP) -> None:
 
     @mcp.tool()
     async def create_subject_type(
-        name: str, subject_type: str, location_type_uuid: Optional[str] = None
+        auth_token: str,
+        name: str,
+        subject_type: str,
+        location_type_uuid: Optional[str] = None,
     ) -> str:
         """Create a subject type (e.g., Person, Household) for data collection in Avni.
 
@@ -40,7 +43,9 @@ def register_program_tools(mcp: FastMCP) -> None:
             "locationTypeUUIDs": [location_type_uuid] if location_type_uuid else [],
         }
 
-        result = await make_avni_request("POST", "/web/subjectType", payload)
+        result = await make_avni_request(
+            "POST", "/web/subjectType", auth_token, payload
+        )
 
         if not result.success:
             return result.format_error("create subject type")
@@ -48,7 +53,7 @@ def register_program_tools(mcp: FastMCP) -> None:
         return format_creation_response("Subject type", name, "uuid", result.data)
 
     @mcp.tool()
-    async def create_program(name: str, subject_type_uuid: str) -> str:
+    async def create_program(auth_token: str, name: str, subject_type_uuid: str) -> str:
         """Create a program in Avni for managing data collection activities.
 
         Args:
@@ -69,7 +74,7 @@ def register_program_tools(mcp: FastMCP) -> None:
             "manualEnrolmentEligibilityCheckRule": "",
         }
 
-        result = await make_avni_request("POST", "/web/program", payload)
+        result = await make_avni_request("POST", "/web/program", auth_token, payload)
 
         if not result.success:
             return result.format_error("create program")
@@ -78,7 +83,7 @@ def register_program_tools(mcp: FastMCP) -> None:
 
     @mcp.tool()
     async def create_encounter_type(
-        name: str, subject_type_uuid: str, program_uuid: str
+        auth_token: str, name: str, subject_type_uuid: str, program_uuid: str
     ) -> str:
         """Create an encounter type for a program and subject type in Avni.
 
@@ -95,7 +100,9 @@ def register_program_tools(mcp: FastMCP) -> None:
             "programUuid": program_uuid,
         }
 
-        result = await make_avni_request("POST", "/web/encounterType", payload)
+        result = await make_avni_request(
+            "POST", "/web/encounterType", auth_token, payload
+        )
 
         if not result.success:
             return result.format_error("create encounter type")

@@ -10,9 +10,9 @@ def register_user_tools(mcp: FastMCP) -> None:
     """Register user-related tools with the MCP server."""
 
     @mcp.tool()
-    async def get_groups() -> str:
+    async def get_groups(auth_token: str) -> str:
         """Retrieve a list of user groups for an organization to find IDs for assigning users."""
-        result = await make_avni_request("GET", "/web/groups")
+        result = await make_avni_request("GET", "/web/groups", auth_token)
 
         if not result.success:
             return result.format_error("retrieve user groups")
@@ -24,6 +24,7 @@ def register_user_tools(mcp: FastMCP) -> None:
 
     @mcp.tool()
     async def create_a_user(
+        auth_token: str,
         org_name: str,
         first_name: str,
         email: str,
@@ -65,7 +66,7 @@ def register_user_tools(mcp: FastMCP) -> None:
             "settings": settings,
         }
 
-        result = await make_avni_request("POST", "/user", payload)
+        result = await make_avni_request("POST", "/user", auth_token, payload)
 
         if not result.success:
             return result.format_error("create admin user")
@@ -74,6 +75,7 @@ def register_user_tools(mcp: FastMCP) -> None:
 
     @mcp.tool()
     async def create_user(
+        auth_token: str,
         org_name: str,
         username: str,
         name: str,
@@ -132,7 +134,7 @@ def register_user_tools(mcp: FastMCP) -> None:
             "settings": settings,
         }
 
-        result = await make_avni_request("POST", "/user", payload)
+        result = await make_avni_request("POST", "/user", auth_token, payload)
 
         if not result.success:
             return result.format_error("create user")
@@ -140,7 +142,7 @@ def register_user_tools(mcp: FastMCP) -> None:
         return f"User '{username}' created successfully with ID {result.data.get('id')}"
 
     @mcp.tool()
-    async def create_user_group(name: str) -> str:
+    async def create_user_group(auth_token: str, name: str) -> str:
         """Create a user group in Avni for assigning roles to users.
 
         Args:
@@ -148,7 +150,7 @@ def register_user_tools(mcp: FastMCP) -> None:
         """
         payload = {"name": name}
 
-        result = await make_avni_request("POST", "/web/groups", payload)
+        result = await make_avni_request("POST", "/web/groups", auth_token, payload)
 
         if not result.success:
             return result.format_error("create user group")
