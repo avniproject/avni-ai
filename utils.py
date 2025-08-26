@@ -38,7 +38,7 @@ class ApiResult:
 
 
 def format_list_response(
-    items: List[Dict[str, Any]],
+    items,
     id_key: str = "id",
     name_key: str = "name",
     extra_key: Optional[str] = None,
@@ -46,23 +46,33 @@ def format_list_response(
     """Format a list of items into a readable string response.
 
     Args:
-        items: List of dictionary items
+        items: List of dictionary items or paginated response object
         id_key: Key for ID field
         name_key: Key for name field
         extra_key: Optional extra field to include
     """
+    # Handle paginated response - extract content array if it exists
+    if isinstance(items, dict) and "content" in items:
+        items = items["content"]
+
     if not items:
         return ""
 
     result = []
     for item in items:
-        line = f"ID: {item.get(id_key)}, Name: {item.get(name_key)}"
-        if extra_key and extra_key in item:
-            value = item.get(extra_key)
-            if isinstance(value, float):
-                line += f", {extra_key.title()}: {value:.1f}"
-            else:
-                line += f", {extra_key.title()}: {value}"
+        # Handle both string items and dictionary items
+        if isinstance(item, str):
+            # If item is a string, just return it as-is
+            line = item
+        else:
+            # If item is a dictionary, extract fields
+            line = f"ID: {item.get(id_key)}, Name: {item.get(name_key)}"
+            if extra_key and extra_key in item:
+                value = item.get(extra_key)
+                if isinstance(value, float):
+                    line += f", {extra_key.title()}: {value:.1f}"
+                else:
+                    line += f", {extra_key.title()}: {value}"
         result.append(line)
 
     return "\n".join(result)

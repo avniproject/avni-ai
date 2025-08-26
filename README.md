@@ -136,3 +136,10 @@ uv run python main.py --log-level DEBUG
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [FastMCP Documentation](https://gofastmcp.com/)
 - [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses)
+
+## Get tools list
+
+curl -X POST https://staging-mcp.avniproject.org/mcp \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}'
