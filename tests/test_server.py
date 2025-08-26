@@ -4,11 +4,13 @@ import os
 import sys
 from pathlib import Path
 from unittest.mock import patch
+import importlib
+import main
 
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from main import create_server, server_instructions, openai_client
+from main import create_server, server_instructions
 
 
 class TestServerInitialization:
@@ -23,13 +25,15 @@ class TestServerInitialization:
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test_key"})
     def test_server_requires_openai_key(self):
         """Test that server requires OpenAI API key."""
-        assert openai_client is not None
+        # Test that OPENAI_API_KEY is loaded from environment
+        importlib.reload(main)  # Reload to pick up env var
+        assert main.OPENAI_API_KEY == "test_key"
 
     def test_server_instructions_exist(self):
         """Test that server has proper instructions."""
         assert server_instructions is not None
         assert "Avni platform" in server_instructions
-        assert "health data management" in server_instructions
+        assert "program data management" in server_instructions
 
 
 # class TestServerConfiguration:

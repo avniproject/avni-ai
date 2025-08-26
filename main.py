@@ -66,7 +66,9 @@ def create_server():
 
     @mcp.custom_route("/health", methods=["GET"])
     async def health_check(request: Request):
-        """Health check endpoint for monitoring."""
+        """
+        Health check endpoint for monitoring.
+        """
         return JSONResponse({"status": "healthy", "service": "Avni MCP Server"})
 
     @mcp.custom_route("/chat", methods=["OPTIONS"])
