@@ -1,7 +1,7 @@
 """Utility functions for common operations."""
 
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from dataclasses import dataclass
 from starlette.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
