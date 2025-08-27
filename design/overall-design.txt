@@ -1,0 +1,39 @@
+                    ┌──────────────────────────┐
+User ──────────────►│  Orchestration Layer     │
+                    │  - Intent Detection      │
+                    │  - Bundle Matching       │
+                    │  - Route to Tier 1 / 2   │
+                    └───────────┬──────────────┘
+                                │
+                ┌───────────────┼────────────────┐
+                │                               │
+     ┌──────────▼─────────┐          ┌───────────▼─────────┐
+     │ Tier 1 (Fast LLM)  │          │ Tier 2 (Reasoning)  │
+     │ - FAQs, small talk │          │ - Config design     │
+     │ - Simple guidance  │          │ - Action proposals  │
+     └──────────┬─────────┘          └───────────┬─────────┘
+                │                               │
+                └─────────────┬─────────────────┘
+                              ▼
+                      ┌───────────────┐
+                      │ Response      │
+                      │ Generation    │
+                      └───────┬───────┘
+                              │
+                              ▼
+         ┌────────────────────────────────────────┐
+         │              Data Stores                │
+         │-----------------------------------------│
+         │ Conversation Logs: all queries & replies│
+         │ Session Memory: short-term context      │
+         │ Conversation Embeddings: long-term mem  │
+         │ Audit Logs: confirmed API changes       │
+         └────────────────────────────────────────┘
+                              │
+      ┌───────────────────────┼───────────────────────────┐
+      │                       │                           │
+      ▼                       ▼                           ▼
+Knowledge Base          Avni API Adapter            Bundle Library
+- Docs (RAG)            - Execute confirmed changes  - Prebuilt configs
+- FAQs                   - Return status             - Metadata for matching
+- Examples               - Write audit log           - Used before Tier 2
