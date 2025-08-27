@@ -10,6 +10,7 @@ dependencies = [
     "openai>=1.99.9",
     "fastmcp>=2.11.3",
     "sentence-transformers>=5.1.0",
+    "numpy>=1.24.0"
 ]
 
 [dependency-groups]

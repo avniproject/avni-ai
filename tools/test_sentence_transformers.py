@@ -124,3 +124,5 @@ def process_prompt_files():
 
 if __name__ == "__main__":
     process_prompt_files()
+# SUMMARY: 291/607 prompts matched correctly (47.9%)
+
