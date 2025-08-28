@@ -9,8 +9,8 @@ import importlib
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import main
-from main import create_server, server_instructions
+from src import main
+from src.main import create_server, server_instructions
 
 
 class TestServerInitialization:

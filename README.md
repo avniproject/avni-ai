@@ -32,7 +32,7 @@ brew install uv
 ```bash
 git clone https://github.com/avniproject/avni-mcp-server
 cd avni-mcp-server
-uv sync
+make deps
 ```
 
 ## ⚙️ Configuration
@@ -67,7 +67,7 @@ AVNI_MCP_SERVER_URL=https://staging-mcp.avniproject.org/sse
 
 ```bash
 # Run the server
-uv run main.py
+make start
 
 # Server will start on http://localhost:8023
 # MCP endpoint: http://localhost:8023/sse/
@@ -77,7 +77,7 @@ uv run main.py
 
 ```bash
 # Run linting
-uv run ruff format .
+make lint
 
 # Run tests
 uv run pytest
@@ -89,28 +89,6 @@ uv run pytest --cov=.
 uv run pytest tests/test_tools.py
 ```
 
-## 🛠️ Available Tools
-
-### Organization Tools
-- `create_organization` - Create new health organizations
-- `list_organizations` - List existing organizations
-- `get_organization` - Get organization details
-
-### User Tools  
-- `create_user` - Create new users
-- `create_user_group` - Create user groups
-- `list_users` - List existing users
-
-### Location Tools
-- `create_location` - Create geographic locations
-- `create_catchment` - Create catchment areas
-- `list_locations` - List existing locations
-
-### Program Tools
-- `create_program` - Create health programs
-- `create_subject_type` - Create subject types
-- `create_encounter_type` - Create encounter types
-
 ### Environment Variables Export
 
 Ensure your deployment exports these variables:
@@ -121,21 +99,6 @@ export AVNI_BASE_URL={{ avni_base_url }}
 export AVNI_MCP_SERVER_URL={{ avni_mcp_server_url }}
 export PORT=8023
 ```
-
-### Logs
-
-```bash
-# Check server logs
-sudo journalctl -u avni-mcp-server -f
-
-# Development debugging
-uv run python main.py --log-level DEBUG
-```
-
-## 🔗 Related Links
-- [Model Context Protocol](https://modelcontextprotocol.io/)
-- [FastMCP Documentation](https://gofastmcp.com/)
-- [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses)
 
 ## Get tools list
 

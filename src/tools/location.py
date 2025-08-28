@@ -1,9 +1,9 @@
 """Location management tools."""
 
 from typing import Optional, List
-from mcp.server.fastmcp import FastMCP
 from client import make_avni_request
 from utils import format_list_response, format_creation_response
+from fastmcp import FastMCP
 
 
 def register_location_tools(mcp: FastMCP) -> None:
