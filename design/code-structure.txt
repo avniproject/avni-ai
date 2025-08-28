@@ -1,0 +1,34 @@
+src/
+  orchestrator/          # Conversation + intent routing
+    ├── __init__.py
+    ├── orchestrator.py
+    └── state_manager.py   # Session state, summaries
+
+  retrieval/             # RAG: docs, embeddings, retrieval logic
+    ├── __init__.py
+    ├── rag_engine.py
+    └── index_builder.py
+
+  bundle_matcher/        # Matches user request → existing bundles
+    ├── __init__.py
+    └── matcher.py
+
+  avni_api/              # Avni API access
+    ├── __init__.py
+    ├── client.py         # REST client wrapper
+    ├── mcp_server.py     # (optional later)
+    └── schemas/          # JSON schemas
+
+  db/                    # Database access layer
+    ├── __init__.py
+    ├── models.py         # ORM / schema definitions
+    └── session.py        # DB session/connection utils
+
+  logging/                # Logging setup + structured logs
+    ├── __init__.py
+    └── logger.py
+
+  config/                 # Config management
+    └── settings.py
+
+tests/                   # Unit + integration tests

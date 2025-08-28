@@ -20,7 +20,13 @@ from tools.location import register_location_tools
 from tools.organization import register_organization_tools
 from tools.program import register_program_tools
 from tools.user import register_user_tools
+from tools.orchestrator import register_orchestrator_tools, RequestType
 from auth_provider import SimpleTokenVerifier
+
+# Import handlers for different request types
+from handlers.rag_handler import handle_rag_request
+from handlers.template_handler import handle_template_request
+from handlers.assistant_handler import handle_assistant_request
 
 load_dotenv()
 
@@ -50,8 +56,7 @@ Important: All operations require the user to have provided their Avni API key w
 
 
 def create_server():
-    """Create and configure the MCP server with Avni tools."""
-
+    """Create and configure the MCP server with Avni tools and orchestrator."""
     mcp = FastMCP(
         name="Avni_MCP_Server",
         instructions=server_instructions,
@@ -59,10 +64,21 @@ def create_server():
         auth=SimpleTokenVerifier(),
     )
 
-    register_organization_tools(mcp)
+    # Initialize the orchestrator with a fast LLM client
+    # TODO: Replace with actual fast LLM client (e.g., gpt-40-mini)
+    fast_llm_client = None
+    orchestrator = register_orchestrator_tools(mcp, fast_llm_client)
+    
+    # Register request handlers with the orchestrator
+    orchestrator.register_handler(RequestType.RAG, handle_rag_request)
+    orchestrator.register_handler(RequestType.TEMPLATE, handle_template_request)
+    orchestrator.register_handler(RequestType.ASSISTANT, handle_assistant_request)
+
+    # Register all tools
     register_location_tools(mcp)
-    register_user_tools(mcp)
+    register_organization_tools(mcp)
     register_program_tools(mcp)
+    register_user_tools(mcp)
 
     @mcp.custom_route("/health", methods=["GET"])
     async def health_check(request: Request):
