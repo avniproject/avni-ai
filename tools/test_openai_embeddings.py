@@ -16,48 +16,56 @@ def get_expected_app_name(prompt_filename: str) -> str:
     e.g., 'cini_prompts.json' -> 'cini'"""
     return prompt_filename.replace('_prompts.json', '')
 
-def load_app_descriptions() -> Dict[str, str]:
-    """Load app description files from the apps directory."""
-    app_files = {
-        "teach": script_dir / "apps" / "teach.md",
-        "phulwari": script_dir / "apps" / "phulwari.md",
-        "cini": script_dir / "apps" / "cini.md",
-        "sickle_cell": script_dir / "apps" / "sickle_cell_screening.md",
-        "gst": script_dir / "apps" / "gst.md",
-        "waste_management": script_dir / "apps" / "waste_management.md",
-        "social_security": script_dir / "apps" / "social_security.md",
-        "waterbody": script_dir / "apps" / "waterbody_desilting.md"
-    }
-    
-    # Load app texts with error handling
-    app_texts = {}
-    for name, path in app_files.items():
-        try:
-            app_texts[name] = path.resolve().read_text(encoding='utf-8')
-        except FileNotFoundError:
-            print(f"Warning: Could not find {path}")
-    
-    if not app_texts:
-        raise FileNotFoundError("No app description files found. Please ensure the files exist in the apps/ directory.")
-    
-    return app_texts
 
-def get_openai_embeddings(texts: List[str], model: str = "text-embedding-3-small") -> np.ndarray:
+"""Load app description files from the apps directory."""
+app_files = {
+    "teach": script_dir / "apps" / "teach.md",
+    "phulwari": script_dir / "apps" / "phulwari.md",
+    "cini": script_dir / "apps" / "cini.md",
+    "sickle_cell": script_dir / "apps" / "sickle_cell_screening.md",
+    "gst": script_dir / "apps" / "gst.md",
+    "waste_management": script_dir / "apps" / "waste_management.md",
+    "social_security": script_dir / "apps" / "social_security.md",
+    "waterbody": script_dir / "apps" / "waterbody_desilting.md"
+}
+
+# Load app texts with error handling
+app_texts = {}
+for name, path in app_files.items():
+    try:
+        app_texts[name] = path.resolve().read_text(encoding='utf-8')
+    except FileNotFoundError:
+        print(f"Warning: Could not find {path}")
+
+if not app_texts:
+    raise FileNotFoundError("No app description files found. Please ensure the files exist in the apps/ directory.")
+    
+batch_size = 5
+all_embeddings = []
+
+app_descriptions = list(app_texts.values())
+batch_size = 5
+all_embeddings = []
+
+for i in range(0, len(app_descriptions), batch_size):
+    batch = app_descriptions[i:i + batch_size]
+    response = openai_client.embeddings.create(
+        input=batch,
+        model="text-embedding-3-small"
+    )
+    batch_embeddings = [data.embedding for data in response.data]
+    all_embeddings.extend(batch_embeddings)
+    
+
+def get_openai_embeddings(text: str, model: str = "text-embedding-3-small") -> np.ndarray:
     """Get embeddings for a list of texts using OpenAI's API."""
     # Batch process if more than 5 texts
-    batch_size = 5
-    all_embeddings = []
-    
-    for i in range(0, len(texts), batch_size):
-        batch = texts[i:i + batch_size]
-        response = openai_client.embeddings.create(
-            input=batch,
-            model=model
-        )
-        batch_embeddings = [data.embedding for data in response.data]
-        all_embeddings.extend(batch_embeddings)
-    
-    return np.array(all_embeddings)
+    response = openai_client.embeddings.create(
+        input=text,
+        model=model
+    )
+    batch_embeddings = response.data[0].embedding
+    return batch_embeddings
 
 def match_prompt_to_app(prompt: str, app_descriptions: Dict[str, str], threshold: float = 0.5) -> Tuple[str, float]:
     """
@@ -71,17 +79,10 @@ def match_prompt_to_app(prompt: str, app_descriptions: Dict[str, str], threshold
     Returns:
         A tuple of (best_match_app, best_score) or ("none", best_score) if below threshold
     """
-    # Combine prompt with all app descriptions
-    texts = [prompt] + list(app_descriptions.values())
-    
-    try:
-        # Get embeddings for all texts
-        embeddings = get_openai_embeddings(texts)
-        
+    try: 
         # Calculate cosine similarities
-        prompt_emb = embeddings[0]
-        app_embs = embeddings[1:]
-        
+        prompt_emb = get_openai_embeddings(prompt)
+        app_embs = all_embeddings
         # Calculate cosine similarity
         similarities = {}
         for (app_name, _), app_emb in zip(app_descriptions.items(), app_embs):
@@ -102,9 +103,6 @@ def match_prompt_to_app(prompt: str, app_descriptions: Dict[str, str], threshold
 
 def process_prompt_files() -> List[dict]:
     """Process prompt files using OpenAI's text-embedding-3-small model."""
-    # Load app descriptions
-    app_texts = load_app_descriptions()
-    
     # Find all prompt JSON files
     prompt_files = list((script_dir / "apps").glob("*_prompts.json"))
     if not prompt_files:
@@ -173,3 +171,6 @@ def process_prompt_files() -> List[dict]:
 if __name__ == "__main__":
     print("\n" + "="*50 + "\nRunning tests with OpenAI Embeddings\n" + "="*50)
     process_prompt_files()
+# 241/607 prompts matched correctly (39.7%)
+# After removing generic prompts:
+# 231/570 prompts matched correctly (40.5%)
