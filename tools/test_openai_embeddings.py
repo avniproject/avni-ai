@@ -67,7 +67,7 @@ def get_openai_embeddings(text: str, model: str = "text-embedding-3-small") -> n
     batch_embeddings = response.data[0].embedding
     return batch_embeddings
 
-def match_prompt_to_app(prompt: str, app_descriptions: Dict[str, str], threshold: float = 0.5) -> Tuple[str, float]:
+def match_prompt_to_app(prompt: str, app_descriptions: Dict[str, str], threshold: float = 0.3) -> Tuple[str, float]:
     """
     Match a prompt to the most similar app using OpenAI's embeddings.
     
@@ -174,3 +174,5 @@ if __name__ == "__main__":
 # 241/607 prompts matched correctly (39.7%)
 # After removing generic prompts:
 # 231/570 prompts matched correctly (40.5%)
+# 30% threshold:
+# 320/570 prompts matched correctly (56.1%)

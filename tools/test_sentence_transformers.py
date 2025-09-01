@@ -8,7 +8,7 @@ from collections import defaultdict
 script_dir = Path(__file__).parent
 
 # Load embedding model
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("all-MpNet-base-v2")
 
 # Define app files relative to the tools/apps directory
 app_files = {
@@ -37,7 +37,7 @@ if not app_texts:
 # Precompute embeddings for app descriptions
 app_embeddings = {name: model.encode(text, convert_to_tensor=True) for name, text in app_texts.items()}
 
-def match_prompt_to_app(prompt, threshold=0.4):
+def match_prompt_to_app(prompt, threshold=0.3):
     # Encode the prompt
     prompt_emb = model.encode(prompt, convert_to_tensor=True)
 
@@ -48,7 +48,7 @@ def match_prompt_to_app(prompt, threshold=0.4):
     best_app, best_score = max(scores.items(), key=lambda x: x[1])
 
     if best_score < threshold:
-        return "none", best_score
+        return "unmatched", best_score
     return best_app, best_score
 
 def get_expected_app_name(prompt_filename):
@@ -124,5 +124,11 @@ def process_prompt_files():
 
 if __name__ == "__main__":
     process_prompt_files()
-# SUMMARY: 291/607 prompts matched correctly (47.9%)
+# After removing generic prompts-40% threshold:
+# SUMMARY: 327/564 prompts matched correctly (58.0%)
+# 30% threshold:
+# 330/564 prompts matched correctly (58.5%)
+# mpnet-base-v2:
+#SUMMARY: 323/564 prompts matched correctly (57.3%)
+
 
