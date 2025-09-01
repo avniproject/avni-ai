@@ -39,7 +39,7 @@ def classify_prompt(prompt: str, categories: Dict[str, str]) -> str:
         
         Prompt to classify: {prompt}
         
-        Respond with ONLY the category name from the list above."""
+        Respond with ONLY the category name that matches the prompt from the list above. If no good match is found, respond with 'unmatched'."""
         
         # Call the OpenAI API
         response = client.chat.completions.create(

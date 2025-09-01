@@ -1,0 +1,230 @@
+Processing unmatched_prompts.json (expected: unmatched)
+number of prompts 100
+  Classifying prompt 16/100...
+❌ Mismatch in unmatched_prompts.json prompt 16
+   Expected: unmatched
+   Got:      social_security
+   Prompt:   Want solution for tracking employment under MGNREGA.
+--------------------------------------------------------------------------------
+  Classifying prompt 17/100...
+❌ Mismatch in unmatched_prompts.json prompt 17
+   Expected: unmatched
+   Got:      teach
+   Prompt:   Need app for skill development training attendance.
+--------------------------------------------------------------------------------
+  Classifying prompt 24/100...
+❌ Mismatch in unmatched_prompts.json prompt 24
+   Expected: unmatched
+   Got:      teach
+   Prompt:   Looking for app to track vocational training centres.
+--------------------------------------------------------------------------------
+  Classifying prompt 29/100...
+❌ Mismatch in unmatched_prompts.json prompt 29
+   Expected: unmatched
+   Got:      social_security
+   Prompt:   Need solution for registering households for LPG subsidies.
+--------------------------------------------------------------------------------
+  Classifying prompt 57/100...
+❌ Mismatch in unmatched_prompts.json prompt 57
+   Expected: unmatched
+   Got:      social_security
+   Prompt:   Looking for solution to track landless labourers’ entitlements.
+--------------------------------------------------------------------------------
+  Classifying prompt 58/100...
+❌ Mismatch in unmatched_prompts.json prompt 58
+   Expected: unmatched
+   Got:      social_security
+   Prompt:   Want system to digitise flood relief distribution.
+--------------------------------------------------------------------------------
+  Classifying prompt 61/100...
+❌ Mismatch in unmatched_prompts.json prompt 61
+   Expected: unmatched
+   Got:      social_security
+   Prompt:   Want app for cattle insurance enrolments.
+--------------------------------------------------------------------------------
+  Classifying prompt 67/100...
+❌ Mismatch in unmatched_prompts.json prompt 67
+   Expected: unmatched
+   Got:      teach
+   Prompt:   Want app for digitising skill certification tests.
+--------------------------------------------------------------------------------
+  Classifying prompt 68/100...
+❌ Mismatch in unmatched_prompts.json prompt 68
+   Expected: unmatched
+   Got:      teach
+   Prompt:   Need mobile tool to monitor digital literacy centres.
+--------------------------------------------------------------------------------
+  Classifying prompt 78/100...
+❌ Mismatch in unmatched_prompts.json prompt 78
+   Expected: unmatched
+   Got:      social_security
+   Prompt:   Looking for app to track village health insurance claims.
+--------------------------------------------------------------------------------
+  Classifying prompt 86/100...
+❌ Mismatch in unmatched_prompts.json prompt 86
+   Expected: unmatched
+   Got:      social_security
+   Prompt:   Need system for rural transport subsidies.
+--------------------------------------------------------------------------------
+  Classifying prompt 100/100...
+❌ Mismatch in unmatched_prompts.json prompt 100
+   Expected: unmatched
+   Got:      teach
+   Prompt:   Want mobile app for farmer training sessions.
+--------------------------------------------------------------------------------
+  88/100 correct (88.0%)
+
+Processing teach_prompts.json (expected: teach)
+number of prompts 96
+  Classifying prompt 14/96...
+❌ Mismatch in teach_prompts.json prompt 14
+   Expected: teach
+   Got:      unmatched
+   Prompt:   Looking for app to log observations in English and Telugu.
+--------------------------------------------------------------------------------
+  Classifying prompt 47/96...
+❌ Mismatch in teach_prompts.json prompt 47
+   Expected: teach
+   Got:      unmatched
+   Prompt:   Looking for app that supports multiple observers.
+--------------------------------------------------------------------------------
+    Classifying prompt 72/96...
+❌ Mismatch in teach_prompts.json prompt 72
+   Expected: teach
+   Got:      unmatched
+   Prompt:   Want system that supports bilingual observation entry.
+--------------------------------------------------------------------------------
+  Classifying prompt 74/96...
+❌ Mismatch in teach_prompts.json prompt 74
+   Expected: teach
+   Got:      unmatched
+   Prompt:   Looking for app to analyse observation trends.
+--------------------------------------------------------------------------------
+  92/96 correct (95.8%)/96...
+
+Processing gst_prompts.json (expected: gst)
+number of prompts 81
+  Classifying prompt 55/81...
+❌ Mismatch in gst_prompts.json prompt 55
+   Expected: gst
+   Got:      unmatched
+   Prompt:   Need app to record physical activity levels.
+--------------------------------------------------------------------------------
+  Classifying prompt 61/81...
+❌ Mismatch in gst_prompts.json prompt 61
+   Expected: gst
+   Got:      unmatched
+   Prompt:   Want mobile app for frontline health workers to use.
+--------------------------------------------------------------------------------
+  79/81 correct (97.5%)/81...
+
+Processing social_security_prompts.json (expected: social_security)
+number of prompts 91
+  Classifying prompt 6/91...
+❌ Mismatch in social_security_prompts.json prompt 6
+   Expected: social_security
+   Got:      teach
+   Prompt:   Looking for app to digitise RTE admissions process.
+--------------------------------------------------------------------------------
+  Classifying prompt 15/91...
+❌ Mismatch in social_security_prompts.json prompt 15
+   Expected: social_security
+   Got:      unmatched
+   Prompt:   Looking for system that checks eligibility by age and gender.
+--------------------------------------------------------------------------------
+  Classifying prompt 19/91...
+❌ Mismatch in social_security_prompts.json prompt 19
+   Expected: social_security
+   Got:      unmatched
+   Prompt:   Need app to support free silai machine distribution.
+--------------------------------------------------------------------------------
+  Classifying prompt 36/91...
+❌ Mismatch in social_security_prompts.json prompt 36
+   Expected: social_security
+   Got:      teach
+   Prompt:   Need mobile solution for RTE facilitation in Haryana.
+--------------------------------------------------------------------------------
+  Classifying prompt 40/91...
+❌ Mismatch in social_security_prompts.json prompt 40
+   Expected: social_security
+   Got:      unmatched
+   Prompt:   Looking for system that tracks whether applications are approved.
+--------------------------------------------------------------------------------
+  Classifying prompt 78/91...
+❌ Mismatch in social_security_prompts.json prompt 78
+   Expected: social_security
+   Got:      unmatched
+   Prompt:   Looking for app that alerts on pending applications.
+--------------------------------------------------------------------------------
+  85/91 correct (93.4%)/91...
+
+Processing phulwari_prompts.json (expected: phulwari)
+number of prompts 74
+  Classifying prompt 17/74...
+❌ Mismatch in phulwari_prompts.json prompt 17
+   Expected: phulwari
+   Got:      unmatched
+   Prompt:   App should allow workers to capture photos of activities.
+--------------------------------------------------------------------------------
+  Classifying prompt 44/74...
+❌ Mismatch in phulwari_prompts.json prompt 44
+   Expected: phulwari
+   Got:      teach
+   Prompt:   Need app to log educational activities like stories and songs.
+--------------------------------------------------------------------------------
+  Classifying prompt 49/74...
+❌ Mismatch in phulwari_prompts.json prompt 49
+   Expected: phulwari
+   Got:      teach
+   Prompt:   Looking for tool that tracks special needs children separately.
+--------------------------------------------------------------------------------
+  Classifying prompt 56/74...
+❌ Mismatch in phulwari_prompts.json prompt 56
+   Expected: phulwari
+   Got:      teach
+   Prompt:   Need solution for tracking outreach activities to parents.
+--------------------------------------------------------------------------------
+  Classifying prompt 58/74...
+❌ Mismatch in phulwari_prompts.json prompt 58
+   Expected: phulwari
+   Got:      unmatched
+   Prompt:   Need app that tracks daily milk distribution.
+--------------------------------------------------------------------------------
+  69/74 correct (93.2%)/74...
+
+Processing sickle_cell_screening_prompts.json (expected: sickle_cell_screening)
+number of prompts 57
+  Classifying prompt 26/57...
+❌ Mismatch in sickle_cell_screening_prompts.json prompt 26
+   Expected: sickle_cell_screening
+   Got:      teach
+   Prompt:   Looking for solution to capture screening in schools.
+--------------------------------------------------------------------------------
+  Classifying prompt 27/57...
+❌ Mismatch in sickle_cell_screening_prompts.json prompt 27
+   Expected: sickle_cell_screening
+   Got:      teach
+   Prompt:   Want app to record results from solubility test.
+--------------------------------------------------------------------------------
+  Classifying prompt 31/57...
+❌ Mismatch in sickle_cell_screening_prompts.json prompt 31
+   Expected: sickle_cell_screening
+   Got:      unmatched
+   Prompt:   Looking for system that generates district-level prevalence maps.
+--------------------------------------------------------------------------------
+  Classifying prompt 33/57...
+❌ Mismatch in sickle_cell_screening_prompts.json prompt 33
+   Expected: sickle_cell_screening
+   Got:      unmatched
+   Prompt:   Want system that records lab reports and uploads photos.
+--------------------------------------------------------------------------------
+  Classifying prompt 46/57...
+❌ Mismatch in sickle_cell_screening_prompts.json prompt 46
+   Expected: sickle_cell_screening
+   Got:      phulwari
+   Prompt:   Want app to track children put on prophylaxis.
+--------------------------------------------------------------------------------
+  52/57 correct (91.2%)/57...
+
+==================================================
+FINAL RESULTS: 465/499 correct (93.2%)
