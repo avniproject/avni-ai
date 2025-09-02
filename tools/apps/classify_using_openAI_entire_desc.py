@@ -145,4 +145,4 @@ if __name__ == "__main__":
     process_prompt_files()
 
 ### Tested for GST and Phulwari apps
-### only around 50%
+### only around 50% - returned wrongly even for prompt that stated 'app for recording sugar levels'
