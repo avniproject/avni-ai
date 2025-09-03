@@ -6,13 +6,13 @@ from utils import ApiResult
 
 
 async def make_avni_request(
-    method: str, endpoint: str, auth_token: str, data: dict = None
+    method: str, endpoint: str, auth_token: str, data: dict = None, files: dict = None
 ) -> ApiResult:
     """Make a request to the Avni API with proper error handling."""
     url = f"{BASE_URL}{endpoint}"
 
     headers = get_headers()
-    headers["AUTH-TOKEN"] = auth_token
+    headers["USER-NAME"] = auth_token   
 
     async with httpx.AsyncClient() as client:
         try:
@@ -20,7 +20,7 @@ async def make_avni_request(
                 response = await client.get(url, headers=headers, timeout=30.0)
             elif method.upper() == "POST":
                 response = await client.post(
-                    url, headers=headers, json=data, timeout=30.0
+                    url, headers=headers, json=data, files=files, timeout=30.0
                 )
             else:
                 return ApiResult.error_result("Unsupported HTTP method")

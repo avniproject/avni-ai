@@ -17,7 +17,7 @@ from openai_client import create_openai_client
 from utils import create_error_response, create_success_response, create_cors_middleware
 
 from tools.location import register_location_tools
-from tools.organization import register_organization_tools
+from tools.identify_bundle import register_organization_tools
 from tools.program import register_program_tools
 from tools.user import register_user_tools
 from auth_provider import SimpleTokenVerifier
@@ -91,17 +91,19 @@ async def process_chat_request(request: Request) -> JSONResponse:
         body = await request.json()
         message = body.get("message")
 
+        
         if not message:
             return create_error_response("Message is required", 400)
 
-        auth_token = request.headers.get("AUTH-TOKEN")
-        if not auth_token:
-            return create_error_response("AUTH-TOKEN header is required", 401)
-
-        if not AVNI_MCP_SERVER_URL:
-            return create_error_response(
-                "AVNI_MCP_SERVER_URL environment variable not set", 500
-            )
+        auth_token = 'maha@sample'
+    
+        # if not auth_token:
+        #     return create_error_response("AUTH-TOKEN header is required", 401)
+        AVNI_MCP_SERVER_URL = "http://localhost:8023"
+        # if not AVNI_MCP_SERVER_URL:
+        #     return create_error_response(
+        #         "AVNI_MCP_SERVER_URL environment variable not set", 500
+        #     )
 
         openai_client = create_openai_client(OPENAI_API_KEY, timeout=180.0)
         async with openai_client as client:

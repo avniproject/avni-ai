@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuration from environment variables
-BASE_URL = os.getenv("AVNI_BASE_URL")
+BASE_URL = "http://localhost:6010"
 
 
 def get_headers() -> dict:
