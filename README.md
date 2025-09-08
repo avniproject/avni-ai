@@ -1,5 +1,8 @@
 # Avni AI
 
+**TODO** Move all MCP-Server code within a sub-folder of this repo.
+
+
 ## Avni MCP Server
 
 A Model Context Protocol (MCP) server that provides AI assistants with programmatic access to the Avni platform. This server enables LLMs like OpenAI GPT-4 to interact with Avni's system through standardized tool calling.
