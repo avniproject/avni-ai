@@ -1,0 +1,106 @@
+"""
+Main testing system that orchestrates the entire testing process.
+"""
+
+import datetime
+from typing import List
+from models import ConversationResult
+from prompts import SCENARIO_NAMES
+from ai_agents import AITester, DifyAssistant
+from ai_reviewer import AIReviewer
+from analytics import StatisticsCalculator, ReportGenerator
+
+
+class TestingSystem:
+    """Enhanced testing system with AI reviewer and comprehensive analytics"""
+
+    def __init__(self, dify_api_key: str):
+        self.tester = AITester()
+        self.assistant = DifyAssistant(dify_api_key)
+        self.reviewer = AIReviewer()
+        self.results: List[ConversationResult] = []
+        self.scenarios = SCENARIO_NAMES
+
+    def run_single_conversation(
+        self, scenario_index: int, cycle: int
+    ) -> ConversationResult:
+        """Run a single conversation and get it reviewed"""
+        # Reset the assistant's conversation for each new test
+        self.assistant.reset_conversation()
+
+        chat_history = []
+        scenario = self.scenarios[scenario_index]
+
+        print(f"  Testing {scenario} (Cycle {cycle})")
+
+        # Initial tester message
+        next_message = self.tester.generate_message([], scenario_index)
+
+        # Run 8 iterations of a conversation
+        for iteration in range(8):
+            print(f"    Iteration {iteration + 1}/8")
+
+            # Get assistant response via Dify
+            ai_response = self.assistant.generate_response(next_message)
+
+            # Record this exchange in our local history for the reviewer
+            chat_history.append({"role": "user", "content": next_message})
+            chat_history.append({"role": "assistant", "content": ai_response})
+
+            if iteration < 7:
+                # Generate next tester message - flip roles for tester's perspective
+                # From tester's view: assistant messages are "user" inputs, tester messages are "assistant" responses
+                tester_history = []
+                for msg in chat_history:
+                    if msg["role"] == "user":  # Tester's previous message
+                        tester_history.append(
+                            {"role": "assistant", "content": msg["content"]}
+                        )
+                    elif (
+                        msg["role"] == "assistant"
+                    ):  # Dify's response becomes input to tester
+                        tester_history.append(
+                            {"role": "user", "content": msg["content"]}
+                        )
+
+                next_message = self.tester.generate_message(
+                    tester_history, scenario_index
+                )
+
+        # Get AI reviewer analysis
+        print(f"    Analyzing conversation...")
+        analysis = self.reviewer.analyze_conversation(chat_history, scenario)
+
+        return ConversationResult(
+            cycle=cycle,
+            scenario=scenario,
+            scenario_index=scenario_index,
+            conversation=chat_history,
+            reviewer_analysis=analysis,
+            timestamp=datetime.datetime.now().isoformat(),
+        )
+
+    def run_full_test_cycles(self, num_cycles: int = 5) -> None:
+        """Run full test cycles across all scenarios"""
+        print(
+            f"Starting {num_cycles} test cycles across {len(self.scenarios)} scenarios"
+        )
+        print(f"Total conversations: {num_cycles * len(self.scenarios)}")
+
+        for cycle in range(1, num_cycles + 1):
+            print(f"\n CYCLE {cycle}/{num_cycles}")
+
+            for scenario_index in range(len(self.scenarios)):
+                result = self.run_single_conversation(scenario_index, cycle)
+                self.results.append(result)
+
+        print(f"\n Completed all {num_cycles} cycles!")
+
+    def generate_and_print_report(self) -> None:
+        """Calculate statistics and print comprehensive report"""
+        print("\n Calculating comprehensive statistics...")
+        statistics = StatisticsCalculator.calculate_statistics(self.results)
+
+        print("\n COMPREHENSIVE TEST REPORT")
+        report = ReportGenerator.generate_report(statistics, self.results)
+        print(report)
