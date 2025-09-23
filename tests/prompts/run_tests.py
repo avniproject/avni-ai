@@ -28,7 +28,7 @@ def main():
     testing_system = TestingSystem(dify_api_key)
 
     # Run test cycles
-    testing_system.run_full_test_cycles(num_cycles=2)
+    testing_system.run_full_test_cycles(num_cycles=5)
 
     # Generate and print comprehensive report
     testing_system.generate_and_print_report()
