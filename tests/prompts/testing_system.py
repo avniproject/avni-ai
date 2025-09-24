@@ -68,7 +68,7 @@ class TestingSystem:
                 )
 
         # Get AI reviewer analysis
-        print(f"    Analyzing conversation...")
+        print("    Analyzing conversation...")
         analysis = self.reviewer.analyze_conversation(chat_history, scenario)
 
         return ConversationResult(
