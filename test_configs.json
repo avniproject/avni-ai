@@ -1,0 +1,235 @@
+{
+  "comprehensive_test_config": {
+    "description": "Complete Avni configuration matching your original prompt",
+    "addressLevelTypes": [
+      {
+        "name": "State",
+        "level": 1.0,
+        "voided": false
+      },
+      {
+        "name": "District",
+        "level": 2.0,
+        "voided": false
+      },
+      {
+        "name": "Block",
+        "level": 3.0,
+        "voided": false
+      }
+    ],
+    "locations": [
+      {
+        "name": "Karnataka",
+        "level": 1.0,
+        "type": "State",
+        "voided": false
+      },
+      {
+        "name": "Maharashtra",
+        "level": 1.0,
+        "type": "State",
+        "voided": false
+      },
+      {
+        "name": "Odisha",
+        "level": 1.0,
+        "type": "State",
+        "voided": false
+      },
+      {
+        "name": "Bengaluru",
+        "level": 2.0,
+        "type": "District",
+        "parent_location": "Karnataka",
+        "voided": false
+      },
+      {
+        "name": "Mysore",
+        "level": 2.0,
+        "type": "District",
+        "parent_location": "Karnataka",
+        "voided": false
+      },
+      {
+        "name": "Mumbai",
+        "level": 2.0,
+        "type": "District",
+        "parent_location": "Maharashtra",
+        "voided": false
+      },
+      {
+        "name": "Pune",
+        "level": 2.0,
+        "type": "District",
+        "parent_location": "Maharashtra",
+        "voided": false
+      },
+      {
+        "name": "Bhubaneswar",
+        "level": 2.0,
+        "type": "District",
+        "parent_location": "Odisha",
+        "voided": false
+      },
+      {
+        "name": "Khordha",
+        "level": 3.0,
+        "type": "Block",
+        "parent_location": "Bhubaneswar",
+        "voided": false
+      }
+    ],
+    "subjectTypes": [
+      {
+        "name": "Person",
+        "type": "Person",
+        "group": false,
+        "household": false,
+        "active": true,
+        "description": "For tracking individuals"
+      },
+      {
+        "name": "Household",
+        "type": "PersonGroup",
+        "group": true,
+        "household": true,
+        "active": true,
+        "description": "For tracking family units"
+      },
+      {
+        "name": "Health Worker",
+        "type": "User",
+        "group": false,
+        "household": false,
+        "active": true,
+        "description": "For tracking field staff"
+      }
+    ],
+    "programs": [
+      {
+        "name": "Maternal Health Program",
+        "colour": "#FF6B6B",
+        "subject_type": "Person",
+        "active": true,
+        "showGrowthChart": true,
+        "allowMultipleEnrolments": false,
+        "description": "Structured maternal health interventions"
+      },
+      {
+        "name": "Nutrition Program",
+        "colour": "#4ECDC4",
+        "subject_type": "Person",
+        "active": true,
+        "showGrowthChart": true,
+        "allowMultipleEnrolments": false,
+        "description": "Nutrition monitoring and counseling"
+      },
+      {
+        "name": "Community Health Program",
+        "colour": "#45B7D1",
+        "subject_type": "Household",
+        "active": true,
+        "showGrowthChart": false,
+        "allowMultipleEnrolments": true,
+        "description": "Community-level health interventions"
+      }
+    ],
+    "encounterTypes": [
+      {
+        "name": "General Health Checkup",
+        "subject_type": "Person",
+        "program": null,
+        "active": true,
+        "isImmutable": false,
+        "description": "General health assessment not tied to any program"
+      },
+      {
+        "name": "Home Visit",
+        "subject_type": "Household",
+        "program": null,
+        "active": true,
+        "isImmutable": false,
+        "description": "Household-level visits and assessments"
+      },
+      {
+        "name": "Antenatal Care Visit",
+        "subject_type": "Person",
+        "program": "Maternal Health Program",
+        "active": true,
+        "isImmutable": false,
+        "description": "Antenatal care within maternal health program"
+      },
+      {
+        "name": "Nutrition Counseling",
+        "subject_type": "Person",
+        "program": "Nutrition Program",
+        "active": true,
+        "isImmutable": false,
+        "description": "Nutrition counseling sessions"
+      }
+    ]
+  },
+  "simple_test_config": {
+    "description": "Simple test configuration for basic validation",
+    "addressLevelTypes": [
+      {
+        "name": "State",
+        "level": 1.0,
+        "voided": false
+      },
+      {
+        "name": "District",
+        "level": 2.0,
+        "voided": false
+      }
+    ],
+    "locations": [
+      {
+        "name": "Karnataka",
+        "level": 1.0,
+        "type": "State",
+        "voided": false
+      },
+      {
+        "name": "Bengaluru",
+        "level": 2.0,
+        "type": "District",
+        "parent_location": "Karnataka",
+        "voided": false
+      }
+    ],
+    "subjectTypes": [],
+    "programs": [],
+    "encounterTypes": []
+  },
+  "edge_case_config": {
+    "description": "Edge cases and data validation tests",
+    "addressLevelTypes": [
+      {
+        "name": "Custom Region",
+        "level": 1.0,
+        "voided": "false"
+      }
+    ],
+    "locations": [
+      {
+        "name": "Test Location",
+        "level": 1.0,
+        "type": "Custom Region",
+        "voided": "false",
+        "gpsCoordinates": {
+          "x": 77.5946,
+          "y": 12.9716
+        },
+        "locationProperties": {
+          "population": 8500000,
+          "area": "741 sq km"
+        }
+      }
+    ],
+    "subjectTypes": [],
+    "programs": [],
+    "encounterTypes": []
+  }
+}

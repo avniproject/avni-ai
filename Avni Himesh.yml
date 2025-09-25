@@ -1,0 +1,2065 @@
+app:
+  description: Avni AI Assistant
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: Avni Himesh
+  use_icon_as_answer_icon: true
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.6@e2665624a156f52160927bceac9e169bd7e5ae6b936ae82575e14c90af390e6e
+    version: null
+kind: app
+version: 0.4.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: Hello! How can I help you?
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1757492907627-source-1757493270484-target
+      selected: false
+      source: '1757492907627'
+      sourceHandle: source
+      target: '1757493270484'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1757495664531-source-1757495688732-target
+      selected: false
+      source: '1757495664531'
+      sourceHandle: source
+      target: '1757495688732'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1757493270484-00ce954d-b2ca-42aa-b302-dc2c163dd1d0-17580163919060-target
+      selected: false
+      source: '1757493270484'
+      sourceHandle: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+      target: '17580163919060'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1757493270484-3489d477-53a2-4b99-9f40-af010262a1c1-1758608702077-target
+      selected: false
+      source: '1757493270484'
+      sourceHandle: 3489d477-53a2-4b99-9f40-af010262a1c1
+      target: '1758608702077'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1758693281998-source-1758693567975-target
+      selected: false
+      source: '1758693281998'
+      sourceHandle: source
+      target: '1758693567975'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1758693567975-true-1758692827777-target
+      selected: false
+      source: '1758693567975'
+      sourceHandle: 'true'
+      target: '1758692827777'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1758693567975-false-1758695000001-target
+      selected: false
+      source: '1758693567975'
+      sourceHandle: 'false'
+      target: '1758695000001'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1758695000001-source-1758695000002-target
+      selected: false
+      source: '1758695000001'
+      sourceHandle: source
+      target: '1758695000002'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1758695000002-true-1758694151292-target
+      selected: false
+      source: '1758695000002'
+      sourceHandle: 'true'
+      target: '1758694151292'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1758695000002-false-1758695000003-target
+      selected: false
+      source: '1758695000002'
+      sourceHandle: 'false'
+      target: '1758695000003'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1758694151292-source-1758693816149-target
+      selected: false
+      source: '1758694151292'
+      sourceHandle: source
+      target: '1758693816149'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1758624264402-production_uat-1758695198689-target
+      selected: false
+      source: '1758624264402'
+      sourceHandle: production_uat
+      target: '1758695198689'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1758624264402-no_config-1757496045338-target
+      selected: false
+      source: '1758624264402'
+      sourceHandle: no_config
+      target: '1757496045338'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1758624264402-success_or_failure-1758693281998-target
+      selected: false
+      source: '1758624264402'
+      sourceHandle: success_or_failure
+      target: '1758693281998'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1758624264402-complete_success-1758695100001-target
+      selected: false
+      source: '1758624264402'
+      sourceHandle: complete_success
+      target: '1758695100001'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1758624264402-analyze_failures-1758695100002-target
+      selected: false
+      source: '1758624264402'
+      sourceHandle: analyze_failures
+      target: '1758695100002'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1757493270484-8ad5b2c6-6d29-4e4f-9f13-7682d4803a70-1758699378772-target
+      selected: false
+      source: '1757493270484'
+      sourceHandle: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+      target: '1758699378772'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1711528708197-source-1758713692744-target
+      selected: false
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1758713692744'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1758713692744-source-1757492907627-target
+      selected: false
+      source: '1758713692744'
+      sourceHandle: source
+      target: '1757492907627'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1757493270484-false-1757495664531-target
+      selected: false
+      source: '1757493270484'
+      sourceHandle: 'false'
+      target: '1757495664531'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1757493270484-true-1757495664531-target
+      selected: false
+      source: '1757493270484'
+      sourceHandle: 'true'
+      target: '1757495664531'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: if-else
+      id: 1758624264401-source-1758624264402-target
+      selected: false
+      source: '1758624264401'
+      sourceHandle: source
+      target: '1758624264402'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 17580163919060-source-1758624264401-target
+      source: '17580163919060'
+      sourceHandle: source
+      target: '1758624264401'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: Define the initial parameters for launching a workflow
+        selected: false
+        title: Start
+        type: start
+        variables:
+        - hide: false
+          label: auth_token
+          max_length: 2000
+          options: []
+          required: false
+          type: paragraph
+          variable: auth_token
+        - default: apfodisha
+          hide: false
+          label: org_name
+          max_length: 200
+          options: []
+          required: false
+          type: text-input
+          variable: org_name
+        - default: trial
+          hide: false
+          label: org_type
+          max_length: 48
+          options: []
+          required: false
+          type: text-input
+          variable: org_type
+        - default: dinesh
+          hide: false
+          hint: ''
+          label: user_name
+          max_length: 48
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: user_name
+      height: 210
+      id: '1711528708197'
+      position:
+        x: 79.5
+        y: 714.5
+      positionAbsolute:
+        x: 79.5
+        y: 714.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1758713692744'
+          - result
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.files#}} {{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            json_schema: "{\n  \"name\": \"RoutingDecision\",\n  \"schema\": {\n \
+              \   \"type\": \"object\",\n    \"properties\": {\n      \"service\"\
+              : {\n        \"type\": \"string\",\n        \"enum\": [\"RAG\", \"ASSISTANT\"\
+              , \"TEMPLATE\"],\n        \"description\": \"Service to which the request\
+              \ is routed\"\n      },\n      \"confidence\": {\n        \"type\":\
+              \ \"number\",\n        \"minimum\": 0.0,\n        \"maximum\": 1.0,\n\
+              \        \"description\": \"Confidence score between 0.0 and 1.0\"\n\
+              \      },\n      \"question_type\": {\n        \"type\": \"string\"\
+              ,\n        \"enum\": [\"capability_inquiry\", \"implementation_request\"\
+              , \"novel_requirement\"],\n        \"description\": \"Categorization\
+              \ of the user's question\"\n      },\n      \"routing_reason\": {\n\
+              \        \"type\": \"string\",\n        \"description\": \"Brief explanation\
+              \ focusing on question structure, not content complexity\"\n      },\n\
+              \      \"clarification_needed\": {\n        \"type\": \"boolean\",\n\
+              \        \"description\": \"Whether clarifying questions are required\"\
+              \n      },\n      \"clarifying_questions\": {\n        \"type\": \"\
+              array\",\n        \"items\": {\n          \"type\": \"string\"\n   \
+              \     },\n        \"description\": \"Up to two clarifying questions,\
+              \ required only if clarification_needed is true\",\n        \"maxItems\"\
+              : 2\n      }\n    },\n    \"required\": [\n      \"service\",\n    \
+              \  \"confidence\",\n      \"question_type\",\n      \"routing_reason\"\
+              ,\n      \"clarification_needed\"\n    ],\n    \"additionalProperties\"\
+              : false\n  }\n}"
+            response_format: json_schema
+            temperature: 0.1
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: b14eb575-d615-41dd-aac1-00663db3a6eb
+          role: system
+          text: "You are the Avni Platform Orchestrator. Route user messages based\
+            \ on their PRIMARY INTENT, not the complexity or specificity of their\n\
+            question.\n\n<context>\n/\n</context>\n\n## Core Routing Logic\n\n\n**OVERRIDE\
+            \ RULES**:\n1. If a message is clearly NOT about Avni or data collection\
+            \ platforms → OUT_OF_SCOPE\n2. If a message starts with capability questions\
+            \ (\"Is it possible\", \"Can Avni\", \"Does Avni support\", \"Is there\
+            \ a way\"), it is ALWAYS RAG regardless of complexity.\n\n\n### RAG -\
+            \ Platform Knowledge & Capabilities\n\n\n**Primary Intent**: Learning\
+            \ what Avni can/cannot do\n\n\n**Definitive Indicators** (Route to RAG\
+            \ even if complex): \n- \"What is Avni?\" → RAG (basic platform knowledge)\n\
+            - \"Tell me about Avni\" → RAG (platform overview)\n- \"Is it possible\
+            \ to...\" → RAG (capability inquiry) \n- \"Can Avni...\" → RAG (platform\
+            \ capability) \n- \"Does Avni support...\" → RAG (feature question) \n\
+            - \"Is there a way to...\" → RAG (method inquiry) \n- \"What are the limitations\
+            \ of...\" → RAG (constraint question) \n- \"How does Avni handle...\"\
+            \ → RAG (mechanism inquiry)\n\n\n**Key Principle**: Complexity of the\
+            \ scenario does NOT change the\nintent. A detailed capability question\
+            \ is still a capability question.\n\n\n\n### ASSISTANT - Custom/Novel\
+            \ Requirements\n\n\n**Primary Intent**: Building something new or unique\n\
+            \n\n**Indicators**: - \"We need something that doesn't exist...\" - \"\
+            Can you\nbuild/create/develop...\" - \"We have unique requirements...\"\
+            \ -\n\"Integration with external system X...\"\n\n\n### OUT_OF_SCOPE -\
+            \ Not Avni Related\n\n\n**Primary Intent**: Questions completely unrelated\
+            \ to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n\
+            - Questions for which no relevant context available in this prompt\n-\
+            \ General programming/coding questions not specific to Avni\n- Questions\
+            \ about other software platforms (Salesforce, Excel, etc.)\n- Personal\
+            \ questions, weather, news, entertainment\n- Academic questions unrelated\
+            \ to health/social programs\n- Technical questions about non-Avni systems\n\
+            - \"What is the capital of...\" / \"How do I cook...\" / \"What's the\
+            \ weather...\"\n- Questions about competitors without Avni context\n\n\
+            \n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\"\
+            ) should NOT be marked as OUT_OF_SCOPE. These require clarification to\
+            \ understand the user's actual intent. \n\n\n## Decision Framework\n\n\
+            \n**Step 1**: Check relevance - If clearly NOT about Avni/data collection\
+            \ → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**: If greeting message → Set\
+            \ clarification_needed = true\n\n\n**Step 2**: Identify the question type\
+            \ - If starts with capability\nquestions → RAG (STOP HERE) - If describes\
+            \ implementation needs →\nASSISTANT\n\n\n## Critical Examples\n\n✅ \"\
+            What is Avni?\" → **RAG** (basic platform knowledge)\n\n✅ \"Tell me about\
+            \ Avni platform\" → **RAG** (platform overview)\n\n✅ \"What does Avni\
+            \ do?\" → **RAG** (platform purpose/functionality)\n\n✅ \"Is it possible\
+            \ to automatically show selected answers from Clinical\nAssessment in\
+            \ Follow-up Visit forms?\" → **RAG** (capability question,\nregardless\
+            \ of technical complexity)\n\n✅ \"Can Avni restrict encounter forms to\
+            \ single entry per individual?\" →\n**RAG** (capability question)\n\n\
+            ✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
+            \n→ **RAG** (capability question, even if the workflow is complex)\n\n\
+            ✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"What are identifiers\"\
+            \n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\
+            \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n\n\n\n✅ \"What\
+            \ is the capital of France?\" → **OUT_OF_SCOPE** (not related to Avni)\n\
+            \n\n✅ \"How do I write Python code for web scraping?\" → **OUT_OF_SCOPE**\
+            \ (general programming, not Avni-specific)\n\n\n✅ \"Can you help me with\
+            \ my Excel formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅\
+            \ \"Hello\" → **RAG** with clarification_needed = true (greeting requires\
+            \ clarification)\n\n\n✅ \"Hi there\" → **RAG** with clarification_needed\
+            \ = true (greeting requires clarification)\n\n\n❌ **WRONG**: \"Sounds\
+            \ complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"Starts with capability\
+            \ question → RAG\"\n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap\
+            \ 1**: Complexity Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\"\
+            \ - ✅ \"Capability question = platform inquiry = RAG\"\n\n\n**Trap 2**:\
+            \ Implementation Details Bias - ❌ \"Mentions specific\ntechnical details\
+            \ = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**:\
+            \ Domain Specificity Bias - ❌ \"Very specific use case =\nASSISTANT\"\
+            \ - ✅ \"Question format determines intent\"\n\n\n**Trap 4**: Relevance\
+            \ Assumption - ❌ \"Any question = must be Avni-related\" - ✅ \"Check if\
+            \ actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting\
+            \ Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification\
+            \ to understand intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"\
+            service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"confidence\": 0.0-1.0,\n\
+            \  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
+            ,\n  \"routing_reason\": \"Brief explanation focusing on question structure,\
+            \ not content complexity\",\n  \"clarification_needed\": true|false,\n\
+            \  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\
+            \n## Clarifying Questions Strategy\n\n\nAsk maximum 2 clarifying questions\
+            \ when:\n- Intent is ambiguous between RAG and Assistant\n- User provides\
+            \ insufficient context about their needs\n- Requirements could match multiple\
+            \ services\n- User sends only greeting messages without specific questions\n\
+            \n\n**Example clarifying questions:**\n- \"Could you describe what type\
+            \ of programs your organization runs?\"\n- \"Are you looking to learn\
+            \ about Avni's capabilities or need help setting something up?\"\n- \"\
+            Is this similar to typical community health/education programs?\"\n- \"\
+            How can I help you with Avni today?\" (for greetings)\n\n\n**General Prompt\
+            \ for Clarification:** When unsure, ask concise,\nopen-ended clarifying\
+            \ questions that help determine whether the user is\nasking about platform\
+            \ capabilities (RAG) or needs implementation help\n(ASSISTANT). Never\
+            \ ask more than two questions at once.\n\n\n## Mental Model Validation\n\
+            \n\nBefore routing, ask:\n1. **\"Is this just a greeting message?\"**\
+            \ - YES → RAG with clarification_needed = true\n2. **\"Is this question\
+            \ actually about Avni or data collection platforms?\"** - NO → OUT_OF_SCOPE\n\
+            3. **\"Is the user asking IF something is possible, or telling me they\
+            \ WANT something implemented?\"** - IF possible → RAG - WANT implemented\
+            \ → ASSISTANT\n\n\n## Decision Tree for Edge Cases\n\n\n    User Message\n\
+            \        │\n        ├── NOT about Avni/data collection (general questions,\
+            \ other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n        │\n \
+            \       ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does\
+            \ Avni...\" ?\n        │   └── YES → RAG (regardless of complexity)\n\
+            \        │\n        ├── Describes implementation needs (\"We need...\"\
+            , \"Help us set up...\", \"Our org wants...\")?\n        │   └── YES →\
+            \ ASSISTANT\n        │\n        └── UNCLEAR → Default to RAG (safer for\
+            \ capability questions)"
+        - id: 36b2faa1-0e45-4962-8107-74a07045af09
+          role: user
+          text: ''
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              clarification_needed:
+                type: boolean
+              clarifying_questions:
+                items:
+                  type: string
+                type: array
+              confidence:
+                type: number
+              question_type:
+                type: string
+              routing_reason:
+                type: string
+              service:
+                type: string
+            required:
+            - service
+            - confidence
+            - question_type
+            - routing_reason
+            - clarification_needed
+            - clarifying_questions
+            type: object
+        structured_output_enabled: true
+        title: Orchestrator
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1757492907627'
+      position:
+        x: 679.5208847590508
+        y: 739.0449267741175
+      positionAbsolute:
+        x: 679.5208847590508
+        y: 739.0449267741175
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
+          conditions:
+          - comparison_operator: not empty
+            id: 91c885b3-6ce9-4a82-9908-ce149c5f4326
+            value: ''
+            varType: object
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - clarifying_questions
+          - comparison_operator: <
+            id: 95728712-b973-4e5a-a178-79b27fc13fcd
+            value: '0.8'
+            varType: number
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - confidence
+          id: 3489d477-53a2-4b99-9f40-af010262a1c1
+          logical_operator: and
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: fb0a1b2b-46e8-4a67-8b98-b44ea87869db
+            value: RAG
+            varType: string
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: 'true'
+          logical_operator: and
+        - case_id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+          conditions:
+          - comparison_operator: is
+            id: 1931b24c-c74e-4a09-b0c1-afeb220851bd
+            value: ASSISTANT
+            varType: string
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+          logical_operator: and
+        - case_id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+          conditions:
+          - comparison_operator: is
+            id: beb8a551-f66d-4add-9480-bb9c185119f4
+            value: OUT_OF_SCOPE
+            varType: string
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: IF/ELSE
+        type: if-else
+      height: 294
+      id: '1757493270484'
+      position:
+        x: 1017.6514583301542
+        y: 702.2275366129412
+      positionAbsolute:
+        x: 1017.6514583301542
+        y: 702.2275366129412
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1758713692744'
+          - result
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
+          role: system
+          text: "Use the following context as your learned knowledge, inside <context></context>\
+            \ XML tags.\n<context>\n{{#context#}}\n</context>\nYou are talking to\
+            \ {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\nWhen\
+            \ answer to user:\n- If you don't know, just say that you don't know.\n\
+            - If you don't know when you are not sure, ask for clarification.\n- If\
+            \ greeting, greet professionaly by their name :  {{#1711528708197.user_name#}}\
+            \ \nAvoid mentioning that you obtained the information from the context.\n\
+            And answer according to the language of the user's question."
+        selected: false
+        title: RAG LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1757495664531'
+      position:
+        x: 1843.5141755407374
+        y: 550.5645879473302
+      positionAbsolute:
+        x: 1843.5141755407374
+        y: 550.5645879473302
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1757495664531.text#}}'
+        desc: ''
+        selected: false
+        title: RAG Answer
+        type: answer
+        variables: []
+      height: 102
+      id: '1757495688732'
+      position:
+        x: 2278.5095654341676
+        y: 403.98998746465634
+      positionAbsolute:
+        x: 2278.5095654341676
+        y: 403.98998746465634
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#17580163919060.structured_output.response#}}'
+        desc: ''
+        selected: false
+        title: Answer 5
+        type: answer
+        variables: []
+      height: 102
+      id: '1757496045338'
+      position:
+        x: 2892.40435534233
+        y: 1367.2111275583736
+      positionAbsolute:
+        x: 2892.40435534233
+        y: 1367.2111275583736
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1757492907627'
+          - text
+        desc: ''
+        memory:
+          query_prompt_template: 'Previous conversation context for {{#1711528708197.user_name#}}:
+            {{#conversation_history#}}
+
+            Current query: {{#sys.query#}} {{#sys.files#}}'
+          role_prefix:
+            assistant: 'Assistant: '
+            user: '{{#1711528708197.user_name#}}: '
+          window:
+            enabled: true
+            size: 20
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
+          role: system
+          text: "Instructions:\nYou are Avni Copilot, an expert assistant for the\
+            \ Avni data collection platform.\nYour primary role is to guide NGOs,\
+            \ program managers, and implementers in designing their Avni configuration\
+            \ and confirm that the configuration matches their requirements.\n- Arrive\
+            \ at the configuration by asking one simple question at a time\n- Ask\
+            \ questions in a way that is easy to understand and answer\n- Confirm\
+            \ that the configuration matches my requirements.\n- Iteratively refine\
+            \ configurations based on my feedback.\n- When user requests configuration\
+            \ creation or when you've gathered enough information, offer to create\
+            \ the actual configuration files.\n- if{{#1711528708197.org_type#}} is\
+            \ \"Production\" or \"UAT\", tell the user that we do not support automatic\
+            \ configurations for their organisation type. Do not proceed with trying\
+            \ to create configuration.\n- You are talking to{{#1711528708197.user_name#}}\n\
+            \nConfiguration Creation Capabilities:\n- You can create location types,\
+            \ locations, subject types, programs, and encounters based on user requirements\n\
+            - Always ask for user confirmation before creating any configuration:\
+            \ \"Would you like me to create this configuration for you?\"\n- When\
+            \ creating configurations, provide them in structured JSON format for\
+            \ easy implementation\n- After creation, explain how the configuration\
+            \ addresses their specific needs\n\nBehaviour:\n- Ask details of the configuration\
+            \ one after the other in the order specified.\n- Do not explain the details\
+            \ of a future step in current response.\n- When user says \"create this\
+            \ for me\" or \"generate the configuration\", proceed with creation after\
+            \ confirming requirements.\n- During conversation flow, at appropriate\
+            \ checkpoints ask: \"Shall I create this configuration for you now, or\
+            \ would you like to discuss more details first?\"\n- CRITICAL: During\
+            \ the conversation, avoid Avni technical terms. Use simple, everyday language\
+            \ that any program manager would understand.\n- Instead of technical terms\
+            \ during discussion, use natural language:\n  * Don't say \"subject type\"\
+            \ → Say \"the people/things you want to track\"\n  * Don't say \"encounter\"\
+            \ → Say \"visit\", \"interaction\", \"data collection\"\n  * Don't say\
+            \ \"program enrollment\" → Say \"joining the program\" or \"participating\
+            \ in\"\n  * Don't say \"persistent entities\" → Say \"things you track\
+            \ over time\"\n- HOWEVER: When providing the FINAL configuration summary\
+            \ or creating configurations, gently introduce the proper Avni terminology\
+            \ with explanations:\n  * \"In Avni, we call the people/things you track\
+            \ 'Subject Types'. So you'll have these Subject Types: Farmer, Work Order,\
+            \ Excavating Machine, Gram Panchayat\"\n  * \"The visits and data collection\
+            \ activities are called 'Encounters' in Avni. You'll have these types\
+            \ of data collection...\"\n  * Only introduce 2-3 concepts per response,\
+            \ don't overwhelm with all terminology at once\n- Be concise in your responses\
+            \ - one simple question at a time.\n- Use a nudging style: ask clarifying\
+            \ questions, provide concrete examples, and help me refine my answers\
+            \ step by step.\n- Keep the conversation practical and oriented toward\
+            \ my real-world workflow rather than technical details of Avni.\n\nCRITICAL\
+            \ ATTRIBUTE HANDLING RULES:\n- If a subject type already exists (from\
+            \ validation), do NOT ask for attributes\n- Only ask for attributes when\
+            \ creating NEW subject types\n- Skip attribute questions for entities\
+            \ that won't be created due to conflicts\n- Focus on configuration structure\
+            \ rather than detailed attributes for existing entities\n- If validation\
+            \ shows conflicts, acknowledge them: \"I see some entities already exist.\
+            \ I'll create only the new ones.\"\n\nCONFLICT RESOLUTION BEHAVIOR:\n\
+            - When conflicts are detected, be transparent: \"Some items already exist\
+            \ in your system\"\n- Offer to proceed with only new items: \"Shall I\
+            \ create just the new configurations?\"\n- Never ask for manual deletion\
+            \ - the system will handle conflicts intelligently\n- Reassure users:\
+            \ \"Don't worry, existing configurations won't be affected\"\n\nContext:\n\
+            An Avni configuration is a structured list of the form\nAddress Level\
+            \ Types (Location Hierarchy):\nLocations:\nSubject Type:\nProgram:\nProgram\
+            \ Encounter:\nGeneral Encounter:\nAddress Level Types (Location Hierarchy)\
+            \ - Define the hierarchical structure of geographic areas (e.g., State\
+            \ > District > Block > Village). These are the \"types\" or \"levels\"\
+            \ in your location hierarchy, not the actual places. Think of them as\
+            \ organizational chart levels for geography.\nLocations - The actual geographic\
+            \ places within your hierarchy (e.g., Karnataka state, Bangalore district,\
+            \ Koramangala village). Each location belongs to a specific address level\
+            \ type and can have a parent location. Subject types are registered at\
+            \ the lowest level of this hierarchy.\nSubject Types – These represent\
+            \ the core persistent entities you will track over time. Subject Types\
+            \ can be:\n- Living entities: households, farmers, patients, children,\
+            \ persons\n- Non-living entities: machines/equipment, work orders, locations,\
+            \ organizational assets, resources\nKey decision criteria: If it's a persistent\
+            \ entity that exists independently and needs\n to be tracked over time,\
+            \ it should be a Subject Type.\nExamples: \"Farmer\", \"Excavating Machine\"\
+            , \"Work Order\", \"Gram Panchayat\", \"Water Source\", \"Tractor\"\n\
+            Subject Types should be registered at the lowest level of the location\
+            \ hierarchy. A subject type is associated to a registration form that\
+            \ can be used to collect attributes of a subject.\nIn the Android app,\
+            \ you register subjects directly from the home screen through the \"Register\"\
+            \ button.\nImportant: Subject types cannot be scheduled. If you need scheduled\
+            \ activities, use encounters instead.\nIf there are multiple humans that\
+            \ are part of the program, try to check if they can be modeled as the\
+            \ same subject type. This requirement is mandatory if all these humans\
+            \ will be part of a household. For example, if we are dealing with a maternal\
+            \ and child health program, the subject types will be \"Person\" and \"\
+            Household\", where mothers and children will be registered as \"Person\"\
+            \ and \"Household\" will be used to register the household.\nPrograms\
+            \ – represent structured interventions or workflows that subjects enroll\
+            \ into and exit from (e.g., maternal health program, farmer training program).\
+            \ Key characteristics:\n- Have clear enrollment and exit processes\n-\
+            \ Associated with a single subject type\n- By default, a subject can have\
+            \ only one active enrollment at a time\n- Can be configured for multiple\
+            \ concurrent enrollments if needed (e.g., chronic disease management)\n\
+            - Use programs when you have: structured activities with enrollment/exit,\
+            \ time-bounded interventions, or ongoing structured care\n- Don't use\
+            \ programs for: ad-hoc interactions, one-time events, or simple tracking\
+            \ without enrollment\n\nProgram Encounters – represent specific types\
+            \ of visits or interactions that happen within a program context (e.g.,\
+            \ training session within a farmer training program, health checkup within\
+            \ a maternal health program). Key points:\n- Always associated with both\
+            \ a subject type AND a program\n- Used for systematic tracking of interactions\
+            \ within structured programs\n- Subject details are already captured in\
+            \ subject registration, don't repeat them\n- Choose program encounters\
+            \ when interactions are part of a structured program workflow\n\nGeneral\
+            \ Encounters - represent visits or data collection points that are NOT\
+            \ tied to any program (e.g., ad-hoc site inspection, emergency repair,\
+            \ stakeholder meeting). Key characteristics:\n- Associated only with a\
+            \ subject type, not with any program\n- Suitable for periodic interactions\
+            \ like annual surveys\n- Can be marked as \"immutable\" to auto-copy data\
+            \ from last encounter\n- Flexible for use outside program contexts\n-\
+            \ Choose general encounters for: standalone interactions, periodic visits,\
+            \ or activities not part of structured programs\nRemember that immunization\
+            \ is not a program encounter or a general encounter. It is a feature automatically\
+            \ available in Avni.\nAvni also provides WHO growth charts that chart\
+            \ the growth of children based on their height and weight. The data will\
+            \ need to be collected through encounter or program encounter forms though.\n\
+            \nDECISION FRAMEWORK:\n0. Ask yourself: \"What geographic areas do they\
+            \ work in?\" → Address Level Types & Locations\n   - Address Level Types:\
+            \ Define hierarchy levels (State, District, Block, Village)\n   - Locations:\
+            \ Create actual places (Karnataka, Bangalore, Koramangala)\n1. Ask yourself:\
+            \ \"Is this a persistent entity that exists independently?\" → Subject\
+            \ Type\n   Examples: Farmer, Work Order, Machine, Gram Panchayat, Water\
+            \ Source\n2. Ask yourself: \"Is this a structured series of activities\
+            \ with enrollment/exit?\" → Program\n   Examples: Training Program, Health\
+            \ Program, Education Program\n3. Ask yourself: \"Is this a one-time event\
+            \ or interaction?\" → Encounter\n   Examples: Site visit, meeting, maintenance\
+            \ check, audit\n4. Ask yourself: \"Does this interaction happen as part\
+            \ of a structured program?\" → Program Encounter\n   Examples: Training\
+            \ session (part of training program), health checkup (part of health program)\n\
+            5. Ask yourself: \"Is this a standalone interaction not part of any program?\"\
+            \ → General Encounter\n   Examples: Ad-hoc site inspection, emergency\
+            \ repair, stakeholder meeting\n\nAlways start with location hierarchy\
+            \ setup (Address Level Types and Locations) first, then prioritize creating\
+            \ Subject Types for entities you need to track over time before considering\
+            \ programs or encounters.\n\nOUTPUT FORMAT - CRITICAL:\nYou MUST ALWAYS\
+            \ respond in this exact JSON format:\n{\n  \"response\": \"Your conversational\
+            \ response to the user\",\n  \"config\": {}\n}\n\nConfig Generation Rules:\n\
+            - The \"config\" key should be empty {} during normal conversation\n-\
+            \ Only populate \"config\" when:\n  1. User explicitly says \"create this\
+            \ configuration\" or \"generate the configuration\"\n  2. User specifically\
+            \ asks to \"create subject types\", \"create programs\", or \"create encounters\"\
+            \n  3. User says \"I am happy with the configuration provided by the Avni\
+            \ assistant\" (final confirmation)\n- NEVER populate \"config\" during\
+            \ information gathering or clarification questions\n- When populating\
+            \ \"config\", use this structure:\n{\n  \"config\": {\n    \"addressLevelTypes\"\
+            : [\n      {\n        \"name\": \"AddressLevelTypeName\", // REQUIRED\
+            \ - string, Location hierarchy level name (e.g., State, District, Block,\
+            \ Village)\n        \"uuid\": \"optional-uuid-for-updates\", // Optional\
+            \ for creation, required for updates - string (Generate a v4 uuid)\n \
+            \       \"voided\": false, // boolean - true | false, default false\n\
+            \        \"level\": 1.0, // REQUIRED - number, hierarchy level (Higher\
+            \ number for top level)\n        \"parentId\": null // nullable integer\
+            \ - ID of parent level (null for top level)\n      }\n    ],\n    \"locations\"\
+            : [\n      {\n        \"name\": \"LocationName\", // REQUIRED - string,\
+            \ Actual location name (e.g., Karnataka, Bangalore, Koramangala, etc.)\n\
+            \        \"uuid\": \"optional-uuid-for-updates\", // Optional for creation,\
+            \ required for updates - string (Generate a v4 uuid)\n        \"voided\"\
+            : false, // boolean - true | false, default false\n        \"level\":\
+            \ 1.0, // REQUIRED - number, matches addressLevelType level\n        \"\
+            type\": \"AddressLevelTypeName\", // REQUIRED - string, name of the addressLevelType\n\
+            \        \"addressLevelTypeUUID\": \"uuid-reference-to-address-level-type\"\
+            , // REQUIRED - string (uuid)\n        \"legacyId\": null, // nullable\
+            \ string - legacy identifier\n        \"gpsCoordinates\": null, // nullable\
+            \ object - {x: longitude, y: latitude}\n        \"locationProperties\"\
+            : {} // object - additional properties/observations\n      }\n    ],\n\
+            \    \"subjectTypes\": [\n      {\n        \"name\": \"SubjectTypeName\"\
+            , // REQUIRED - string\n        \"uuid\": \"uuid\", // Required. Generate\
+            \ a v4 uuid.\n        \"group\": false, // boolean - only true if this\
+            \ is a group subject type, false for individual, person and user\n   \
+            \     \"household\": false, // boolean - whether this is a household subject\
+            \ type\n        \"active\": true, // boolean - default true\n        \"\
+            type\": \"Person\", // REQUIRED - enum: Person|Group|User|PersonGroup|UserGroup\n\
+            \        \"subjectSummaryRule\": null, // nullable string - rule for generating\
+            \ subject summary\n        \"programEligibilityCheckRule\": null, // nullable\
+            \ string - rule for program eligibility\n        \"memberAdditionEligibilityCheckRule\"\
+            : null, // nullable string - rule for member addition\n        \"allowEmptyLocation\"\
+            : true, // boolean - default true\n        \"allowMiddleName\": false,\
+            \ // boolean - whether middle name is allowed\n        \"lastNameOptional\"\
+            : false, // boolean - default false\n        \"allowProfilePicture\":\
+            \ false, // boolean - default false\n        \"uniqueName\": false, //\
+            \ boolean - whether name should be unique, default false\n        \"validFirstNameFormat\"\
+            : null, // nullable object - format validation for first name\n      \
+            \  \"validMiddleNameFormat\": null, // nullable object - format validation\
+            \ for middle name\n        \"validLastNameFormat\": null, // nullable\
+            \ object - format validation for last name\n        \"iconFileS3Key\"\
+            : null, // nullable string - S3 key for subject type icon\n        \"\
+            directlyAssignable\": false, // boolean - default false\n        \"shouldSyncByLocation\"\
+            : false, // boolean - whether to sync by location\n        \"syncRegistrationConcept1\"\
+            : null, // nullable string - first sync registration concept\n       \
+            \ \"syncRegistrationConcept2\": null, // nullable string - second sync\
+            \ registration concept\n        \"syncRegistrationConcept1Usable\": false,\
+            \ // boolean - whether first concept is usable\n        \"syncRegistrationConcept2Usable\"\
+            : false, // boolean - whether second concept is usable\n        \"nameHelpText\"\
+            : null, // nullable string - help text for name field\n        \"settings\"\
+            : null, // nullable object - additional settings\n\"voided\": false, //\
+            \ boolean - whether subject type is deleted\n\"registrationFormUuid\"\
+            : \"uuid\" // generate a v4 uuid\n      }\n    ],\n    \"programs\": [\n\
+            \      {\n        \"name\": \"Program Name\", // REQUIRED - string\n \
+            \       \"uuid\": \"uuid\", // Required. Generate a v4 uuid.\n       \
+            \ \"colour\": \"#FF5733\", // REQUIRED - string in hex color format (e.g.,\
+            \ #FF5733, #863333)\n        \"voided\": false, // boolean - default false\n\
+            \        \"active\": true, // boolean - default true\n        \"enrolmentEligibilityCheckRule\"\
+            : null, // nullable string - rule for enrolment eligibility\n        \"\
+            enrolmentSummaryRule\": null, // nullable string - rule for enrolment\
+            \ summary\n        \"enrolmentEligibilityCheckDeclarativeRule\": null,\
+            \ // nullable object - declarative rule\n        \"manualEligibilityCheckRequired\"\
+            : false, // boolean - default false, can be true\n        \"showGrowthChart\"\
+            : false, // boolean - default false, can be true for health programs\n\
+            \        \"manualEnrolmentEligibilityCheckRule\": null, // nullable string\
+            \ - manual check rule\n        \"manualEnrolmentEligibilityCheckDeclarativeRule\"\
+            : null, // nullable object - manual declarative rule\n        \"allowMultipleEnrolments\"\
+            : false, // boolean - default false, can be true for chronic programs\n\
+            \"subjectTypeUuid\": \"uuid\", // v4 uuid. Use the uuid generated for\
+            \ the subject that this program is linked to\n\"programEnrolmentFormUuid\"\
+            : \"uuid\", // generate a v4 uuid\n\"programExitFormUuid\": \"uuid\",\
+            \  // generate a v4 uuid\n\n      }\n    ],\n    \"encounterTypes\": [\n\
+            \      {\n        \"name\": \"Encounter Type Name\", // REQUIRED - string\n\
+            \        \"uuid\": \"uuid\", // Required. Generate a v4 uuid.\n      \
+            \  \"entityEligibilityCheckRule\": null, // nullable string - rule for\
+            \ encounter eligibility\n        \"active\": true, // boolean - default\
+            \ true\n        \"entityEligibilityCheckDeclarativeRule\": null, // nullable\
+            \ object - declarative rule\n        \"isImmutable\": false, // boolean\
+            \ - default false\n        \"voided\": false, // boolean - default false\n\
+            \"subjectTypeUuid\": \"uuid\", // v4 uuid. Use the uuid generated for\
+            \ the subject that this encounter type is linked to\n\"programUuid\":\
+            \ \"uuid\", // v4 uuid. Nullable. Required if the encounter type is under\
+            \ a structured program. Use the uuid generated for the program that this\
+            \ encounter type is linked to\n      }\n    ]\n  }\n}\n- omit null values\
+            \ from the output\n- always include the 'addressLevelTypes' , 'locations',\
+            \ 'subjectTypes', 'programs' and 'encounterTypes' elements as an empty\
+            \ array even if there are none to be created\n\nExample Behaviors:\nIf\
+            \ a user says: \"We work across 3 states with district and village level\
+            \ operations\", you might respond:\n{\n  \"response\": \"I'll help you\
+            \ set up the location hierarchy. So you have State at the top level, then\
+            \ District, then Village? Which states and districts do you work in?\"\
+            ,\n  \"config\": {}\n}\n\nIf a user says: \"We work with adolescent girls\
+            \ on nutrition\", you might respond:\n{\n  \"response\": \"Great! So we'd\
+            \ track adolescent girls. Do they join a formal nutrition program, or\
+            \ do you just have regular interactions with them? What kinds of activities\
+            \ do you do - like monthly counseling, growth check-ups?\",\n  \"config\"\
+            : {}\n}\n\nIf a user says: \"Create this configuration for me\", you would\
+            \ respond:\n{\n  \"response\": \"I've created the Avni configuration based\
+            \ on our discussion. This includes tracking adolescent girls as the main\
+            \ subject type, with a nutrition program for structured interventions...\"\
+            ,\n  \"config\": { /* full configuration object */ }\n}\n\nConfiguration\
+            \ Creation Flow:\n1. Gather requirements through natural conversation\
+            \ (config always empty)\n2. At key milestones, ask: \"Shall I create this\
+            \ configuration for you now?\"\n3. Only when user confirms creation, populate\
+            \ the config object\n4. Explain how each part addresses their specific\
+            \ needs"
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              config:
+                properties:
+                  addressLevelTypes:
+                    items:
+                      properties:
+                        level:
+                          type: number
+                        name:
+                          type: string
+                        parentId:
+                          type:
+                          - integer
+                          - 'null'
+                        uuid:
+                          type: string
+                        voided:
+                          type: boolean
+                      required:
+                      - name
+                      - level
+                      type: object
+                    type: array
+                  encounterTypes:
+                    items:
+                      properties:
+                        active:
+                          type: boolean
+                        entityEligibilityCheckRule:
+                          type:
+                          - string
+                          - 'null'
+                        isImmutable:
+                          type: boolean
+                        name:
+                          type: string
+                        voided:
+                          type: boolean
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  locations:
+                    items:
+                      properties:
+                        addressLevelTypeUUID:
+                          type: string
+                        gpsCoordinates:
+                          type:
+                          - object
+                          - 'null'
+                        legacyId:
+                          type:
+                          - string
+                          - 'null'
+                        level:
+                          type: number
+                        locationProperties:
+                          type: object
+                        name:
+                          type: string
+                        organisationUUID:
+                          type: string
+                        type:
+                          type: string
+                        uuid:
+                          type: string
+                        voided:
+                          type: boolean
+                      required:
+                      - name
+                      - level
+                      - type
+                      - addressLevelTypeUUID
+                      - organisationUUID
+                      type: object
+                    type: array
+                  programs:
+                    items:
+                      properties:
+                        active:
+                          type: boolean
+                        allowMultipleEnrolments:
+                          type: boolean
+                        colour:
+                          type: string
+                        enrolmentEligibilityCheckRule:
+                          type:
+                          - string
+                          - 'null'
+                        enrolmentSummaryRule:
+                          type:
+                          - string
+                          - 'null'
+                        manualEligibilityCheckRequired:
+                          type: boolean
+                        name:
+                          type: string
+                        showGrowthChart:
+                          type: boolean
+                        voided:
+                          type: boolean
+                      required:
+                      - name
+                      - colour
+                      type: object
+                    type: array
+                  subjectTypes:
+                    items:
+                      properties:
+                        active:
+                          type: boolean
+                        allowEmptyLocation:
+                          type: boolean
+                        allowMiddleName:
+                          type: boolean
+                        allowProfilePicture:
+                          type: boolean
+                        directlyAssignable:
+                          type: boolean
+                        group:
+                          type: boolean
+                        household:
+                          type: boolean
+                        lastNameOptional:
+                          type: boolean
+                        memberAdditionEligibilityCheckRule:
+                          type:
+                          - string
+                          - 'null'
+                        name:
+                          type: string
+                        programEligibilityCheckRule:
+                          type:
+                          - string
+                          - 'null'
+                        shouldSyncByLocation:
+                          type: boolean
+                        subjectSummaryRule:
+                          type:
+                          - string
+                          - 'null'
+                        type:
+                          type: string
+                        uniqueName:
+                          type: boolean
+                      required:
+                      - name
+                      - type
+                      type: object
+                    type: array
+                type: object
+              response:
+                type: string
+            required:
+            - response
+            - config
+            type: object
+        structured_output_enabled: true
+        title: Assistant LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '17580163919060'
+      position:
+        x: 1371.5285453458414
+        y: 1059.0298017145046
+      positionAbsolute:
+        x: 1371.5285453458414
+        y: 1059.0298017145046
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
+        selected: false
+        title: Clarify the question
+        type: answer
+        variables: []
+      height: 137
+      id: '1758608702077'
+      position:
+        x: 1409.7669821360873
+        y: 414.79698163829846
+      positionAbsolute:
+        x: 1409.7669821360873
+        y: 414.79698163829846
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#17580163919060.structured_output.response#}}{{#17580163919060.structured_output.config#}}'
+        selected: false
+        title: Answer 4
+        type: answer
+        variables: []
+      height: 121
+      id: '1758692827777'
+      position:
+        x: 4781.118291097593
+        y: 1753.0656052341733
+      positionAbsolute:
+        x: 4781.118291097593
+        y: 1753.0656052341733
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import requests\nimport json\nimport uuid\nfrom copy import deepcopy\n\
+          import time\n\ndef main(config={}, auth_token=\"abcd\", org_type=\"Production\"\
+          ):\n    \"\"\"\n    Comprehensive Avni Configuration Manager\n    Handles:\
+          \ Validation → Creation → Verification → Progressive Updates\n    Uses GET\
+          \ calls to verify actual state before attempting partial operations\n  \
+          \  \"\"\"\n    # API Endpoint mapping based on avni-webapp analysis\n  \
+          \  API_ENDPOINTS = {\n        'addressLevelType': '/addressLevelType',\n\
+          \        'locations': '/locations',\n        'catchment': '/catchment',\n\
+          \        'subjectType': '/web/subjectType',\n        'program': '/web/program',\n\
+          \        'encounterType': '/web/encounterType'\n    }\n    \n    base_url\
+          \ = 'https://staging.avniproject.org'\n    headers = {\n        'auth-token':\
+          \ auth_token,\n        'Content-Type': 'application/json'\n    }\n    \n\
+          \    # Check organization type\n    if org_type in ['Production', 'UAT']:\n\
+          \        return {\n            'configResult': {\n                'result':\
+          \ 'error',\n                'message': 'Configuration creation not supported\
+          \ for Production/UAT organizations',\n                'status': 'production_uat_blocked',\n\
+          \                'flow_action': 'block_creation'\n            }\n      \
+          \  }\n    \n    if not config or len(config) == 0:\n        return {\n \
+          \           'configResult': {\n                'result': 'error',\n    \
+          \            'message': 'No configuration provided',\n                'status':\
+          \ 'no_config',\n                'flow_action': 'request_config'\n      \
+          \      }\n        }\n    \n    def verify_entity_exists(entity_type, entity_name):\n\
+          \        \"\"\"Use GET API to verify if entity exists\"\"\"\n        try:\n\
+          \            # Map plural config keys to singular API endpoint keys\n  \
+          \          entity_type_mapping = {\n                'addressLevelTypes':\
+          \ 'addressLevelType',\n                'locations': 'locations',\n     \
+          \           'catchments': 'catchment',\n                'subjectTypes':\
+          \ 'subjectType',\n                'programs': 'program',\n             \
+          \   'encounterTypes': 'encounterType'\n            }\n            \n   \
+          \         api_entity_type = entity_type_mapping.get(entity_type, entity_type)\n\
+          \            endpoint = API_ENDPOINTS.get(api_entity_type)\n           \
+          \ if not endpoint:\n                return False, \"Unknown entity type:\
+          \ \" + str(entity_type)\n            \n            # Special handling for\
+          \ different entity types\n            if api_entity_type == 'addressLevelType':\n\
+          \                # AddressLevelType doesn't have a search endpoint, use the main GET endpoint\n\
+          \                # to fetch all address level types and search through them\n                try:\n\
+          \                    search_url = base_url + endpoint\n                    response = requests.get(\n\
+          \                        search_url,\n                        headers=headers,\n\
+          \                        params={'size': 1000},  # Get all address level types\n\
+          \                        timeout=10\n                    )\n                    \n\
+          \                    if response.status_code == 200:\n                        results = response.json()\n\
+          \                        # Handle paginated response structure\n                        if isinstance(results, dict) and 'content' in results:\n\
+          \                            address_level_types = results['content']\n                        elif isinstance(results, list):\n\
+          \                            address_level_types = results\n                        else:\n\
+          \                            return False, \"Unexpected response format from addressLevelType API\"\n\
+          \                        \n                        # Search for matching name (case-insensitive)\n\
+          \                        for alt in address_level_types:\n                            if isinstance(alt, dict) and alt.get('name', '').lower() == entity_name.lower():\n\
+          \                                return True, None\n                        \n\
+          \                        return False, None  # Not found in existing address level types\n\
+          \                    else:\n                        return False, f\"AddressLevelType verification failed: {response.status_code}\"\n\
+          \                except Exception as e:\n                    return False, f\"AddressLevelType verification error: {str(e)}\"\n            else:\n \
+          \               # Different search patterns based on entity type\n     \
+          \           if api_entity_type in ['subjectType', 'program', 'encounterType']:\n\
+          \                    # Web entities don't have search endpoints, use paginated\
+          \ get all\n                    search_url = base_url + endpoint\n      \
+          \              response = requests.get(\n                        search_url,\n\
+          \                        headers=headers,\n                        params={'size':\
+          \ 1000},  # Get all items to search through\n                        timeout=10\n\
+          \                    )\n                elif api_entity_type in ['locations',\
+          \ 'catchment']:\n                    # These have dedicated search endpoints\n\
+          \                    if api_entity_type == 'locations':\n              \
+          \          search_url = base_url + endpoint + \"/search/find\"\n       \
+          \                 # Use 'title' parameter for locations as per LocationController\n\
+          \                        response = requests.get(\n                    \
+          \        search_url,\n                            headers=headers,\n   \
+          \                         params={'title': entity_name},\n             \
+          \               timeout=10\n                        )\n                \
+          \    else:  # catchment\n                        search_url = base_url +\
+          \ endpoint + \"/search/find\"\n                        # Use 'name' parameter\
+          \ for catchments\n                        response = requests.get(\n   \
+          \                         search_url,\n                            headers=headers,\n\
+          \                            params={'name': entity_name},\n           \
+          \                 timeout=10\n                        )\n              \
+          \  else:\n                    # Default fallback\n                    search_url\
+          \ = base_url + endpoint + \"/search\"\n                    response = requests.get(\n\
+          \                        search_url,\n                        headers=headers,\n\
+          \                        params={'name': entity_name},\n               \
+          \         timeout=10\n                    )\n            \n            if\
+          \ response.status_code == 200:\n                results = response.json()\n\
+          \                \n                # Debug logging for locations\n     \
+          \           if api_entity_type == 'locations':\n                    print(f\"\
+          DEBUG: Location search for '{entity_name}' returned: {results}\")\n    \
+          \            \n                # Handle different response formats\n   \
+          \             if api_entity_type in ['subjectType', 'program', 'encounterType']:\n\
+          \                    # Web entities return paginated results with _embedded\
+          \ structure\n                    if isinstance(results, dict) and '_embedded'\
+          \ in results:\n                        embedded_data = results['_embedded']\n\
+          \                        # Find the entity data in embedded response\n \
+          \                       for key in embedded_data:\n                    \
+          \        if isinstance(embedded_data[key], list):\n                    \
+          \            # Search through the list for matching name\n             \
+          \                   for item in embedded_data[key]:\n                  \
+          \                  if item.get('name') == entity_name:\n               \
+          \                         return True, None\n                          \
+          \      return False, None\n                    return False, None\n    \
+          \            elif isinstance(results, dict) and api_entity_type == 'locations':\n\
+          \                    # Location search might return paginated response\n\
+          \                    if 'content' in results:\n                        locations_list\
+          \ = results['content']\n                        print(f\"DEBUG: Location\
+          \ search returned paginated response with {len(locations_list)} items\"\
+          )\n                        if len(locations_list) == 0:\n              \
+          \              return False, None\n                        \n          \
+          \              # Check if any location matches exactly\n               \
+          \         for location in locations_list:\n                            if\
+          \ isinstance(location, dict):\n                                location_title\
+          \ = location.get('title', '')\n                                print(f\"\
+          DEBUG: Comparing '{entity_name}' with location '{location_title}'\")\n \
+          \                               if location_title == entity_name:\n    \
+          \                                print(f\"DEBUG: Found exact match for '{entity_name}'\"\
+          )\n                                    return True, None\n             \
+          \           \n                        print(f\"DEBUG: No exact match found\
+          \ for '{entity_name}' in paginated results\")\n                        return\
+          \ False, None\n                    else:\n                        print(f\"\
+          DEBUG: Location search returned dict but no 'content' key: {results}\")\n\
+          \                        return False, None\n                elif isinstance(results,\
+          \ list):\n                    # For locations/catchments search results\
+          \ or direct arrays\n                    if api_entity_type in ['locations',\
+          \ 'catchment']:\n                        # These return search results directly\n\
+          \                        # Debug: Check what we actually got\n         \
+          \               found = len(results) > 0\n                        if api_entity_type\
+          \ == 'locations':\n                            # For locations, check if\
+          \ we have any results and if they match\n                            if\
+          \ not found:\n                                print(f\"DEBUG: No locations\
+          \ found for '{entity_name}'\")\n                                return False,\
+          \ None\n                            \n                            # Check\
+          \ if any location in results matches our search term exactly\n         \
+          \                   for location in results:\n                         \
+          \       if isinstance(location, dict):\n                               \
+          \     location_title = location.get('title', '')\n                     \
+          \               print(f\"DEBUG: Comparing '{entity_name}' with location\
+          \ '{location_title}'\")\n                                    if location_title\
+          \ == entity_name:\n                                        print(f\"DEBUG:\
+          \ Found exact match for '{entity_name}'\")\n                           \
+          \             return True, None\n                            \n        \
+          \                    # If we have results but none match exactly, consider\
+          \ it not found\n                            print(f\"DEBUG: No exact match\
+          \ found for '{entity_name}' in {len(results)} results\")\n             \
+          \               return False, None\n                        return found,\
+          \ None\n                    else:\n                        # Direct array\
+          \ responses\n                        return len(results) > 0, None\n   \
+          \             else:\n                    # Other response types\n      \
+          \              return bool(results), None\n            else:\n         \
+          \       return False, \"Search failed: \" + str(response.status_code)\n\
+          \        except Exception as e:\n            return False, \"Verification\
+          \ error: \" + str(e)\n    \n    def create_entity(entity_type, entity_data):\n\
+          \        \"\"\"Create a single entity with proper validation\"\"\"\n   \
+          \     try:\n            # Map plural config keys to singular API endpoint\
+          \ keys\n            entity_type_mapping = {\n                'addressLevelTypes':\
+          \ 'addressLevelType',\n                'locations': 'locations',\n     \
+          \           'catchments': 'catchment',\n                'subjectTypes':\
+          \ 'subjectType',\n                'programs': 'program',\n             \
+          \   'encounterTypes': 'encounterType'\n            }\n            \n   \
+          \         api_entity_type = entity_type_mapping.get(entity_type, entity_type)\n\
+          \            endpoint = API_ENDPOINTS.get(api_entity_type)\n           \
+          \ if not endpoint:\n                return {\n                    'status':\
+          \ 'error',\n                    'message': \"Unknown entity type: \" + str(entity_type),\n\
+          \                    'status_code': 400\n                }\n           \
+          \ \n            # Ensure UUID\n            if 'uuid' not in entity_data\
+          \ or not entity_data['uuid']:\n                entity_data['uuid'] = str(uuid.uuid4())\n\
+          \            \n            # Transform data based on entity type\n\
+          \            if entity_type == 'locations':\n                # Transform location data to match LocationContract structure\n\
+          \                location_data = {\n                    'uuid': entity_data['uuid'],\n\
+          \                    'name': entity_data['name'],  # LocationContract uses 'name' field from ReferenceDataContract\n\
+          \                    'level': entity_data.get('level'),\n                    'type': entity_data.get('type'),\n\
+          \                    'addressLevelTypeUUID': entity_data.get('addressLevelTypeUUID'),\n\
+          \                    'legacyId': entity_data.get('legacyId'),\n                    'gpsCoordinates': entity_data.get('gpsCoordinates'),\n\
+          \                    'locationProperties': entity_data.get('locationProperties', {}),\n\
+          \                    'voided': entity_data.get('voided', False)\n                }\n\
+          \                \n                # Handle parent relationship - locations need parent UUID reference, not parentId\n\
+          \                if 'parentLocationUUID' in entity_data and entity_data['parentLocationUUID']:\n\
+          \                    location_data['parent'] = {'uuid': entity_data['parentLocationUUID']}\n\
+          \                \n                # CRITICAL FIX: Handle boolean conversion for voided field\n                if 'voided' in location_data and isinstance(location_data['voided'], str):\n\
+          \                    location_data['voided'] = location_data['voided'].lower() == 'true'\n\
+          \                \n                # Remove null values and empty objects\n                location_data = {k: v for k, v in location_data.items() if v is not None and v != {}}\n\
+          \                data_to_send = [location_data]  # LocationController expects array\n\
+          \                \n            elif entity_type == 'addressLevelTypes':\n\
+          \                # Transform address level type data\n                alt_data = {\n\
+          \                    'uuid': entity_data['uuid'],\n                    'name': entity_data['name'],\n\
+          \                    'level': entity_data.get('level'),\n                    'parentId': entity_data.get('parentId'),\n\
+          \                    'voided': entity_data.get('voided', False)\n                }\n\
+          \                # Remove null values\n                alt_data = {k: v for k, v in alt_data.items() if v is not None}\n\
+          \                data_to_send = alt_data\n                \n            else:\n\
+          \                # For other entity types, use data as-is\n                data_to_send = entity_data\n\
+          \            \n            create_url = base_url + endpoint\n          \
+          \  response = requests.post(\n                create_url,\n            \
+          \    headers=headers,\n                data=json.dumps(data_to_send),\n\
+          \                timeout=30\n            )\n            \n            success_msg\
+          \ = 'Created successfully'\n            error_msg = \"Creation failed: \"\
+          \ + str(response.text)\n            \n            return {\n           \
+          \     'status': 'success' if response.status_code < 400 else 'error',\n\
+          \                'status_code': response.status_code,\n                'response':\
+          \ response.json() if response.status_code < 400 else response.text,\n  \
+          \              'message': success_msg if response.status_code < 400 else\
+          \ error_msg\n            }\n        except Exception as e:\n           \
+          \ return {\n                'status': 'error',\n                'message':\
+          \ \"Exception during creation: \" + str(e),\n                'status_code':\
+          \ 500\n            }\n    \n    def process_entity_group(entity_type, entities,\
+          \ existing_check=True):\n        \"\"\"Process a group of entities with\
+          \ verification and progressive creation\"\"\"\n        results = []\n  \
+          \      \n        for entity in entities:\n            entity_name = entity.get('name',\
+          \ 'Unknown')\n            \n            # Step 1: Verify if entity already\
+          \ exists (if requested)\n            if existing_check:\n              \
+          \  exists, error = verify_entity_exists(entity_type, entity_name)\n    \
+          \            if error:\n                    results.append({\n         \
+          \               'name': entity_name,\n                        'status':\
+          \ 'error',\n                        'message': \"Verification failed: \"\
+          \ + str(error),\n                        'status_code': 500,\n         \
+          \               'action': 'verification_failed'\n                    })\n\
+          \                    continue\n                \n                if exists:\n\
+          \                    skip_msg = entity_type + \" '\" + entity_name + \"\
+          ' already exists\"\n                    results.append({\n             \
+          \           'name': entity_name,\n                        'status': 'skipped',\n\
+          \                        'message': skip_msg,\n                        'status_code':\
+          \ 200,\n                        'action': 'already_exists'\n           \
+          \         })\n                    continue\n            \n            #\
+          \ Step 2: Attempt creation\n            creation_result = create_entity(entity_type,\
+          \ entity)\n            creation_result['name'] = entity_name\n         \
+          \   creation_result['action'] = 'created' if creation_result['status'] ==\
+          \ 'success' else 'creation_failed'\n            results.append(creation_result)\n\
+          \        \n        return results\n    \n    try:\n        # Initialize\
+          \ results structure\n        configResult = {\n            'addressLevelTypes':\
+          \ [],\n            'locations': [],\n            'catchments': [],\n   \
+          \         'subjectTypes': [],\n            'programs': [],\n           \
+          \ 'encounterTypes': [],\n            'verification_enabled': True,\n   \
+          \         'progressive_creation': True\n        }\n        \n        # Entity\
+          \ processing order (respects dependencies)\n        entity_order = [\n \
+          \           'addressLevelTypes',\n            'locations',\n           \
+          \ 'catchments',\n            'subjectTypes',\n            'programs',\n\
+          \            'encounterTypes'\n        ]\n        \n        # Process each\
+          \ entity type in order\n        for entity_type in entity_order:\n     \
+          \       if entity_type in config and config[entity_type]:\n            \
+          \    print(\"Processing \" + entity_type + \"...\")\n                configResult[entity_type]\
+          \ = process_entity_group(\n                    entity_type, \n         \
+          \           config[entity_type],\n                    existing_check=True\n\
+          \                )\n        \n        # Analyze results\n        total_entities\
+          \ = 0\n        successful_entities = 0\n        failed_entities = 0\n  \
+          \      skipped_entities = 0\n        \n        for entity_type in entity_order:\n\
+          \            for entity in configResult.get(entity_type, []):\n        \
+          \        total_entities += 1\n                if entity.get('status') ==\
+          \ 'success':\n                    successful_entities += 1\n           \
+          \     elif entity.get('status') == 'skipped':\n                    skipped_entities\
+          \ += 1\n                else:\n                    failed_entities += 1\n\
+          \        \n        # Determine flow action based on results\n        if\
+          \ total_entities == 0:\n            result = 'success'\n            status\
+          \ = 'no_entities_to_process'\n            flow_action = 'complete_success'\n\
+          \        elif successful_entities == total_entities:\n            result\
+          \ = 'success'\n            status = 'all_entities_created'\n           \
+          \ flow_action = 'complete_success'\n        elif successful_entities > 0\
+          \ and failed_entities > 0:\n            result = 'partial_success'\n   \
+          \         status = 'partial_entities_created'\n            flow_action =\
+          \ 'analyze_failures'\n        elif skipped_entities == total_entities:\n\
+          \            result = 'success'\n            status = 'all_entities_already_exist'\n\
+          \            flow_action = 'complete_success'\n        elif failed_entities\
+          \ == total_entities:\n            result = 'failure'\n            status\
+          \ = 'all_entities_failed'\n            flow_action = 'analyze_failures'\n\
+          \        else:\n            result = 'partial_success'\n            status\
+          \ = 'mixed_results'\n            flow_action = 'analyze_failures'\n    \
+          \    \n        summary_msg = (\"Processed \" + str(total_entities) + \"\
+          \ entities: \" + \n                      str(successful_entities) + \" created,\
+          \ \" + \n                      str(skipped_entities) + \" skipped, \" +\
+          \ \n                      str(failed_entities) + \" failed\")\n        \n\
+          \        return {\n            'configResult': {\n                'result':\
+          \ result,\n                'status': status,\n                'flow_action':\
+          \ flow_action,\n                'message': summary_msg,\n              \
+          \  'summary': {\n                    'total': total_entities,\n        \
+          \            'successful': successful_entities,\n                    'failed':\
+          \ failed_entities,\n                    'skipped': skipped_entities\n  \
+          \              },\n                **configResult\n            }\n     \
+          \   }\n        \n    except Exception as error:\n        error_msg = \"\
+          Unexpected error: \" + str(error)\n        return {\n            'configResult':\
+          \ {\n                'result': 'error',\n                'status': 'exception_occurred',\n\
+          \                'flow_action': 'handle_exception',\n                'message':\
+          \ error_msg,\n                'summary': {'total': 0, 'successful': 0, 'failed':\
+          \ 0, 'skipped': 0}\n            }\n        }\n"
+        code_language: python3
+        outputs:
+          configResult:
+            children: null
+            type: object
+        selected: false
+        title: Comprehensive Configuration Manager
+        type: code
+        variables:
+        - value_selector:
+          - '17580163919060'
+          - structured_output
+          - config
+          value_type: object
+          variable: config
+        - value_selector:
+          - '1711528708197'
+          - auth_token
+          value_type: string
+          variable: auth_token
+        - value_selector:
+          - '1711528708197'
+          - org_type
+          value_type: string
+          variable: org_type
+      height: 52
+      id: '1758624264401'
+      position:
+        x: 1696.9959119567468
+        y: 1291.8452689845076
+      positionAbsolute:
+        x: 1696.9959119567468
+        y: 1291.8452689845076
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: a0a936ba-619a-46d1-a1b5-146a4416c836
+          role: system
+          text: '{{#1758624264401.configResult.result#}}
+
+            Based on the result from configuration creation, respond with a single
+            word. If result is "success" then say "Success". If result is "failure"
+            or "error" then say "Failure". Reply only in a single word either "Success"
+            or "Failure"'
+        selected: false
+        structured_output_enabled: false
+        title: Check Responses
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '1758693281998'
+      position:
+        x: 3508.159844080605
+        y: 1660.9030710723694
+      positionAbsolute:
+        x: 3508.159844080605
+        y: 1660.9030710723694
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 8e8b2b4a-1b2c-4d3e-9f0a-1b2c3d4e5f6a
+          role: system
+          text: 'You are a safety assistant for Avni configuration management. The
+            user is about to delete an implementation in a {{#1711528708197.org_type#}}
+            environment.
+
+
+            This is a CRITICAL operation that will permanently delete all configuration
+            data.
+
+
+            Your task is to:
+
+            1. Clearly explain the risks of deletion in production/UAT environments
+
+            2. Ask for explicit confirmation
+
+            3. Respond with EXACTLY "CONFIRMED" if the user explicitly confirms
+
+            4. Respond with EXACTLY "CANCELLED" if the user cancels or shows any hesitation
+
+
+            Be very strict about confirmation - only accept clear, unambiguous confirmation.'
+        - id: 9f1a2b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+          role: user
+          text: The configuration creation failed and the system wants to delete the
+            implementation. This is a {{#1711528708197.org_type#}} environment. Should
+            I proceed with deletion?
+        selected: false
+        title: Deletion Confirmation
+        type: llm
+        variables:
+        - value_selector:
+          - '1711528708197'
+          - org_type
+          value_type: string
+          variable: org_type
+      height: 88
+      id: '1758695000001'
+      position:
+        x: 4200
+        y: 1300
+      positionAbsolute:
+        x: 4200
+        y: 1300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: conf-check-001
+            value: CONFIRMED
+            varType: string
+            variable_selector:
+            - '1758695000001'
+            - text
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: Check Confirmation
+        type: if-else
+      height: 124
+      id: '1758695000002'
+      position:
+        x: 4500
+        y: 1300
+      positionAbsolute:
+        x: 4500
+        y: 1300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Deletion cancelled by user. The implementation was not deleted to
+          prevent data loss in the {{#1711528708197.org_type#}} environment.
+
+
+          To proceed with deletion, you must explicitly confirm the operation when
+          prompted.'
+        selected: false
+        title: Deletion Cancelled
+        type: answer
+        variables:
+        - value_selector:
+          - '1711528708197'
+          - org_type
+          value_type: string
+          variable: org_type
+      height: 198
+      id: '1758695000003'
+      position:
+        x: 4800
+        y: 1400
+      positionAbsolute:
+        x: 4800
+        y: 1400
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: bc017f4c-6d6f-466d-bb74-222e3922f34e
+            value: Success
+            varType: string
+            variable_selector:
+            - '1758693281998'
+            - text
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: IF/ELSE 6
+        type: if-else
+      height: 124
+      id: '1758693567975'
+      position:
+        x: 3942.635726528355
+        y: 1406.2719548802834
+      positionAbsolute:
+        x: 3942.635726528355
+        y: 1406.2719548802834
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: There were errors while creating this configuration. Would you like
+          to restart and try again?
+        selected: false
+        title: Answer 5
+        type: answer
+        variables: []
+      height: 132
+      id: '1758693816149'
+      position:
+        x: 4770.484176467899
+        y: 1411.7671137442917
+      positionAbsolute:
+        x: 4770.484176467899
+        y: 1411.7671137442917
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        headers: auth-token:{{#1711528708197.auth_token#}}
+        method: delete
+        params: 'deleteMetadata:true
+
+          deleteAdminConfig:false'
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: Delete Implementation
+        type: http-request
+        url: https://staging.avniproject.org/implementation/delete
+        variables: []
+      height: 153
+      id: '1758694151292'
+      position:
+        x: 4401.009380224768
+        y: 1411.7671137442917
+      positionAbsolute:
+        x: 4401.009380224768
+        y: 1411.7671137442917
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: Cannot create configuration because you have a {{#1711528708197.org_type#}}
+          account.
+        selected: false
+        title: Answer 6
+        type: answer
+        variables: []
+      height: 134
+      id: '1758695198689'
+      position:
+        x: 2873.3347021541435
+        y: 1153.6064292006101
+      positionAbsolute:
+        x: 2873.3347021541435
+        y: 1153.6064292006101
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: This assistant can help you with any questions related to Avni. This
+          does not seem relevant to Avni.
+        selected: false
+        title: Unrelated Question
+        type: answer
+        variables: []
+      height: 132
+      id: '1758699378772'
+      position:
+        x: 1625.82809511913
+        y: 914.4985346267281
+      positionAbsolute:
+        x: 1625.82809511913
+        y: 914.4985346267281
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        dataset_ids:
+        - EcEHhfyw2lTA/pRvqDse3E7RCHi8WmJgNSgzX1pQN+8cN6n17MR+Rps3VogupFsu
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: weighted_score
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: text-embedding-3-large
+              embedding_provider_name: langgenius/openai/openai
+              vector_weight: 0.7
+        query_variable_selector:
+        - '1711528708197'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: Knowledge Retrieval
+        type: knowledge-retrieval
+      height: 90
+      id: '1758713692744'
+      position:
+        x: 382.02759711954866
+        y: 745.9078304270952
+      positionAbsolute:
+        x: 382.02759711954866
+        y: 745.9078304270952
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: production_uat
+          conditions:
+          - comparison_operator: is
+            id: prod-uat-check
+            value: error
+            varType: string
+            variable_selector:
+            - '1758624264401'
+            - configResult
+            - result
+          - comparison_operator: is
+            id: prod-uat-status-check
+            value: production_uat_blocked
+            varType: string
+            variable_selector:
+            - '1758624264401'
+            - configResult
+            - status
+          id: production_uat
+          logical_operator: and
+        - case_id: no_config
+          conditions:
+          - comparison_operator: is
+            id: no-config-check
+            value: error
+            varType: string
+            variable_selector:
+            - '1758624264401'
+            - configResult
+            - result
+          - comparison_operator: is
+            id: no-config-status-check
+            value: no_config
+            varType: string
+            variable_selector:
+            - '1758624264401'
+            - configResult
+            - status
+          id: no_config
+          logical_operator: and
+        - case_id: complete_success
+          conditions:
+          - comparison_operator: is
+            id: complete-success-check
+            value: complete_success
+            varType: string
+            variable_selector:
+            - '1758624264401'
+            - configResult
+            - flow_action
+          id: complete_success
+          logical_operator: and
+        - case_id: analyze_failures
+          conditions:
+          - comparison_operator: is
+            id: analyze-failures-check
+            value: analyze_failures
+            varType: string
+            variable_selector:
+            - '1758624264401'
+            - configResult
+            - flow_action
+          id: analyze_failures
+          logical_operator: and
+        - case_id: success_or_failure
+          conditions:
+          - comparison_operator: is
+            id: success-check
+            value: success
+            varType: string
+            variable_selector:
+            - '1758624264401'
+            - configResult
+            - result
+          - comparison_operator: is
+            id: failure-check
+            value: failure
+            varType: string
+            variable_selector:
+            - '1758624264401'
+            - configResult
+            - result
+          id: success_or_failure
+          logical_operator: or
+        desc: Route based on configuration creation result
+        selected: false
+        title: Route Config Result
+        type: if-else
+      height: 438
+      id: '1758624264402'
+      position:
+        x: 2117.3397569645485
+        y: 1303.656726907239
+      positionAbsolute:
+        x: 2117.3397569645485
+        y: 1303.656726907239
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '✅ **Configuration Created Successfully!**
+
+
+          {{#1758624264401.configResult.message#}}
+
+
+          **Summary:**
+
+          - Total entities: {{#1758624264401.configResult.summary.total#}}
+
+          - Successfully created: {{#1758624264401.configResult.summary.successful#}}
+
+          - Skipped (already exist): {{#1758624264401.configResult.summary.skipped#}}
+
+          - Failed: {{#1758624264401.configResult.summary.failed#}}
+
+
+          {{#1758624264401.configResult.summary.skipped#}}Some entities were skipped
+          because they already exist in your organization. This is normal and expected.{{/1758624264401.configResult.summary.skipped#}}
+
+
+          Your Avni configuration is now ready to use! 🎉'
+        selected: false
+        title: Complete Success
+        type: answer
+        variables: []
+      height: 372
+      id: '1758695100001'
+      position:
+        x: 2500
+        y: 1200
+      positionAbsolute:
+        x: 2500
+        y: 1200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: "⚠️ **Partial Configuration Results**\n\n{{#1758624264401.configResult.message#}}\n\
+          \n**What happened:**\n- ✅ Successfully created: {{#1758624264401.configResult.summary.successful#}}\
+          \ entities\n- ⏭️ Skipped (already exist): {{#1758624264401.configResult.summary.skipped#}}\
+          \ entities  \n- ❌ Failed: {{#1758624264401.configResult.summary.failed#}}\
+          \ entities\n\n**Next Steps:**\n1. **Review the errors** in the detailed\
+          \ results above\n2. **Fix any data issues** (missing required fields, invalid\
+          \ references, etc.)\n3. **Retry the configuration** for the failed entities\n\
+          4. **Contact support** if you encounter persistent API or system errors\n\
+          \n**Note:** The successfully created entities are already in your system\
+          \ and don't need to be recreated. \U0001F527"
+        selected: false
+        title: Analyze Failures
+        type: answer
+        variables: []
+      height: 415
+      id: '1758695100002'
+      position:
+        x: 2500
+        y: 1450
+      positionAbsolute:
+        x: 2500
+        y: 1450
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: -3162.125371463659
+      y: -2045.0383644414403
+      zoom: 1.3882584400853335
+  rag_pipeline_variables: []

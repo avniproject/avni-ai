@@ -1,0 +1,68 @@
+[
+  {
+    "test_name": "test_basic_hierarchy",
+    "status": "\u274c FAIL",
+    "passed": false,
+    "message": "Basic location hierarchy with State and District levels",
+    "details": {
+      "configResult": {
+        "result": "failure",
+        "status": "all_entities_failed",
+        "flow_action": "analyze_failures",
+        "message": "Processed 5 entities: 0 created, 0 skipped, 5 failed",
+        "summary": {
+          "total": 5,
+          "successful": 0,
+          "failed": 5,
+          "skipped": 0
+        },
+        "addressLevelTypes": [
+          {
+            "name": "Test State 1758809539",
+            "status": "error",
+            "message": "Verification failed: AddressLevelType verification failed: 401",
+            "status_code": 500,
+            "action": "verification_failed"
+          },
+          {
+            "name": "Test District 1758809539",
+            "status": "error",
+            "message": "Verification failed: AddressLevelType verification failed: 401",
+            "status_code": 500,
+            "action": "verification_failed"
+          }
+        ],
+        "locations": [
+          {
+            "name": "Test State Location 1758809539",
+            "status": "error",
+            "message": "Verification failed: Search failed: 401",
+            "status_code": 500,
+            "action": "verification_failed"
+          },
+          {
+            "name": "Test District A 1758809539",
+            "status": "error",
+            "message": "Verification failed: Search failed: 401",
+            "status_code": 500,
+            "action": "verification_failed"
+          },
+          {
+            "name": "Test District B 1758809539",
+            "status": "error",
+            "message": "Verification failed: Search failed: 401",
+            "status_code": 500,
+            "action": "verification_failed"
+          }
+        ],
+        "catchments": [],
+        "subjectTypes": [],
+        "programs": [],
+        "encounterTypes": [],
+        "verification_enabled": true,
+        "progressive_creation": true
+      }
+    },
+    "timestamp": "2025-09-25T19:42:20.241057"
+  }
+]
