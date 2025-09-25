@@ -5,6 +5,68 @@ from copy import deepcopy
 import time
 import re
 
+def sort_locations_by_hierarchy(locations):
+    """
+    Sort locations by hierarchy level (parents first, then children)
+    This ensures parent locations are created before child locations
+    """
+    if not locations:
+        return locations
+    
+    # Sort by level (lower level = higher in hierarchy, should be created first)
+    sorted_locations = sorted(locations, key=lambda x: x.get('level', 999))
+    return sorted_locations
+
+def find_parent_by_hierarchy(parent_type, parent_level, child_entity):
+    """
+    Find parent location by type and hierarchy level
+    Generic approach that works for any location hierarchy
+    """
+    try:
+        # Search for locations of the parent type at the parent level
+        search_url = f"{base_url}/locations"
+        response = requests.get(
+            search_url,
+            headers=headers,
+            cookies=cookies,
+            params={
+                'size': 1000,
+                'type': parent_type,
+                'level': parent_level
+            },
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            results = response.json()
+            
+            # Handle paginated response
+            locations = []
+            if isinstance(results, dict) and 'content' in results:
+                locations = results['content']
+            elif isinstance(results, list):
+                locations = results
+            
+            # For now, return the first matching parent
+            # In a more sophisticated system, you could use geographic proximity
+            # or other criteria to find the most appropriate parent
+            for location in locations:
+                if (isinstance(location, dict) and 
+                    location.get('type') == parent_type and 
+                    location.get('level') == parent_level):
+                    print(f"DEBUG: Found potential parent '{location.get('title')}' for '{child_entity.get('name')}'")
+                    return location
+            
+            print(f"DEBUG: No parent of type '{parent_type}' at level {parent_level} found")
+            return None
+        else:
+            print(f"WARNING: Parent search failed with status {response.status_code}")
+            return None
+            
+    except Exception as e:
+        print(f"ERROR: Exception in find_parent_by_hierarchy: {str(e)}")
+        return None
+
 def main(auth_token, org_type, config, user_name=None, org_name='test-suite', base_url='https://staging.avniproject.org'):
     """
     Comprehensive Avni Configuration Manager
@@ -96,8 +158,8 @@ def main(auth_token, org_type, config, user_name=None, org_name='test-suite', ba
             }
         }
     
-    def verify_entity_exists(entity_type, entity_name):
-        """Use GET API to verify if entity exists"""
+    def verify_entity_exists(entity_type, entity_name, entity_uuid=None, entity_id=None):
+        """Use GET API to verify if entity exists by name, UUID, or ID"""
         try:
             # Map plural config keys to singular API endpoint keys
             entity_type_mapping = {
@@ -113,6 +175,26 @@ def main(auth_token, org_type, config, user_name=None, org_name='test-suite', ba
             endpoint = API_ENDPOINTS.get(api_entity_type)
             if not endpoint:
                 return False, "Unknown entity type: " + str(entity_type)
+            
+            # Handle UUID-based lookup for locations
+            if entity_uuid and api_entity_type == 'locations':
+                # Direct UUID lookup for locations
+                search_url = f"{base_url}/locations/web"
+                response = requests.get(
+                    search_url,
+                    headers=headers,
+                    cookies=cookies,
+                    params={'uuid': entity_uuid},
+                    timeout=10
+                )
+                
+                if response.status_code == 200:
+                    location_data = response.json()
+                    print(f"DEBUG: Found location by UUID {entity_uuid}: {location_data.get('title', 'Unknown')}")
+                    return True, location_data
+                else:
+                    print(f"DEBUG: Location with UUID {entity_uuid} not found")
+                    return False, None
             
             # Special handling for different entity types
             if api_entity_type == 'addressLevelType':
@@ -141,8 +223,10 @@ def main(auth_token, org_type, config, user_name=None, org_name='test-suite', ba
                         # Search for matching name (case-insensitive)
                         for alt in address_level_types:
                             if isinstance(alt, dict) and alt.get('name', '').lower() == entity_name.lower():
-                                return True, None
+                                print(f"DEBUG: Found existing AddressLevelType '{entity_name}' with ID {alt.get('id')}")
+                                return True, alt  # Return the actual AddressLevelType object
                         
+                        print(f"DEBUG: AddressLevelType '{entity_name}' not found")
                         return False, None  # Not found in existing address level types
                     else:
                         return False, f"AddressLevelType verification failed: {response.status_code}"
@@ -272,6 +356,36 @@ def main(auth_token, org_type, config, user_name=None, org_name='test-suite', ba
         except Exception as e:
             return False, "Verification error: " + str(e)
     
+    def find_locations_by_type_id(type_id):
+        """Find locations by AddressLevelType ID using the findAsList endpoint"""
+        try:
+            search_url = f"{base_url}/locations/search/findAsList"
+            response = requests.get(
+                search_url,
+                headers=headers,
+                cookies=cookies,
+                params={'typeId': type_id},
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                results = response.json()
+                print(f"DEBUG: Found {len(results) if isinstance(results, list) else 0} locations for typeId {type_id}")
+                return results if isinstance(results, list) else []
+            else:
+                print(f"WARNING: Location search by typeId failed with status {response.status_code}")
+                return []
+                
+        except Exception as e:
+            print(f"ERROR: Exception in find_locations_by_type_id: {str(e)}")
+            return []
+    
+    def should_be_parent(state_name, district_name):
+        """Generic heuristic - for now, just return True to use first available parent"""
+        # In a real system, this could use geographic data, naming patterns, or config hints
+        # For this demo, we'll use the first available state as parent for districts
+        return True
+    
     def create_entity(entity_type, entity_data):
         """Create a single entity with proper validation"""
         try:
@@ -306,16 +420,39 @@ def main(auth_token, org_type, config, user_name=None, org_name='test-suite', ba
                     'name': entity_data['name'],  # LocationContract uses 'name' field from ReferenceDataContract
                     'level': entity_data.get('level'),
                     'type': entity_data.get('type'),
-                    'addressLevelTypeUUID': entity_data.get('addressLevelTypeUUID'),
                     'legacyId': entity_data.get('legacyId'),
                     'gpsCoordinates': entity_data.get('gpsCoordinates'),
                     'locationProperties': entity_data.get('locationProperties', {}),
                     'voided': entity_data.get('voided', False)
                 }
                 
-                # Handle parent relationship - locations need parent UUID reference, not parentId
+                # CRITICAL: Look up existing AddressLevelType and use its ID, not UUID
+                address_level_type_name = entity_data.get('type')
+                if address_level_type_name:
+                    alt_exists, alt_data = verify_entity_exists('addressLevelTypes', address_level_type_name)
+                    if alt_exists and alt_data and isinstance(alt_data, dict):
+                        # Use the actual ID from the existing AddressLevelType
+                        location_data['typeId'] = alt_data.get('id')
+                        print(f"DEBUG: Using existing AddressLevelType ID {alt_data.get('id')} for location '{entity_data['name']}'")
+                    else:
+                        print(f"WARNING: AddressLevelType '{address_level_type_name}' not found for location '{entity_data['name']}'")
+                        # Still include the UUID as fallback
+                        location_data['addressLevelTypeUUID'] = entity_data.get('addressLevelTypeUUID')
+                
+                # Handle parent relationship - use parentLocationUUID to find parentId
                 if 'parentLocationUUID' in entity_data and entity_data['parentLocationUUID']:
-                    location_data['parent'] = {'uuid': entity_data['parentLocationUUID']}
+                    parent_uuid = entity_data['parentLocationUUID']
+                    
+                    # Look up the parent location by UUID to get its database ID
+                    parent_exists, parent_data = verify_entity_exists('locations', None, parent_uuid)
+                    if parent_exists and parent_data and parent_data.get('id'):
+                        location_data['parentId'] = parent_data.get('id')
+                        print(f"DEBUG: Set parentId={parent_data.get('id')} for '{entity_data['name']}' using parentLocationUUID")
+                    else:
+                        print(f"WARNING: Parent location with UUID {parent_uuid} not found for '{entity_data['name']}'")
+                elif entity_data.get('level', 0) > 1:
+                    print(f"INFO: No parentLocationUUID provided for '{entity_data['name']}', cannot determine parent")
+                # For top-level locations, don't include parent fields at all
                 
                 # CRITICAL FIX: Remove 'voided' field - it should be boolean, not string
                 if 'voided' in location_data and isinstance(location_data['voided'], str):
@@ -429,38 +566,62 @@ def main(auth_token, org_type, config, user_name=None, org_name='test-suite', ba
             'encounterTypes'
         ]
         
-        # Process each entity type in order
+        # Process each entity type in dependency order
         for entity_type in entity_order:
             if entity_type in config and config[entity_type]:
-                print("Processing " + entity_type + "...")
+                print(f"Processing {entity_type}...")
                 
-                # Special handling for locations to establish parent-child relationships
+                entities = config[entity_type]
+                
+                # Special handling for locations - sort by hierarchy (parents first)
                 if entity_type == 'locations':
-                    locations = config[entity_type]
+                    entities = sort_locations_by_hierarchy(entities)
                     
                     # Create a mapping of location names to UUIDs for parent references
                     location_uuid_map = {}
-                    for location in locations:
+                    for location in entities:
                         location_uuid_map[location.get('name', '')] = location.get('uuid', '')
                     
-                    # Process locations and add parent references for districts
+                    # Process locations - no hardcoded parent relationships
                     processed_locations = []
-                    for location in locations:
+                    parent_locations_by_level = {}  # Track locations by level
+                    
+                    # First pass: group locations by level
+                    for location in entities:
+                        level = location.get('level')
+                        if level not in parent_locations_by_level:
+                            parent_locations_by_level[level] = []
+                        parent_locations_by_level[level].append(location)
+                    
+                    # Second pass: process all locations
+                    child_index_by_level = {}  # Track distribution index for each level
+                    
+                    for location in entities:
                         location_copy = location.copy()
+                        current_level = location.get('level')
                         
-                        # For district-level locations, find their parent state
-                        if location.get('level') == 2.0 and location.get('type') == 'District':
-                            location_name = location.get('name', '')
-                            parent_state = None
+                        # For child locations, find parent from previous level
+                        if current_level and current_level > 1.0:
+                            parent_level = current_level - 1.0
+                            parent_locations = parent_locations_by_level.get(parent_level, [])
                             
-                            # Based on the typical config structure
-                            if location_name in ['Bengaluru', 'Mysore']:
-                                parent_state = 'Karnataka'
-                            elif location_name in ['Mumbai', 'Pune']:
-                                parent_state = 'Maharashtra'
-                            
-                            if parent_state and parent_state in location_uuid_map:
-                                location_copy['parentLocationUUID'] = location_uuid_map[parent_state]
+                            if parent_locations:
+                                # Initialize index for this level if not exists
+                                if current_level not in child_index_by_level:
+                                    child_index_by_level[current_level] = 0
+                                
+                                # Distribute children evenly among parents of previous level
+                                parent_index = child_index_by_level[current_level] % len(parent_locations)
+                                parent_location = parent_locations[parent_index]
+                                parent_name = parent_location.get('name', '')
+                                
+                                if parent_name in location_uuid_map:
+                                    location_copy['parentLocationUUID'] = location_uuid_map[parent_name]
+                                    print(f"DEBUG: Assigned parent '{parent_name}' (level {parent_level}) to '{location.get('name')}' (level {current_level})")
+                                
+                                child_index_by_level[current_level] += 1
+                            else:
+                                print(f"WARNING: No parent locations found at level {parent_level} for '{location.get('name')}'")
                         
                         processed_locations.append(location_copy)
                     
