@@ -2,8 +2,8 @@
 
 from typing import Optional, List
 from mcp.server.fastmcp import FastMCP
-from client import make_avni_request
-from utils import format_list_response, format_creation_response
+from src.client import make_avni_request
+from src.utils import format_list_response, format_creation_response
 
 
 def register_user_tools(mcp: FastMCP) -> None:

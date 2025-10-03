@@ -2,9 +2,9 @@
 
 from typing import Optional, List
 from mcp.server.fastmcp import FastMCP
-from client import make_avni_request
-from utils import format_list_response, format_creation_response
-from tool_registry import tool_registry
+from src.client import make_avni_request
+from src.utils import format_list_response, format_creation_response
+from src.tool_registry import tool_registry
 
 
 def register_location_tools(mcp: FastMCP) -> None:

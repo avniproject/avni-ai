@@ -1,8 +1,8 @@
 """HTTP client for Avni API."""
 
 import httpx
-from config import BASE_URL, get_headers
-from utils import ApiResult
+from .config import BASE_URL, get_headers
+from src.utils import ApiResult
 
 
 async def make_avni_request(

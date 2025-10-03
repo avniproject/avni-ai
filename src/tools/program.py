@@ -4,9 +4,9 @@ from typing import Optional
 
 from mcp.server.fastmcp import FastMCP
 
-from client import make_avni_request
-from utils import format_creation_response
-from tool_registry import tool_registry
+from src.client import make_avni_request
+from src.utils import format_creation_response
+from src.tool_registry import tool_registry
 
 
 def register_program_tools(mcp: FastMCP) -> None:

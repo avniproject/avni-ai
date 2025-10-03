@@ -12,15 +12,13 @@ from dotenv import load_dotenv
 from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from openai_client import create_openai_client
-from openai_function_client import create_openai_function_client
 
-from utils import create_error_response, create_success_response, create_cors_middleware
-
-from tools.location import register_location_tools, register_location_tools_direct
-from tools.program import register_program_tools, register_program_tools_direct
-from tool_registry import tool_registry
-from auth_provider import SimpleTokenVerifier
+from .auth_provider import SimpleTokenVerifier
+from .openai_function_client import create_openai_function_client
+from .tool_registry import tool_registry
+from .tools.location import register_location_tools, register_location_tools_direct
+from .tools.program import register_program_tools, register_program_tools_direct
+from .utils import create_error_response, create_success_response, create_cors_middleware
 
 load_dotenv()
 
@@ -52,7 +50,7 @@ def create_server():
     """Create and configure the MCP server with Avni tools."""
 
     mcp = FastMCP(
-        name="Avni_MCP_Server",
+        name="Avni AI Server",
         instructions=server_instructions,
         stateless_http=True,
         auth=SimpleTokenVerifier(),
@@ -60,7 +58,7 @@ def create_server():
 
     register_location_tools(mcp)
     register_program_tools(mcp)
-    
+
     # Register tools for direct function calling
     register_location_tools_direct()
     register_program_tools_direct()
@@ -101,7 +99,7 @@ async def process_chat_request(request: Request) -> JSONResponse:
 
         # Get available tools from the registry
         available_tools = tool_registry.get_openai_tools()
-        
+
         # Create messages for the conversation
         messages = [
             {
@@ -109,7 +107,7 @@ async def process_chat_request(request: Request) -> JSONResponse:
                 "content": server_instructions
             },
             {
-                "role": "user", 
+                "role": "user",
                 "content": message
             }
         ]
@@ -122,30 +120,30 @@ async def process_chat_request(request: Request) -> JSONResponse:
                 tools=available_tools,
                 model="gpt-4o"
             )
-            
+
             # Check if the assistant wants to call functions
             choice = response["choices"][0]
             assistant_message = choice["message"]
-            
+
             # Add the assistant's message to the conversation
             messages.append(assistant_message)
-            
+
             # Process any function calls
             if assistant_message.get("tool_calls"):
                 function_results = await client.process_function_calls(
                     response, tool_registry, auth_token
                 )
-                
+
                 # Add function results to the conversation
                 messages.extend(function_results)
-                
+
                 # Make another API call to get the final response
                 final_response = await client.create_chat_completion(
                     messages=messages,
                     tools=available_tools,
                     model="gpt-4o"
                 )
-                
+
                 final_message = final_response["choices"][0]["message"]
                 output_text = final_message.get("content", "No response generated")
             else:
@@ -170,10 +168,10 @@ if not OPENAI_API_KEY:
 
 logger.info("Initializing Avni MCP Server for production deployment...")
 
-mcp_server = create_server()
+ai_server = create_server()
 
 # Create ASGI application with proper HTTP middleware
-app = mcp_server.http_app(middleware=[create_cors_middleware()])
+app = ai_server.http_app(middleware=[create_cors_middleware()])
 
 logger.info("ASGI application created successfully")
 logger.info("Deploy with: uvicorn main:app --host 0.0.0.0 --port 8023")
@@ -185,7 +183,7 @@ def main():
     logger.info(f"Starting Avni MCP server on 0.0.0.0:{port}")
 
     try:
-        mcp_server.run(
+        ai_server.run(
             transport="http",
             host="0.0.0.0",
             port=port,
