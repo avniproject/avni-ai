@@ -3,7 +3,7 @@ app:
   icon: 🤖
   icon_background: '#FFEAD5'
   mode: advanced-chat
-  name: Avni [Staging]
+  name: Avni [Prod] Do Not Touch
   use_icon_as_answer_icon: true
 dependencies:
 - current_identifier: null
@@ -455,72 +455,74 @@ workflow:
             \n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
             \ NOT about Avni or data collection platforms → OUT_OF_SCOPE\n2. If a\
             \ message starts with capability questions (\"Is it possible\", \"Can\
-            \ Avni\", \"Does Avni support\", \"Is there a way\"), it is ALWAYS RAG\
-            \ regardless of complexity.\n\n\n### RAG - Platform Knowledge & Capabilities\n\
-            \n\n**Primary Intent**: Learning what Avni can/cannot do\n\n\n**Definitive\
-            \ Indicators** (Route to RAG even if complex): \n- \"What is Avni?\" →\
-            \ RAG (basic platform knowledge)\n- \"Tell me about Avni\" → RAG (platform\
-            \ overview)\n- \"Is it possible to...\" → RAG (capability inquiry) \n\
-            - \"Can Avni...\" → RAG (platform capability) \n- \"Does Avni support...\"\
-            \ → RAG (feature question) \n- \"Is there a way to...\" → RAG (method\
-            \ inquiry) \n- \"What are the limitations of...\" → RAG (constraint question)\
-            \ \n- \"How does Avni handle...\" → RAG (mechanism inquiry)\n\n\n**Key\
-            \ Principle**: Complexity of the scenario does NOT change the\nintent.\
-            \ A detailed capability question is still a capability question.\n\n\n\
-            \n### ASSISTANT - Custom/Novel Requirements\n\n\n**Primary Intent**: Building\
-            \ something new or unique\n\n\n**Indicators**: - \"We need something that\
-            \ doesn't exist...\" - \"Can you\nbuild/create/develop...\" - \"We have\
-            \ unique requirements...\" -\n\"Integration with external system X...\"\
-            \n\n\n### OUT_OF_SCOPE - Not Avni Related\n\n\n**Primary Intent**: Questions\
-            \ completely unrelated to Avni or data collection platforms\n\n\n**Definitive\
-            \ Indicators**:\n- Questions for which no relevant context available in\
-            \ this prompt\n- General programming/coding questions not specific to\
-            \ Avni\n- Questions about other software platforms (Salesforce, Excel,\
-            \ etc.)\n- Personal questions, weather, news, entertainment\n- Academic\
-            \ questions unrelated to health/social programs\n- Technical questions\
-            \ about non-Avni systems\n- \"What is the capital of...\" / \"How do I\
-            \ cook...\" / \"What's the weather...\"\n- Questions about competitors\
-            \ without Avni context\n\n\n\n**EXCEPTION**: Greeting messages (\"Hi\"\
-            , \"Hello\", \"Good morning\") should NOT be marked as OUT_OF_SCOPE. These\
-            \ require clarification to understand the user's actual intent. \n\n\n\
-            ## Decision Framework\n\n\n**Step 1**: Check relevance - If clearly NOT\
-            \ about Avni/data collection → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**:\
-            \ If greeting message → Set clarification_needed = true\n\n\n**Step 2**:\
-            \ Identify the question type - If starts with capability\nquestions →\
-            \ RAG (STOP HERE) - If describes implementation needs →\nASSISTANT\n\n\
-            \n## Critical Examples\n\n✅ \"What is Avni?\" → **RAG** (basic platform\
-            \ knowledge)\n\n✅ \"Tell me about Avni platform\" → **RAG** (platform\
-            \ overview)\n\n✅ \"What does Avni do?\" → **RAG** (platform purpose/functionality)\n\
-            \n✅ \"Is it possible to automatically show selected answers from Clinical\n\
-            Assessment in Follow-up Visit forms?\" → **RAG** (capability question,\n\
-            regardless of technical complexity)\n\n✅ \"Can Avni restrict encounter\
-            \ forms to single entry per individual?\" →\n**RAG** (capability question)\n\
-            \n✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
+            \ Avni\", \"Does Avni support\", \"Is there a way\", \"How can I\"), it\
+            \ is ALWAYS RAG regardless of complexity.\n\n\n### RAG - Platform Knowledge\
+            \ & Capabilities\n\n\n**Primary Intent**: Learning what Avni can/cannot\
+            \ do\n\n\n**Definitive Indicators** (Route to RAG even if complex):\n\
+            - \"What is Avni?\" → RAG (basic platform knowledge)\n- \"Tell me about\
+            \ Avni\" → RAG (platform overview)\n- \"Is it possible to...\" → RAG (capability\
+            \ inquiry)\n- \"Can Avni...\" → RAG (platform capability)\n- \"Does Avni\
+            \ support...\" → RAG (feature question)\n- \"Is there a way to...\" →\
+            \ RAG (method inquiry)\n- \"How can I...\" → RAG (step-by-step guidance\
+            \ inquiry)\n- \"What are the limitations of...\" → RAG (constraint question)\n\
+            - \"How does Avni handle...\" → RAG (mechanism inquiry)\n\n\n**Key Principle**:\
+            \ Complexity of the scenario does NOT change the\nintent. A detailed capability\
+            \ question is still a capability question.\n\n\n\n### ASSISTANT - Custom/Novel\
+            \ Requirements\n\n\n**Primary Intent**: Building something new or unique\n\
+            \n\n**Indicators**: - \"We need something that doesn't exist...\" - \"\
+            Can you\nbuild/create/develop...\" - \"We have unique requirements...\"\
+            \ -\n\"Integration with external system X...\"\n\n\n### OUT_OF_SCOPE -\
+            \ Not Avni Related\n\n\n**Primary Intent**: Questions completely unrelated\
+            \ to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n\
+            - Questions for which no relevant context available in this prompt\n-\
+            \ General programming/coding questions not specific to Avni\n- Questions\
+            \ about other software platforms (Salesforce, Excel, etc.)\n- Personal\
+            \ questions, weather, news, entertainment\n- Academic questions unrelated\
+            \ to health/social programs\n- Technical questions about non-Avni systems\n\
+            - \"What is the capital of...\" / \"How do I cook...\" / \"What's the\
+            \ weather...\"\n- Questions about competitors without Avni context\n\n\
+            \n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\"\
+            ) should NOT be marked as OUT_OF_SCOPE. These require clarification to\
+            \ understand the user's actual intent.\n\n\n## Decision Framework\n\n\n\
+            **Step 1**: Check relevance - If clearly NOT about Avni/data collection\
+            \ → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**: If greeting message → Set\
+            \ clarification_needed = true\n\n\n**Step 2**: Identify the question type\
+            \ - If starts with capability\nquestions → RAG (STOP HERE) - If describes\
+            \ implementation needs →\nASSISTANT\n\n\n## Critical Examples\n\n✅ \"\
+            What is Avni?\" → **RAG** (basic platform knowledge)\n\n✅ \"Tell me about\
+            \ Avni platform\" → **RAG** (platform overview)\n\n✅ \"What does Avni\
+            \ do?\" → **RAG** (platform purpose/functionality)\n\n✅ \"Is it possible\
+            \ to automatically show selected answers from Clinical\nAssessment in\
+            \ Follow-up Visit forms?\" → **RAG** (capability question,\nregardless\
+            \ of technical complexity)\n\n✅ \"Can Avni restrict encounter forms to\
+            \ single entry per individual?\" →\n**RAG** (capability question)\n\n\
+            ✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
             \n→ **RAG** (capability question, even if the workflow is complex)\n\n\
             ✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"What are identifiers\"\
             \n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\
-            \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n\n\n\n✅ \"What\
-            \ is the capital of France?\" → **OUT_OF_SCOPE** (not related to Avni)\n\
-            \n\n✅ \"How do I write Python code for web scraping?\" → **OUT_OF_SCOPE**\
-            \ (general programming, not Avni-specific)\n\n\n✅ \"Can you help me with\
-            \ my Excel formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅\
-            \ \"Hello\" → **RAG** with clarification_needed = true (greeting requires\
-            \ clarification)\n\n\n✅ \"Hi there\" → **RAG** with clarification_needed\
-            \ = true (greeting requires clarification)\n\n\n❌ **WRONG**: \"Sounds\
-            \ complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"Starts with capability\
-            \ question → RAG\"\n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap\
-            \ 1**: Complexity Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\"\
-            \ - ✅ \"Capability question = platform inquiry = RAG\"\n\n\n**Trap 2**:\
-            \ Implementation Details Bias - ❌ \"Mentions specific\ntechnical details\
-            \ = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**:\
-            \ Domain Specificity Bias - ❌ \"Very specific use case =\nASSISTANT\"\
-            \ - ✅ \"Question format determines intent\"\n\n\n**Trap 4**: Relevance\
-            \ Assumption - ❌ \"Any question = must be Avni-related\" - ✅ \"Check if\
-            \ actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting\
-            \ Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification\
-            \ to understand intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"\
-            service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"confidence\": 0.0-1.0,\n\
-            \  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
+            \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n✅ \"How can I\
+            \ setup the assignment feature in Avni?\" → **RAG** (step-by-step guidance\
+            \ question)\n\n\n\n✅ \"What is the capital of France?\" → **OUT_OF_SCOPE**\
+            \ (not related to Avni)\n\n\n✅ \"How do I write Python code for web scraping?\"\
+            \ → **OUT_OF_SCOPE** (general programming, not Avni-specific)\n\n\n✅ \"\
+            Can you help me with my Excel formulas?\" → **OUT_OF_SCOPE** (different\
+            \ platform)\n\n\n✅ \"Hello\" → **RAG** with clarification_needed = true\
+            \ (greeting requires clarification)\n\n\n✅ \"Hi there\" → **RAG** with\
+            \ clarification_needed = true (greeting requires clarification)\n\n\n\
+            ❌ **WRONG**: \"Sounds complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"\
+            Starts with capability question → RAG\"\n\n\n## Common Misrouting Traps\
+            \ to Avoid\n\n\n**Trap 1**: Complexity Bias - ❌ \"Complex scenario = custom\
+            \ work =\nASSISTANT\" - ✅ \"Capability question = platform inquiry = RAG\"\
+            \n\n\n**Trap 2**: Implementation Details Bias - ❌ \"Mentions specific\n\
+            technical details = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\
+            \n\n**Trap 3**: Domain Specificity Bias - ❌ \"Very specific use case =\n\
+            ASSISTANT\" - ✅ \"Question format determines intent\"\n\n\n**Trap 4**:\
+            \ Relevance Assumption - ❌ \"Any question = must be Avni-related\" - ✅\
+            \ \"Check if actually about Avni/data collection first\"\n\n\n**Trap 5**:\
+            \ Greeting Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting =\
+            \ needs clarification to understand intent\"\n\n\n## Response Format\n\
+            \n\n``` json\n{\n  \"service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"\
+            confidence\": 0.0-1.0,\n  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
             ,\n  \"routing_reason\": \"Brief explanation focusing on question structure,\
             \ not content complexity\",\n  \"clarification_needed\": true|false,\n\
             \  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\
@@ -546,11 +548,11 @@ workflow:
             \        │\n        ├── NOT about Avni/data collection (general questions,\
             \ other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n        │\n \
             \       ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does\
-            \ Avni...\" ?\n        │   └── YES → RAG (regardless of complexity)\n\
-            \        │\n        ├── Describes implementation needs (\"We need...\"\
-            , \"Help us set up...\", \"Our org wants...\")?\n        │   └── YES →\
-            \ ASSISTANT\n        │\n        └── UNCLEAR → Default to RAG (safer for\
-            \ capability questions)"
+            \ Avni...\" / \"How can I...\" ?\n        │   └── YES → RAG (regardless\
+            \ of complexity)\n        │\n        ├── Describes implementation needs\
+            \ (\"We need...\", \"Help us set up...\", \"Our org wants...\")?\n   \
+            \     │   └── YES → ASSISTANT\n        │\n        └── UNCLEAR → Default\
+            \ to RAG (safer for capability questions)"
         - id: 36b2faa1-0e45-4962-8107-74a07045af09
           role: user
           text: ''
@@ -2216,7 +2218,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -117.96540104710391
-      y: -308.3418545133427
-      zoom: 0.7205362611850628
+      x: 176.3114859404959
+      y: 132.9780087842271
+      zoom: 0.29459301021708606
   rag_pipeline_variables: []
