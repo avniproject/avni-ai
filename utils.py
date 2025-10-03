@@ -52,11 +52,23 @@ def format_list_response(
         extra_key: Optional extra field to include
     """
     # Handle paginated response - extract content array if it exists
-    if isinstance(items, dict) and "content" in items:
-        items = items["content"]
+    if isinstance(items, dict):
+        if "content" in items:
+            items = items["content"]
+        elif "page" in items and not items.get("content"):
+            # Handle empty paginated response
+            page_info = items["page"]
+            total = page_info.get("totalElements", 0)
+            if total == 0:
+                return "No items found."
+            else:
+                return f"Found {total} items but no content returned."
+        else:
+            # If it's a dict but not paginated, treat as single item
+            items = [items]
 
     if not items:
-        return ""
+        return "No items found."
 
     result = []
     for item in items:

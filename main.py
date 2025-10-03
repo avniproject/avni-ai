@@ -13,13 +13,13 @@ from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from openai_client import create_openai_client
+from openai_function_client import create_openai_function_client
 
 from utils import create_error_response, create_success_response, create_cors_middleware
 
-from tools.location import register_location_tools
-from tools.organization import register_organization_tools
-from tools.program import register_program_tools
-from tools.user import register_user_tools
+from tools.location import register_location_tools, register_location_tools_direct
+from tools.program import register_program_tools, register_program_tools_direct
+from tool_registry import tool_registry
 from auth_provider import SimpleTokenVerifier
 
 load_dotenv()
@@ -37,7 +37,6 @@ server_instructions = """
 You are an AI assistant that helps users (usually management personals of NGOs) interact with the Avni platform for their program data management.
 
 You have access to various tools to:
-- Create organizations, users, and user groups  
 - Manage locations and catchments
 - Create programs, subject types, and encounter types
 - List and retrieve information about these entities
@@ -59,10 +58,12 @@ def create_server():
         auth=SimpleTokenVerifier(),
     )
 
-    register_organization_tools(mcp)
     register_location_tools(mcp)
-    register_user_tools(mcp)
     register_program_tools(mcp)
+    
+    # Register tools for direct function calling
+    register_location_tools_direct()
+    register_program_tools_direct()
 
     @mcp.custom_route("/health", methods=["GET"])
     async def health_check(request: Request):
@@ -85,7 +86,7 @@ def create_server():
 
 
 async def process_chat_request(request: Request) -> JSONResponse:
-    """Process a complete chat request from parsing to response."""
+    """Process a complete chat request using direct function calling."""
 
     try:
         body = await request.json()
@@ -98,33 +99,58 @@ async def process_chat_request(request: Request) -> JSONResponse:
         if not auth_token:
             return create_error_response("AUTH-TOKEN header is required", 401)
 
-        if not AVNI_MCP_SERVER_URL:
-            return create_error_response(
-                "AVNI_MCP_SERVER_URL environment variable not set", 500
-            )
+        # Get available tools from the registry
+        available_tools = tool_registry.get_openai_tools()
+        
+        # Create messages for the conversation
+        messages = [
+            {
+                "role": "system",
+                "content": server_instructions
+            },
+            {
+                "role": "user", 
+                "content": message
+            }
+        ]
 
-        openai_client = create_openai_client(OPENAI_API_KEY, timeout=180.0)
+        openai_client = create_openai_function_client(OPENAI_API_KEY, timeout=180.0)
         async with openai_client as client:
-            response = await client.create_mcp_response(
-                input_text=message,
-                server_label="Avni_MCP_Server",
-                server_url=AVNI_MCP_SERVER_URL,
-                auth_token=auth_token,
-                model="gpt-4o",
-                instructions=f"Use this auth token when calling MCP tools: {auth_token}",
+            # First API call to get the assistant's response and potential function calls
+            response = await client.create_chat_completion(
+                messages=messages,
+                tools=available_tools,
+                model="gpt-4o"
             )
-
-        output_text = "No output received"
-
-        if "output" in response:
-            for item in response["output"]:
-                if item.get("type") == "message" and item.get("role") == "assistant":
-                    content = item.get("content", [])
-                    for content_item in content:
-                        if content_item.get("type") == "output_text":
-                            output_text = content_item.get("text", "No output received")
-                            break
-                    break
+            
+            # Check if the assistant wants to call functions
+            choice = response["choices"][0]
+            assistant_message = choice["message"]
+            
+            # Add the assistant's message to the conversation
+            messages.append(assistant_message)
+            
+            # Process any function calls
+            if assistant_message.get("tool_calls"):
+                function_results = await client.process_function_calls(
+                    response, tool_registry, auth_token
+                )
+                
+                # Add function results to the conversation
+                messages.extend(function_results)
+                
+                # Make another API call to get the final response
+                final_response = await client.create_chat_completion(
+                    messages=messages,
+                    tools=available_tools,
+                    model="gpt-4o"
+                )
+                
+                final_message = final_response["choices"][0]["message"]
+                output_text = final_message.get("content", "No response generated")
+            else:
+                # No function calls, use the assistant's direct response
+                output_text = assistant_message.get("content", "No response generated")
 
         return create_success_response({"response": output_text})
 
