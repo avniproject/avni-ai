@@ -16,10 +16,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Import our components
-from src.openai_function_client import create_openai_function_client
-from src.tools.location import register_location_tools_direct
-from src.tools.program import register_program_tools_direct
-from src.tool_registry import tool_registry
+from src.clients import create_openai_client
+from src.tools.admin.addressleveltypes import register_address_level_type_tools
+from src.tools.admin.catchments import register_catchment_tools
+from src.tools.admin.locations import register_location_tools
+from src.tools.app_designer.encounters import register_encounter_tools
+from src.tools.app_designer.programs import register_program_tools
+from src.tools.app_designer.subject_types import register_subject_type_tools
+from src.core import tool_registry
 
 pytest.skip("Skipping all tests in this module", allow_module_level=True)
 async def test_location_tools():
@@ -108,55 +112,33 @@ async def make_openai_call(messages, test_name):
         print(f"📋 Available tools: {len(available_tools)}")
 
         # Create OpenAI client
-        async with create_openai_function_client(api_key) as client:
+        async with create_openai_client(api_key) as client:
             print(f"🤖 Making OpenAI API call for: {test_name}")
 
-            # First API call
-            response = await client.create_chat_completion(
-                messages=messages,
+            # First API call using Responses API
+            input_text = messages[-1]["content"]  # Get user message
+            response = await client.create_response(
+                input_text=input_text,
                 tools=available_tools,
                 model="gpt-4o-mini"  # Using mini for cost efficiency
             )
 
-            # Check the response
-            choice = response["choices"][0]
-            assistant_message = choice["message"]
+            # Check the response content
+            response_content = response.get("content", "No content")
+            print(f"💬 Assistant response: {response_content}")
 
-            print(f"💬 Assistant response: {assistant_message.get('content', 'No content')}")
+            # Process any function calls
+            function_results = await client.process_function_calls(
+                response, tool_registry, auth_token
+            )
 
-            # Add assistant message to conversation
-            messages.append(assistant_message)
-
-            # Check if assistant wants to call functions
-            if assistant_message.get("tool_calls"):
-                print(f"🔧 Assistant wants to call {len(assistant_message['tool_calls'])} function(s)")
-
-                # Process function calls
-                function_results = await client.process_function_calls(
-                    response, tool_registry, auth_token
-                )
-
+            if function_results:
+                print(f"🔧 Processed {len(function_results)} function calls")
                 print(f"📊 Function call results:")
                 for i, result in enumerate(function_results, 1):
-                    print(f"   {i}. {result['name']}: {result['content'][:200]}...")
-
-                # Add function results to conversation
-                messages.extend(function_results)
-
-                # Make final API call to get assistant's summary
-                print("🔄 Making final API call for summary...")
-                final_response = await client.create_chat_completion(
-                    messages=messages,
-                    tools=available_tools,
-                    model="gpt-4o-mini"
-                )
-
-                final_message = final_response["choices"][0]["message"]
-                final_text = final_message.get("content", "No final response")
-                print(f"✅ Final response: {final_text}")
-
+                    print(f"   {i}. {result['name']}: {result['result'][:200]}...")
             else:
-                print("ℹ️  No function calls requested by assistant")
+                print("ℹ️  No function calls were made")
 
             print(f"✅ {test_name} test completed successfully!")
             return True
@@ -175,8 +157,12 @@ async def main():
 
     # Register all tools
     print("📝 Registering tools...")
-    register_location_tools_direct()
-    register_program_tools_direct()
+    register_address_level_type_tools()
+    register_catchment_tools()
+    register_location_tools()
+    register_encounter_tools()
+    register_program_tools()
+    register_subject_type_tools()
 
     tools = tool_registry.list_tools()
     print(f"✅ Registered {len(tools)} tools: {', '.join(tools)}")

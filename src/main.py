@@ -13,12 +13,15 @@ from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .auth_provider import SimpleTokenVerifier
-from .openai_function_client import create_openai_function_client
-from .tool_registry import tool_registry
-from .tools.location import register_location_tools, register_location_tools_direct
-from .tools.program import register_program_tools, register_program_tools_direct
-from .utils import create_error_response, create_success_response, create_cors_middleware
+from .auth import SimpleTokenVerifier
+from .handlers import process_chat_request, process_config_request
+from src.tools.admin.addressleveltypes import  register_address_level_type_tools
+from src.tools.admin.catchments import  register_catchment_tools
+from src.tools.admin.locations import  register_location_tools
+from src.tools.app_designer.encounters import register_encounter_tools
+from src.tools.app_designer.programs import register_program_tools
+from src.tools.app_designer.subject_types import register_subject_type_tools
+from .utils import create_cors_middleware
 
 load_dotenv()
 
@@ -29,7 +32,6 @@ logger = logging.getLogger(__name__)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 base_url = os.getenv("AVNI_MCP_SERVER_URL")
 AVNI_MCP_SERVER_URL = base_url + "/mcp"
-AVNI_BASE_URL = os.getenv("AVNI_BASE_URL")
 
 server_instructions = """
 You are an AI assistant that helps users (usually management personals of NGOs) interact with the Avni platform for their program data management.
@@ -47,7 +49,7 @@ Important: All operations require the user to have provided their Avni API key w
 
 
 def create_server():
-    """Create and configure the MCP server with Avni tools."""
+    """Starts an mcp server, though we have removed the mcp server tools as we do direct function calling now """
 
     mcp = FastMCP(
         name="Avni AI Server",
@@ -56,12 +58,12 @@ def create_server():
         auth=SimpleTokenVerifier(),
     )
 
-    register_location_tools(mcp)
-    register_program_tools(mcp)
-
-    # Register tools for direct function calling
-    register_location_tools_direct()
-    register_program_tools_direct()
+    register_address_level_type_tools()
+    register_catchment_tools()
+    register_location_tools()
+    register_encounter_tools()
+    register_program_tools()
+    register_subject_type_tools()
 
     @mcp.custom_route("/health", methods=["GET"])
     async def health_check(request: Request):
@@ -70,6 +72,7 @@ def create_server():
         """
         return JSONResponse({"status": "healthy", "service": "Avni MCP Server"})
 
+    """ /chat endpoint was being used initially when we were not using Dify , we can get rid of this endpoint"""
     @mcp.custom_route("/chat", methods=["OPTIONS"])
     async def chat_options(request: Request):
         """Handle CORS preflight requests for /chat endpoint."""
@@ -78,86 +81,13 @@ def create_server():
     @mcp.custom_route("/chat", methods=["POST"])
     async def chat_endpoint(request: Request):
         """Chat endpoint that integrates with OpenAI Responses API."""
-        return await process_chat_request(request)
+        return await process_chat_request(request, OPENAI_API_KEY, server_instructions)
+
+    @mcp.custom_route("/process-config", methods=["POST"])
+    async def process_config_endpoint(request: Request):
+        return await process_config_request(request, OPENAI_API_KEY)
 
     return mcp
-
-
-async def process_chat_request(request: Request) -> JSONResponse:
-    """Process a complete chat request using direct function calling."""
-
-    try:
-        body = await request.json()
-        message = body.get("message")
-
-        if not message:
-            return create_error_response("Message is required", 400)
-
-        auth_token = request.headers.get("AUTH-TOKEN")
-        if not auth_token:
-            return create_error_response("AUTH-TOKEN header is required", 401)
-
-        # Get available tools from the registry
-        available_tools = tool_registry.get_openai_tools()
-
-        # Create messages for the conversation
-        messages = [
-            {
-                "role": "system",
-                "content": server_instructions
-            },
-            {
-                "role": "user",
-                "content": message
-            }
-        ]
-
-        openai_client = create_openai_function_client(OPENAI_API_KEY, timeout=180.0)
-        async with openai_client as client:
-            # First API call to get the assistant's response and potential function calls
-            response = await client.create_chat_completion(
-                messages=messages,
-                tools=available_tools,
-                model="gpt-4o"
-            )
-
-            # Check if the assistant wants to call functions
-            choice = response["choices"][0]
-            assistant_message = choice["message"]
-
-            # Add the assistant's message to the conversation
-            messages.append(assistant_message)
-
-            # Process any function calls
-            if assistant_message.get("tool_calls"):
-                function_results = await client.process_function_calls(
-                    response, tool_registry, auth_token
-                )
-
-                # Add function results to the conversation
-                messages.extend(function_results)
-
-                # Make another API call to get the final response
-                final_response = await client.create_chat_completion(
-                    messages=messages,
-                    tools=available_tools,
-                    model="gpt-4o"
-                )
-
-                final_message = final_response["choices"][0]["message"]
-                output_text = final_message.get("content", "No response generated")
-            else:
-                # No function calls, use the assistant's direct response
-                output_text = assistant_message.get("content", "No response generated")
-
-        return create_success_response({"response": output_text})
-
-    except Exception as e:
-        logger.error(f"Chat request processing error: {e}")
-        import traceback
-
-        logger.error(f"Full traceback: {traceback.format_exc()}")
-        return create_error_response("Internal server error", 500)
 
 
 if not OPENAI_API_KEY:

@@ -3,7 +3,7 @@ app:
   icon: 🤖
   icon_background: '#FFEAD5'
   mode: advanced-chat
-  name: Avni [Staging]
+  name: Avni [Prod] Do Not Touch
   use_icon_as_answer_icon: true
 dependencies:
 - current_identifier: null
@@ -388,7 +388,7 @@ workflow:
           required: false
           type: text-input
           variable: user_name
-      height: 210
+      height: 208
       id: '1711528708197'
       position:
         x: 79.5
@@ -400,7 +400,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -455,72 +455,74 @@ workflow:
             \n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
             \ NOT about Avni or data collection platforms → OUT_OF_SCOPE\n2. If a\
             \ message starts with capability questions (\"Is it possible\", \"Can\
-            \ Avni\", \"Does Avni support\", \"Is there a way\"), it is ALWAYS RAG\
-            \ regardless of complexity.\n\n\n### RAG - Platform Knowledge & Capabilities\n\
-            \n\n**Primary Intent**: Learning what Avni can/cannot do\n\n\n**Definitive\
-            \ Indicators** (Route to RAG even if complex): \n- \"What is Avni?\" →\
-            \ RAG (basic platform knowledge)\n- \"Tell me about Avni\" → RAG (platform\
-            \ overview)\n- \"Is it possible to...\" → RAG (capability inquiry) \n\
-            - \"Can Avni...\" → RAG (platform capability) \n- \"Does Avni support...\"\
-            \ → RAG (feature question) \n- \"Is there a way to...\" → RAG (method\
-            \ inquiry) \n- \"What are the limitations of...\" → RAG (constraint question)\
-            \ \n- \"How does Avni handle...\" → RAG (mechanism inquiry)\n\n\n**Key\
-            \ Principle**: Complexity of the scenario does NOT change the\nintent.\
-            \ A detailed capability question is still a capability question.\n\n\n\
-            \n### ASSISTANT - Custom/Novel Requirements\n\n\n**Primary Intent**: Building\
-            \ something new or unique\n\n\n**Indicators**: - \"We need something that\
-            \ doesn't exist...\" - \"Can you\nbuild/create/develop...\" - \"We have\
-            \ unique requirements...\" -\n\"Integration with external system X...\"\
-            \n\n\n### OUT_OF_SCOPE - Not Avni Related\n\n\n**Primary Intent**: Questions\
-            \ completely unrelated to Avni or data collection platforms\n\n\n**Definitive\
-            \ Indicators**:\n- Questions for which no relevant context available in\
-            \ this prompt\n- General programming/coding questions not specific to\
-            \ Avni\n- Questions about other software platforms (Salesforce, Excel,\
-            \ etc.)\n- Personal questions, weather, news, entertainment\n- Academic\
-            \ questions unrelated to health/social programs\n- Technical questions\
-            \ about non-Avni systems\n- \"What is the capital of...\" / \"How do I\
-            \ cook...\" / \"What's the weather...\"\n- Questions about competitors\
-            \ without Avni context\n\n\n\n**EXCEPTION**: Greeting messages (\"Hi\"\
-            , \"Hello\", \"Good morning\") should NOT be marked as OUT_OF_SCOPE. These\
-            \ require clarification to understand the user's actual intent. \n\n\n\
-            ## Decision Framework\n\n\n**Step 1**: Check relevance - If clearly NOT\
-            \ about Avni/data collection → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**:\
-            \ If greeting message → Set clarification_needed = true\n\n\n**Step 2**:\
-            \ Identify the question type - If starts with capability\nquestions →\
-            \ RAG (STOP HERE) - If describes implementation needs →\nASSISTANT\n\n\
-            \n## Critical Examples\n\n✅ \"What is Avni?\" → **RAG** (basic platform\
-            \ knowledge)\n\n✅ \"Tell me about Avni platform\" → **RAG** (platform\
-            \ overview)\n\n✅ \"What does Avni do?\" → **RAG** (platform purpose/functionality)\n\
-            \n✅ \"Is it possible to automatically show selected answers from Clinical\n\
-            Assessment in Follow-up Visit forms?\" → **RAG** (capability question,\n\
-            regardless of technical complexity)\n\n✅ \"Can Avni restrict encounter\
-            \ forms to single entry per individual?\" →\n**RAG** (capability question)\n\
-            \n✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
+            \ Avni\", \"Does Avni support\", \"Is there a way\", \"How can I\"), it\
+            \ is ALWAYS RAG regardless of complexity.\n\n\n### RAG - Platform Knowledge\
+            \ & Capabilities\n\n\n**Primary Intent**: Learning what Avni can/cannot\
+            \ do\n\n\n**Definitive Indicators** (Route to RAG even if complex):\n\
+            - \"What is Avni?\" → RAG (basic platform knowledge)\n- \"Tell me about\
+            \ Avni\" → RAG (platform overview)\n- \"Is it possible to...\" → RAG (capability\
+            \ inquiry)\n- \"Can Avni...\" → RAG (platform capability)\n- \"Does Avni\
+            \ support...\" → RAG (feature question)\n- \"Is there a way to...\" →\
+            \ RAG (method inquiry)\n- \"How can I...\" → RAG (step-by-step guidance\
+            \ inquiry)\n- \"What are the limitations of...\" → RAG (constraint question)\n\
+            - \"How does Avni handle...\" → RAG (mechanism inquiry)\n\n\n**Key Principle**:\
+            \ Complexity of the scenario does NOT change the\nintent. A detailed capability\
+            \ question is still a capability question.\n\n\n\n### ASSISTANT - Custom/Novel\
+            \ Requirements\n\n\n**Primary Intent**: Building something new or unique\n\
+            \n\n**Indicators**: - \"We need something that doesn't exist...\" - \"\
+            Can you\nbuild/create/develop...\" - \"We have unique requirements...\"\
+            \ -\n\"Integration with external system X...\"\n\n\n### OUT_OF_SCOPE -\
+            \ Not Avni Related\n\n\n**Primary Intent**: Questions completely unrelated\
+            \ to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n\
+            - Questions for which no relevant context available in this prompt\n-\
+            \ General programming/coding questions not specific to Avni\n- Questions\
+            \ about other software platforms (Salesforce, Excel, etc.)\n- Personal\
+            \ questions, weather, news, entertainment\n- Academic questions unrelated\
+            \ to health/social programs\n- Technical questions about non-Avni systems\n\
+            - \"What is the capital of...\" / \"How do I cook...\" / \"What's the\
+            \ weather...\"\n- Questions about competitors without Avni context\n\n\
+            \n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\"\
+            ) should NOT be marked as OUT_OF_SCOPE. These require clarification to\
+            \ understand the user's actual intent.\n\n\n## Decision Framework\n\n\n\
+            **Step 1**: Check relevance - If clearly NOT about Avni/data collection\
+            \ → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**: If greeting message → Set\
+            \ clarification_needed = true\n\n\n**Step 2**: Identify the question type\
+            \ - If starts with capability\nquestions → RAG (STOP HERE) - If describes\
+            \ implementation needs →\nASSISTANT\n\n\n## Critical Examples\n\n✅ \"\
+            What is Avni?\" → **RAG** (basic platform knowledge)\n\n✅ \"Tell me about\
+            \ Avni platform\" → **RAG** (platform overview)\n\n✅ \"What does Avni\
+            \ do?\" → **RAG** (platform purpose/functionality)\n\n✅ \"Is it possible\
+            \ to automatically show selected answers from Clinical\nAssessment in\
+            \ Follow-up Visit forms?\" → **RAG** (capability question,\nregardless\
+            \ of technical complexity)\n\n✅ \"Can Avni restrict encounter forms to\
+            \ single entry per individual?\" →\n**RAG** (capability question)\n\n\
+            ✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
             \n→ **RAG** (capability question, even if the workflow is complex)\n\n\
             ✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"What are identifiers\"\
             \n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\
-            \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n\n\n\n✅ \"What\
-            \ is the capital of France?\" → **OUT_OF_SCOPE** (not related to Avni)\n\
-            \n\n✅ \"How do I write Python code for web scraping?\" → **OUT_OF_SCOPE**\
-            \ (general programming, not Avni-specific)\n\n\n✅ \"Can you help me with\
-            \ my Excel formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅\
-            \ \"Hello\" → **RAG** with clarification_needed = true (greeting requires\
-            \ clarification)\n\n\n✅ \"Hi there\" → **RAG** with clarification_needed\
-            \ = true (greeting requires clarification)\n\n\n❌ **WRONG**: \"Sounds\
-            \ complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"Starts with capability\
-            \ question → RAG\"\n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap\
-            \ 1**: Complexity Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\"\
-            \ - ✅ \"Capability question = platform inquiry = RAG\"\n\n\n**Trap 2**:\
-            \ Implementation Details Bias - ❌ \"Mentions specific\ntechnical details\
-            \ = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**:\
-            \ Domain Specificity Bias - ❌ \"Very specific use case =\nASSISTANT\"\
-            \ - ✅ \"Question format determines intent\"\n\n\n**Trap 4**: Relevance\
-            \ Assumption - ❌ \"Any question = must be Avni-related\" - ✅ \"Check if\
-            \ actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting\
-            \ Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification\
-            \ to understand intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"\
-            service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"confidence\": 0.0-1.0,\n\
-            \  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
+            \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n✅ \"How can I\
+            \ setup the assignment feature in Avni?\" → **RAG** (step-by-step guidance\
+            \ question)\n\n\n\n✅ \"What is the capital of France?\" → **OUT_OF_SCOPE**\
+            \ (not related to Avni)\n\n\n✅ \"How do I write Python code for web scraping?\"\
+            \ → **OUT_OF_SCOPE** (general programming, not Avni-specific)\n\n\n✅ \"\
+            Can you help me with my Excel formulas?\" → **OUT_OF_SCOPE** (different\
+            \ platform)\n\n\n✅ \"Hello\" → **RAG** with clarification_needed = true\
+            \ (greeting requires clarification)\n\n\n✅ \"Hi there\" → **RAG** with\
+            \ clarification_needed = true (greeting requires clarification)\n\n\n\
+            ❌ **WRONG**: \"Sounds complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"\
+            Starts with capability question → RAG\"\n\n\n## Common Misrouting Traps\
+            \ to Avoid\n\n\n**Trap 1**: Complexity Bias - ❌ \"Complex scenario = custom\
+            \ work =\nASSISTANT\" - ✅ \"Capability question = platform inquiry = RAG\"\
+            \n\n\n**Trap 2**: Implementation Details Bias - ❌ \"Mentions specific\n\
+            technical details = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\
+            \n\n**Trap 3**: Domain Specificity Bias - ❌ \"Very specific use case =\n\
+            ASSISTANT\" - ✅ \"Question format determines intent\"\n\n\n**Trap 4**:\
+            \ Relevance Assumption - ❌ \"Any question = must be Avni-related\" - ✅\
+            \ \"Check if actually about Avni/data collection first\"\n\n\n**Trap 5**:\
+            \ Greeting Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting =\
+            \ needs clarification to understand intent\"\n\n\n## Response Format\n\
+            \n\n``` json\n{\n  \"service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"\
+            confidence\": 0.0-1.0,\n  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
             ,\n  \"routing_reason\": \"Brief explanation focusing on question structure,\
             \ not content complexity\",\n  \"clarification_needed\": true|false,\n\
             \  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\
@@ -543,14 +545,14 @@ workflow:
             3. **\"Is the user asking IF something is possible, or telling me they\
             \ WANT something implemented?\"** - IF possible → RAG - WANT implemented\
             \ → ASSISTANT\n\n\n## Decision Tree for Edge Cases\n\n\n    User Message\n\
-            \        \n        ├── NOT about Avni/data collection (general questions,\
-            \ other platforms)?\n           └── YES → OUT_OF_SCOPE\n        \n \
+            \        │\n        ├── NOT about Avni/data collection (general questions,\
+            \ other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n        │\n \
             \       ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does\
-            \ Avni...\" ?\n           └── YES → RAG (regardless of complexity)\n\
-            \        \n        ├── Describes implementation needs (\"We need...\"\
-            , \"Help us set up...\", \"Our org wants...\")?\n           └── YES →\
-            \ ASSISTANT\n        \n        └── UNCLEAR → Default to RAG (safer for\
-            \ capability questions)"
+            \ Avni...\" / \"How can I...\" ?\n        │   └── YES → RAG (regardless\
+            \ of complexity)\n        │\n        ├── Describes implementation needs\
+            \ (\"We need...\", \"Help us set up...\", \"Our org wants...\")?\n   \
+            \     │   └── YES → ASSISTANT\n        │\n        └── UNCLEAR → Default\
+            \ to RAG (safer for capability questions)"
         - id: 36b2faa1-0e45-4962-8107-74a07045af09
           role: user
           text: ''
@@ -587,7 +589,7 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1757492907627'
       position:
         x: 679.5208847590508
@@ -599,7 +601,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
@@ -662,7 +664,7 @@ workflow:
         selected: false
         title: IF/ELSE
         type: if-else
-      height: 294
+      height: 292
       id: '1757493270484'
       position:
         x: 1017.6514583301542
@@ -674,7 +676,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -722,7 +724,7 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1757495664531'
       position:
         x: 1843.5141755407374
@@ -734,7 +736,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#1757495664531.text#}}'
         desc: ''
@@ -742,7 +744,7 @@ workflow:
         title: RAG Answer
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1757495688732'
       position:
         x: 2278.5095654341676
@@ -754,7 +756,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#17580163919060.text#}}'
         desc: ''
@@ -762,7 +764,7 @@ workflow:
         title: Answer 5
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1757496045338'
       position:
         x: 3276.9696999300368
@@ -774,7 +776,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -835,7 +837,12 @@ workflow:
             \ question at a time.\n- Use a nudging style: ask clarifying questions,\
             \ provide concrete examples, and help me refine my answers step by step.\n\
             - Keep the conversation practical and oriented toward my real-world workflow\
-            \ rather than technical details of Avni.\n\nCRITICAL ATTRIBUTE HANDLING\
+            \ rather than technical details of Avni.\n\nIMPORTANT LIMITATION:\n- I\
+            \ cannot help with writing, debugging, or creating Avni rules (JavaScript\
+            \ code for custom logic in forms)\n- If asked about rules, clearly respond:\
+            \ \"I can't help you with writing Avni rules right now. For creating or\
+            \ implementing rules in Avni, please consult the Avni documentation or\
+            \ reach out to the Avni support team.\"\n\nCRITICAL ATTRIBUTE HANDLING\
             \ RULES:\n- If a subject type already exists (from validation), do NOT\
             \ ask for attributes\n- Only ask for attributes when creating NEW subject\
             \ types\n- Skip attribute questions for entities that won't be created\
@@ -981,7 +988,7 @@ workflow:
             \ that up\" or \"Let me know when you've created this\"\n- This creates\
             \ a natural, step-by-step implementation flow rather than just theoretical\
             \ planning"
-        selected: false
+        selected: true
         structured_output:
           schema:
             additionalProperties: false
@@ -1149,7 +1156,7 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '17580163919060'
       position:
         x: 1340.6439991246866
@@ -1161,14 +1168,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
         selected: false
         title: Clarify the question
         type: answer
         variables: []
-      height: 137
+      height: 136
       id: '1758608702077'
       position:
         x: 1409.7669821360873
@@ -1180,14 +1187,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#17580163919060.text#}}'
         selected: false
         title: Answer 4
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1758692827777'
       position:
         x: 4781.118291097593
@@ -1199,7 +1206,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         code: "import requests\nimport json\nimport uuid\nfrom copy import deepcopy\n\
           import time\nimport re\ndef sort_locations_by_hierarchy(locations):\n  \
@@ -1681,7 +1688,7 @@ workflow:
           - org_name
           value_type: string
           variable: org_name
-      height: 52
+      height: 50
       id: '1758624264401'
       position:
         x: 1696.9959119567468
@@ -1693,7 +1700,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: false
@@ -1719,7 +1726,7 @@ workflow:
         type: llm
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1758693281998'
       position:
         x: 3129.4764325533256
@@ -1731,7 +1738,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: false
@@ -1780,7 +1787,7 @@ workflow:
           - org_type
           value_type: string
           variable: org_type
-      height: 88
+      height: 86
       id: '1758695000001'
       position:
         x: 4200
@@ -1792,7 +1799,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 'true'
@@ -1809,7 +1816,7 @@ workflow:
         selected: false
         title: Check Confirmation
         type: if-else
-      height: 124
+      height: 122
       id: '1758695000002'
       position:
         x: 4500
@@ -1821,7 +1828,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: 'Deletion cancelled by user. The implementation was not deleted to
           prevent data loss in the {{#1711528708197.org_type#}} environment.
@@ -1838,7 +1845,7 @@ workflow:
           - org_type
           value_type: string
           variable: org_type
-      height: 199
+      height: 197
       id: '1758695000003'
       position:
         x: 4800
@@ -1850,7 +1857,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 'true'
@@ -1867,7 +1874,7 @@ workflow:
         selected: false
         title: IF/ELSE 6
         type: if-else
-      height: 124
+      height: 122
       id: '1758693567975'
       position:
         x: 3579.896879696961
@@ -1879,7 +1886,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: There were errors while creating this configuration. Would you like
           to restart and try again?
@@ -1887,7 +1894,7 @@ workflow:
         title: Answer 5
         type: answer
         variables: []
-      height: 132
+      height: 130
       id: '1758693816149'
       position:
         x: 5224.107042065841
@@ -1899,7 +1906,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         authorization:
           config: null
@@ -1926,7 +1933,7 @@ workflow:
         type: http-request
         url: https://staging.avniproject.org/implementation/delete
         variables: []
-      height: 153
+      height: 151
       id: '1758694151292'
       position:
         x: 4893.962172072561
@@ -1938,7 +1945,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: Cannot create configuration because you have a {{#1711528708197.org_type#}}
           account.
@@ -1946,7 +1953,7 @@ workflow:
         title: Answer 6
         type: answer
         variables: []
-      height: 135
+      height: 133
       id: '1758695198689'
       position:
         x: 3359.5667470351527
@@ -1958,7 +1965,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: This assistant can help you with any questions related to Avni. This
           does not seem relevant to Avni.
@@ -1966,7 +1973,7 @@ workflow:
         title: Unrelated Question
         type: answer
         variables: []
-      height: 132
+      height: 130
       id: '1758699378772'
       position:
         x: 1625.82809511913
@@ -1978,7 +1985,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         dataset_ids:
         - EcEHhfyw2lTA/pRvqDse3E7RCHi8WmJgNSgzX1pQN+8cN6n17MR+Rps3VogupFsu
@@ -2000,7 +2007,7 @@ workflow:
         selected: false
         title: Knowledge Retrieval
         type: knowledge-retrieval
-      height: 90
+      height: 88
       id: '1758713692744'
       position:
         x: 382.02759711954866
@@ -2012,7 +2019,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: blocked_config
@@ -2115,7 +2122,7 @@ workflow:
         selected: false
         title: Route Config Result
         type: if-else
-      height: 486
+      height: 484
       id: '1758624264402'
       position:
         x: 2117.3397569645485
@@ -2127,7 +2134,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '✅ **Configuration Created Successfully!**
 
@@ -2167,7 +2174,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: "⚠️ **Partial Configuration Results**\n\n{{#1758624264401.configResult.message#}}\n\
           \n**What happened:**\n- ✅ Successfully created: {{#1758624264401.configResult.summary.successful#}}\
@@ -2183,7 +2190,7 @@ workflow:
         title: Analyze Failures
         type: answer
         variables: []
-      height: 414
+      height: 413
       id: '1758695100002'
       position:
         x: 2570.7246610736015
@@ -2195,14 +2202,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#17580163919060.text#}}'
         selected: false
         title: Assistant LLM Response
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1758624264404'
       position:
         x: 2485.822496688369
@@ -2214,9 +2221,9 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     viewport:
-      x: -117.96540104710391
-      y: -308.3418545133427
-      zoom: 0.7205362611850628
+      x: -783.050317642887
+      y: -695.4749714176595
+      zoom: 0.7980786415671234
   rag_pipeline_variables: []

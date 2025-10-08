@@ -13,6 +13,16 @@ dependencies = [
     "pytest-asyncio>=1.1.0",
 ]
 
+[project.scripts]
+avni-mcp-server = "src.main:main"
+
+[tool.uv]
+package = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
 [dependency-groups]
 test = [
     "pytest>=8.0.0",

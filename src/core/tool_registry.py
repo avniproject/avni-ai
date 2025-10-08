@@ -3,7 +3,6 @@
 import inspect
 from typing import Dict, List, Any, Callable, get_type_hints
 from dataclasses import dataclass
-import json
 
 
 @dataclass
@@ -77,8 +76,16 @@ class ToolRegistry:
         
         self.tools[tool_name] = tool_def
     
-    def get_openai_tools(self) -> List[Dict[str, Any]]:
-        """Get tools in OpenAI function calling format."""
+    def get_openai_tools(self, filter_tools: List[str] = None) -> List[Dict[str, Any]]:
+        """Get tools in OpenAI function calling format.
+        
+        Args:
+            filter_tools: List of tool names to include. If None, returns all tools.
+        """
+        tools_to_include = self.tools.values()
+        if filter_tools:
+            tools_to_include = [tool for tool in self.tools.values() if tool.name in filter_tools]
+            
         return [
             {
                 "type": "function",
@@ -88,7 +95,7 @@ class ToolRegistry:
                     "parameters": tool.parameters
                 }
             }
-            for tool in self.tools.values()
+            for tool in tools_to_include
         ]
     
     async def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:

@@ -1,10 +1,4 @@
 # Avni AI
-
-**TODO** Move all MCP-Server code within a sub-folder of this repo.
-
-
-## Avni MCP Server
-
 A Model Context Protocol (MCP) server that provides AI assistants with programmatic access to the Avni platform. This server enables LLMs like OpenAI GPT-4 to interact with Avni's system through standardized tool calling.
 
 ## 🚀 Features
@@ -13,7 +7,7 @@ A Model Context Protocol (MCP) server that provides AI assistants with programma
 - Built-in monitoring support at `/health`
 - REST API endpoint at `/chat`
 - Access to organizations, users, locations, and programs (WIP)
-- Deployed with SSE transport and proper error handling
+- Deployed with HTTP transport and proper error handling
 
 ## 📋 Prerequisites
 
@@ -63,7 +57,7 @@ PORT=8023
 **Staging:**
 ```env
 AVNI_BASE_URL=https://staging.avniproject.org
-AVNI_MCP_SERVER_URL=https://staging-mcp.avniproject.org/sse
+AVNI_MCP_SERVER_URL=https://staging-mcp.avniproject.org/mcp
 ```
 
 ## 🚀 Usage
@@ -72,10 +66,10 @@ AVNI_MCP_SERVER_URL=https://staging-mcp.avniproject.org/sse
 
 ```bash
 # Run the server
-uv run main.py
+uv run avni-mcp-server
 
 # Server will start on http://localhost:8023
-# MCP endpoint: http://localhost:8023/sse/
+# MCP endpoint: http://localhost:8023/mcp
 # Health check: http://localhost:8023/health
 # Chat endpoint: http://localhost:8023/chat
 ```
@@ -96,15 +90,6 @@ uv run pytest tests/test_tools.py
 
 ## 🛠️ Available Tools
 
-### Organization Tools
-- `create_organization` - Create new health organizations
-- `list_organizations` - List existing organizations
-- `get_organization` - Get organization details
-
-### User Tools  
-- `create_user` - Create new users
-- `create_user_group` - Create user groups
-- `list_users` - List existing users
 
 ### Location Tools
 - `create_location` - Create geographic locations
