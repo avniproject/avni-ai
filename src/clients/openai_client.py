@@ -126,7 +126,8 @@ class OpenAIResponsesClient:
         auth_token: str,
         model: str = "gpt-4o",
         instructions: Optional[str] = None,
-        available_tools: List[Dict[str, Any]] = None
+        available_tools: List[Dict[str, Any]] = None,
+        session_logger: Optional[logging.Logger] = None
     ) -> Dict[str, Any]:
         """Process function calls following the exact OpenAI Responses API pattern."""
         
@@ -165,7 +166,7 @@ class OpenAIResponsesClient:
             try:
                 # Execute the function
                 result = await execute_function_call(
-                    function_name, function_args, tool_registry, auth_token
+                    function_name, function_args, tool_registry, auth_token, session_logger
                 )
                 
                 # Add successful result to input list

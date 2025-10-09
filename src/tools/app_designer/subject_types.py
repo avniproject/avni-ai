@@ -1,7 +1,11 @@
+import logging
 from typing import Optional
 from src.clients import make_avni_request
 from src.utils.format_utils import format_creation_response
+from src.utils.session_context import log_payload
 from src.core import tool_registry
+
+logger = logging.getLogger(__name__)
 
 async def create_subject_type(
     auth_token: str,
@@ -34,6 +38,9 @@ async def create_subject_type(
         "active": True,
         "locationTypeUUIDs": [location_type_uuid] if location_type_uuid else [],
     }
+
+    # Log the actual API payload to both standard and session loggers
+    log_payload("SubjectType API payload:", payload)
 
     result = await make_avni_request(
         "POST", "/web/subjectType", auth_token, payload

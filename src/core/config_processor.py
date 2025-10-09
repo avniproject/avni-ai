@@ -40,8 +40,7 @@ class ConfigProcessor:
         self, 
         config: Dict[str, Any], 
         auth_token: str,
-        base_url: str,
-        context: Optional[Dict[str, Any]] = None
+        base_url: str
     ) -> Dict[str, Any]:
         """
         Process a config object using LLM with continuous loop until done=true.
@@ -50,7 +49,6 @@ class ConfigProcessor:
             config: Configuration object to process
             auth_token: Avni API authentication token  
             base_url: Avni API base URL
-            context: Additional context (optional)
             
         Returns:
             Dict with done flag, status, results, etc.
@@ -63,18 +61,16 @@ class ConfigProcessor:
         session_logger.info(f"NEW CONFIG PROCESSING SESSION: {session_id}")
         session_logger.info(f"Base URL: {base_url}")
         session_logger.info(f"Config: {json.dumps(config, indent=2)}")
-        if context:
-            session_logger.info(f"Context: {json.dumps(context, indent=2)}")
         session_logger.info("=" * 80)
         
         try:
-            # Fetch operational modules context first
-            logger.info(f"Fetching operational modules context from {base_url}")
-            session_logger.info("STEP 1: Fetching operational modules context")
+            # Fetch complete existing configuration context
+            logger.info(f"Fetching complete existing configuration from {base_url}")
+            session_logger.info("STEP 1: Fetching complete existing configuration")
             avni_client = create_avni_client(base_url)
-            operational_context = await avni_client.fetch_operational_modules(auth_token)
             
-            # Check if operational modules fetch failed
+            # Get operational modules (contains subject types, programs, encounter types, address level types)
+            operational_context = await avni_client.fetch_operational_modules(auth_token)
             if "error" in operational_context:
                 session_logger.error(f"Failed to fetch operational modules: {operational_context['error']}")
                 return create_error_result(
@@ -82,15 +78,42 @@ class ConfigProcessor:
                     [operational_context["error"]]
                 )
             
-            session_logger.info(f"Successfully fetched operational modules: {json.dumps(operational_context, indent=2)}")
+            # Get locations (not included in operational modules)
+            logger.info("Fetching existing locations")
+            session_logger.info("   Fetching existing locations...")
+            locations_result = await avni_client.make_request("GET", "/locations", auth_token)
+            if not locations_result.success:
+                session_logger.error(f"Failed to fetch locations: {locations_result.error}")
+                return create_error_result(
+                    "Failed to fetch existing locations",
+                    [locations_result.error]
+                )
             
-            # Build system instructions with all context
-            system_instructions = build_system_instructions(operational_context, context)
+            # Get catchments (not included in operational modules)
+            logger.info("Fetching existing catchments")
+            session_logger.info("   Fetching existing catchments...")
+            catchments_result = await avni_client.make_request("GET", "/catchment", auth_token)
+            if not catchments_result.success:
+                session_logger.error(f"Failed to fetch catchments: {catchments_result.error}")
+                return create_error_result(
+                    "Failed to fetch existing catchments",
+                    [catchments_result.error]
+                )
+            
+            # Combine all existing configuration data
+            complete_existing_config = operational_context.copy()
+            complete_existing_config["locations"] = locations_result.data or []
+            complete_existing_config["catchments"] = catchments_result.data or []
+            
+            session_logger.info(f"Successfully fetched complete existing config with {len(complete_existing_config.get('locations', []))} locations and {len(complete_existing_config.get('catchments', []))} catchments")
+            
+            # Build system instructions
+            system_instructions = build_system_instructions(complete_existing_config)
             session_logger.info("STEP 2: Built system instructions")
             session_logger.info(f"System instructions: {system_instructions}")
             
-            # Initial input for LLM
-            config_input = build_initial_input(config)
+            # Initial input for LLM (includes complete existing config in message body)
+            config_input = build_initial_input(config, complete_existing_config)
             session_logger.info("STEP 3: Built initial input for LLM")
             session_logger.info(f"Initial input: {config_input}")
             
@@ -101,7 +124,7 @@ class ConfigProcessor:
                 tool_name = tool.get("function", {}).get("name", "unknown")
                 session_logger.info(f"  Tool {i}: {tool_name}")
             
-            max_iterations = 10  # Prevent infinite loops
+            max_iterations = 30  # Prevent infinite loops
             session_logger.info(f"STEP 5: Starting LLM iteration loop (max {max_iterations} iterations)")
             
             async with create_openai_client(self.openai_api_key, timeout=180.0) as client:
@@ -167,7 +190,7 @@ class ConfigProcessor:
                     
                     # Process any function calls and continue the conversation (with filtered tools)
                     current_response = await client.process_function_calls_and_continue(
-                        response, tool_registry, auth_token, model="gpt-4o", instructions=system_instructions, available_tools=available_tools
+                        response, tool_registry, auth_token, model="gpt-4o", instructions=system_instructions, available_tools=available_tools, session_logger=session_logger
                     )
                     
                     # Extract final response content

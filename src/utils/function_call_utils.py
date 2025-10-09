@@ -3,6 +3,7 @@
 import json
 import logging
 from typing import Dict, List, Any, Optional
+from src.utils.session_context import set_session_logger
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,8 @@ async def execute_function_call(
     function_name: str, 
     function_args: Dict[str, Any], 
     tool_registry, 
-    auth_token: str
+    auth_token: str,
+    session_logger: Optional[logging.Logger] = None
 ) -> Any:
     """Execute a single function call and return the result.
     
@@ -124,6 +126,7 @@ async def execute_function_call(
         function_args: Arguments for the function
         tool_registry: The tool registry to execute functions
         auth_token: Authentication token to inject
+        session_logger: Optional session logger for detailed logging
         
     Returns:
         The function execution result
@@ -132,7 +135,20 @@ async def execute_function_call(
     function_args["auth_token"] = auth_token
     
     logger.info(f"🔧 Executing function: {function_name}")
+    
+    # Always log to session logger during config processing
+    if session_logger:
+        session_logger.info(f"🔧 EXECUTING FUNCTION: {function_name}")
+        session_logger.info(f"   Arguments: {json.dumps(function_args, indent=2)}")
+        # Set session logger context for tools to use
+        set_session_logger(session_logger)
+    
     result = await tool_registry.call_tool(function_name, function_args)
     logger.info(f"   Function result: {str(result)[:200]}...")
+    
+    # Always log result to session logger
+    if session_logger:
+        session_logger.info(f"   Function result: {str(result)}")
+        session_logger.info(f"   ---")
     
     return result

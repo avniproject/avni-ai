@@ -106,8 +106,7 @@ async def process_config_request(request: Request, openai_api_key: str) -> JSONR
     
     Expected body:
     {
-        "config": {...},
-        "context": {...}  // optional
+        "expected_config": {...}
     }
     
     Args:
@@ -119,11 +118,10 @@ async def process_config_request(request: Request, openai_api_key: str) -> JSONR
     """
     try:
         body = await request.json()
-        config = body.get("config")
-        context = body.get("context")
+        expected_config = body.get("expected_config")
         
-        if not config:
-            return create_error_response("Config object is required", 400)
+        if not expected_config:
+            return create_error_response("expected_config object is required", 400)
         
         # Get auth token from header
         auth_token = request.headers.get("avni-auth-token")
@@ -138,10 +136,9 @@ async def process_config_request(request: Request, openai_api_key: str) -> JSONR
         # Create config processor and process the config
         processor = create_config_processor(openai_api_key)
         result = await processor.process_config(
-            config=config,
+            config=expected_config,
             auth_token=auth_token,
-            base_url=base_url,
-            context=context
+            base_url=base_url
         )
         
         return create_success_response(result)
