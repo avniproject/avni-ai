@@ -1,6 +1,6 @@
 """Contract classes for Catchment operations."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List
 
 

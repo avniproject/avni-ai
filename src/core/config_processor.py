@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 from ..clients import create_openai_client, create_avni_client
 from .tool_registry import tool_registry

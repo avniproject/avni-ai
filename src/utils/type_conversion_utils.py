@@ -1,8 +1,7 @@
 """Utility functions for type conversion, especially dict to dataclass conversion."""
 
-import inspect
-from typing import Dict, Any, Callable, get_type_hints, get_origin, get_args, List
-from dataclasses import is_dataclass, fields
+from typing import Dict, Any, Callable, get_type_hints, get_origin, get_args
+from dataclasses import is_dataclass
 
 
 def convert_arguments_for_function(
@@ -41,7 +40,7 @@ def convert_arguments_for_function(
                     converted_args[param_name] = convert_dict_to_dataclass(
                         param_type, param_value
                     )
-                except TypeError as e:
+                except TypeError:
                     # If conversion fails, use the original value and let the function handle the error
                     # This allows for better error messages from the actual function
                     converted_args[param_name] = param_value

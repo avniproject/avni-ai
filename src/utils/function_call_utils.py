@@ -43,10 +43,10 @@ def add_function_output(
     """
     if is_error:
         output_data = {"error": str(result)}
-        logger.info(f"   Added error output to input_list")
+        logger.info("   Added error output to input_list")
     else:
         output_data = result  # Direct result, not wrapped in {"result": ...}
-        logger.info(f"   Added function output to input_list")
+        logger.info("   Added function output to input_list")
 
     function_output = {
         "type": "function_call_output",
@@ -153,6 +153,6 @@ async def execute_function_call(
     # Always log result to session logger
     if session_logger:
         session_logger.info(f"   Function result: {str(result)}")
-        session_logger.info(f"   ---")
+        session_logger.info("   ---")
 
     return result

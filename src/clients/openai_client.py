@@ -106,7 +106,7 @@ class OpenAIResponsesClient:
         instructions: Optional[str],
     ) -> Any:
         """Make the continuation API call after function execution."""
-        logger.info(f"📞 Making continuation API call after function execution...")
+        logger.info("📞 Making continuation API call after function execution...")
         logger.info(
             f"📝 Final input list length before continuation: {len(input_list)}"
         )

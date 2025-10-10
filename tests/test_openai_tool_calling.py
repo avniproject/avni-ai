@@ -8,13 +8,6 @@ import logging
 import pytest
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 # Import our components
 from src.clients import create_openai_client
 from src.tools.admin.addressleveltypes import register_address_level_type_tools
@@ -24,6 +17,13 @@ from src.tools.app_designer.encounters import register_encounter_tools
 from src.tools.app_designer.programs import register_program_tools
 from src.tools.app_designer.subject_types import register_subject_type_tools
 from src.core import tool_registry
+
+# Load environment variables
+load_dotenv()
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 pytest.skip("Skipping all tests in this module", allow_module_level=True)
 
@@ -103,7 +103,7 @@ async def make_openai_call(messages, test_name):
         # Validate API key format
         if not api_key.startswith("sk-") or len(api_key) < 40:
             print(
-                f"❌ Invalid OpenAI API key format. Key should start with 'sk-' and be longer than 40 characters."
+                "❌ Invalid OpenAI API key format. Key should start with 'sk-' and be longer than 40 characters."
             )
             print(f"   Current key: {api_key[:10]}... (length: {len(api_key)})")
             return False
@@ -138,7 +138,7 @@ async def make_openai_call(messages, test_name):
 
             if function_results:
                 print(f"🔧 Processed {len(function_results)} function calls")
-                print(f"📊 Function call results:")
+                print("📊 Function call results:")
                 for i, result in enumerate(function_results, 1):
                     print(f"   {i}. {result['name']}: {result['result'][:200]}...")
             else:

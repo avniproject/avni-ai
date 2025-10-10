@@ -1,7 +1,7 @@
 """Contract classes for Location operations."""
 
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List
 
 
 @dataclass

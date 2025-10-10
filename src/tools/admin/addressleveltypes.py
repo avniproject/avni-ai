@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 from src.clients import make_avni_request
 from src.utils.format_utils import format_creation_response
 from src.utils.session_context import log_payload

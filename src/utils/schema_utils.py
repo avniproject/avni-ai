@@ -72,13 +72,13 @@ def type_to_json_schema(param_type: type) -> Dict[str, Any]:
         return dataclass_to_json_schema(param_type)
 
     # Handle primitive types
-    if param_type == str:
+    if param_type is str:
         return {"type": "string"}
-    elif param_type == int:
+    elif param_type is int:
         return {"type": "integer"}
-    elif param_type == float:
+    elif param_type is float:
         return {"type": "number"}
-    elif param_type == bool:
+    elif param_type is bool:
         return {"type": "boolean"}
     else:
         # Default fallback
