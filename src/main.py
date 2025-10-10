@@ -15,9 +15,9 @@ from starlette.responses import JSONResponse
 
 from .auth import SimpleTokenVerifier
 from .handlers import process_chat_request, process_config_request
-from src.tools.admin.addressleveltypes import  register_address_level_type_tools
-from src.tools.admin.catchments import  register_catchment_tools
-from src.tools.admin.locations import  register_location_tools
+from src.tools.admin.addressleveltypes import register_address_level_type_tools
+from src.tools.admin.catchments import register_catchment_tools
+from src.tools.admin.locations import register_location_tools
 from src.tools.app_designer.encounters import register_encounter_tools
 from src.tools.app_designer.programs import register_program_tools
 from src.tools.app_designer.subject_types import register_subject_type_tools
@@ -49,7 +49,7 @@ Important: All operations require the user to have provided their Avni API key w
 
 
 def create_server():
-    """Starts an mcp server, though we have removed the mcp server tools as we do direct function calling now """
+    """Starts an mcp server, though we have removed the mcp server tools as we do direct function calling now"""
 
     mcp = FastMCP(
         name="Avni AI Server",
@@ -73,6 +73,7 @@ def create_server():
         return JSONResponse({"status": "healthy", "service": "Avni MCP Server"})
 
     """ /chat endpoint was being used initially when we were not using Dify , we can get rid of this endpoint"""
+
     @mcp.custom_route("/chat", methods=["OPTIONS"])
     async def chat_options(request: Request):
         """Handle CORS preflight requests for /chat endpoint."""

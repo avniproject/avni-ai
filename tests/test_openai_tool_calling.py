@@ -26,6 +26,8 @@ from src.tools.app_designer.subject_types import register_subject_type_tools
 from src.core import tool_registry
 
 pytest.skip("Skipping all tests in this module", allow_module_level=True)
+
+
 async def test_location_tools():
     """Test location-related tools via OpenAI function calling."""
 
@@ -36,12 +38,12 @@ async def test_location_tools():
     messages = [
         {
             "role": "system",
-            "content": "You are an AI assistant that helps with Avni platform operations. Use the available tools to help users."
+            "content": "You are an AI assistant that helps with Avni platform operations. Use the available tools to help users.",
         },
         {
             "role": "user",
-            "content": "Can you get the list of location types available in the system?"
-        }
+            "content": "Can you get the list of location types available in the system?",
+        },
     ]
 
     return await make_openai_call(messages, "Location Types")
@@ -57,12 +59,12 @@ async def test_program_tools():
     messages = [
         {
             "role": "system",
-            "content": "You are an AI assistant that helps with Avni platform operations. Use the available tools to help users."
+            "content": "You are an AI assistant that helps with Avni platform operations. Use the available tools to help users.",
         },
         {
             "role": "user",
-            "content": "I want to create a new subject type called 'Patient' of type 'Person' for my health program."
-        }
+            "content": "I want to create a new subject type called 'Patient' of type 'Person' for my health program.",
+        },
     ]
 
     return await make_openai_call(messages, "Create Subject Type")
@@ -77,12 +79,12 @@ async def test_catchments():
     messages = [
         {
             "role": "system",
-            "content": "You are an AI assistant that helps with Avni platform operations. Use the available tools to help users."
+            "content": "You are an AI assistant that helps with Avni platform operations. Use the available tools to help users.",
         },
         {
             "role": "user",
-            "content": "Show me all the catchments available in the system."
-        }
+            "content": "Show me all the catchments available in the system.",
+        },
     ]
 
     return await make_openai_call(messages, "Get Catchments")
@@ -99,8 +101,10 @@ async def make_openai_call(messages, test_name):
             return False
 
         # Validate API key format
-        if not api_key.startswith('sk-') or len(api_key) < 40:
-            print(f"❌ Invalid OpenAI API key format. Key should start with 'sk-' and be longer than 40 characters.")
+        if not api_key.startswith("sk-") or len(api_key) < 40:
+            print(
+                f"❌ Invalid OpenAI API key format. Key should start with 'sk-' and be longer than 40 characters."
+            )
             print(f"   Current key: {api_key[:10]}... (length: {len(api_key)})")
             return False
 
@@ -120,7 +124,7 @@ async def make_openai_call(messages, test_name):
             response = await client.create_response(
                 input_text=input_text,
                 tools=available_tools,
-                model="gpt-4o-mini"  # Using mini for cost efficiency
+                model="gpt-4o-mini",  # Using mini for cost efficiency
             )
 
             # Check the response content
