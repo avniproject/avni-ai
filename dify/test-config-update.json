@@ -1,0 +1,214 @@
+{
+  "config": {
+    "update": {
+      "addressLevelTypes": [
+        {
+          "name": "Updated CRUD State",
+          "level": 3.0,
+          "parentId": null,
+          "voided": false
+        },
+        {
+          "name": "Updated CRUD District", 
+          "level": 2.0,
+          "parentId": "id of Updated CRUD State",
+          "voided": false
+        },
+        {
+          "name": "Updated CRUD Block",
+          "level": 1.0,
+          "parentId": "id of Updated CRUD District", 
+          "voided": false
+        }
+      ],
+      "locations": [
+        {
+          "title": "Updated Karnataka CRUD State",
+          "level": 3,
+          "parents": []
+        },
+        {
+          "title": "Updated Bangalore CRUD District",
+          "level": 2,
+          "parents": [{"id": "id of Updated Karnataka CRUD State"}]
+        },
+        {
+          "title": "Updated Electronic City CRUD Block",
+          "level": 1,
+          "parents": [{"id": "id of Updated Bangalore CRUD District"}]
+        }
+      ],
+      "catchments": [
+        {
+          "name": "Updated CRUD Urban Catchment",
+          "locationIds": ["id of Updated Karnataka CRUD State", "id of Updated Bangalore CRUD District"],
+          "deleteFastSync": false
+        },
+        {
+          "name": "Updated CRUD Rural Catchment", 
+          "locationIds": ["id of Updated Electronic City CRUD Block"],
+          "deleteFastSync": false
+        }
+      ],
+      "subjectTypes": [
+        {
+          "name": "Updated CRUD Individual",
+          "type": "Person",
+          "active": true,
+          "voided": false,
+          "group": false,
+          "household": false,
+          "allowEmptyLocation": true,
+          "allowMiddleName": true,
+          "lastNameOptional": false,
+          "allowProfilePicture": true,
+          "uniqueName": false,
+          "directlyAssignable": false,
+          "shouldSyncByLocation": true,
+          "settings": {
+            "displayRegistrationDetails": true,
+            "displayPlannedEncounters": true,
+            "enableApproval": false
+          },
+          "subjectSummaryRule": "Updated summary rule for individuals",
+          "programEligibilityCheckRule": null,
+          "memberAdditionEligibilityCheckRule": null,
+          "validFirstNameFormat": null,
+          "validMiddleNameFormat": null,
+          "validLastNameFormat": null,
+          "iconFileS3Key": null,
+          "syncRegistrationConcept1": null,
+          "syncRegistrationConcept2": null,
+          "nameHelpText": "Updated help text for individual names",
+          "groupRoles": [],
+          "registrationFormUuid": null
+        },
+        {
+          "name": "Updated CRUD Household",
+          "type": "Household", 
+          "active": true,
+          "voided": false,
+          "group": false,
+          "household": true,
+          "allowEmptyLocation": false,
+          "allowMiddleName": false,
+          "lastNameOptional": true,
+          "allowProfilePicture": true,
+          "uniqueName": true,
+          "directlyAssignable": false,
+          "shouldSyncByLocation": true,
+          "settings": {
+            "displayRegistrationDetails": true,
+            "displayPlannedEncounters": false,
+            "enableApproval": true
+          },
+          "subjectSummaryRule": "Updated household summary",
+          "programEligibilityCheckRule": null,
+          "memberAdditionEligibilityCheckRule": "Updated member addition rule",
+          "validFirstNameFormat": null,
+          "validMiddleNameFormat": null,
+          "validLastNameFormat": null,
+          "iconFileS3Key": null,
+          "syncRegistrationConcept1": null,
+          "syncRegistrationConcept2": null,
+          "nameHelpText": "Updated help text for household names",
+          "groupRoles": [
+            {
+              "subjectMemberName": "Updated CRUD Individual",
+              "groupRoleUUID": "crud9abc-def0-1234-5678-9abcdef01234",
+              "groupSubjectTypeUUID": "crud5678-9abc-def0-1234-56789abcdef0",
+              "memberSubjectTypeUUID": "crud1234-5678-9abc-def0-123456789abc",
+              "role": "Updated Head of Household",
+              "minimumNumberOfMembers": 1,
+              "maximumNumberOfMembers": 2,
+              "isPrimary": true,
+              "voided": false
+            },
+            {
+              "subjectMemberName": "Updated CRUD Individual",
+              "groupRoleUUID": "cruddef0-1234-5678-9abc-def012345678",
+              "groupSubjectTypeUUID": "crud5678-9abc-def0-1234-56789abcdef0", 
+              "memberSubjectTypeUUID": "crud1234-5678-9abc-def0-123456789abc",
+              "role": "Updated Household Member",
+              "minimumNumberOfMembers": 0,
+              "maximumNumberOfMembers": 25,
+              "isPrimary": false,
+              "voided": false
+            }
+          ],
+          "registrationFormUuid": null
+        }
+      ],
+      "programs": [
+        {
+          "name": "Updated CRUD Health Program",
+          "colour": "#FF9800",
+          "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
+          "programSubjectLabel": "Updated Health Participant",
+          "enrolmentSummaryRule": "Updated enrolment summary for health program",
+          "enrolmentEligibilityCheckRule": "Updated eligibility check rule",
+          "enrolmentEligibilityCheckDeclarativeRule": null,
+          "manualEligibilityCheckRequired": true,
+          "showGrowthChart": true,
+          "manualEnrolmentEligibilityCheckRule": true,
+          "manualEnrolmentEligibilityCheckDeclarativeRule": null,
+          "allowMultipleEnrolments": true,
+          "programEnrolmentFormUuid": null,
+          "programExitFormUuid": null,
+          "active": true,
+          "voided": false
+        },
+        {
+          "name": "Updated CRUD Family Welfare",
+          "colour": "#9C27B0",
+          "subjectTypeUuid": "crud5678-9abc-def0-1234-56789abcdef0",
+          "programSubjectLabel": "Updated Family Unit",
+          "enrolmentSummaryRule": "Updated family welfare summary",
+          "enrolmentEligibilityCheckRule": null,
+          "enrolmentEligibilityCheckDeclarativeRule": null,
+          "manualEligibilityCheckRequired": false,
+          "showGrowthChart": true,
+          "manualEnrolmentEligibilityCheckRule": false,
+          "manualEnrolmentEligibilityCheckDeclarativeRule": null,
+          "allowMultipleEnrolments": true,
+          "programEnrolmentFormUuid": null,
+          "programExitFormUuid": null,
+          "active": true,
+          "voided": false
+        }
+      ],
+      "encounterTypes": [
+        {
+          "name": "Updated CRUD Registration",
+          "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
+          "programUuid": null,
+          "active": true,
+          "voided": false,
+          "isImmutable": true,
+          "entityEligibilityCheckRule": "Updated registration eligibility rule",
+          "entityEligibilityCheckDeclarativeRule": null
+        },
+        {
+          "name": "Updated CRUD Health Checkup",
+          "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
+          "programUuid": "crud2468-acef-1357-9bdf-02468acef135",
+          "active": true,
+          "voided": false,
+          "isImmutable": false,
+          "entityEligibilityCheckRule": "Updated health checkup eligibility",
+          "entityEligibilityCheckDeclarativeRule": null
+        },
+        {
+          "name": "Updated CRUD Family Survey",
+          "subjectTypeUuid": "crud5678-9abc-def0-1234-56789abcdef0",
+          "programUuid": "crud3579-bdef-2468-acef-13579bdef246",
+          "active": true,
+          "voided": false,
+          "isImmutable": false,
+          "entityEligibilityCheckRule": "Updated family survey eligibility",
+          "entityEligibilityCheckDeclarativeRule": null
+        }
+      ]
+    }
+  }
+}

@@ -9,14 +9,17 @@ from ..utils.request_utils import extract_base_url
 
 logger = logging.getLogger(__name__)
 
-async def process_chat_request(request: Request, openai_api_key: str, server_instructions: str) -> JSONResponse:
+
+async def process_chat_request(
+    request: Request, openai_api_key: str, server_instructions: str
+) -> JSONResponse:
     """Process a complete chat request using direct function calling.
-    
+
     Args:
         request: The incoming request object
         openai_api_key: OpenAI API key for making requests
         server_instructions: System instructions for the AI assistant
-        
+
     Returns:
         JSONResponse with the chat result or error
     """
@@ -36,23 +39,15 @@ async def process_chat_request(request: Request, openai_api_key: str, server_ins
 
         # Create messages for the conversation
         messages = [
-            {
-                "role": "system",
-                "content": server_instructions
-            },
-            {
-                "role": "user",
-                "content": message
-            }
+            {"role": "system", "content": server_instructions},
+            {"role": "user", "content": message},
         ]
 
         openai_client = create_openai_client(openai_api_key, timeout=180.0)
         async with openai_client as client:
             # First API call to get the assistant's response and potential function calls
             response = await client.create_chat_completion(
-                messages=messages,
-                tools=available_tools,
-                model="gpt-4o"
+                messages=messages, tools=available_tools, model="gpt-4o"
             )
 
             # Check if the assistant wants to call functions
@@ -73,9 +68,7 @@ async def process_chat_request(request: Request, openai_api_key: str, server_ins
 
                 # Make another API call to get the final response
                 final_response = await client.create_chat_completion(
-                    messages=messages,
-                    tools=available_tools,
-                    model="gpt-4o"
+                    messages=messages, tools=available_tools, model="gpt-4o"
                 )
 
                 final_message = final_response["choices"][0]["message"]
@@ -89,62 +82,94 @@ async def process_chat_request(request: Request, openai_api_key: str, server_ins
     except Exception as e:
         logger.error(f"Chat request processing error: {e}")
         import traceback
+
         logger.error(f"Full traceback: {traceback.format_exc()}")
         return create_error_response("Internal server error", 500)
 
 
 async def process_config_request(request: Request, openai_api_key: str) -> JSONResponse:
     """
-    Process Avni configuration using LLM with continuous loop until completion.
-    
+    Process Avni configuration using LLM with CRUD operations (create, update, delete).
+
     Expected headers:
     - avni-auth-token: Required authentication token for Avni API
     - avni-base-url: Optional base URL for Avni API
-    
+
     Expected query parameters:
     - base_url: Optional base URL for Avni API (overrides header)
-    
+
     Expected body:
     {
-        "expected_config": {...}
+        "config": {
+            "create": {
+                "addressLevelTypes": [...],
+                "locations": [...],
+                "catchments": [...],
+                "subjectTypes": [...],
+                "programs": [...],
+                "encounterTypes": [...]
+            },
+            "update": {
+                "addressLevelTypes": [...],
+                "locations": [...],
+                "catchments": [...],
+                "subjectTypes": [...],
+                "programs": [...],
+                "encounterTypes": [...]
+            },
+            "delete": {
+                "addressLevelTypes": [...],
+                "locations": [...],
+                "catchments": [...],
+                "subjectTypes": [...],
+                "programs": [...],
+                "encounterTypes": [...]
+            }
+        }
     }
-    
+
     Args:
         request: The incoming request object
         openai_api_key: OpenAI API key for making requests
-        
+
     Returns:
         JSONResponse with the config processing result or error
     """
     try:
         body = await request.json()
-        expected_config = body.get("expected_config")
-        
-        if not expected_config:
-            return create_error_response("expected_config object is required", 400)
-        
+        config_data = body.get("config")
+
+        if not config_data:
+            return create_error_response("config object is required", 400)
+
+        # Validate that config has at least one operation
+        if not any(op in config_data for op in ["create", "update", "delete"]):
+            return create_error_response(
+                "config must contain at least one of: create, update, delete", 400
+            )
+
         # Get auth token from header
         auth_token = request.headers.get("avni-auth-token")
         if not auth_token:
             return create_error_response("avni-auth-token header is required", 401)
-        
+
         # Extract base URL with priority: query > header > env > default
         base_url = extract_base_url(request)
-        
-        logger.info(f"Processing config with Avni base URL: {base_url}")
-        
+
+        logger.info(f"Processing CRUD config with Avni base URL: {base_url}")
+        logger.info(f"Operations requested: {list(config_data.keys())}")
+
         # Create config processor and process the config
         processor = create_config_processor(openai_api_key)
         result = await processor.process_config(
-            config=expected_config,
-            auth_token=auth_token,
-            base_url=base_url
+            config=config_data, auth_token=auth_token, base_url=base_url
         )
-        
+
         return create_success_response(result)
-        
+
     except Exception as e:
         logger.error(f"Config processing error: {e}")
         import traceback
+
         logger.error(f"Full traceback: {traceback.format_exc()}")
         return create_error_response("Internal server error", 500)

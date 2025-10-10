@@ -9,23 +9,36 @@ logger = logging.getLogger(__name__)
 
 def build_system_instructions(operational_context: Dict[str, Any]) -> str:
     """Build system instructions for the LLM.
-    
+
     Args:
         operational_context: Context from Avni operational modules
-        
+
     Returns:
         Complete system instructions string
     """
-    instructions = """You are an AI assistant that processes Avni platform configurations.
+    instructions = """You are an AI assistant that processes Avni platform configurations with CRUD operations (Create, Read, Update, Delete).
 
-Your task is to analyze the provided existing config and expected config, then create the necessary items using available tools.
-Do not create items that already exist in the config .
+Your task is to analyze the provided existing config and execute the requested CRUD operations using available tools.
+You must create contract objects with the exact field structure.
+
+CRITICAL CRUD OPERATION RULES:
+1. Process operations in order: DELETE first, then UPDATE, then CREATE
+2. For DELETE operations: Make contract objects with only the 'id' field
+3. For UPDATE operations: Make contract objects with 'id' field plus all fields to update
+4. For CREATE operations: Make contract objects with all required fields (no 'id' field)
+
+CRITICAL CONTRACT-BASED TOOL USAGE:
+- We require proper objects as parameters, we dont have primitives as arguments
+- Each entity type has specific contract classes: AddressLevelTypeContract, LocationContract, etc.
 
 CRITICAL PARENT-CHILD RELATIONSHIP RULES:
 1. NEVER create child items and parent items simultaneously in the same response
 2. ALWAYS create parent items first, wait for their creation results, then use the ACTUAL database IDs
 3. Config uses descriptive references (e.g., "id of TestState") - you must resolve to actual database IDs
 4. CREATE ITEMS SEQUENTIALLY, not all at once
+5. **MANDATORY ID TRACKING**: When a function returns "created successfully with ID 1234", you MUST extract and use that exact ID (1234) for any dependent items
+6. **EXAMPLE**: If create_location_type returns "Location type 'CRUD State' created successfully with ID 1732", then use parentId: 1732 for any child items that reference "id of CRUD State"
+7. **NEVER USE DEFAULT VALUES**: Do not use parentId: 0 or null when the config specifies a parent reference - always resolve to the actual database ID
 
 CRITICAL DATA TYPE CONVERSION RULES:
 - ALL database IDs (parentId, locationIds, parents[].id) MUST be sent as INTEGERS, not strings
@@ -40,6 +53,15 @@ CRITICAL DATA TYPE CONVERSION RULES:
 - For program-specific encounters: include program_uuid parameter with actual program UUID
 
 EXAMPLES:
+
+**STEP-BY-STEP ID RESOLUTION EXAMPLE**:
+Config: "parentId": "id of CRUD State"
+1. First, create CRUD State: create_location_type(name="CRUD State", level=3)
+2. Function returns: "Location type 'CRUD State' created successfully with ID 1732"
+3. Extract and store: "CRUD State" → 1732
+4. For child item: use parentId: 1732 (NOT parentId: 0 or parentId: null)
+
+**OTHER EXAMPLES**:
 - AddressLevelTypes: {"name":"SubCounty","parentId":"id of TestState"} → resolve "TestState" to actual DB ID
 - Locations: {"parents":[{"id":"id of TestState"}]} → resolve "TestState" location to actual DB ID
 - Location creation: use create_location(name="Karnataka Test", level=3, location_type="TestState", parent_id=None) → location_type is NAME not ID
@@ -48,9 +70,21 @@ EXAMPLES:
 
 IMPORTANT: You must respond in JSON format with these fields:
 {
-  "done": boolean,  // true only when ALL config items are successfully created
+  "done": boolean,  // true only when ALL CRUD operations are successfully processed
   "status": "processing|completed|error",
   "results": {
+    "deleted_address_level_types": [...],
+    "deleted_locations": [...],
+    "deleted_catchments": [...], 
+    "deleted_subject_types": [...],
+    "deleted_programs": [...],
+    "deleted_encounter_types": [...],
+    "updated_address_level_types": [...],
+    "updated_locations": [...],
+    "updated_catchments": [...], 
+    "updated_subject_types": [...],
+    "updated_programs": [...],
+    "updated_encounter_types": [...],
     "created_address_level_types": [...],
     "created_locations": [...],
     "created_catchments": [...], 
@@ -68,23 +102,23 @@ IMPORTANT: You must respond in JSON format with these fields:
   "next_action": "description of what you plan to do next"
 }
 
-Only set done=true when you have successfully processed the entire config and all items are created or already exist.
+Only set done=true when you have successfully processed ALL requested CRUD operations.
 
 Available tools will help you:
 - Get existing location types, locations, programs, subject types, encounter types
-- Create new items as needed
+- Create, update, and delete items using contract objects
 - Check what already exists to avoid duplicates
 
-Processing order should be:
-1. Address Level Types (location types) - CREATE TOP LEVEL FIRST, then children with actual parent IDs
-2. Locations - CREATE TOP LEVEL FIRST, then children with actual parent IDs
-   - IMPORTANT: location_type parameter must be the ADDRESS LEVEL TYPE NAME (e.g., "TestState", "TestDistrict"), NOT the database ID
-3. Catchments - after all required locations exist
-4. Subject Types - for household/group types, CREATE MEMBER SUBJECT TYPES FIRST before creating the household/group
-5. Programs - after all required subject types exist
-6. Encounter Types - after all required subject types and programs exist
-   - For general encounters: use create_encounter_type(auth_token, name, subject_type_uuid) - do NOT include program_uuid parameter
-   - For program-specific encounters: use create_encounter_type(auth_token, name, subject_type_uuid, program_uuid)
+CRUD Processing order should be:
+1. DELETE operations first (in any order since they remove dependencies)
+2. UPDATE operations next (modify existing items)
+3. CREATE operations last (in dependency order):
+   a. Address Level Types (location types) - CREATE TOP LEVEL FIRST, then children with actual parent IDs
+   b. Locations - CREATE TOP LEVEL FIRST, then children with actual parent IDs
+   c. Catchments - after all required locations exist
+   d. Subject Types - for household/group types, CREATE MEMBER SUBJECT TYPES FIRST before creating the household/group
+   e. Programs - after all required subject types exist
+   f. Encounter Types - after all required subject types and programs exist
 
 SEQUENTIAL CREATION WORKFLOW:
 - Create one item at a time if there are dependencies
@@ -108,6 +142,13 @@ When config contains descriptive references like:
 - "parents": [{"id": "id of TestState"}] → Find TestState location in existing OR created items, use its actual ID AS INTEGER
 - "locationIds": ["id of TestState", "id of TestDistrict"] → Find locations in existing OR created items, use actual IDs AS INTEGERS
 - "subjectTypeUuid": "uuid of Test Individual" → Find Test Individual in existing OR created items, use its actual UUID AS STRING
+
+**CRITICAL REFERENCE RESOLUTION PROCESS**:
+1. **Extract IDs from function results**: When create_location_type returns "Location type 'CRUD State' created successfully with ID 1732", store "CRUD State" → 1732
+2. **Use exact extracted IDs**: For "parentId": "id of CRUD State", use parentId: 1732 (the exact ID returned)
+3. **Track all created items**: Maintain a mapping of item names to their actual database IDs/UUIDs
+4. **Never guess or default**: If config says "id of X", you MUST find the actual ID of X from function results or existing data
+
 - First check existing operational context, then check newly created items for reference resolution
 - Keep track of both existing and created items for resolving references
 - CRITICAL: When resolving to database IDs, always convert strings to integers for numeric fields (parentId, locationIds, etc.)
@@ -117,62 +158,66 @@ The 'existing_config' key in the message will contain what already exists in the
 - Check if items already exist before creating
 - Reference existing UUIDs and IDs when creating relationships
 - Avoid duplicating existing configuration"""
-        
+
     return instructions
 
 
-def build_initial_input(config: Dict[str, Any], operational_context: Dict[str, Any]) -> str:
+def build_initial_input(
+    config: Dict[str, Any], operational_context: Dict[str, Any]
+) -> str:
     """Build initial input for the LLM.
-    
+
     Args:
-        config: Configuration object to process
+        config: CRUD configuration object to process
         operational_context: Existing configuration from Avni
-        
+
     Returns:
         Initial input string for the LLM
     """
-    input_data = {
-        "existing_config": operational_context,
-        "expected_config": config
-    }
-    
-    return f"""Please process the configuration below. 
+    input_data = {"existing_config": operational_context, "crud_config": config}
+
+    # Identify which operations are requested
+    operations = []
+    if "delete" in config and config["delete"]:
+        operations.append("DELETE")
+    if "update" in config and config["update"]:
+        operations.append("UPDATE")
+    if "create" in config and config["create"]:
+        operations.append("CREATE")
+
+    return f"""Please process the CRUD configuration below. 
 
 FIRST: Analyze the 'existing_config' to understand what already exists in the system:
 - List all existing address level types, locations, subject types, programs, and encounter types
 - Note their IDs, UUIDs, and names for reference resolution
 
-THEN: Process 'expected_config' to create missing items in the correct order (DO NOT RECREATE EXISTING ITEMS):
-- Create items in the following order (top-level first, then children using actual parent database IDs as INTEGERS):
-1. Address Level Types (top-level first with NO parentId, then children using actual parent database IDs as INTEGERS)
-2. Locations (top-level first with NO parentId, then children using actual parent location IDs as INTEGERS)
-3. Catchments (using actual location IDs as INTEGER ARRAY [123, 456] NOT comma-separated string "123,456")
-4. Subject Types (member types before household/group types)
-5. Programs (using actual subject type UUIDs)
-6. Encounter Types (using actual subject type UUIDs, program UUIDs for program-specific encounters, null for general encounters)
+THEN: Process 'crud_config' operations in this order: {" → ".join(operations)}
 
-CRITICAL RULES:
-- Check existing_config first to avoid recreating existing items
+CRITICAL RULES FOR EACH OPERATION TYPE:
+- DELETE: Use delete contract objects with only 'id' field (e.g., {{"id": 123}})
+- UPDATE: Use update contract objects with 'id' field plus all fields to update
+- CREATE: Use create contract objects with all required fields (no 'id' field)
+- Process DELETE operations first, then UPDATE, then CREATE
+- For CREATE operations, follow dependency order (parents before children)
+- Check existing_config first to avoid operating on non-existent items
 - ALWAYS convert descriptive references to actual database values with correct data types
 - For locationIds in catchments: MUST be integers [123, 456, 789], NOT strings ["123", "456", "789"]
-- NEVER send locationIds as comma-separated string "123,456,789" - use proper array format [123, 456, 789]
 - For parentId and location parents: MUST be integers, NOT strings
-- Complete each category fully before moving to the next
-- Wait for creation results to get actual IDs/UUIDs before proceeding:
+- Wait for operation results to get actual IDs/UUIDs before proceeding to dependent operations
 
 {json.dumps(input_data, indent=2)}
 
 
 
-Remember to respond in JSON format with the required fields."""
+Remember to respond in JSON format with the required fields and track all CRUD operations separately."""
 
 
 def parse_llm_response(response_content: str) -> Dict[str, Any]:
     """Parse JSON response from LLM.
-    
+
     Args:
         response_content: Raw response content from LLM
-        
+
     Returns:
         Parsed response dictionary with fallback structure
     """
@@ -185,7 +230,7 @@ def parse_llm_response(response_content: str) -> Dict[str, Any]:
             start = response_content.find("{", i)
             if start == -1:
                 break
-            
+
             # Find the matching closing brace
             brace_count = 0
             end = start
@@ -196,21 +241,27 @@ def parse_llm_response(response_content: str) -> Dict[str, Any]:
                     brace_count -= 1
                     if brace_count == 0:
                         # Found complete JSON block
-                        json_str = response_content[start:end + 1]
+                        json_str = response_content[start : end + 1]
                         try:
                             parsed = json.loads(json_str)
                             json_blocks.append(parsed)
-                            logger.info(f"Found valid JSON block with done={parsed.get('done', 'unknown')}")
+                            logger.info(
+                                f"Found valid JSON block with done={parsed.get('done', 'unknown')}"
+                            )
                         except json.JSONDecodeError:
-                            logger.warning(f"Invalid JSON block found: {json_str[:100]}...")
+                            logger.warning(
+                                f"Invalid JSON block found: {json_str[:100]}..."
+                            )
                         break
                 end += 1
             i = end + 1
-        
+
         # Return the last valid JSON block (most recent response)
         if json_blocks:
             final_response = json_blocks[-1]
-            logger.info(f"Using final JSON block with done={final_response.get('done', 'unknown')}")
+            logger.info(
+                f"Using final JSON block with done={final_response.get('done', 'unknown')}"
+            )
             return final_response
         else:
             # Fallback if no valid JSON found
@@ -223,33 +274,45 @@ def parse_llm_response(response_content: str) -> Dict[str, Any]:
 
 def extract_text_content(response) -> str:
     """Extract text content from OpenAI response.
-    
+
     Args:
         response: OpenAI response object
-        
+
     Returns:
         Extracted text content or empty string
     """
     # Use OpenAI response object method
-    if hasattr(response, 'output_text'):
+    if hasattr(response, "output_text"):
         return response.output_text or ""
-    
+
     return ""
 
 
 def _create_fallback_response(next_action: str) -> Dict[str, Any]:
     """Create fallback response structure when parsing fails.
-    
+
     Args:
         next_action: Description of next action
-        
+
     Returns:
         Fallback response dictionary
     """
     return {
         "done": False,
-        "status": "processing", 
+        "status": "processing",
         "results": {
+            "deleted_address_level_types": [],
+            "deleted_locations": [],
+            "deleted_catchments": [],
+            "deleted_subject_types": [],
+            "deleted_programs": [],
+            "deleted_encounter_types": [],
+            "updated_address_level_types": [],
+            "updated_locations": [],
+            "updated_catchments": [],
+            "updated_subject_types": [],
+            "updated_programs": [],
+            "updated_encounter_types": [],
             "created_address_level_types": [],
             "created_locations": [],
             "created_catchments": [],
@@ -262,7 +325,7 @@ def _create_fallback_response(next_action: str) -> Dict[str, Any]:
             "existing_subject_types": [],
             "existing_programs": [],
             "existing_encounter_types": [],
-            "errors": []
+            "errors": [],
         },
-        "next_action": next_action
+        "next_action": next_action,
     }
