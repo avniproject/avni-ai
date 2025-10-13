@@ -133,29 +133,31 @@ class AvniClient:
         """
         try:
             complete_config = {}
-            
+
             # Define all endpoints to fetch
             endpoints = {
                 "addressLevelTypes": "/addressLevelType",
-                "locations": "/locations", 
+                "locations": "/locations",
                 "catchments": "/catchment",
                 "subjectTypes": "/web/subjectType",
                 "programs": "/web/program",
-                "encounterTypes": "/web/encounterType"
+                "encounterTypes": "/web/encounterType",
             }
-            
+
             # Fetch data from each endpoint
             for config_key, endpoint in endpoints.items():
                 logger.info(f"Fetching {config_key} from {endpoint}")
                 result = await self.make_request("GET", endpoint, auth_token)
-                
+
                 if result.success:
                     complete_config[config_key] = result.data or []
-                    logger.info(f"Successfully fetched {len(complete_config[config_key])} {config_key}")
+                    logger.info(
+                        f"Successfully fetched {len(complete_config[config_key])} {config_key}"
+                    )
                 else:
                     logger.error(f"Failed to fetch {config_key}: {result.error}")
                     return {"error": f"Failed to fetch {config_key}: {result.error}"}
-            
+
             logger.info("Successfully fetched complete configuration")
             return complete_config
 

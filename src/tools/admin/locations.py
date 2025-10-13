@@ -65,15 +65,19 @@ async def update_location(auth_token: str, contract: LocationUpdateContract) -> 
         auth_token: Authentication token for Avni API
         contract: LocationUpdateContract with update details
     """
-    
+
     # Auto-correct self-referencing parentId (common LLM mistake)
     if contract.parentId is not None and contract.parentId == contract.id:
-        logger.info(f"Auto-correcting self-referencing parentId from {contract.parentId} to null for location {contract.id}")
+        logger.info(
+            f"Auto-correcting self-referencing parentId from {contract.parentId} to null for location {contract.id}"
+        )
         contract.parentId = None
-    
+
     # Auto-correct parentId: 0 to null (common LLM mistake)
     if contract.parentId == 0:
-        logger.info(f"Auto-correcting parentId from 0 to null for location {contract.id}")
+        logger.info(
+            f"Auto-correcting parentId from 0 to null for location {contract.id}"
+        )
         contract.parentId = None
 
     payload = {
@@ -81,7 +85,7 @@ async def update_location(auth_token: str, contract: LocationUpdateContract) -> 
         LocationFields.TITLE.value: contract.title,
         LocationFields.LEVEL.value: contract.level,
     }
-    
+
     # Only include parentId if it's not None
     if contract.parentId is not None:
         payload[LocationFields.PARENT_ID.value] = contract.parentId

@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import List
 from typing import Optional
 
+
 @dataclass
 class LocationParent:
     """Parent reference in location hierarchy."""
