@@ -14,7 +14,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from .auth import SimpleTokenVerifier
-from .handlers import process_chat_request, process_config_request
+from .handlers import process_chat_request, process_config_request, process_config_async_request, get_task_status
 from src.tools.admin.addressleveltypes import register_address_level_type_tools
 from src.tools.admin.catchments import register_catchment_tools
 from src.tools.admin.locations import register_location_tools
@@ -86,7 +86,16 @@ def create_server():
 
     @mcp.custom_route("/process-config", methods=["POST"])
     async def process_config_endpoint(request: Request):
-        return await process_config_request(request, OPENAI_API_KEY)
+        return await process_config_request(request)
+
+    @mcp.custom_route("/process-config-async", methods=["POST"])
+    async def process_config_async_endpoint(request: Request):
+        return await process_config_async_request(request)
+
+    @mcp.custom_route("/process-config-status/{task_id}", methods=["GET"])  
+    async def get_config_task_status(request: Request):
+        task_id = request.path_params["task_id"]
+        return await get_task_status(task_id)
 
     return mcp
 

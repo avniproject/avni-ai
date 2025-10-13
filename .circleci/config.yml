@@ -30,7 +30,7 @@ commands:
       - run: |
           pwd
           cd ~/avni-infra/configure
-          VAULT_PASSWORD_FILE=~/.vault-pass.txt mcp_zip_path=~/artifacts make deploy-avni-mcp-server-<< parameters.env >>
+          VAULT_PASSWORD_FILE=~/.vault-pass.txt mcp_zip_path=~/artifacts make deploy-avni-ai-<< parameters.env >>
 
       - run: rm ~/.vault-pass.txt
 
@@ -97,7 +97,7 @@ jobs:
           name: Create build artifact
           command: |
             mkdir -p /tmp/artifacts
-            tar -czf /tmp/artifacts/avni-mcp-server.tar.gz \
+            tar -czf /tmp/artifacts/avni-ai.tar.gz \
               --exclude='.git' \
               --exclude='.venv' \
               --exclude='__pycache__' \
@@ -113,7 +113,7 @@ jobs:
       - persist_to_workspace:
           root: /tmp/artifacts
           paths:
-            - avni-mcp-server.tar.gz
+            - avni-ai.tar.gz
 
   test:
     docker:

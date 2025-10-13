@@ -1,0 +1,220 @@
+{
+  "config": {
+    "create": {
+      "addressLevelTypes": [
+        {
+          "name": "Async Test State",
+          "level": 3.0,
+          "parentId": null,
+          "voided": false
+        },
+        {
+          "name": "Async Test District",
+          "level": 2.0,
+          "parentId": "id of Async Test State",
+          "voided": false
+        },
+        {
+          "name": "Async Test Village",
+          "level": 1.0,
+          "parentId": "id of Async Test District",
+          "voided": false
+        }
+      ],
+      "locations": [
+        {
+          "name": "Mumbai Async",
+          "level": 3,
+          "type": "Async Test State",
+          "parents": []
+        },
+        {
+          "name": "Thane Async District",
+          "level": 2,
+          "type": "Async Test District",
+          "parents": [{"id": "id of Mumbai Async"}]
+        },
+        {
+          "name": "Kalyan Async Village",
+          "level": 1,
+          "type": "Async Test Village",
+          "parents": [{"id": "id of Thane Async District"}]
+        }
+      ],
+      "catchments": [
+        {
+          "name": "Async Metro Catchment",
+          "locationIds": ["id of Mumbai Async", "id of Thane Async District"]
+        },
+        {
+          "name": "Async Rural Catchment",
+          "locationIds": ["id of Kalyan Async Village"]
+        }
+      ],
+      "subjectTypes": [
+        {
+          "name": "Async Test Person",
+          "uuid": "async123-4567-8901-2345-678901234567",
+          "type": "Person",
+          "active": true,
+          "voided": false,
+          "group": false,
+          "household": false,
+          "allowEmptyLocation": true,
+          "allowMiddleName": false,
+          "lastNameOptional": false,
+          "allowProfilePicture": false,
+          "uniqueName": false,
+          "directlyAssignable": false,
+          "shouldSyncByLocation": true,
+          "settings": {
+            "displayRegistrationDetails": true,
+            "displayPlannedEncounters": true
+          },
+          "subjectSummaryRule": null,
+          "programEligibilityCheckRule": null,
+          "memberAdditionEligibilityCheckRule": null,
+          "validFirstNameFormat": null,
+          "validMiddleNameFormat": null,
+          "validLastNameFormat": null,
+          "iconFileS3Key": null,
+          "syncRegistrationConcept1": null,
+          "syncRegistrationConcept2": null,
+          "nameHelpText": null,
+          "groupRoles": [],
+          "registrationFormUuid": null
+        },
+        {
+          "name": "Async Test Family",
+          "uuid": "async789-0123-4567-8901-234567890123",
+          "type": "Household",
+          "active": true,
+          "voided": false,
+          "group": true,
+          "household": true,
+          "allowEmptyLocation": false,
+          "allowMiddleName": false,
+          "lastNameOptional": true,
+          "allowProfilePicture": false,
+          "uniqueName": true,
+          "directlyAssignable": false,
+          "shouldSyncByLocation": true,
+          "settings": {
+            "displayRegistrationDetails": true,
+            "displayPlannedEncounters": true
+          },
+          "subjectSummaryRule": null,
+          "programEligibilityCheckRule": null,
+          "memberAdditionEligibilityCheckRule": null,
+          "validFirstNameFormat": null,
+          "validMiddleNameFormat": null,
+          "validLastNameFormat": null,
+          "iconFileS3Key": null,
+          "syncRegistrationConcept1": null,
+          "syncRegistrationConcept2": null,
+          "nameHelpText": null,
+          "groupRoles": [
+            {
+              "subjectMemberName": "Async Test Person",
+              "groupRoleUUID": "asyncrole-1234-5678-9012-345678901234",
+              "groupSubjectTypeUUID": "async789-0123-4567-8901-234567890123",
+              "memberSubjectTypeUUID": "async123-4567-8901-2345-678901234567",
+              "role": "Family Head",
+              "minimumNumberOfMembers": 1,
+              "maximumNumberOfMembers": 1,
+              "isPrimary": true,
+              "voided": false
+            },
+            {
+              "subjectMemberName": "Async Test Person",
+              "groupRoleUUID": "asyncrole-5678-9012-3456-789012345678",
+              "groupSubjectTypeUUID": "async789-0123-4567-8901-234567890123",
+              "memberSubjectTypeUUID": "async123-4567-8901-2345-678901234567",
+              "role": "Family Member",
+              "minimumNumberOfMembers": 0,
+              "maximumNumberOfMembers": 15,
+              "isPrimary": false,
+              "voided": false
+            }
+          ],
+          "registrationFormUuid": null
+        }
+      ],
+      "programs": [
+        {
+          "name": "Async Wellness Program",
+          "uuid": "asyncprog-1234-5678-9012-345678901234",
+          "colour": "#9C27B0",
+          "subjectTypeUuid": "async123-4567-8901-2345-678901234567",
+          "programSubjectLabel": "Wellness Participant",
+          "enrolmentSummaryRule": null,
+          "enrolmentEligibilityCheckRule": null,
+          "enrolmentEligibilityCheckDeclarativeRule": null,
+          "manualEligibilityCheckRequired": false,
+          "showGrowthChart": true,
+          "manualEnrolmentEligibilityCheckRule": null,
+          "manualEnrolmentEligibilityCheckDeclarativeRule": null,
+          "allowMultipleEnrolments": false,
+          "programEnrolmentFormUuid": null,
+          "programExitFormUuid": null,
+          "active": true,
+          "voided": false
+        },
+        {
+          "name": "Async Family Support",
+          "uuid": "asyncprog-5678-9012-3456-789012345678",
+          "colour": "#FF5722",
+          "subjectTypeUuid": "async789-0123-4567-8901-234567890123",
+          "programSubjectLabel": "Support Family",
+          "enrolmentSummaryRule": null,
+          "enrolmentEligibilityCheckRule": null,
+          "enrolmentEligibilityCheckDeclarativeRule": null,
+          "manualEligibilityCheckRequired": false,
+          "showGrowthChart": false,
+          "manualEnrolmentEligibilityCheckRule": null,
+          "manualEnrolmentEligibilityCheckDeclarativeRule": null,
+          "allowMultipleEnrolments": false,
+          "programEnrolmentFormUuid": null,
+          "programExitFormUuid": null,
+          "active": true,
+          "voided": false
+        }
+      ],
+      "encounterTypes": [
+        {
+          "name": "Async Health Screening",
+          "uuid": "asyncenc-1234-5678-9012-345678901234",
+          "subjectTypeUuid": "async123-4567-8901-2345-678901234567",
+          "programUuid": null,
+          "active": true,
+          "voided": false,
+          "isImmutable": false,
+          "entityEligibilityCheckRule": null,
+          "entityEligibilityCheckDeclarativeRule": null
+        },
+        {
+          "name": "Async Wellness Checkup",
+          "uuid": "asyncenc-5678-9012-3456-789012345678",
+          "subjectTypeUuid": "async123-4567-8901-2345-678901234567",
+          "programUuid": "asyncprog-1234-5678-9012-345678901234",
+          "active": true,
+          "voided": false,
+          "isImmutable": false,
+          "entityEligibilityCheckRule": null,
+          "entityEligibilityCheckDeclarativeRule": null
+        },
+        {
+          "name": "Async Family Assessment",
+          "uuid": "asyncenc-9012-3456-7890-123456789012",
+          "subjectTypeUuid": "async789-0123-4567-8901-234567890123",
+          "programUuid": "asyncprog-5678-9012-3456-789012345678",
+          "active": true,
+          "voided": false,
+          "isImmutable": false,
+          "entityEligibilityCheckRule": null,
+          "entityEligibilityCheckDeclarativeRule": null
+        }
+      ]
+    }
+  }
+}

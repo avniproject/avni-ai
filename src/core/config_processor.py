@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from typing import Dict, Any
 
 from ..clients import create_openai_client, create_avni_client
@@ -263,14 +264,15 @@ class ConfigProcessor:
             return error_result
 
 
-def create_config_processor(openai_api_key: str) -> ConfigProcessor:
+def create_config_processor() -> ConfigProcessor:
     """
     Factory function to create a config processor.
-
-    Args:
-        openai_api_key: OpenAI API key
+    Gets OpenAI API key from environment variables.
 
     Returns:
         Configured config processor
     """
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if not openai_api_key:
+        raise ValueError("OPENAI_API_KEY environment variable is required")
     return ConfigProcessor(openai_api_key)

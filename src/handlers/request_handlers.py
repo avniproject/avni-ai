@@ -4,6 +4,7 @@ from starlette.responses import JSONResponse
 
 from ..clients import create_openai_client
 from ..core import tool_registry, create_config_processor
+from ..core.task_manager import task_manager, TaskStatus
 from ..utils import create_error_response, create_success_response
 from ..utils.request_utils import extract_base_url
 
@@ -87,7 +88,7 @@ async def process_chat_request(
         return create_error_response("Internal server error", 500)
 
 
-async def process_config_request(request: Request, openai_api_key: str) -> JSONResponse:
+async def process_config_request(request: Request) -> JSONResponse:
     """
     Process Avni configuration using LLM with CRUD operations (create, update, delete).
 
@@ -160,7 +161,7 @@ async def process_config_request(request: Request, openai_api_key: str) -> JSONR
         logger.info(f"Operations requested: {list(config_data.keys())}")
 
         # Create config processor and process the config
-        processor = create_config_processor(openai_api_key)
+        processor = create_config_processor()
         result = await processor.process_config(
             config=config_data, auth_token=auth_token, base_url=base_url
         )
@@ -172,4 +173,77 @@ async def process_config_request(request: Request, openai_api_key: str) -> JSONR
         import traceback
 
         logger.error(f"Full traceback: {traceback.format_exc()}")
+        return create_error_response("Internal server error", 500)
+
+
+async def process_config_async_request(request: Request) -> JSONResponse:
+    """
+    Start async configuration processing and return task ID immediately.
+    
+    Same request format as /process-config but returns immediately with task ID.
+    Use /process-config-status/{task_id} to check progress.
+    """
+    try:
+        body = await request.json()
+        config_data = body.get("config")
+
+        if not config_data:
+            return create_error_response("config object is required", 400)
+
+        # Validate that config has at least one operation
+        if not any(op in config_data for op in ["create", "update", "delete"]):
+            return create_error_response(
+                "config must contain at least one of: create, update, delete", 400
+            )
+
+        # Get auth token from header
+        auth_token = request.headers.get("avni-auth-token")
+        if not auth_token:
+            return create_error_response("avni-auth-token header is required", 401)
+
+        # Extract base URL with priority: query > header > env > default
+        base_url = extract_base_url(request)
+
+        logger.info(f"Starting async CRUD config processing with Avni base URL: {base_url}")
+        logger.info(f"Operations requested: {list(config_data.keys())}")
+
+        # Create task
+        task_id = task_manager.create_task(
+            config_data=config_data,
+            auth_token=auth_token,
+            base_url=base_url
+        )
+
+        # Start background processing
+        processor = create_config_processor()
+        task_manager.start_background_task(task_id, processor, None)  # API key handled internally
+
+        # Return task ID immediately
+        return create_success_response({
+            "task_id": task_id,
+            "status": "processing",
+            "message": "Configuration processing started. Use /process-config-status/{task_id} to check progress."
+        })
+
+    except Exception as e:
+        logger.error(f"Async config processing error: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        return create_error_response("Internal server error", 500)
+
+
+async def get_task_status(task_id: str) -> JSONResponse:
+    """
+    Get status and result of a configuration processing task.
+    """
+    try:
+        task = task_manager.get_task(task_id)
+        
+        if not task:
+            return create_error_response(f"Task {task_id} not found or expired", 404)
+
+        return create_success_response(task.to_dict())
+
+    except Exception as e:
+        logger.error(f"Task status error: {e}")
         return create_error_response("Internal server error", 500)

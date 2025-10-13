@@ -7,126 +7,297 @@
     "config": {
       "type": "object",
       "properties": {
-        "addressLevelTypes": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {"type": "string"},
-              "uuid": {"type": "string"},
-              "voided": {"type": "boolean"},
-              "level": {"type": "number"},
-              "parentId": {"type": ["integer", "null"]}
-            },
-            "required": ["name", "level"]
-          }
-        },
-        "locations": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {"type": "string"},
-              "uuid": {"type": "string"},
-              "voided": {"type": "boolean"},
-              "level": {"type": "number"},
-              "type": {"type": "string"},
-              "addressLevelTypeUUID": {"type": "string"},
-              "organisationUUID": {"type": "string"},
-              "legacyId": {"type": ["string", "null"]},
-              "gpsCoordinates": {"type": ["object", "null"]},
-              "locationProperties": {"type": "object"}
-            },
-            "required": ["name", "level", "type", "addressLevelTypeUUID", "organisationUUID"]
-          }
-        },
-        "subjectTypes": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {"type": "string"},
-              "type": {"type": "string"},
-              "group": {"type": "boolean"},
-              "household": {"type": "boolean"},
-              "active": {"type": "boolean"},
-              "subjectSummaryRule": {"type": ["string", "null"]},
-              "programEligibilityCheckRule": {"type": ["string", "null"]},
-              "memberAdditionEligibilityCheckRule": {"type": ["string", "null"]},
-              "allowEmptyLocation": {"type": "boolean"},
-              "allowMiddleName": {"type": "boolean"},
-              "lastNameOptional": {"type": "boolean"},
-              "allowProfilePicture": {"type": "boolean"},
-              "uniqueName": {"type": "boolean"},
-              "directlyAssignable": {"type": "boolean"},
-              "shouldSyncByLocation": {"type": "boolean"}
-            },
-            "required": ["name", "type"]
-          }
-        },
-        "programs": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {"type": "string"},
-              "colour": {"type": "string"},
-              "voided": {"type": "boolean"},
-              "active": {"type": "boolean"},
-              "enrolmentEligibilityCheckRule": {"type": ["string", "null"]},
-              "enrolmentSummaryRule": {"type": ["string", "null"]},
-              "manualEligibilityCheckRequired": {"type": "boolean"},
-              "showGrowthChart": {"type": "boolean"},
-              "allowMultipleEnrolments": {"type": "boolean"}
-            },
-            "required": ["name", "colour"]
-          }
-        },
-        "encounterTypes": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {"type": "string"},
-              "entityEligibilityCheckRule": {"type": ["string", "null"]},
-              "active": {"type": "boolean"},
-              "isImmutable": {"type": "boolean"},
-              "voided": {"type": "boolean"}
-            },
-            "required": ["name"]
-          }
-        }
-      }
-    },
-    "context": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "type": "string",
-          "enum": ["verify_entities"]
-        },
-        "entities": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": ["addressLevelTypes", "locations", "subjectTypes", "programs", "encounterTypes"]
-              },
-              "name": {
-                "type": "string"
+        "create": {
+          "type": "object",
+          "properties": {
+            "addressLevelTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "level": {"type": "number"},
+                  "parentId": {"type": ["string", "null"]},
+                  "voided": {"type": "boolean"}
+                },
+                "required": ["name", "level"]
               }
             },
-            "required": ["type", "name"]
+            "locations": {
+              "type": "array", 
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "level": {"type": "number"},
+                  "type": {"type": "string"},
+                  "parents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"}
+                      },
+                      "required": ["id"]
+                    }
+                  }
+                },
+                "required": ["name", "level", "type", "parents"]
+              }
+            },
+            "catchments": {
+              "type": "array",
+              "items": {
+                "type": "object", 
+                "properties": {
+                  "name": {"type": "string"},
+                  "locationIds": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                  }
+                },
+                "required": ["name", "locationIds"]
+              }
+            },
+            "subjectTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "uuid": {"type": "string"},
+                  "type": {"type": "string"},
+                  "active": {"type": "boolean"},
+                  "voided": {"type": "boolean"},
+                  "group": {"type": "boolean"},
+                  "household": {"type": "boolean"},
+                  "allowEmptyLocation": {"type": "boolean"},
+                  "allowMiddleName": {"type": "boolean"},
+                  "lastNameOptional": {"type": "boolean"},
+                  "allowProfilePicture": {"type": "boolean"},
+                  "uniqueName": {"type": "boolean"},
+                  "directlyAssignable": {"type": "boolean"},
+                  "shouldSyncByLocation": {"type": "boolean"},
+                  "settings": {"type": "object"},
+                  "subjectSummaryRule": {"type": ["string", "null"]},
+                  "programEligibilityCheckRule": {"type": ["string", "null"]},
+                  "memberAdditionEligibilityCheckRule": {"type": ["string", "null"]},
+                  "validFirstNameFormat": {"type": ["object", "null"]},
+                  "validMiddleNameFormat": {"type": ["object", "null"]},
+                  "validLastNameFormat": {"type": ["object", "null"]},
+                  "iconFileS3Key": {"type": ["string", "null"]},
+                  "syncRegistrationConcept1": {"type": ["string", "null"]},
+                  "syncRegistrationConcept2": {"type": ["string", "null"]},
+                  "nameHelpText": {"type": ["string", "null"]},
+                  "groupRoles": {"type": "array"},
+                  "registrationFormUuid": {"type": ["string", "null"]}
+                },
+                "required": ["name", "uuid", "type"]
+              }
+            },
+            "programs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "uuid": {"type": "string"},
+                  "colour": {"type": "string"},
+                  "subjectTypeUuid": {"type": "string"},
+                  "programSubjectLabel": {"type": "string"},
+                  "active": {"type": "boolean"},
+                  "voided": {"type": "boolean"},
+                  "showGrowthChart": {"type": "boolean"},
+                  "allowMultipleEnrolments": {"type": "boolean"},
+                  "manualEligibilityCheckRequired": {"type": "boolean"},
+                  "enrolmentSummaryRule": {"type": ["string", "null"]},
+                  "enrolmentEligibilityCheckRule": {"type": ["string", "null"]},
+                  "enrolmentEligibilityCheckDeclarativeRule": {"type": ["object", "null"]},
+                  "manualEnrolmentEligibilityCheckRule": {"type": ["string", "null"]},
+                  "manualEnrolmentEligibilityCheckDeclarativeRule": {"type": ["object", "null"]},
+                  "programEnrolmentFormUuid": {"type": ["string", "null"]},
+                  "programExitFormUuid": {"type": ["string", "null"]}
+                },
+                "required": ["name", "uuid", "colour", "subjectTypeUuid"]
+              }
+            },
+            "encounterTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "uuid": {"type": "string"},
+                  "subjectTypeUuid": {"type": "string"},
+                  "programUuid": {"type": ["string", "null"]},
+                  "active": {"type": "boolean"},
+                  "voided": {"type": "boolean"},
+                  "isImmutable": {"type": "boolean"},
+                  "entityEligibilityCheckRule": {"type": ["string", "null"]},
+                  "entityEligibilityCheckDeclarativeRule": {"type": ["object", "null"]}
+                },
+                "required": ["name", "uuid", "subjectTypeUuid"]
+              }
+            }
+          }
+        },
+        "update": {
+          "type": "object",
+          "properties": {
+            "addressLevelTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "level": {"type": "number"},
+                  "parentId": {"type": ["string", "null"]},
+                  "voided": {"type": "boolean"}
+                },
+                "required": ["name"]
+              }
+            },
+            "locations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {"type": "string"},
+                  "level": {"type": "number"},
+                  "parentId": {"type": ["string", "null"]}
+                },
+                "required": ["title"]
+              }
+            },
+            "catchments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "locationIds": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                  },
+                  "deleteFastSync": {"type": "boolean"}
+                },
+                "required": ["name"]
+              }
+            },
+            "subjectTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "type": {"type": "string"},
+                  "allowMiddleName": {"type": "boolean"},
+                  "allowProfilePicture": {"type": "boolean"},
+                  "settings": {"type": "object"},
+                  "groupRoles": {"type": "array"}
+                },
+                "required": ["name"]
+              }
+            },
+            "programs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "colour": {"type": "string"},
+                  "showGrowthChart": {"type": "boolean"},
+                  "allowMultipleEnrolments": {"type": "boolean"},
+                  "manualEligibilityCheckRequired": {"type": "boolean"},
+                  "programSubjectLabel": {"type": "string"},
+                  "enrolmentSummaryRule": {"type": ["string", "null"]},
+                  "enrolmentEligibilityCheckRule": {"type": ["string", "null"]}
+                },
+                "required": ["name"]
+              }
+            },
+            "encounterTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "isImmutable": {"type": "boolean"},
+                  "entityEligibilityCheckRule": {"type": ["string", "null"]}
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "delete": {
+          "type": "object",
+          "properties": {
+            "encounterTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"}
+                },
+                "required": ["id"]
+              }
+            },
+            "programs": {
+              "type": "array", 
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"}
+                },
+                "required": ["id"]
+              }
+            },
+            "subjectTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"}
+                },
+                "required": ["id"]
+              }
+            },
+            "catchments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"}
+                },
+                "required": ["id"]
+              }
+            },
+            "locations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"}
+                },
+                "required": ["id"]
+              }
+            },
+            "addressLevelTypes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"}
+                },
+                "required": ["id"]
+              }
+            }
           }
         }
       }
-    },
-    "loop": {
-      "type": "boolean"
     }
   },
-  "required": ["response", "config", "context", "loop"],
+  "required": ["response", "config"],
   "additionalProperties": false
 }
