@@ -63,6 +63,17 @@ async def update_location_type(
         auth_token: Authentication token for Avni API
         contract: AddressLevelTypeUpdateContract with update details
     """
+    
+    # Auto-correct self-referencing parentId (common LLM mistake)
+    if contract.parentId is not None and contract.parentId == contract.id:
+        logger.info(f"Auto-correcting self-referencing parentId from {contract.parentId} to null for location type {contract.id}")
+        contract.parentId = None
+    
+    # Auto-correct parentId: 0 to null (common LLM mistake)
+    if contract.parentId == 0:
+        logger.info(f"Auto-correcting parentId from 0 to null for location type {contract.id}")
+        contract.parentId = None
+    
     payload = {
         AddressLevelTypeFields.UUID.value: contract.uuid,
         AddressLevelTypeFields.NAME.value: contract.name,

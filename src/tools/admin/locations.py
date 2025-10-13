@@ -65,17 +65,26 @@ async def update_location(auth_token: str, contract: LocationUpdateContract) -> 
         auth_token: Authentication token for Avni API
         contract: LocationUpdateContract with update details
     """
-    # Convert LocationParent objects to API format
-    parents_payload = []
-    for parent in contract.parents:
-        parents_payload.append({LocationFields.ID.value: parent.id})
+    
+    # Auto-correct self-referencing parentId (common LLM mistake)
+    if contract.parentId is not None and contract.parentId == contract.id:
+        logger.info(f"Auto-correcting self-referencing parentId from {contract.parentId} to null for location {contract.id}")
+        contract.parentId = None
+    
+    # Auto-correct parentId: 0 to null (common LLM mistake)
+    if contract.parentId == 0:
+        logger.info(f"Auto-correcting parentId from 0 to null for location {contract.id}")
+        contract.parentId = None
 
     payload = {
         LocationFields.ID.value: contract.id,
         LocationFields.TITLE.value: contract.title,
         LocationFields.LEVEL.value: contract.level,
-        LocationFields.PARENTS.value: parents_payload,
     }
+    
+    # Only include parentId if it's not None
+    if contract.parentId is not None:
+        payload[LocationFields.PARENT_ID.value] = contract.parentId
 
     # Log the actual API payload to both standard and session loggers
     log_payload("Location UPDATE payload:", payload)

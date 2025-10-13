@@ -38,16 +38,32 @@ CRITICAL PARENT-CHILD RELATIONSHIP RULES:
 4. CREATE ITEMS SEQUENTIALLY, not all at once
 5. **MANDATORY ID TRACKING**: When a function returns "created successfully with ID 1234", you MUST extract and use that exact ID (1234) for any dependent items
 6. **EXAMPLE**: If create_location_type returns "Location type 'CRUD State' created successfully with ID 1732", then use parentId: 1732 for any child items that reference "id of CRUD State"
-7. **NEVER USE DEFAULT VALUES**: Do not use parentId: 0 or null when the config specifies a parent reference - always resolve to the actual database ID
+7. **NEVER USE DEFAULT VALUES**: Do not use parentId: 0 when the config specifies a parent reference - always resolve to the actual database ID. However, when config explicitly has parentId: null, preserve that null value.
+
+CRITICAL DISTINCTION: ADDRESS LEVEL TYPES vs LOCATIONS:
+- Address Level Types (location types) are TEMPLATES that define location hierarchy levels
+- Locations are ACTUAL geographic instances that use those templates
+- **NEVER** use an AddressLevelType ID as a Location parent ID
+- Location parents must reference OTHER LOCATION IDs, not AddressLevelType IDs
+- When creating locations: location_type parameter = AddressLevelType NAME, parents[].id = actual LOCATION ID
 
 CRITICAL DATA TYPE CONVERSION RULES:
 - ALL database IDs (parentId, locationIds, parents[].id) MUST be sent as INTEGERS, not strings
 - When resolving "id of ItemName" references, convert the result to integer before using
 - When there are multiple location Ids they need to be in an array for Example: locationIds: [269896, 269895] is correct wheras  ["269896", "269895"] and "269903,269904" are incorrect especially when creating catchments
 - UUIDs remain as strings
-- For top-level items (no parent): DO NOT include parentId field in the payload at all
+
+CRITICAL NULL/PARENT HANDLING RULES:
+- When parentId is null in config: PRESERVE null, do NOT convert to 0 or any other value
+- For top-level items with parentId: null in config: Keep parentId: null in the contract object
+- NEVER convert null values to 0, empty string, or any default value
+- **CRITICAL SELF-REFERENCE BUG**: NEVER set parentId to the same value as the item's own ID - an item cannot be its own parent
+- When config has "parent_id": null, ensure parentId: null in contract, NOT parentId: <item's own ID>
+- Only omit parentId field completely when the config doesn't specify it at all
 - For locations with no parent: DO NOT include parentId parameter in function calls
 - For location creation: location_type parameter must be the addressLevelType NAME (e.g., "TestState"), not the database ID
+
+OTHER CONVERSION RULES:
 - For encounter types: entityEligibilityCheckRule must be empty string "", entityEligibilityCheckDeclarativeRule must be null
 - For general encounters:DO NOT include program_uuid parameter in function calls payload at all (do not send "program_uuid": "" ,program_uuid should be completely neglected), otherwise it will fail to create encounter type
 - For program-specific encounters: include program_uuid parameter with actual program UUID
@@ -61,10 +77,30 @@ Config: "parentId": "id of CRUD State"
 3. Extract and store: "CRUD State" → 1732
 4. For child item: use parentId: 1732 (NOT parentId: 0 or parentId: null)
 
+**NULL/PARENT HANDLING EXAMPLES**:
+- Config: {"name":"Updated CRUD State","parentId":null} → Contract: {"name":"Updated CRUD State","parentId":null} (PRESERVE null)
+- Config: {"name":"SubCounty","parentId":"id of TestState"} → Contract: {"name":"SubCounty","parentId":1234} (resolve to actual DB ID)
+- Config: {"name":"TopLevel"} → Contract: {"name":"TopLevel"} (omit parentId field entirely if not in config)
+
+**COMMON MISTAKES TO AVOID**:
+- WRONG: parentId: 0 (never use 0)
+- WRONG: parentId: 269937 when id: 269937 (self-reference)  
+- CORRECT: parentId: null for top-level items
+- CORRECT: parentId: 5678 when referencing actual parent location ID 5678
+
+**ADDRESS LEVEL TYPE vs LOCATION EXAMPLES**:
+- AddressLevelTypes: {"name":"SubCounty","parentId":"id of TestState"} → resolve "TestState" ADDRESS LEVEL TYPE to actual DB ID (e.g., 1732)
+- Locations: {"parents":[{"id":"id of TestState"}]} → resolve "TestState" LOCATION to actual LOCATION ID (e.g., 5678)
+- WRONG: create_location with parents:[{"id": 1732}] where 1732 is AddressLevelType ID
+- CORRECT: create_location with parents:[{"id": 5678}] where 5678 is actual Location ID
+- Location creation: use create_location(name="Karnataka Test", level=3, location_type="TestState") → location_type is AddressLevelType NAME
+
+**REFERENCE RESOLUTION PROCESS**:
+1. "id of TestState" in AddressLevelType context → Find AddressLevelType named "TestState" → Use its ID (e.g., 1732)
+2. "id of TestState" in Location context → Find Location named "TestState" → Use its ID (e.g., 5678)
+3. Always check context: are you creating AddressLevelType or Location?
+
 **OTHER EXAMPLES**:
-- AddressLevelTypes: {"name":"SubCounty","parentId":"id of TestState"} → resolve "TestState" to actual DB ID
-- Locations: {"parents":[{"id":"id of TestState"}]} → resolve "TestState" location to actual DB ID
-- Location creation: use create_location(name="Karnataka Test", level=3, location_type="TestState", parent_id=None) → location_type is NAME not ID
 - Programs: {"subjectTypeUuid":"uuid of Test Individual"} → resolve to actual UUID from creation
 - EncounterTypes: {"programUuid":"uuid of Test Health Program"} → resolve to actual UUID
 
@@ -130,7 +166,9 @@ SPECIFIC DEPENDENCY RULES:
 1. For AddressLevelTypes: Create top-level (parentId: null) first, then children using actual parent database ID
 2. For Locations: Create top-level (parents: []) first, then children using actual parent location ID
    - CRITICAL: Use addressLevelType NAME for location_type parameter, NOT the database ID
-   - Example: create_location(name="Karnataka", level=3, location_type="TestState") ← "TestState" is the NAME
+   - CRITICAL: parents[].id must be LOCATION ID, NEVER use AddressLevelType ID
+   - Example: create_location(name="Karnataka", level=3, location_type="TestState") ← "TestState" is the AddressLevelType NAME
+   - Example: parents:[{"id": 5678}] where 5678 is an actual Location ID, NOT AddressLevelType ID
 3. For Household/Group SubjectTypes: Create member subject types first, then reference them in groupRoles
 4. For Programs: Ensure referenced subjectTypeUuid exists first
 5. For EncounterTypes: Ensure referenced subjectTypeUuid and programUuid (if applicable) exist first

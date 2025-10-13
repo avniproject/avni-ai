@@ -25,17 +25,17 @@
         {
           "title": "Updated Karnataka CRUD State",
           "level": 3,
-          "parents": []
+          "parentId": null
         },
         {
           "title": "Updated Bangalore CRUD District",
           "level": 2,
-          "parents": [{"id": "id of Updated Karnataka CRUD State"}]
+          "parentId": "id of Updated Karnataka CRUD State"
         },
         {
           "title": "Updated Electronic City CRUD Block",
           "level": 1,
-          "parents": [{"id": "id of Updated Bangalore CRUD District"}]
+          "parentId": "id of Updated Bangalore CRUD District"
         }
       ],
       "catchments": [
@@ -70,7 +70,7 @@
             "displayPlannedEncounters": true,
             "enableApproval": false
           },
-          "subjectSummaryRule": "Updated summary rule for individuals",
+          "subjectSummaryRule": null,
           "programEligibilityCheckRule": null,
           "memberAdditionEligibilityCheckRule": null,
           "validFirstNameFormat": null,
@@ -79,7 +79,7 @@
           "iconFileS3Key": null,
           "syncRegistrationConcept1": null,
           "syncRegistrationConcept2": null,
-          "nameHelpText": "Updated help text for individual names",
+          "nameHelpText": "",
           "groupRoles": [],
           "registrationFormUuid": null
         },
@@ -88,7 +88,7 @@
           "type": "Household", 
           "active": true,
           "voided": false,
-          "group": false,
+          "group": true,
           "household": true,
           "allowEmptyLocation": false,
           "allowMiddleName": false,
@@ -102,16 +102,16 @@
             "displayPlannedEncounters": false,
             "enableApproval": true
           },
-          "subjectSummaryRule": "Updated household summary",
+          "subjectSummaryRule": null,
           "programEligibilityCheckRule": null,
-          "memberAdditionEligibilityCheckRule": "Updated member addition rule",
+          "memberAdditionEligibilityCheckRule": "",
           "validFirstNameFormat": null,
           "validMiddleNameFormat": null,
           "validLastNameFormat": null,
           "iconFileS3Key": null,
           "syncRegistrationConcept1": null,
           "syncRegistrationConcept2": null,
-          "nameHelpText": "Updated help text for household names",
+          "nameHelpText": "",
           "groupRoles": [
             {
               "subjectMemberName": "Updated CRUD Individual",
@@ -144,13 +144,13 @@
           "name": "Updated CRUD Health Program",
           "colour": "#FF9800",
           "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
-          "programSubjectLabel": "Updated Health Participant",
-          "enrolmentSummaryRule": "Updated enrolment summary for health program",
-          "enrolmentEligibilityCheckRule": "Updated eligibility check rule",
+          "programSubjectLabel": "",
+          "enrolmentSummaryRule": "",
+          "enrolmentEligibilityCheckRule": "",
           "enrolmentEligibilityCheckDeclarativeRule": null,
           "manualEligibilityCheckRequired": true,
           "showGrowthChart": true,
-          "manualEnrolmentEligibilityCheckRule": true,
+          "manualEnrolmentEligibilityCheckRule": null,
           "manualEnrolmentEligibilityCheckDeclarativeRule": null,
           "allowMultipleEnrolments": true,
           "programEnrolmentFormUuid": null,
@@ -163,12 +163,12 @@
           "colour": "#9C27B0",
           "subjectTypeUuid": "crud5678-9abc-def0-1234-56789abcdef0",
           "programSubjectLabel": "Updated Family Unit",
-          "enrolmentSummaryRule": "Updated family welfare summary",
+          "enrolmentSummaryRule": "",
           "enrolmentEligibilityCheckRule": null,
           "enrolmentEligibilityCheckDeclarativeRule": null,
           "manualEligibilityCheckRequired": false,
           "showGrowthChart": true,
-          "manualEnrolmentEligibilityCheckRule": false,
+          "manualEnrolmentEligibilityCheckRule": null,
           "manualEnrolmentEligibilityCheckDeclarativeRule": null,
           "allowMultipleEnrolments": true,
           "programEnrolmentFormUuid": null,
@@ -185,7 +185,7 @@
           "active": true,
           "voided": false,
           "isImmutable": true,
-          "entityEligibilityCheckRule": "Updated registration eligibility rule",
+          "entityEligibilityCheckRule": "",
           "entityEligibilityCheckDeclarativeRule": null
         },
         {
@@ -195,7 +195,7 @@
           "active": true,
           "voided": false,
           "isImmutable": false,
-          "entityEligibilityCheckRule": "Updated health checkup eligibility",
+          "entityEligibilityCheckRule": "",
           "entityEligibilityCheckDeclarativeRule": null
         },
         {
@@ -205,7 +205,7 @@
           "active": true,
           "voided": false,
           "isImmutable": false,
-          "entityEligibilityCheckRule": "Updated family survey eligibility",
+          "entityEligibilityCheckRule": "",
           "entityEligibilityCheckDeclarativeRule": null
         }
       ]

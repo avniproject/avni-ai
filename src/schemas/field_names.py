@@ -21,6 +21,7 @@ class LocationFields(Enum):
     LEVEL = "level"
     TYPE = "type"
     PARENTS = "parents"
+    PARENT_ID = "parentId"
     ID = "id"
 
 

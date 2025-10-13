@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 from typing import List
-
+from typing import Optional
 
 @dataclass
 class LocationParent:
@@ -28,7 +28,7 @@ class LocationUpdateContract:
     id: int  # Used in URL path parameter AND in request body
     title: str  # API uses 'title' for updates
     level: int
-    parents: List[LocationParent] = field(default_factory=list)
+    parentId: Optional[int] = None
 
 
 @dataclass

@@ -121,30 +121,46 @@ class AvniClient:
             method, endpoint, auth_token, data, self.base_url
         )
 
-    async def fetch_operational_modules(self, auth_token: str) -> Dict[str, Any]:
+    async def fetch_complete_config(self, auth_token: str) -> Dict[str, Any]:
         """
-        Fetch operational modules context from Avni API.
+        Fetch complete configuration from Avni API by calling specific endpoints.
 
         Args:
             auth_token: Avni API authentication token
 
         Returns:
-            Dictionary containing operational modules data or error information
+            Dictionary containing complete configuration data or error information
         """
         try:
-            result = await self.make_request(
-                "GET", "/web/operationalModules", auth_token
-            )
-
-            if result.success:
-                logger.info("Successfully fetched operational modules context")
-                return result.data
-            else:
-                logger.error(f"Failed to fetch operational modules: {result.error}")
-                return {"error": result.error}
+            complete_config = {}
+            
+            # Define all endpoints to fetch
+            endpoints = {
+                "addressLevelTypes": "/addressLevelType",
+                "locations": "/locations", 
+                "catchments": "/catchment",
+                "subjectTypes": "/web/subjectType",
+                "programs": "/web/program",
+                "encounterTypes": "/web/encounterType"
+            }
+            
+            # Fetch data from each endpoint
+            for config_key, endpoint in endpoints.items():
+                logger.info(f"Fetching {config_key} from {endpoint}")
+                result = await self.make_request("GET", endpoint, auth_token)
+                
+                if result.success:
+                    complete_config[config_key] = result.data or []
+                    logger.info(f"Successfully fetched {len(complete_config[config_key])} {config_key}")
+                else:
+                    logger.error(f"Failed to fetch {config_key}: {result.error}")
+                    return {"error": f"Failed to fetch {config_key}: {result.error}"}
+            
+            logger.info("Successfully fetched complete configuration")
+            return complete_config
 
         except Exception as e:
-            error_msg = f"Failed to fetch operational modules: {str(e)}"
+            error_msg = f"Failed to fetch complete configuration: {str(e)}"
             logger.error(error_msg)
             return {"error": error_msg}
 

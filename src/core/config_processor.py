@@ -64,54 +64,27 @@ class ConfigProcessor:
             session_logger.info("STEP 1: Fetching complete existing configuration")
             avni_client = create_avni_client(base_url)
 
-            # Get operational modules (contains subject types, programs, encounter types, address level types)
-            operational_context = await avni_client.fetch_operational_modules(
+            # Get complete configuration using the new method
+            complete_existing_config = await avni_client.fetch_complete_config(
                 auth_token
             )
-            if "error" in operational_context:
+            if "error" in complete_existing_config:
                 session_logger.error(
-                    f"Failed to fetch operational modules: {operational_context['error']}"
+                    f"Failed to fetch complete configuration: {complete_existing_config['error']}"
                 )
                 return create_error_result(
-                    "Failed to fetch operational modules context",
-                    [operational_context["error"]],
+                    "Failed to fetch complete configuration",
+                    [complete_existing_config["error"]],
                 )
-
-            # Get locations (not included in operational modules)
-            logger.info("Fetching existing locations")
-            session_logger.info("   Fetching existing locations...")
-            locations_result = await avni_client.make_request(
-                "GET", "/locations", auth_token
-            )
-            if not locations_result.success:
-                session_logger.error(
-                    f"Failed to fetch locations: {locations_result.error}"
-                )
-                return create_error_result(
-                    "Failed to fetch existing locations", [locations_result.error]
-                )
-
-            # Get catchments (not included in operational modules)
-            logger.info("Fetching existing catchments")
-            session_logger.info("   Fetching existing catchments...")
-            catchments_result = await avni_client.make_request(
-                "GET", "/catchment", auth_token
-            )
-            if not catchments_result.success:
-                session_logger.error(
-                    f"Failed to fetch catchments: {catchments_result.error}"
-                )
-                return create_error_result(
-                    "Failed to fetch existing catchments", [catchments_result.error]
-                )
-
-            # Combine all existing configuration data
-            complete_existing_config = operational_context.copy()
-            complete_existing_config["locations"] = locations_result.data or []
-            complete_existing_config["catchments"] = catchments_result.data or []
 
             session_logger.info(
-                f"Successfully fetched complete existing config with {len(complete_existing_config.get('locations', []))} locations and {len(complete_existing_config.get('catchments', []))} catchments"
+                f"Successfully fetched complete existing config with "
+                f"{len(complete_existing_config.get('addressLevelTypes', []))} address level types, "
+                f"{len(complete_existing_config.get('locations', []))} locations, "
+                f"{len(complete_existing_config.get('catchments', []))} catchments, "
+                f"{len(complete_existing_config.get('subjectTypes', []))} subject types, "
+                f"{len(complete_existing_config.get('programs', []))} programs, "
+                f"{len(complete_existing_config.get('encounterTypes', []))} encounter types"
             )
 
             # Build system instructions
