@@ -14,7 +14,11 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from .auth import SimpleTokenVerifier
-from .handlers import process_chat_request, process_config_request, process_config_async_request, get_task_status
+from .handlers import (
+    process_config_request,
+    process_config_async_request,
+    get_task_status,
+)
 from src.tools.admin.addressleveltypes import register_address_level_type_tools
 from src.tools.admin.catchments import register_catchment_tools
 from src.tools.admin.locations import register_location_tools
@@ -72,18 +76,6 @@ def create_server():
         """
         return JSONResponse({"status": "healthy", "service": "Avni MCP Server"})
 
-    """ /chat endpoint was being used initially when we were not using Dify , we can get rid of this endpoint"""
-
-    @mcp.custom_route("/chat", methods=["OPTIONS"])
-    async def chat_options(request: Request):
-        """Handle CORS preflight requests for /chat endpoint."""
-        return JSONResponse({"status": "ok"})
-
-    @mcp.custom_route("/chat", methods=["POST"])
-    async def chat_endpoint(request: Request):
-        """Chat endpoint that integrates with OpenAI Responses API."""
-        return await process_chat_request(request, OPENAI_API_KEY, server_instructions)
-
     @mcp.custom_route("/process-config", methods=["POST"])
     async def process_config_endpoint(request: Request):
         return await process_config_request(request)
@@ -92,7 +84,7 @@ def create_server():
     async def process_config_async_endpoint(request: Request):
         return await process_config_async_request(request)
 
-    @mcp.custom_route("/process-config-status/{task_id}", methods=["GET"])  
+    @mcp.custom_route("/process-config-status/{task_id}", methods=["GET"])
     async def get_config_task_status(request: Request):
         task_id = request.path_params["task_id"]
         return await get_task_status(task_id)

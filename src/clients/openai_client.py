@@ -135,16 +135,9 @@ class OpenAIResponsesClient:
         available_tools: List[Dict[str, Any]] = None,
         session_logger: Optional[logging.Logger] = None,
     ) -> Dict[str, Any]:
-        """Process function calls following the exact OpenAI Responses API pattern."""
-
-        # Get the stored input list from the response
         input_list = getattr(response, "_input_list", [])
 
-        # Save function call outputs for subsequent requests (like the OpenAI example)
         input_list += response.output
-        logger.info(
-            f"📝 Added response output to input_list. New length: {len(input_list)}"
-        )
 
         function_calls = extract_function_calls(response)
 

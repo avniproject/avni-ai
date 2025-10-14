@@ -11,6 +11,8 @@ from ..utils.config_utils import (
     build_initial_input,
     parse_llm_response,
     extract_text_content,
+    log_input_list,
+    log_openai_response_summary,
 )
 from ..utils.response_utils import (
     create_success_result,
@@ -31,8 +33,6 @@ class ConfigProcessor:
         Args:
             openai_api_key: OpenAI API key for LLM calls
         """
-        if not openai_api_key:
-            raise ValueError("OpenAI API key is required")
         self.openai_api_key = openai_api_key
 
     async def process_config(
@@ -78,15 +78,7 @@ class ConfigProcessor:
                     [complete_existing_config["error"]],
                 )
 
-            session_logger.info(
-                f"Successfully fetched complete existing config with "
-                f"{len(complete_existing_config.get('addressLevelTypes', []))} address level types, "
-                f"{len(complete_existing_config.get('locations', []))} locations, "
-                f"{len(complete_existing_config.get('catchments', []))} catchments, "
-                f"{len(complete_existing_config.get('subjectTypes', []))} subject types, "
-                f"{len(complete_existing_config.get('programs', []))} programs, "
-                f"{len(complete_existing_config.get('encounterTypes', []))} encounter types"
-            )
+            session_logger.info("Successfully fetched complete existing config")
 
             # Build system instructions
             system_instructions = build_system_instructions(complete_existing_config)
@@ -117,15 +109,12 @@ class ConfigProcessor:
                 current_response = None
 
                 for iteration in range(max_iterations):
-                    logger.info(f"LLM iteration {iteration + 1}/{max_iterations}")
+                    logger.info(f"LLM iteration {iteration + 1}")
                     session_logger.info("=" * 50)
-                    session_logger.info(
-                        f"LLM ITERATION {iteration + 1}/{max_iterations}"
-                    )
+                    session_logger.info(f"LLM ITERATION {iteration + 1}")
                     session_logger.info("=" * 50)
 
                     if iteration == 0:
-                        # First iteration - use initial config input
                         session_logger.info(f"Input to LLM: {config_input}")
                         response = await client.create_response(
                             input_text=config_input,
@@ -134,7 +123,6 @@ class ConfigProcessor:
                             instructions=system_instructions,
                         )
                     else:
-                        # Continue conversation using stored input list from previous response
                         if current_response and hasattr(
                             current_response, "_input_list"
                         ):
@@ -143,7 +131,8 @@ class ConfigProcessor:
                                 f"Continuing conversation with input_list length: {len(input_list)}"
                             )
 
-                            # Make continuation call directly with input list
+                            # Make continuation calls with the input list
+                            # noinspection PyProtectedMember
                             response = await client._client.responses.create(
                                 model="gpt-4o",
                                 instructions=system_instructions,
@@ -158,7 +147,6 @@ class ConfigProcessor:
                                 ],
                                 input=input_list,
                             )
-                            # Store input list in response
                             setattr(response, "_input_list", input_list)
                         else:
                             session_logger.error(
@@ -166,10 +154,8 @@ class ConfigProcessor:
                             )
                             break
 
-                    # DEBUG: Log the complete response structure
-                    session_logger.info(
-                        f"COMPLETE OpenAI Response: {response.model_dump_json(indent=2)}"
-                    )
+                    # Log response summary
+                    log_openai_response_summary(response, session_logger)
 
                     # Extract response content - check if it has text output
                     response_content = extract_text_content(response)
@@ -178,16 +164,7 @@ class ConfigProcessor:
                     # Log the input list for debugging
                     if hasattr(response, "_input_list"):
                         input_list = getattr(response, "_input_list")
-                        session_logger.info("Current input list:")
-                        for i, item in enumerate(input_list):
-                            if isinstance(item, dict):
-                                session_logger.info(
-                                    f"  {i}: {item.get('type', item.get('role', 'unknown'))} - {str(item)[:100]}..."
-                                )
-                            else:
-                                session_logger.info(
-                                    f"  {i}: {type(item)} - {str(item)[:100]}..."
-                                )
+                        log_input_list(input_list, session_logger)
 
                     # Process any function calls and continue the conversation (with filtered tools)
                     current_response = await client.process_function_calls_and_continue(
@@ -200,13 +177,13 @@ class ConfigProcessor:
                         session_logger=session_logger,
                     )
 
-                    # Extract final response content
                     final_response_content = extract_text_content(current_response)
                     session_logger.info(
                         f"Final LLM response after tools: {final_response_content}"
                     )
 
                     # Parse JSON response from final LLM response
+                    # TODO (One possible way to avoid this is to tell the LLM to respond in a particular format)
                     llm_result = parse_llm_response(final_response_content)
                     session_logger.info(
                         f"Parsed LLM result: {json.dumps(llm_result, indent=2)}"
@@ -228,15 +205,6 @@ class ConfigProcessor:
                         session_logger.info(
                             f"Conversation will continue with input_list length: {len(input_list)}"
                         )
-                        for i, item in enumerate(input_list):
-                            if isinstance(item, dict):
-                                session_logger.info(
-                                    f"  {i}: {item.get('type', item.get('role', 'unknown'))} - {str(item)[:100]}..."
-                                )
-                            else:
-                                session_logger.info(
-                                    f"  {i}: {type(item)} - {str(item)[:100]}..."
-                                )
 
                 # Max iterations reached
                 logger.warning(f"Reached maximum iterations ({max_iterations})")
@@ -265,14 +233,5 @@ class ConfigProcessor:
 
 
 def create_config_processor() -> ConfigProcessor:
-    """
-    Factory function to create a config processor.
-    Gets OpenAI API key from environment variables.
-
-    Returns:
-        Configured config processor
-    """
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    if not openai_api_key:
-        raise ValueError("OPENAI_API_KEY environment variable is required")
-    return ConfigProcessor(openai_api_key)
+    """Factory function to create a config processor."""
+    return ConfigProcessor(os.getenv("OPENAI_API_KEY"))

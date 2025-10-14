@@ -327,6 +327,68 @@ def extract_text_content(response) -> str:
     return ""
 
 
+def log_openai_response_summary(response, session_logger):
+    """Log OpenAI response summary with key fields, avoiding expensive full serialization.
+
+    Args:
+        response: OpenAI response object
+        session_logger: Logger instance to use
+    """
+    try:
+        # Extract key fields without full serialization
+        response_id = getattr(response, "id", "N/A")
+        model = getattr(response, "model", "N/A")
+        created_at = getattr(response, "created_at", "N/A")
+        object_type = getattr(response, "object", "N/A")
+
+        # Check for choices and tool calls
+        choices_count = 0
+        tool_calls_count = 0
+        if hasattr(response, "choices") and response.choices:
+            choices_count = len(response.choices)
+            if hasattr(response.choices[0], "message") and hasattr(
+                response.choices[0].message, "tool_calls"
+            ):
+                tool_calls_count = (
+                    len(response.choices[0].message.tool_calls)
+                    if response.choices[0].message.tool_calls
+                    else 0
+                )
+
+        # Check for other key fields
+        temperature = getattr(response, "temperature", "N/A")
+        tool_choice = getattr(response, "tool_choice", "N/A")
+        parallel_tool_calls = getattr(response, "parallel_tool_calls", "N/A")
+
+        session_logger.info(
+            f"Response Summary: id={response_id}, model={model}, created_at={created_at}, "
+            f"object={object_type}, choices={choices_count}, tool_calls={tool_calls_count}, "
+            f"temperature={temperature}, tool_choice={tool_choice}, parallel_tool_calls={parallel_tool_calls}"
+        )
+
+    except Exception as e:
+        session_logger.warning(f"Could not log response summary: {e}")
+        session_logger.info("Response: [Could not extract summary]")
+
+
+def log_input_list(input_list, session_logger, prefix="Current input list"):
+    """Log input list items for debugging.
+
+    Args:
+        input_list: List of input items to log
+        session_logger: Logger instance to use
+        prefix: Prefix message for the log
+    """
+    session_logger.info(f"{prefix}:")
+    for i, item in enumerate(input_list):
+        if isinstance(item, dict):
+            session_logger.info(
+                f"  {i}: {item.get('type', item.get('role', 'unknown'))} - {str(item)[:100]}..."
+            )
+        else:
+            session_logger.info(f"  {i}: {type(item)} - {str(item)[:100]}...")
+
+
 def _create_fallback_response(next_action: str) -> Dict[str, Any]:
     """Create fallback response structure when parsing fails.
 

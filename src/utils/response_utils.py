@@ -3,7 +3,6 @@
 from typing import Dict, Any
 
 
-
 def create_success_result(
     llm_result: Dict[str, Any], iterations: int
 ) -> Dict[str, Any]:
@@ -18,7 +17,7 @@ def create_success_result(
     """
     results = llm_result.get("results", {})
     end_user_result = llm_result.get("endUserResult", "")
-    
+
     return {
         "done": True,
         "status": "completed",
@@ -90,7 +89,7 @@ def create_max_iterations_result(max_iterations: int) -> Dict[str, Any]:
         Max iterations result dictionary
     """
     error_message = "Processing incomplete - reached maximum iterations"
-    
+
     return {
         "done": False,
         "status": "error",
