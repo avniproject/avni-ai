@@ -135,6 +135,7 @@ IMPORTANT: You must respond in JSON format with these fields:
     "existing_encounter_types": [...],
     "errors": [...]    // any errors encountered
   },
+  "endUserResult": "✅ Successfully created 3 address level types (State, District, Block), 2 locations (Karnataka, Bangalore), and 1 health program. Configuration is ready for use!",
   "next_action": "description of what you plan to do next"
 }
 

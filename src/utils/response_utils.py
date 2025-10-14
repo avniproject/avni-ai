@@ -3,6 +3,7 @@
 from typing import Dict, Any
 
 
+
 def create_success_result(
     llm_result: Dict[str, Any], iterations: int
 ) -> Dict[str, Any]:
@@ -15,10 +16,14 @@ def create_success_result(
     Returns:
         Success result dictionary
     """
+    results = llm_result.get("results", {})
+    end_user_result = llm_result.get("endUserResult", "")
+    
     return {
         "done": True,
         "status": "completed",
-        "results": llm_result.get("results", {}),
+        "results": results,
+        "endUserResult": end_user_result,
         "iterations": iterations,
         "function_calls_made": 0,  # Not tracking individual function calls anymore
     }
@@ -70,6 +75,7 @@ def create_error_result(
             "existing_encounter_types": [],
             "errors": errors,
         },
+        "endUserResult": f"❌ Configuration processing failed: {error_message}",
         "message": error_message,
     }
 
@@ -83,6 +89,8 @@ def create_max_iterations_result(max_iterations: int) -> Dict[str, Any]:
     Returns:
         Max iterations result dictionary
     """
+    error_message = "Processing incomplete - reached maximum iterations"
+    
     return {
         "done": False,
         "status": "error",
@@ -113,6 +121,7 @@ def create_max_iterations_result(max_iterations: int) -> Dict[str, Any]:
             "existing_encounter_types": [],
             "errors": ["Maximum iterations reached"],
         },
+        "endUserResult": f"❌ {error_message}",
         "iterations": max_iterations,
-        "message": "Processing incomplete - reached maximum iterations",
+        "message": error_message,
     }
