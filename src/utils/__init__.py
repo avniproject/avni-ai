@@ -40,6 +40,7 @@ from .response_utils import (
     create_error_result,
     create_max_iterations_result,
 )
+from .request_validation import validate_config_request
 
 __all__ = [
     "create_error_response",
@@ -63,4 +64,5 @@ __all__ = [
     "create_success_result",
     "create_error_result",
     "create_max_iterations_result",
+    "validate_config_request",
 ]
