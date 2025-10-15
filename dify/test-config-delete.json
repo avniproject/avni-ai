@@ -3,47 +3,47 @@
     "delete": {
       "encounterTypes": [
         {
-          "id": "id of Updated CRUD Family Survey"
+          "id": "id of Updated Family Survey"
         }
       ],
       "programs": [
         {
-          "id": "id of Updated CRUD Family Welfare"
+          "id": "id of Updated Family Welfare"
         }
       ],
       "subjectTypes": [
         {
-          "id": "id of Updated CRUD Household"
+          "id": "id of Updated Household"
         }
       ],
       "catchments": [
         {
-          "id": "id of Updated CRUD Rural Catchment"
+          "id": "id of Updated Rural Catchment"
         },
         {
-          "id": "id of Updated CRUD Urban Catchment"
+          "id": "id of Updated Urban Catchment"
         }
       ],
       "locations": [
         {
-          "id": "id of Updated Electronic City CRUD Block"
+          "id": "id of Updated Electronic City"
         },
         {
-          "id": "id of Updated Bangalore CRUD District"
+          "id": "id of Updated Bangalore"
         },
         {
-          "id": "id of Updated Karnataka CRUD State"
+          "id": "id of Updated Karnataka"
         }
       ],
       "addressLevelTypes": [
         {
-          "id": "id of Updated CRUD Block"
+          "id": "id of Updated Block"
         },
         {
-          "id": "id of Updated CRUD District"
+          "id": "id of Updated District"
         },
         {
-          "id": "id of Updated CRUD State"
+          "id": "id of Updated State"
         }
       ]
     }

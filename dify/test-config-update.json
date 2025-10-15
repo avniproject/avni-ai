@@ -3,56 +3,56 @@
     "update": {
       "addressLevelTypes": [
         {
-          "name": "Updated CRUD State",
+          "name": "Updated State",
           "level": 3.0,
           "parentId": null,
           "voided": false
         },
         {
-          "name": "Updated CRUD District", 
+          "name": "Updated District", 
           "level": 2.0,
-          "parentId": "id of Updated CRUD State",
+          "parentId": "id of Updated State",
           "voided": false
         },
         {
-          "name": "Updated CRUD Block",
+          "name": "Updated Block",
           "level": 1.0,
-          "parentId": "id of Updated CRUD District", 
+          "parentId": "id of Updated District", 
           "voided": false
         }
       ],
       "locations": [
         {
-          "title": "Updated Karnataka CRUD State",
+          "title": "Updated Karnataka",
           "level": 3,
           "parentId": null
         },
         {
-          "title": "Updated Bangalore CRUD District",
+          "title": "Updated Bangalore",
           "level": 2,
-          "parentId": "id of Updated Karnataka CRUD State"
+          "parentId": "id of Updated Karnataka"
         },
         {
-          "title": "Updated Electronic City CRUD Block",
+          "title": "Updated Electronic City",
           "level": 1,
-          "parentId": "id of Updated Bangalore CRUD District"
+          "parentId": "id of Updated Bangalore"
         }
       ],
       "catchments": [
         {
-          "name": "Updated CRUD Urban Catchment",
-          "locationIds": ["id of Updated Karnataka CRUD State", "id of Updated Bangalore CRUD District"],
+          "name": "Updated Urban Catchment",
+          "locationIds": ["id of Updated Karnataka", "id of Updated Bangalore"],
           "deleteFastSync": false
         },
         {
-          "name": "Updated CRUD Rural Catchment", 
-          "locationIds": ["id of Updated Electronic City CRUD Block"],
+          "name": "Updated Rural Catchment", 
+          "locationIds": ["id of Updated Electronic City"],
           "deleteFastSync": false
         }
       ],
       "subjectTypes": [
         {
-          "name": "Updated CRUD Individual",
+          "name": "Updated Individual",
           "type": "Person",
           "active": true,
           "voided": false,
@@ -84,7 +84,7 @@
           "registrationFormUuid": null
         },
         {
-          "name": "Updated CRUD Household",
+          "name": "Updated Household",
           "type": "Household", 
           "active": true,
           "voided": false,
@@ -114,7 +114,7 @@
           "nameHelpText": "",
           "groupRoles": [
             {
-              "subjectMemberName": "Updated CRUD Individual",
+              "subjectMemberName": "Updated Individual",
               "groupRoleUUID": "crud9abc-def0-1234-5678-9abcdef01234",
               "groupSubjectTypeUUID": "crud5678-9abc-def0-1234-56789abcdef0",
               "memberSubjectTypeUUID": "crud1234-5678-9abc-def0-123456789abc",
@@ -125,7 +125,7 @@
               "voided": false
             },
             {
-              "subjectMemberName": "Updated CRUD Individual",
+              "subjectMemberName": "Updated Individual",
               "groupRoleUUID": "cruddef0-1234-5678-9abc-def012345678",
               "groupSubjectTypeUUID": "crud5678-9abc-def0-1234-56789abcdef0", 
               "memberSubjectTypeUUID": "crud1234-5678-9abc-def0-123456789abc",
@@ -141,7 +141,7 @@
       ],
       "programs": [
         {
-          "name": "Updated CRUD Health Program",
+          "name": "Updated Health Program",
           "colour": "#FF9800",
           "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
           "programSubjectLabel": "",
@@ -159,7 +159,7 @@
           "voided": false
         },
         {
-          "name": "Updated CRUD Family Welfare",
+          "name": "Updated Family Welfare",
           "colour": "#9C27B0",
           "subjectTypeUuid": "crud5678-9abc-def0-1234-56789abcdef0",
           "programSubjectLabel": "Updated Family Unit",
@@ -179,7 +179,7 @@
       ],
       "encounterTypes": [
         {
-          "name": "Updated CRUD Registration",
+          "name": "Updated Registration",
           "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
           "programUuid": null,
           "active": true,
@@ -189,7 +189,7 @@
           "entityEligibilityCheckDeclarativeRule": null
         },
         {
-          "name": "Updated CRUD Health Checkup",
+          "name": "Updated Health Checkup",
           "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
           "programUuid": "crud2468-acef-1357-9bdf-02468acef135",
           "active": true,
@@ -199,7 +199,7 @@
           "entityEligibilityCheckDeclarativeRule": null
         },
         {
-          "name": "Updated CRUD Family Survey",
+          "name": "Updated Family Survey",
           "subjectTypeUuid": "crud5678-9abc-def0-1234-56789abcdef0",
           "programUuid": "crud3579-bdef-2468-acef-13579bdef246",
           "active": true,

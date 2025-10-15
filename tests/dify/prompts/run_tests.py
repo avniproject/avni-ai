@@ -5,6 +5,9 @@ Main entry point for the Avni AI Assistant testing system.
 import os
 import openai
 from testing_system import TestingSystem
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def main():

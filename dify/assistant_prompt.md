@@ -161,7 +161,7 @@ Config Generation Rules:
         {
           "name": "SubjectTypeName",          // REQUIRED - string
           "uuid": "generate-v4-uuid",        // REQUIRED - generate v4 uuid
-          "type": "Person",                   // REQUIRED - enum: Person|Group|User|PersonGroup|UserGroup|Household
+          "type": "Person",                   // REQUIRED - enum: Person|Group|User|Individual|Household
           "active": true,                     // boolean - default true
           "voided": false,                    // boolean - default false
           "group": false,                     // boolean - true for group types
@@ -177,7 +177,19 @@ Config Generation Rules:
             "displayRegistrationDetails": true,
             "displayPlannedEncounters": true
           },
-          "groupRoles": [],                   // array - for household/group types, define member roles
+          "groupRoles": [                     // array - for household/group types, define member roles
+            {
+              "subjectMemberName": "string",      // REQUIRED - name of member subject type
+              "groupRoleUUID": "generate-v4-uuid", // REQUIRED - generate v4 uuid for role
+              "groupSubjectTypeUUID": "reference-group-uuid", // REQUIRED - reference to group subject type
+              "memberSubjectTypeUUID": "reference-member-uuid", // REQUIRED - reference to member subject type
+              "role": "string",                   // REQUIRED - role name (e.g., "Head of Household", "Household Member")
+              "minimumNumberOfMembers": 1,          // REQUIRED - minimum number of members for this role
+              "maximumNumberOfMembers": 1,          // REQUIRED - maximum number of members for this role
+              "isPrimary": true,                    // REQUIRED - boolean, true for primary role
+              "voided": false                       // REQUIRED - boolean, default false
+            }
+          ],
           "registrationFormUuid": null        // nullable - auto-generated
         }
       ],

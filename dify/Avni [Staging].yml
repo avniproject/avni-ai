@@ -972,7 +972,7 @@ workflow:
             \ \"name\": \"SubjectTypeName\",          // REQUIRED - string\n     \
             \     \"uuid\": \"generate-v4-uuid\",        // REQUIRED - generate v4\
             \ uuid\n          \"type\": \"Person\",                   // REQUIRED\
-            \ - enum: Person|Group|User|PersonGroup|UserGroup|Household\n        \
+            \ - enum: Person|Group|User|Individual|Household\n        \
             \  \"active\": true,                     // boolean - default true\n \
             \         \"voided\": false,                    // boolean - default false\n\
             \          \"group\": false,                     // boolean - true for\

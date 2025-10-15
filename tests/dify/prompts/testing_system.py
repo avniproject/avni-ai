@@ -6,7 +6,8 @@ import datetime
 from typing import List
 from models import ConversationResult
 from prompts import SCENARIO_NAMES
-from ai_agents import AITester, DifyAssistant
+from ai_tester import AITester
+from tests.dify.common.dify_client import DifyClient
 from ai_reviewer import AIReviewer
 from analytics import StatisticsCalculator, ReportGenerator
 
@@ -16,7 +17,8 @@ class TestingSystem:
 
     def __init__(self, dify_api_key: str):
         self.tester = AITester()
-        self.assistant = DifyAssistant(dify_api_key)
+        self.dify_client = DifyClient(dify_api_key)
+        self.conversation_id = ""
         self.reviewer = AIReviewer()
         self.results: List[ConversationResult] = []
         self.scenarios = SCENARIO_NAMES
@@ -25,8 +27,8 @@ class TestingSystem:
         self, scenario_index: int, cycle: int
     ) -> ConversationResult:
         """Run a single conversation and get it reviewed"""
-        # Reset the assistant's conversation for each new test
-        self.assistant.reset_conversation()
+        # Reset the conversation for each new test
+        self.conversation_id = ""
 
         chat_history = []
         scenario = self.scenarios[scenario_index]
@@ -41,7 +43,17 @@ class TestingSystem:
             print(f"    Iteration {iteration + 1}/8")
 
             # Get assistant response via Dify
-            ai_response = self.assistant.generate_response(next_message)
+            response = self.dify_client.send_message(
+                query=next_message,
+                conversation_id=self.conversation_id,
+            )
+
+            if response["success"]:
+                self.conversation_id = response["conversation_id"]
+                ai_response = response["answer"]
+            else:
+                print(f"Dify API error: {response.get('error', 'Unknown error')}")
+                ai_response = "Sorry, I encountered an error."
 
             # Record this exchange in our local history for the reviewer
             chat_history.append({"role": "user", "content": next_message})

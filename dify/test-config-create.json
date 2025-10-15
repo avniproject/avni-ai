@@ -3,57 +3,57 @@
     "create": {
       "addressLevelTypes": [
         {
-          "name": "CRUD State",
+          "name": "State",
           "level": 3.0,
           "parentId": null,
           "voided": false
         },
         {
-          "name": "CRUD District",
+          "name": "District",
           "level": 2.0,
-          "parentId": "id of CRUD State",
+          "parentId": "id of State",
           "voided": false
         },
         {
-          "name": "CRUD Block",
+          "name": "Block",
           "level": 1.0,
-          "parentId": "id of CRUD District",
+          "parentId": "id of District",
           "voided": false
         }
       ],
       "locations": [
         {
-          "name": "Karnataka CRUD",
+          "name": "Karnataka",
           "level": 3,
-          "type": "CRUD State",
+          "type": "State",
           "parents": []
         },
         {
-          "name": "Bangalore CRUD District",
+          "name": "Bangalore",
           "level": 2,
-          "type": "CRUD District",
-          "parents": [{"id": "id of Karnataka CRUD"}]
+          "type": "District",
+          "parents": [{"id": "id of Karnataka"}]
         },
         {
-          "name": "Electronic City CRUD Block",
+          "name": "Electronic City",
           "level": 1,
-          "type": "CRUD Block",
-          "parents": [{"id": "id of Bangalore CRUD District"}]
+          "type": "Block",
+          "parents": [{"id": "id of Bangalore"}]
         }
       ],
       "catchments": [
         {
-          "name": "CRUD Urban Catchment",
-          "locationIds": ["id of Karnataka CRUD", "id of Bangalore CRUD District"]
+          "name": "Urban Catchment",
+          "locationIds": ["id of Karnataka", "id of Bangalore"]
         },
         {
-          "name": "CRUD Rural Catchment",
-          "locationIds": ["id of Electronic City CRUD Block"]
+          "name": "Rural Catchment",
+          "locationIds": ["id of Electronic City"]
         }
       ],
       "subjectTypes": [
         {
-          "name": "CRUD Individual",
+          "name": "Individual",
           "uuid": "crud1234-5678-9abc-def0-123456789abc",
           "type": "Person",
           "active": true,
@@ -85,7 +85,7 @@
           "registrationFormUuid": null
         },
         {
-          "name": "CRUD Household",
+          "name": "Household",
           "uuid": "crud5678-9abc-def0-1234-56789abcdef0",
           "type": "Household",
           "active": true,
@@ -115,7 +115,7 @@
           "nameHelpText": null,
           "groupRoles": [
             {
-              "subjectMemberName": "CRUD Individual",
+              "subjectMemberName": "Individual",
               "groupRoleUUID": "crud9abc-def0-1234-5678-9abcdef01234",
               "groupSubjectTypeUUID": "crud5678-9abc-def0-1234-56789abcdef0",
               "memberSubjectTypeUUID": "crud1234-5678-9abc-def0-123456789abc",
@@ -126,7 +126,7 @@
               "voided": false
             },
             {
-              "subjectMemberName": "CRUD Individual",
+              "subjectMemberName": "Individual",
               "groupRoleUUID": "cruddef0-1234-5678-9abc-def012345678",
               "groupSubjectTypeUUID": "crud5678-9abc-def0-1234-56789abcdef0",
               "memberSubjectTypeUUID": "crud1234-5678-9abc-def0-123456789abc",
@@ -142,7 +142,7 @@
       ],
       "programs": [
         {
-          "name": "CRUD Health Program",
+          "name": "Health Program",
           "uuid": "crud2468-acef-1357-9bdf-02468acef135",
           "colour": "#4CAF50",
           "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
@@ -161,7 +161,7 @@
           "voided": false
         },
         {
-          "name": "CRUD Family Welfare",
+          "name": "Family Welfare",
           "uuid": "crud3579-bdef-2468-acef-13579bdef246",
           "colour": "#2196F3",
           "subjectTypeUuid": "crud5678-9abc-def0-1234-56789abcdef0",
@@ -182,7 +182,7 @@
       ],
       "encounterTypes": [
         {
-          "name": "CRUD Registration",
+          "name": "Registration",
           "uuid": "crud4680-cdef-3579-bdef-24680cdef357",
           "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
           "programUuid": null,
@@ -193,7 +193,7 @@
           "entityEligibilityCheckDeclarativeRule": null
         },
         {
-          "name": "CRUD Health Checkup",
+          "name": "Health Checkup",
           "uuid": "crud5791-def0-4680-cdef-35791def0468",
           "subjectTypeUuid": "crud1234-5678-9abc-def0-123456789abc",
           "programUuid": "crud2468-acef-1357-9bdf-02468acef135",
@@ -204,7 +204,7 @@
           "entityEligibilityCheckDeclarativeRule": null
         },
         {
-          "name": "CRUD Family Survey",
+          "name": "Family Survey",
           "uuid": "crud6802-ef01-5791-def0-46802ef01579",
           "subjectTypeUuid": "crud5678-9abc-def0-1234-56789abcdef0",
           "programUuid": "crud3579-bdef-2468-acef-13579bdef246",
