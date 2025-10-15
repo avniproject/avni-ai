@@ -4,33 +4,30 @@ from typing import Dict, Any, Optional
 
 
 def submit_async_config(
-        config: Dict[str, Any],
-        avni_auth_token: str,
-        avni_base_url: Optional[str] = None,
-        staging_url: str = "https://staging-mcp.avniproject.org"
+    config: Dict[str, Any],
+    avni_auth_token: str,
+    avni_base_url: Optional[str] = None,
+    staging_url: str = "https://staging-mcp.avniproject.org",
 ) -> Dict[str, Any]:
     """
     Submit configuration for async processing.
-    
+
     Args:
         config: Configuration JSON object
         avni_auth_token: Avni authentication token
         avni_base_url: Optional Avni API base URL
         staging_url: MCP staging server URL
-        
+
     Returns:
         Response with task_id or error
     """
-    staging_url = staging_url.rstrip('/')
+    staging_url = staging_url.rstrip("/")
     session = requests.Session()
 
     # Submit configuration
     submit_url = f"{staging_url}/process-config-async"
 
-    headers = {
-        "Content-Type": "application/json",
-        "avni-auth-token": avni_auth_token
-    }
+    headers = {"Content-Type": "application/json", "avni-auth-token": avni_auth_token}
 
     if avni_base_url:
         headers["avni-base-url"] = avni_base_url
@@ -42,22 +39,14 @@ def submit_async_config(
     print(f"📦 Body size: {len(json.dumps(body).encode('utf-8'))} bytes")
 
     try:
-        response = session.post(
-            submit_url,
-            headers=headers,
-            json=body,
-            timeout=30
-        )
+        response = session.post(submit_url, headers=headers, json=body, timeout=30)
 
         print(f"✅ Submit response status: {response.status_code}")
 
         if response.status_code != 200:
             error_text = response.text
             print(f"❌ Submit error {response.status_code}: {error_text}")
-            return {
-                "error": f"HTTP {response.status_code}",
-                "message": error_text
-            }
+            return {"error": f"HTTP {response.status_code}", "message": error_text}
 
         result = response.json()
         task_id = result.get("task_id")
@@ -76,7 +65,7 @@ def submit_async_config(
 def main(avni_auth_token: str, avni_base_url: str, config: Dict[str, Any]):
     """
     Submit configuration for async processing.
-    
+
     Args:
         avni_auth_token: Avni authentication token
         avni_base_url: Avni API base URL
@@ -94,7 +83,7 @@ def main(avni_auth_token: str, avni_base_url: str, config: Dict[str, Any]):
         config=config,
         avni_auth_token=avni_auth_token,
         avni_base_url=avni_base_url,
-        staging_url=staging_url
+        staging_url=staging_url,
     )
 
     print("\n" + "=" * 40)

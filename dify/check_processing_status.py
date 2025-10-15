@@ -2,9 +2,9 @@ import json
 import requests
 from typing import Dict, Any
 
+
 def check_task_status(
-        task_id: str,
-        staging_url: str = "https://staging-mcp.avniproject.org"
+    task_id: str, staging_url: str = "https://staging-mcp.avniproject.org"
 ) -> Dict[str, Any]:
     """
     Check task status once.
@@ -16,7 +16,7 @@ def check_task_status(
     Returns:
         Task status result
     """
-    staging_url = staging_url.rstrip('/')
+    staging_url = staging_url.rstrip("/")
     session = requests.Session()
 
     status_url = f"{staging_url}/process-config-status/{task_id}"
@@ -32,7 +32,7 @@ def check_task_status(
             return {
                 "error": f"Status check HTTP {status_response.status_code}",
                 "message": error_text,
-                "task_id": task_id
+                "task_id": task_id,
             }
 
         status_result = status_response.json()
@@ -47,11 +47,7 @@ def check_task_status(
 
     except requests.exceptions.RequestException as e:
         print(f"🔥 Status check request failed: {e}")
-        return {
-            "error": "Status check failed",
-            "message": str(e),
-            "task_id": task_id
-        }
+        return {"error": "Status check failed", "message": str(e), "task_id": task_id}
 
 
 def main(submit_output: Dict[str, Any], loop: bool = False):
@@ -76,7 +72,7 @@ def main(submit_output: Dict[str, Any], loop: bool = False):
     if not task_id:
         error_result = {
             "error": "No task_id found in submit output",
-            "submit_output": submit_output
+            "submit_output": submit_output,
         }
         print("❌ No task_id found in submit output")
         print(json.dumps(error_result, indent=2))
