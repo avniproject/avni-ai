@@ -352,12 +352,11 @@ workflow:
         title: Start
         type: start
         variables:
-        - default: wdhsacjkzxaisdjckzx
-          hide: false
+        - hide: true
           label: auth_token
           max_length: 2000
           options: []
-          required: true
+          required: false
           type: paragraph
           variable: auth_token
         - hide: true
@@ -367,7 +366,8 @@ workflow:
           required: false
           type: text-input
           variable: org_name
-        - hide: true
+        - default: trial
+          hide: true
           label: org_type
           max_length: 48
           options: []
@@ -383,15 +383,16 @@ workflow:
           required: false
           type: text-input
           variable: user_name
-        - default: https://staging.avniproject.org/
+        - default: ''
+          hide: true
           hint: ''
-          label: avnibaseurl
+          label: avni_mcp_server_url
           max_length: 48
           options: []
           placeholder: ''
-          required: true
+          required: false
           type: text-input
-          variable: avnibaseurl
+          variable: avni_mcp_server_url
       height: 234
       id: '1711528708197'
       position:
@@ -400,7 +401,7 @@ workflow:
       positionAbsolute:
         x: 78.04011682406383
         y: 713.2058315649839
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -934,34 +935,31 @@ workflow:
             \ Subject Types for entities they need to track over time before considering\
             \ programs or encounters.\n\nOUTPUT FORMAT - CRITICAL:\nYou MUST ALWAYS\
             \ respond in this exact JSON format:\n{\n\"response\": \"Your conversational\
-            \ response to the user\",\n\"config\": {},\n\"contentLength\": 1234\n\
-            }\n\nIMPORTANT: \n- The \"contentLength\" field should ONLY be included\
-            \ when \"config\" is populated (not empty)\n- \"contentLength\" should\
-            \ be the exact byte length of the stringified config JSON (including all\
-            \ whitespace, newlines, and formatting)\n- To calculate: count every character\
-            \ including spaces, tabs, newlines, quotes, braces, etc.\n- When \"config\"\
-            \ is empty {}, do NOT include the \"contentLength\" field\n- CRITICAL:\
-            \ Ensure accurate byte counting - incorrect content length will cause\
-            \ HTTP errors\n\nConfig Generation Rules:\n- The \"config\" key should\
-            \ be empty {} during normal conversation\n- Only populate \"config\" when:\n\
-            \    1. User explicitly says \"create this configuration\" or \"generate\
-            \ the configuration\"\n    2. User specifically asks to \"create/update/delete\
-            \ subject types\", \"create/update/delete programs\", etc.\n    3. User\
-            \ says \"I am happy with the configuration provided by the Avni assistant\"\
-            \ (final confirmation)\n    4. User chooses \"automatically create/update\"\
-            \ when given the choice between automation vs navigation\n- NEVER populate\
-            \ \"config\" during information gathering or clarification questions\n\
-            - When populating \"config\", use this CRUD structure:\n{\n  \"config\"\
-            : {\n    \"create\": {\n      \"addressLevelTypes\": [\n        {\n  \
-            \        \"name\": \"AddressLevelTypeName\",     // REQUIRED - string\n\
-            \          \"level\": 3.0,                       // REQUIRED - number\
-            \ (higher = higher level)\n          \"parentId\": null,             \
-            \      // nullable - null for top level, \"id of ParentName\" for children\n\
-            \          \"voided\": false                     // boolean - default\
-            \ false\n        }\n      ],\n      \"locations\": [\n        {\n    \
-            \      \"name\": \"LocationName\",             // REQUIRED - string\n\
-            \          \"level\": 3,                         // REQUIRED - number,\
-            \ matches addressLevelType level\n          \"type\": \"AddressLevelTypeName\"\
+            \ response to the user\",\n\"config\": {}\n}\n\nConfig Generation Rules:\n\
+            - The \"config\" key should be empty {} during normal conversation\n-\
+            \ Only populate \"config\" when:\n    1. User explicitly says \"create\
+            \ this configuration\" or \"generate the configuration\"\n    2. User\
+            \ specifically asks to \"create/update/delete subject types\", \"create/update/delete\
+            \ programs\", etc.\n    3. User says \"I am happy with the configuration\
+            \ provided by the Avni assistant\" (final confirmation)\n    4. User chooses\
+            \ \"automatically create/update\" when given the choice between automation\
+            \ vs navigation\n- NEVER populate \"config\" during information gathering\
+            \ or clarification questions\n- CRITICAL: NEVER change the field names/keys\
+            \ in the configuration schema below\n- ALWAYS use the EXACT field names\
+            \ as specified in the schema\n- DO NOT rename, modify, or substitute any\
+            \ field names (e.g., do NOT change \"role\" to \"name\", do NOT change\
+            \ \"minimumNumberOfMembers\" to \"min\")\n- Field names are part of the\
+            \ API contract and must remain consistent\n- When populating \"config\"\
+            , use this CRUD structure:\n{\n  \"config\": {\n    \"create\": {\n  \
+            \    \"addressLevelTypes\": [\n        {\n          \"name\": \"AddressLevelTypeName\"\
+            ,     // REQUIRED - string\n          \"level\": 3.0,                \
+            \       // REQUIRED - number (higher = higher level)\n          \"parentId\"\
+            : null,                   // nullable - null for top level, \"id of ParentName\"\
+            \ for children\n          \"voided\": false                     // boolean\
+            \ - default false\n        }\n      ],\n      \"locations\": [\n     \
+            \   {\n          \"name\": \"LocationName\",             // REQUIRED -\
+            \ string\n          \"level\": 3,                         // REQUIRED\
+            \ - number, matches addressLevelType level\n          \"type\": \"AddressLevelTypeName\"\
             ,     // REQUIRED - string, must match addressLevelType name\n       \
             \   \"parents\": []                       // array - [] for top level,\
             \ [{\"id\": \"id of ParentLocationName\"}] for children\n        }\n \
@@ -972,26 +970,40 @@ workflow:
             \ \"name\": \"SubjectTypeName\",          // REQUIRED - string\n     \
             \     \"uuid\": \"generate-v4-uuid\",        // REQUIRED - generate v4\
             \ uuid\n          \"type\": \"Person\",                   // REQUIRED\
-            \ - enum: Person|Group|User|Individual|Household\n        \
-            \  \"active\": true,                     // boolean - default true\n \
-            \         \"voided\": false,                    // boolean - default false\n\
-            \          \"group\": false,                     // boolean - true for\
-            \ group types\n          \"household\": false,                 // boolean\
-            \ - true for household types\n          \"allowEmptyLocation\": true,\
-            \         // boolean - default true\n          \"allowMiddleName\": false,\
-            \           // boolean - default false\n          \"lastNameOptional\"\
-            : false,          // boolean - default false\n          \"allowProfilePicture\"\
-            : false,       // boolean - default false\n          \"uniqueName\": false,\
-            \                // boolean - default false\n          \"directlyAssignable\"\
+            \ - enum: Person|Group|User|Individual|Household\n          \"active\"\
+            : true,                     // boolean - default true\n          \"voided\"\
+            : false,                    // boolean - default false\n          \"group\"\
+            : false,                     // boolean - true for group types\n     \
+            \     \"household\": false,                 // boolean - true for household\
+            \ types\n          \"allowEmptyLocation\": true,         // boolean -\
+            \ default true\n          \"allowMiddleName\": false,           // boolean\
+            \ - default false\n          \"lastNameOptional\": false,          //\
+            \ boolean - default false\n          \"allowProfilePicture\": false, \
+            \      // boolean - default false\n          \"uniqueName\": false,  \
+            \              // boolean - default false\n          \"directlyAssignable\"\
             : false,        // boolean - default false\n          \"shouldSyncByLocation\"\
             : true,       // boolean - default true\n          \"settings\": {   \
             \                    // object - display settings\n            \"displayRegistrationDetails\"\
             : true,\n            \"displayPlannedEncounters\": true\n          },\n\
-            \          \"groupRoles\": [],                   // array - for household/group\
-            \ types, define member roles\n          \"registrationFormUuid\": null\
-            \        // nullable - auto-generated\n        }\n      ],\n      \"programs\"\
-            : [\n        {\n          \"name\": \"ProgramName\",              // REQUIRED\
-            \ - string\n          \"uuid\": \"generate-v4-uuid\",        // REQUIRED\
+            \          \"groupRoles\": [                     // array - for household/group\
+            \ types, define member roles\n            {\n              \"subjectMemberName\"\
+            : \"string\",      // REQUIRED - name of member subject type\n       \
+            \       \"groupRoleUUID\": \"generate-v4-uuid\", // REQUIRED - generate\
+            \ v4 uuid for role\n              \"groupSubjectTypeUUID\": \"reference-group-uuid\"\
+            , // REQUIRED - reference to group subject type\n              \"memberSubjectTypeUUID\"\
+            : \"reference-member-uuid\", // REQUIRED - reference to member subject\
+            \ type\n              \"role\": \"string\",                   // REQUIRED\
+            \ - role name (e.g., \"Head of Household\", \"Household Member\")\n  \
+            \            \"minimumNumberOfMembers\": 1,          // REQUIRED - minimum\
+            \ number of members for this role\n              \"maximumNumberOfMembers\"\
+            : 1,          // REQUIRED - maximum number of members for this role\n\
+            \              \"isPrimary\": true,                    // REQUIRED - boolean,\
+            \ true for primary role\n              \"voided\": false             \
+            \          // REQUIRED - boolean, default false\n            }\n     \
+            \     ],\n          \"registrationFormUuid\": null        // nullable\
+            \ - auto-generated\n        }\n      ],\n      \"programs\": [\n     \
+            \   {\n          \"name\": \"ProgramName\",              // REQUIRED -\
+            \ string\n          \"uuid\": \"generate-v4-uuid\",        // REQUIRED\
             \ - generate v4 uuid\n          \"colour\": \"#4CAF50\",             \
             \   // REQUIRED - hex color\n          \"subjectTypeUuid\": \"reference-subject-uuid\"\
             , // REQUIRED - reference to subject type\n          \"programSubjectLabel\"\
@@ -1147,11 +1159,11 @@ workflow:
       height: 86
       id: '17580163919060'
       position:
-        x: 1340.6439991246866
-        y: 1263.3429536390665
+        x: 1334.633954985886
+        y: 1227.2826888062627
       positionAbsolute:
-        x: 1340.6439991246866
-        y: 1263.3429536390665
+        x: 1334.633954985886
+        y: 1227.2826888062627
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1275,57 +1287,38 @@ workflow:
       positionAbsolute:
         x: 2002.3222401694788
         y: 1493.4103892509604
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 241
     - data:
         code: "import json\nimport requests\nfrom typing import Dict, Any, Optional\n\
-          \n\ndef submit_async_config(\n    config: Dict[str, Any], \n    avni_auth_token:\
-          \ str,\n    avni_base_url: Optional[str] = None,\n    staging_url: str =\
-          \ \"https://staging-mcp.avniproject.org\"\n) -> Dict[str, Any]:\n    \"\"\
-          \"\n    Submit configuration for async processing.\n    \n    Args:\n  \
-          \      config: Configuration JSON object\n        avni_auth_token: Avni\
-          \ authentication token\n        avni_base_url: Optional Avni API base URL\n\
-          \        staging_url: MCP staging server URL\n        \n    Returns:\n \
-          \       Response with task_id or error\n    \"\"\"\n    staging_url = staging_url.rstrip('/')\n\
-          \    session = requests.Session()\n    \n    # Submit configuration\n  \
-          \  submit_url = f\"{staging_url}/process-config-async\"\n    \n    headers\
-          \ = {\n        \"Content-Type\": \"application/json\",\n        \"avni-auth-token\"\
-          : avni_auth_token\n    }\n    \n    if avni_base_url:\n        headers[\"\
-          avni-base-url\"] = avni_base_url\n    \n    body = {\"config\": config}\n\
-          \    \n    print(f\"\U0001F4E4 Submitting config to: {submit_url}\")\n \
-          \   print(f\"\U0001F4CB Headers: {json.dumps(headers, indent=2)}\")\n  \
-          \  print(f\"\U0001F4E6 Body size: {len(json.dumps(body).encode('utf-8'))}\
-          \ bytes\")\n    \n    try:\n        response = session.post(\n         \
-          \   submit_url, \n            headers=headers, \n            json=body,\n\
-          \            timeout=30\n        )\n        \n        print(f\"✅ Submit\
-          \ response status: {response.status_code}\")\n        \n        if response.status_code\
-          \ != 200:\n            error_text = response.text\n            print(f\"\
-          ❌ Submit error {response.status_code}: {error_text}\")\n            return\
-          \ {\n                \"error\": f\"HTTP {response.status_code}\",\n    \
-          \            \"message\": error_text\n            }\n        \n        result\
-          \ = response.json()\n        task_id = result.get(\"task_id\")\n       \
-          \ \n        if not task_id:\n            return {\"error\": \"No task_id\
-          \ returned\", \"response\": result}\n        \n        print(f\"\U0001F3AF\
-          \ Task ID: {task_id}\")\n        return {\"task_id\": task_id, \"status\"\
-          : \"submitted\"}\n        \n    except requests.exceptions.RequestException\
+          \n\ndef submit_async_config(\n    config: Dict[str, Any],\n    avni_auth_token:\
+          \ str,\n    avni_mcp_server_url: str,\n) -> Dict[str, Any]:\n\n    session\
+          \ = requests.Session()\n\n    submit_url = f\"{avni_mcp_server_url}/process-config-async\"\
+          \n\n    headers = {\"Content-Type\": \"application/json\", \"avni-auth-token\"\
+          : avni_auth_token}\n\n    body = {\"config\": config}\n\n    print(f\"\U0001F4E4\
+          \ Submitting config to: {submit_url}\")\n    print(f\"\U0001F4CB Headers:\
+          \ {json.dumps(headers, indent=2)}\")\n    print(f\"\U0001F4E6 Body size:\
+          \ {len(json.dumps(body).encode('utf-8'))} bytes\")\n\n    try:\n       \
+          \ response = session.post(submit_url, headers=headers, json=body, timeout=30)\n\
+          \n        if response.status_code != 200:\n            error_text = response.text\n\
+          \            return {\"error\": f\"HTTP {response.status_code}\", \"message\"\
+          : error_text}\n\n        result = response.json()\n        task_id = result.get(\"\
+          task_id\")\n\n        if not task_id:\n            return {\"error\": \"\
+          No task_id returned\", \"response\": result}\n\n        return {\"task_id\"\
+          : task_id, \"status\": \"submitted\"}\n\n    except requests.exceptions.RequestException\
           \ as e:\n        print(f\"\U0001F525 Submit request failed: {e}\")\n   \
           \     return {\"error\": \"Submit request failed\", \"message\": str(e)}\n\
-          \n\ndef main(avni_auth_token: str, avni_base_url: str, config: Dict[str,\
-          \ Any]):\n    \"\"\"\n    Submit configuration for async processing.\n \
-          \   \n    Args:\n        avni_auth_token: Avni authentication token\n  \
-          \      avni_base_url: Avni API base URL\n        config: Configuration object\
-          \ to process\n    \"\"\"\n    print(\"\U0001F680 Avni Async Config Submission\"\
-          )\n    print(\"=\" * 40)\n    \n    print(f\"\U0001F4CB Configuration preview:\"\
-          )\n    print(json.dumps(config, indent=2)[:300] + \"...\")\n    \n    #\
-          \ Submit configuration\n    staging_url = \"https://staging-mcp.avniproject.org\"\
-          \n    result = submit_async_config(\n        config=config,\n        avni_auth_token=avni_auth_token,\n\
-          \        avni_base_url=avni_base_url,\n        staging_url=staging_url\n\
-          \    )\n    \n    print(\"\\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 SUBMISSION\
-          \ RESULT:\")\n    print(json.dumps(result, indent=2))\n    \n    return\
-          \ {\"output\": result}"
+          \n\ndef main(avni_auth_token: str, avni_mcp_server_url: str, config: Dict[str,\
+          \ Any]):\n\n    print(\"\U0001F680 Avni Async Config Submission\")\n   \
+          \ print(\"=\" * 40)\n\n    print(\"\U0001F4CB Configuration preview:\")\n\
+          \    print(json.dumps(config, indent=2)[:300] + \"...\")\n\n    result =\
+          \ submit_async_config(\n        config=config,\n        avni_auth_token=avni_auth_token,\n\
+          \        avni_mcp_server_url=avni_mcp_server_url,\n    )\n\n    print(\"\
+          \\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 SUBMISSION RESULT:\")\n    print(json.dumps(result,\
+          \ indent=2))\n\n    return {\"output\": result}\n"
         code_language: python3
         outputs:
           output:
@@ -1341,24 +1334,24 @@ workflow:
           value_type: string
           variable: avni_auth_token
         - value_selector:
-          - '1711528708197'
-          - avnibaseurl
-          value_type: string
-          variable: avni_base_url
-        - value_selector:
           - '17580163919060'
           - structured_output
           - config
           value_type: object
           variable: config
+        - value_selector:
+          - '1711528708197'
+          - avni_mcp_server_url
+          value_type: string
+          variable: avni_mcp_server_url
       height: 50
       id: '1760416664434'
       position:
-        x: 2058.2319666307462
-        y: 1163.4241930646667
+        x: 2073.257076977748
+        y: 1166.429215134067
       positionAbsolute:
-        x: 2058.2319666307462
-        y: 1163.4241930646667
+        x: 2073.257076977748
+        y: 1166.429215134067
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1483,6 +1476,7 @@ workflow:
       positionAbsolute:
         x: 2656.456781918812
         y: 1206.4250404978643
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1490,50 +1484,27 @@ workflow:
       zIndex: 1002
     - data:
         code: "import json\nimport requests\nfrom typing import Dict, Any\n\ndef check_task_status(\n\
-          \    task_id: str,\n    staging_url: str = \"https://staging-mcp.avniproject.org\"\
-          \n) -> Dict[str, Any]:\n    \"\"\"\n    Check task status once.\n    \n\
-          \    Args:\n        task_id: Task ID to check\n        staging_url: MCP\
-          \ staging server URL\n        \n    Returns:\n        Task status result\n\
-          \    \"\"\"\n    staging_url = staging_url.rstrip('/')\n    session = requests.Session()\n\
-          \    \n    status_url = f\"{staging_url}/process-config-status/{task_id}\"\
-          \n    \n    print(f\"\U0001F50D Checking task status: {task_id}\")\n   \
-          \ \n    try:\n        status_response = session.get(status_url, timeout=10)\n\
-          \        \n        if status_response.status_code != 200:\n            error_text\
-          \ = status_response.text\n            print(f\"❌ Status check error {status_response.status_code}:\
-          \ {error_text}\")\n            return {\n                \"error\": f\"\
-          Status check HTTP {status_response.status_code}\",\n                \"message\"\
-          : error_text,\n                \"task_id\": task_id\n            }\n   \
-          \     \n        status_result = status_response.json()\n        status =\
-          \ status_result.get(\"status\")\n        progress = status_result.get(\"\
-          progress\", \"\")\n        \n        print(f\"\U0001F4CA Status = {status}\"\
-          )\n        if progress:\n            print(f\"\U0001F4DD Progress: {progress}\"\
-          )\n        \n        return status_result\n        \n    except requests.exceptions.RequestException\
-          \ as e:\n        print(f\"\U0001F525 Status check request failed: {e}\"\
-          )\n        return {\n            \"error\": \"Status check failed\", \n\
-          \            \"message\": str(e),\n            \"task_id\": task_id\n  \
-          \      }\n\n\ndef main(submit_output: Dict[str, Any], loop: bool = False):\n\
-          \    \"\"\"\n    Check task status once.\n    \n    Args:\n        submit_output:\
-          \ Output from submit_async_config.py containing task_id\n        loop: Parameter\
-          \ for external loop handling (updates to False if terminal status)\n   \
-          \ \"\"\"\n    print(\"\U0001F680 Avni Async Status Check\")\n    print(\"\
-          =\" * 40)\n    \n    # Extract task_id from submit output\n    if \"output\"\
-          \ in submit_output:\n        task_id = submit_output[\"output\"].get(\"\
-          task_id\")\n    elif \"submit_output\" in submit_output:\n        task_id\
-          \ = submit_output[\"submit_output\"].get(\"task_id\")\n    else:\n     \
-          \   task_id = submit_output.get(\"task_id\")\n    \n    if not task_id:\n\
-          \        error_result = {\n            \"error\": \"No task_id found in\
-          \ submit output\",\n            \"submit_output\": submit_output\n     \
-          \   }\n        print(\"❌ No task_id found in submit output\")\n        print(json.dumps(error_result,\
-          \ indent=2))\n        return {\"output\": error_result}\n    \n    print(f\"\
-          \U0001F3AF Extracted Task ID: {task_id}\")\n    \n    # Check status once\n\
-          \    staging_url = \"https://staging-mcp.avniproject.org\"\n    result =\
-          \ check_task_status(task_id=task_id, staging_url=staging_url)\n    \n  \
-          \  # Update loop variable if terminal status reached\n    status = result.get(\"\
+          \    task_id: str,avni_mcp_server_url: str\n) -> Dict[str, Any]:\n\n   \
+          \ session = requests.Session()\n\n    status_url = f\"{avni_mcp_server_url}/process-config-status/{task_id}\"\
+          \n\n    print(f\"\U0001F50D Checking task status: {task_id}\")\n\n    try:\n\
+          \        status_response = session.get(status_url, timeout=10)\n\n     \
+          \   if status_response.status_code != 200:\n            error_text = status_response.text\n\
+          \            return {\n                \"error\": f\"Status check HTTP {status_response.status_code}\"\
+          ,\n                \"message\": error_text,\n                \"task_id\"\
+          : task_id,\n            }\n\n        status_result = status_response.json()\n\
+          \        status = status_result.get(\"status\")\n        progress = status_result.get(\"\
+          progress\", \"\")\n\n        if progress:\n            print(f\"\U0001F4DD\
+          \ Progress: {progress}\")\n\n        return status_result\n\n    except\
+          \ requests.exceptions.RequestException as e:\n        return {\"error\"\
+          : \"Status check failed\", \"message\": str(e), \"task_id\": task_id}\n\n\
+          \ndef main(submit_output: Dict[str, Any], avni_mcp_server_url: str):\n\n\
+          \    print(\"\U0001F680 Config Task Status Check\")\n    print(\"=\" * 40)\n\
+          \    \n    task_id = submit_output[\"output\"].get(\"task_id\")\n    result\
+          \ = check_task_status(task_id,avni_mcp_server_url)\n\n    status = result.get(\"\
           status\")\n    if status in [\"completed\", \"failed\", \"expired\"]:\n\
-          \        loop = False\n        print(f\"✅ Terminal status reached: {status}\"\
-          )\n    \n    print(\"\\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 FINAL RESULT:\"\
-          )\n    print(json.dumps(result, indent=2))\n    \n    return {\"output\"\
-          : result}\n"
+          \        print(f\"✅ Terminal status reached: {status}\")\n\n    print(\"\
+          \\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 FINAL RESULT:\")\n    print(json.dumps(result,\
+          \ indent=2))\n\n    return {\"output\": result}\n"
         code_language: python3
         isInIteration: false
         isInLoop: true
@@ -1550,7 +1521,7 @@ workflow:
           - '1760416664434'
           - output
           value_type: object
-          variable: submit_output
+          variable: output
         - value_selector:
           - conversation
           - loop
@@ -1648,11 +1619,11 @@ workflow:
       id: '1760424123324'
       parentId: '1760423058735'
       position:
-        x: 1737.8279520763822
-        y: 231.19679491984039
+        x: 1739.755997151547
+        y: 231
       positionAbsolute:
-        x: 4266.284733995194
-        y: 1369.6218354177047
+        x: 4268.212779070359
+        y: 1369.4250404978643
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1721,7 +1692,7 @@ workflow:
       type: custom
       width: 241
     viewport:
-      x: 214.8668351130575
-      y: -221.2142086532658
-      zoom: 0.7122115874786883
+      x: 346.60185950360176
+      y: -272.64530817319644
+      zoom: 0.6979649593993463
   rag_pipeline_variables: []

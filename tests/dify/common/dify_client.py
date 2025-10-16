@@ -4,14 +4,15 @@ import requests
 import json
 import logging
 from typing import Dict, Any, Optional
+import os
 
 logger = logging.getLogger(__name__)
 
 
 class DifyClient:
-    def __init__(self, api_key: str, base_url: str = "https://api.dify.ai/v1"):
+    def __init__(self, api_key: str):
         self.api_key = api_key
-        self.base_url = base_url
+        self.base_url = os.getenv("DIFY_API_BASE_URL")
         self.headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -21,12 +22,12 @@ class DifyClient:
         self,
         query: str,
         conversation_id: str = "",
-        user: str = "automated_tester",
+        user: str = "automated_prompts_tester",
         inputs: Optional[Dict[str, Any]] = None,
         timeout: int = 120,
     ) -> Dict[str, Any]:
         """
-        Send a message to Dify workflow with optional inputs.
+        Send a message to Dify Avni AI Assistant.
 
         Args:
             query: The user query/message
@@ -44,6 +45,7 @@ class DifyClient:
             "conversation_id": conversation_id,
             "user": user,
         }
+        print(payload)
 
         try:
             logger.info(f"Sending message to Dify: {query[:100]}...")

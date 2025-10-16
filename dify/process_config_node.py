@@ -6,31 +6,13 @@ from typing import Dict, Any, Optional
 def submit_async_config(
     config: Dict[str, Any],
     avni_auth_token: str,
-    avni_base_url: Optional[str] = None,
-    staging_url: str = "https://staging-mcp.avniproject.org",
+    avni_mcp_server_url: str,
 ) -> Dict[str, Any]:
-    """
-    Submit configuration for async processing.
-
-    Args:
-        config: Configuration JSON object
-        avni_auth_token: Avni authentication token
-        avni_base_url: Optional Avni API base URL
-        staging_url: MCP staging server URL
-
-    Returns:
-        Response with task_id or error
-    """
-    staging_url = staging_url.rstrip("/")
     session = requests.Session()
 
-    # Submit configuration
-    submit_url = f"{staging_url}/process-config-async"
+    submit_url = f"{avni_mcp_server_url}/process-config-async"
 
     headers = {"Content-Type": "application/json", "avni-auth-token": avni_auth_token}
-
-    if avni_base_url:
-        headers["avni-base-url"] = avni_base_url
 
     body = {"config": config}
 
@@ -41,11 +23,8 @@ def submit_async_config(
     try:
         response = session.post(submit_url, headers=headers, json=body, timeout=30)
 
-        print(f"✅ Submit response status: {response.status_code}")
-
         if response.status_code != 200:
             error_text = response.text
-            print(f"❌ Submit error {response.status_code}: {error_text}")
             return {"error": f"HTTP {response.status_code}", "message": error_text}
 
         result = response.json()
@@ -54,7 +33,6 @@ def submit_async_config(
         if not task_id:
             return {"error": "No task_id returned", "response": result}
 
-        print(f"🎯 Task ID: {task_id}")
         return {"task_id": task_id, "status": "submitted"}
 
     except requests.exceptions.RequestException as e:
@@ -62,28 +40,17 @@ def submit_async_config(
         return {"error": "Submit request failed", "message": str(e)}
 
 
-def main(avni_auth_token: str, avni_base_url: str, config: Dict[str, Any]):
-    """
-    Submit configuration for async processing.
-
-    Args:
-        avni_auth_token: Avni authentication token
-        avni_base_url: Avni API base URL
-        config: Configuration object to process
-    """
+def main(avni_auth_token: str, avni_mcp_server_url: str, config: Dict[str, Any]):
     print("🚀 Avni Async Config Submission")
     print("=" * 40)
 
     print("📋 Configuration preview:")
     print(json.dumps(config, indent=2)[:300] + "...")
 
-    # Submit configuration
-    staging_url = "https://staging-mcp.avniproject.org"
     result = submit_async_config(
         config=config,
         avni_auth_token=avni_auth_token,
-        avni_base_url=avni_base_url,
-        staging_url=staging_url,
+        avni_mcp_server_url=avni_mcp_server_url,
     )
 
     print("\n" + "=" * 40)

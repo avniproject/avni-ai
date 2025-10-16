@@ -15,7 +15,6 @@ from starlette.responses import JSONResponse
 
 from .auth import SimpleTokenVerifier
 from .handlers import (
-    process_config_request,
     process_config_async_request,
     get_task_status,
 )
@@ -34,8 +33,6 @@ logger = logging.getLogger(__name__)
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-base_url = os.getenv("AVNI_MCP_SERVER_URL")
-AVNI_MCP_SERVER_URL = base_url + "/mcp"
 
 server_instructions = """
 You are an AI assistant that helps users (usually management personals of NGOs) interact with the Avni platform for their program data management.
@@ -75,10 +72,6 @@ def create_server():
         Health check endpoint for monitoring.
         """
         return JSONResponse({"status": "healthy", "service": "Avni MCP Server"})
-
-    @mcp.custom_route("/process-config", methods=["POST"])
-    async def process_config_endpoint(request: Request):
-        return await process_config_request(request)
 
     @mcp.custom_route("/process-config-async", methods=["POST"])
     async def process_config_async_endpoint(request: Request):

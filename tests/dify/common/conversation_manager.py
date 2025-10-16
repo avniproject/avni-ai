@@ -36,7 +36,6 @@ class DifyConversationManager:
         org_name: str = "Test Organization",
         org_type: str = "Demo",
         user_name: str = "Test User",
-        avni_base_url: str = "https://app.avniproject.org",
     ) -> Tuple[bool, Dict[str, Any], List[Dict[str, Any]]]:
         """
         Conduct a complete conversation with Dify to generate configuration.
@@ -47,7 +46,6 @@ class DifyConversationManager:
             org_name: Organization name
             org_type: Organization type
             user_name: User name
-            avni_base_url: Avni base URL
 
         Returns:
             Tuple of (success, final_config, conversation_history)
@@ -78,7 +76,6 @@ class DifyConversationManager:
                     "org_name": org_name,
                     "org_type": org_type,
                     "user_name": user_name,
-                    "avnibaseurl": avni_base_url,
                 }
 
                 response = self.dify_client.send_message(

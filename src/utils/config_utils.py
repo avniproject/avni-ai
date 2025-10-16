@@ -7,11 +7,9 @@ from typing import Dict, Any
 logger = logging.getLogger(__name__)
 
 
-def build_system_instructions(operational_context: Dict[str, Any]) -> str:
+def build_system_instructions() -> str:
     """Build system instructions for the LLM.
 
-    Args:
-        operational_context: Context from Avni operational modules
 
     Returns:
         Complete system instructions string
@@ -67,6 +65,15 @@ OTHER CONVERSION RULES:
 - For encounter types: entityEligibilityCheckRule must be empty string "", entityEligibilityCheckDeclarativeRule must be null
 - For general encounters:DO NOT include program_uuid parameter in function calls payload at all (do not send "program_uuid": "" ,program_uuid should be completely neglected), otherwise it will fail to create encounter type
 - For program-specific encounters: include program_uuid parameter with actual program UUID
+
+UUID GENERATION AND REFERENCE RULES:
+- When config contains "uuid": "generate-v4-uuid" or "subjectTypeUuid": "generate-v4-uuid" → Generate a new UUID version 4 and use that value
+- When config contains "subjectTypeUuid": "reference-subject-uuid-for-individuals" → Find the existing "Individual" subject type UUID from operational context and use that value
+- When config contains "subjectTypeUuid": "reference-subject-uuid-for-household" → Find the existing "Household" subject type UUID from operational context and use that value
+- When config contains any field with "generate-v4-uuid" → Generate a new UUID v4 for that field
+- When config contains any field with "reference-subject-uuid-for-X" → Find the existing subject type with name X and use its UUID
+- Generated UUIDs must be in standard format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+- Always use the EXACT UUID from operational context when referencing existing items
 
 EXAMPLES:
 

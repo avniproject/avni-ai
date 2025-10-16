@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 from ..clients import create_openai_client, create_avni_client
 from .tool_registry import tool_registry
-from ..utils.logging_utils import setup_file_logging, create_session_id
+from ..utils.logging_utils import setup_file_logging
 from ..utils.config_utils import (
     build_system_instructions,
     build_initial_input,
@@ -36,7 +36,7 @@ class ConfigProcessor:
         self.openai_api_key = openai_api_key
 
     async def process_config(
-        self, config: Dict[str, Any], auth_token: str, base_url: str
+        self, config: Dict[str, Any], auth_token: str, base_url: str, task_id: str
     ) -> Dict[str, Any]:
         """
         Process a config object using LLM with continuous loop until done=true.
@@ -45,16 +45,16 @@ class ConfigProcessor:
             config: Configuration object to process
             auth_token: Avni API authentication token
             base_url: Avni API base URL
+            task_id: Task ID to use for logging session
 
         Returns:
             Dict with done flag, status, results, etc.
         """
-        # Create session ID for logging
-        session_id = create_session_id()
-        session_logger = setup_file_logging(session_id)
+        # Use task_id for logging session
+        session_logger = setup_file_logging(task_id)
 
         session_logger.info("=" * 80)
-        session_logger.info(f"NEW CONFIG PROCESSING SESSION: {session_id}")
+        session_logger.info(f"NEW CONFIG PROCESSING SESSION: {task_id}")
         session_logger.info(f"Base URL: {base_url}")
         session_logger.info(f"Config: {json.dumps(config, indent=2)}")
         session_logger.info("=" * 80)
@@ -80,17 +80,12 @@ class ConfigProcessor:
 
             session_logger.info("Successfully fetched complete existing config")
 
-            # Build system instructions
-            system_instructions = build_system_instructions(complete_existing_config)
+            system_instructions = build_system_instructions()
             session_logger.info("STEP 2: Built system instructions")
-            session_logger.info(f"System instructions: {system_instructions}")
-
-            # Initial input for LLM (includes complete existing config in message body)
             config_input = build_initial_input(config, complete_existing_config)
             session_logger.info("STEP 3: Built initial input for LLM")
             session_logger.info(f"Initial input: {config_input}")
 
-            # Get available tools
             available_tools = tool_registry.get_openai_tools()
             session_logger.info(f"STEP 4: Got {len(available_tools)} available tools")
             for i, tool in enumerate(available_tools, 1):

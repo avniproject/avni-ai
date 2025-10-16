@@ -43,7 +43,7 @@ CRITICAL: You are a PROGRAM MANAGER who KNOWS your program requirements. You are
 - YOU share operational concerns: "Teachers are not tech-savvy", "Some schools have poor connectivity"
 - YOU respond to AI suggestions with specific follow-up needs or concerns
 When Avni identifies a configuration, look for edge cases where it might not work for the objectives of the program. Talk about these edge cases to Avni and request changes to the configuration. Work with Avni until it matches your requirements.
-If the configuration matches, you can say "I am happy with the configuration provided by the Avni assistant".
+If the configuration matches, you can say "I am happy with the configuration provided by the Avni assistant  and ask it to create the configuration automatically do not ask for step by step instructions".
     """,
     # Farmer Training Program
     """

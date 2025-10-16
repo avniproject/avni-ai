@@ -19,7 +19,6 @@ from .http_utils import (
     create_cors_middleware,
 )
 from .api_utils import ApiResult
-from .request_utils import extract_base_url
 from .format_utils import format_list_response, format_creation_response
 from .function_call_utils import (
     parse_function_arguments,
@@ -28,7 +27,7 @@ from .function_call_utils import (
     extract_function_calls,
     execute_function_call,
 )
-from .logging_utils import setup_file_logging, create_session_id
+from .logging_utils import setup_file_logging
 from .config_utils import (
     build_system_instructions,
     build_initial_input,
@@ -47,7 +46,6 @@ __all__ = [
     "create_success_response",
     "create_cors_middleware",
     "ApiResult",
-    "extract_base_url",
     "format_list_response",
     "format_creation_response",
     "parse_function_arguments",
@@ -56,7 +54,6 @@ __all__ = [
     "extract_function_calls",
     "execute_function_call",
     "setup_file_logging",
-    "create_session_id",
     "build_system_instructions",
     "build_initial_input",
     "parse_llm_response",

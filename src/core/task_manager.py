@@ -161,6 +161,7 @@ class TaskManager:
                 config=task.config_data,
                 auth_token=task.auth_token,
                 base_url=task.base_url,
+                task_id=task_id,
             )
 
             # Mark as completed

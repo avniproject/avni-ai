@@ -11,16 +11,12 @@ from ..utils.request_validation import validate_config_request
 logger = logging.getLogger(__name__)
 
 
-async def process_config_request(request: Request) -> JSONResponse:
+async def process_config_async_request(request: Request) -> JSONResponse:
     """
-    Process Avni configuration using LLM with CRUD operations (create, update, delete).
+    Start async configuration processing and return task ID immediately.
 
-    Expected headers:
+     Expected headers:
     - avni-auth-token: Required authentication token for Avni API
-    - avni-base-url: Optional base URL for Avni API
-
-    Expected query parameters:
-    - base_url: Optional base URL for Avni API (overrides header)
 
     Expected body:
     {
@@ -52,44 +48,7 @@ async def process_config_request(request: Request) -> JSONResponse:
         }
     }
 
-    Args:
-        request: The incoming request object
-        openai_api_key: OpenAI API key for making requests
 
-    Returns:
-        JSONResponse with the config processing result or error
-    """
-    try:
-        config_data, auth_token, base_url, error = await validate_config_request(
-            request
-        )
-        if error:
-            status_code = 401 if "auth-token" in error else 400
-            return create_error_response(error, status_code)
-
-        logger.info(f"Processing CRUD config with Avni base URL: {base_url}")
-        logger.info(f"Operations requested: {list(config_data.keys())}")
-
-        processor = create_config_processor()
-        result = await processor.process_config(
-            config=config_data, auth_token=auth_token, base_url=base_url
-        )
-
-        return create_success_response(result)
-
-    except Exception as e:
-        logger.error(f"Config processing error: {e}")
-        import traceback
-
-        logger.error(f"Full traceback: {traceback.format_exc()}")
-        return create_error_response("Internal server error", 500)
-
-
-async def process_config_async_request(request: Request) -> JSONResponse:
-    """
-    Start async configuration processing and return task ID immediately.
-
-    Same request format as /process-config but returns immediately with task ID.
     Use /process-config-status/{task_id} to check progress.
     """
     try:
@@ -133,7 +92,7 @@ async def process_config_async_request(request: Request) -> JSONResponse:
 
 async def get_task_status(task_id: str) -> JSONResponse:
     """
-    Get status and result of a configuration processing task.
+    Get the status and result of a configuration processing task.
     """
     try:
         task = task_manager.get_task(task_id)

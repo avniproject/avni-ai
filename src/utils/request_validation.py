@@ -2,7 +2,7 @@
 
 from typing import Dict, Any, Optional, Tuple
 from starlette.requests import Request
-from .request_utils import extract_base_url
+import os
 
 
 async def validate_config_request(
@@ -41,7 +41,7 @@ async def validate_config_request(
             return None, None, None, "avni-auth-token header is required"
 
         # Extract base URL with priority: query > header > env > default
-        base_url = extract_base_url(request)
+        base_url = os.getenv("AVNI_BASE_URL").rstrip("/")
 
         return config_data, auth_token, base_url, None
 

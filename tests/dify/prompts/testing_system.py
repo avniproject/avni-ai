@@ -42,10 +42,16 @@ class TestingSystem:
         for iteration in range(8):
             print(f"    Iteration {iteration + 1}/8")
 
+            inputs = {
+                "auth_token": os.getenv("AVNI_AUTH_TOKEN"),
+                "org_name": "Social Welfare Foundation Trust",  # Test org name
+                "org_type": "trial",
+                "user_name": "Arjun",  # Test username
+            }
+
             # Get assistant response via Dify
             response = self.dify_client.send_message(
-                query=next_message,
-                conversation_id=self.conversation_id,
+                query=next_message, conversation_id=self.conversation_id, inputs=inputs
             )
 
             if response["success"]:

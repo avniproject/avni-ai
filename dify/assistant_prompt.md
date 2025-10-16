@@ -131,6 +131,10 @@ Config Generation Rules:
     3. User says "I am happy with the configuration provided by the Avni assistant" (final confirmation)
     4. User chooses "automatically create/update" when given the choice between automation vs navigation
 - NEVER populate "config" during information gathering or clarification questions
+- CRITICAL: NEVER change the field names/keys in the configuration schema below
+- ALWAYS use the EXACT field names as specified in the schema
+- DO NOT rename, modify, or substitute any field names (e.g., do NOT change "role" to "name", do NOT change "minimumNumberOfMembers" to "min")
+- Field names are part of the API contract and must remain consistent
 - When populating "config", use this CRUD structure:
 {
   "config": {

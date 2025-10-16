@@ -38,7 +38,7 @@ async def make_avni_request(
         ApiResult with success/error status and data
     """
     if not base_url:
-        base_url = os.getenv("AVNI_BASE_URL", "https://app.avniproject.org")
+        base_url = os.getenv("AVNI_BASE_URL")
 
     url = f"{base_url.rstrip('/')}{endpoint}"
 
