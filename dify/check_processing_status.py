@@ -87,7 +87,6 @@ def main(submit_output: Dict[str, Any], loop: bool = False):
     # Update loop variable if terminal status reached
     status = result.get("status")
     if status in ["completed", "failed", "expired"]:
-        loop = False
         print(f"✅ Terminal status reached: {status}")
 
     print("\n" + "=" * 40)

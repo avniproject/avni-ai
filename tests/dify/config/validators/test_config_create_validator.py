@@ -311,20 +311,6 @@ class TestConfigCreateValidator:
             errors.append(f"Expected exactly 2 programs, got {len(programs)}")
             return errors
 
-        # Expected programs (clean names)
-        expected_programs = [
-            {
-                "name": "Health Program",
-                "colour": "#4CAF50",
-                "programSubjectLabel": "Health Participant",
-            },
-            {
-                "name": "Family Welfare",
-                "colour": "#2196F3",
-                "programSubjectLabel": "Family Unit",
-            },
-        ]
-
         # Find programs by name
         health_program = None
         family_program = None
@@ -376,19 +362,6 @@ class TestConfigCreateValidator:
                 f"Expected exactly 3 encounterTypes, got {len(encounter_types)}"
             )
             return errors
-
-        # Expected encounter types
-        expected_encounters = [
-            {"name": "Registration", "programUuid": None},
-            {
-                "name": "Health Checkup",
-                "programUuid": "crud2468-acef-1357-9bdf-02468acef135",
-            },
-            {
-                "name": "Family Survey",
-                "programUuid": "crud3579-bdef-2468-acef-13579bdef246",
-            },
-        ]
 
         # Find encounters by name
         registration_enc = None

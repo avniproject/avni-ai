@@ -5,7 +5,7 @@ Handles the multi-round conversations with the Dify-built Avni AI Assistant.
 
 import json
 import logging
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Tuple
 from .dify_client import DifyClient, extract_config_from_response
 from ..utils.message_templates import (
     get_create_message,

@@ -101,7 +101,7 @@ def extract_config_from_response(response_text: str) -> Optional[Dict[str, Any]]
             if isinstance(parsed, dict):
                 return parsed
         except json.JSONDecodeError:
-            logger.error(f"Failed to parse JSON response that starts with {{")
+            logger.error("Failed to parse JSON response that starts with {{")
             return None
 
     return None

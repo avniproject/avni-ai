@@ -5,8 +5,6 @@ import pytest
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # Add the parent directories to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
@@ -20,6 +18,8 @@ from tests.dify.config.validators.test_config_update_validator import (
 from tests.dify.config.validators.test_config_delete_validator import (
     TestConfigDeleteValidator,
 )
+
+load_dotenv()
 
 
 async def run_dify_config_test(

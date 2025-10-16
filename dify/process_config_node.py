@@ -74,7 +74,7 @@ def main(avni_auth_token: str, avni_base_url: str, config: Dict[str, Any]):
     print("🚀 Avni Async Config Submission")
     print("=" * 40)
 
-    print(f"📋 Configuration preview:")
+    print("📋 Configuration preview:")
     print(json.dumps(config, indent=2)[:300] + "...")
 
     # Submit configuration
