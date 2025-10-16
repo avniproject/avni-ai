@@ -11,7 +11,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src import main
-from src.main import create_server, server_instructions
+from src.main import create_server
 
 
 class TestServerInitialization:

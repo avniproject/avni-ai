@@ -10,7 +10,7 @@ from ai_tester import AITester
 from tests.dify.common.dify_client import DifyClient
 from ai_reviewer import AIReviewer
 from analytics import StatisticsCalculator, ReportGenerator
-
+import os
 
 class TestingSystem:
     """Enhanced testing system with AI reviewer and comprehensive analytics"""
