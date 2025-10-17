@@ -23,7 +23,6 @@ class ConfigTask:
     updated_at: datetime
     config_data: Dict[str, Any]
     auth_token: str
-    base_url: Optional[str] = None
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     progress: Optional[str] = None
@@ -69,7 +68,6 @@ class TaskManager:
         self,
         config_data: Dict[str, Any],
         auth_token: str,
-        base_url: Optional[str] = None,
     ) -> str:
         """Create a new configuration processing task."""
         task_id = str(uuid.uuid4())
@@ -82,7 +80,6 @@ class TaskManager:
             updated_at=now,
             config_data=config_data,
             auth_token=auth_token,
-            base_url=base_url,
         )
 
         self._tasks[task_id] = task
@@ -160,7 +157,6 @@ class TaskManager:
             result = await processor.process_config(
                 config=task.config_data,
                 auth_token=task.auth_token,
-                base_url=task.base_url,
                 task_id=task_id,
             )
 

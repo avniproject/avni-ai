@@ -1,11 +1,9 @@
-"""
-Main testing system that orchestrates the entire testing process.
-"""
+"""Main testing system that orchestrates the entire testing process."""
 
 import datetime
 from typing import List
 from models import ConversationResult
-from prompts import SCENARIO_NAMES
+from prompts import SCENARIO_NAMES, TESTER_PROMPTS
 from ai_tester import AITester
 from tests.dify.common.dify_client import DifyClient
 from ai_reviewer import AIReviewer
@@ -17,7 +15,7 @@ class TestingSystem:
     """Enhanced testing system with AI reviewer and comprehensive analytics"""
 
     def __init__(self, dify_api_key: str):
-        self.tester = AITester()
+        self.tester = AITester(TESTER_PROMPTS)
         self.dify_client = DifyClient(dify_api_key)
         self.conversation_id = ""
         self.reviewer = AIReviewer()
@@ -48,6 +46,7 @@ class TestingSystem:
                 "org_name": "Social Welfare Foundation Trust",  # Test org name
                 "org_type": "trial",
                 "user_name": "Arjun",  # Test username
+                "avni_mcp_server_url": os.getenv("AVNI_MCP_SERVER_URL"),
             }
 
             # Get assistant response via Dify

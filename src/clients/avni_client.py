@@ -87,15 +87,14 @@ async def make_avni_request(
 class AvniClient:
     """Client for interacting with Avni API."""
 
-    def __init__(self, base_url: str, timeout: float = 30.0):
+    def __init__(self, timeout: float = 30.0):
         """
         Initialize Avni client.
 
         Args:
-            base_url: Base URL for Avni API
             timeout: Request timeout in seconds
         """
-        self.base_url = base_url.rstrip("/")
+        self.base_url = os.getenv("AVNI_BASE_URL")
         self.timeout = timeout
 
     async def make_request(
@@ -167,15 +166,14 @@ class AvniClient:
             return {"error": error_msg}
 
 
-def create_avni_client(base_url: str, timeout: float = 30.0) -> AvniClient:
+def create_avni_client(timeout: float = 30.0) -> AvniClient:
     """
     Factory function to create an Avni client.
 
     Args:
-        base_url: Base URL for Avni API
         timeout: Request timeout in seconds
 
     Returns:
         Configured Avni client
     """
-    return AvniClient(base_url, timeout)
+    return AvniClient(timeout)

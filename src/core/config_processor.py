@@ -36,7 +36,7 @@ class ConfigProcessor:
         self.openai_api_key = openai_api_key
 
     async def process_config(
-        self, config: Dict[str, Any], auth_token: str, base_url: str, task_id: str
+        self, config: Dict[str, Any], auth_token: str, task_id: str
     ) -> Dict[str, Any]:
         """
         Process a config object using LLM with continuous loop until done=true.
@@ -44,7 +44,6 @@ class ConfigProcessor:
         Args:
             config: Configuration object to process
             auth_token: Avni API authentication token
-            base_url: Avni API base URL
             task_id: Task ID to use for logging session
 
         Returns:
@@ -55,15 +54,14 @@ class ConfigProcessor:
 
         session_logger.info("=" * 80)
         session_logger.info(f"NEW CONFIG PROCESSING SESSION: {task_id}")
-        session_logger.info(f"Base URL: {base_url}")
         session_logger.info(f"Config: {json.dumps(config, indent=2)}")
         session_logger.info("=" * 80)
 
         try:
             # Fetch complete existing configuration context
-            logger.info(f"Fetching complete existing configuration from {base_url}")
+            logger.info("Fetching complete existing configuration")
             session_logger.info("STEP 1: Fetching complete existing configuration")
-            avni_client = create_avni_client(base_url)
+            avni_client = create_avni_client()
 
             # Get complete configuration using the new method
             complete_existing_config = await avni_client.fetch_complete_config(
@@ -84,7 +82,6 @@ class ConfigProcessor:
             session_logger.info("STEP 2: Built system instructions")
             config_input = build_initial_input(config, complete_existing_config)
             session_logger.info("STEP 3: Built initial input for LLM")
-            session_logger.info(f"Initial input: {config_input}")
 
             available_tools = tool_registry.get_openai_tools()
             session_logger.info(f"STEP 4: Got {len(available_tools)} available tools")

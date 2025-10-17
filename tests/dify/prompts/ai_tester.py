@@ -9,17 +9,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 import openai
 from typing import Dict, List
-from prompts import TESTER_PROMPTS
 
 
 class AITester:
     """AI that acts as a program manager testing the Avni assistant"""
 
-    def __init__(self):
-        self.prompts = TESTER_PROMPTS
+    def __init__(self, prompts):
+        self.prompts = prompts
 
     def generate_message(self, chat_history: List[Dict], scenario_index: int) -> str:
-        """Generate tester message"""
         try:
             messages = [
                 {"role": "system", "content": self.prompts[scenario_index]}

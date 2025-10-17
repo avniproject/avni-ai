@@ -151,7 +151,6 @@ Only set done=true when you have successfully processed ALL requested CRUD opera
 Available tools will help you:
 - Get existing location types, locations, programs, subject types, encounter types
 - Create, update, and delete items using contract objects
-- Check what already exists to avoid duplicates
 
 CRUD Processing order should be:
 1. DELETE operations first (in any order since they remove dependencies)
@@ -201,9 +200,26 @@ When config contains descriptive references like:
 
 OPERATIONAL CONTEXT:
 The 'existing_config' key in the message will contain what already exists in the system. Use this to:
-- Check if items already exist before creating
+- Check if items already exist before creating (MANDATORY - see rules above). You must do this for all the entities (AddressLevelTypes, Locations, Catchments, SubjectTypes, Programs, EncounterTypes )
 - Reference existing UUIDs and IDs when creating relationships
-- Avoid duplicating existing configuration"""
+- Avoid duplicating existing configuration
+
+MANDATORY EXISTENCE CHECKING RULES:
+Before ANY CREATE operation, you MUST:
+1. **CHECK EXISTING CONFIGURATION FIRST**: Search the 'existing_config' for items with the same name
+2. **CASE-INSENSITIVE NAME MATCHING**: Compare names using case-insensitive comparison (e.g., "State" matches "state" or "STATE")
+3. **SKIP CREATION IF EXISTS**: If an item with the same name already exists (ignoring case), DO NOT create it
+4. **RECORD AS EXISTING**: Add existing items to the appropriate "existing_*" arrays in results
+5. **CONTINUE PROCESSING**: Move to the next item without treating this as an error
+
+EXISTENCE CHECKING WORKFLOW EXAMPLE:
+1. CRUD config wants to create AddressLevelType "State"
+2. Check existing_config.addressLevelTypes for any item where name is "state" (case-insensitive)
+3. IF FOUND: Skip creation, add to existing_address_level_types: [{"name": "State", "id": 123, "reason": "already_exists"}])
+3. IF FOUND: Skip creation, add to existing_address_level_types: [{"name": "State", "id": 123, "reason": "already_exists"}]
+4. IF NOT FOUND: Proceed with creation using create_address_level_type()
+
+"""
 
     return instructions
 

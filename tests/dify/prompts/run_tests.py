@@ -27,7 +27,6 @@ def main():
 
     print("Starting Enhanced Avni AI Assistant Testing System")
 
-    # Create and run testing system with Dify API key
     testing_system = TestingSystem(dify_api_key)
 
     # Run test cycles

@@ -22,17 +22,23 @@ def check_task_status(task_id: str, avni_mcp_server_url: str) -> Dict[str, Any]:
             }
 
         status_result = status_response.json()
+        status = status_result.get("status")
+        progress = status_result.get("progress", "")
+
+        if progress:
+            print(f"📝 Progress: {progress}")
+
         return status_result
 
     except requests.exceptions.RequestException as e:
         return {"error": "Status check failed", "message": str(e), "task_id": task_id}
 
 
-def main(submit_output: Dict[str, Any], avni_mcp_server_url: str):
+def main(output: Dict[str, Any], avni_mcp_server_url: str):
     print("🚀 Config Task Status Check")
     print("=" * 40)
 
-    task_id = submit_output["output"].get("task_id")
+    task_id = output.get("task_id")
     result = check_task_status(task_id, avni_mcp_server_url)
 
     status = result.get("status")

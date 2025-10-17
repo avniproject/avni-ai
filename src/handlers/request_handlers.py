@@ -60,14 +60,12 @@ async def process_config_async_request(request: Request) -> JSONResponse:
             status_code = 401 if "auth-token" in error else 400
             return create_error_response(error, status_code)
 
-        logger.info(
-            f"Starting async CRUD config processing with Avni base URL: {base_url}"
-        )
+        logger.info("Starting async CRUD config processing")
         logger.info(f"Operations requested: {list(config_data.keys())}")
 
         # Create a task
         task_id = task_manager.create_task(
-            config_data=config_data, auth_token=auth_token, base_url=base_url
+            config_data=config_data, auth_token=auth_token
         )
 
         # Start background processing

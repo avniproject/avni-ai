@@ -3,6 +3,7 @@ Conversation manager for Dify workflow testing.
 Handles the multi-round conversations with the Dify-built Avni AI Assistant.
 """
 
+import os
 import json
 import logging
 from typing import Dict, Any, List, Tuple
@@ -76,6 +77,7 @@ class DifyConversationManager:
                     "org_name": org_name,
                     "org_type": org_type,
                     "user_name": user_name,
+                    "avni_mcp_server_url": os.getenv("AVNI_MCP_SERVER_URL"),
                 }
 
                 response = self.dify_client.send_message(

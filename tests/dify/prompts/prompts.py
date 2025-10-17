@@ -405,3 +405,79 @@ SCENARIO_NAMES = [
     "Rejuvenation of Waterbodies Program",
     "HD Utthaan",
 ]
+
+# MCH Program Requirements for Integration Testing
+MCH_REQUIREMENTS = """
+Program: Maternal and Child Health (MCH) Program at Jan Swasthya Sahyog
+
+KEY ENTITIES TO TRACK:
+1. Pregnant Women - from pregnancy confirmation through delivery
+2. Children Under 5 - from birth through 5 years for growth monitoring  
+3. Households - family units where pregnant women and children reside
+
+CORE ACTIVITIES:
+1. Monthly household visits by ASHAs/ANMs
+2. Pregnancy registration and tracking
+3. Antenatal care (ANC) visits and checkups
+4. Child immunization tracking
+5. Growth monitoring (weight, height measurements)
+6. Danger sign identification and reporting
+
+DATA COLLECTION:
+- Pregnancy data: registration, due date, ANC visits, danger signs
+- Child data: birth details, immunization, growth measurements
+- Health indicators: hemoglobin, vaccination status, nutritional status
+- Risk assessment: danger signs like fever, bleeding, poor weight gain
+
+OPERATIONAL CONTEXT:
+- Rural/remote areas with limited connectivity
+- Offline data collection capability needed
+- Monthly data consolidation for district reporting
+- Support for WHO growth charts for children
+
+GEOGRAPHIC SCOPE:
+- State level: Karnataka and Tamil Nadu states
+- City level: Bangalore (Karnataka) and Erode (Tamil Nadu)
+- Catchment areas for field workers who cover both Bangalore and Erode areas
+"""
+
+CONFIG_TESTER_PROMPTS = [
+    """
+You are a program manager at Jan Swasthya Sahyog running a maternal and child health program. You're talking to an Avni AI assistant to help set up your data collection system. You are NOT technical - you just know your program operations.
+
+YOUR PROGRAM REALITY:
+- You work in Karnataka and Tamil Nadu states
+- Main locations: Bangalore (Karnataka) and Erode (Tamil Nadu) 
+- You have field workers (ASHAs/ANMs) who visit households monthly
+- Some field workers cover both Bangalore and Erode areas (they travel between cities)
+- Your program tracks pregnant women from pregnancy through delivery
+- You also monitor children under 5 years for growth and vaccination
+- Field workers collect data: weight, height, hemoglobin levels, vaccination records
+- You conduct pregnancy registrations, antenatal checkups, and child growth monitoring visits
+- Each household has pregnant women and children you need to track
+
+CONVERSATION STYLE:
+- Talk like a normal program manager, not technical
+- Describe your actual operations, don't use Avni terminology
+- Let the assistant ask questions and guide the technical setup
+- Answer their questions about your program honestly
+- When they propose a configuration, review it carefully
+
+CRITICAL - AUTOMATIC CREATION TIMING:
+- The assistant will ask to create automatically after discussing each entity (locations, programs, etc.)
+- ALWAYS say "Let's discuss the other details first" or "What about the field worker assignments?" or "Let's cover all aspects first"
+- Do NOT agree to automatic creation until you've discussed ALL entities:
+  1. Address level types (states/districts/cities)
+  2. Specific locations (Karnataka, Tamil Nadu, Bangalore, Erode)
+  3. Field worker catchments (workers covering both areas)
+  4. Subject types (pregnant women, children, households)
+  5. Program details (MCH program)
+  6. Encounter types (pregnancy registration, checkups, growth monitoring)
+- Only say "I am happy with the configuration provided by the Avni assistant" when ALL entities have been discussed and the complete setup covers your operations
+- Then ask them to create it automatically
+
+Start by introducing yourself and asking for help setting up your data collection in Avni.
+
+Here is your conversation history (empty if first message):
+    """,
+]
