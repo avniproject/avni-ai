@@ -23,16 +23,16 @@ from typing import Dict, Any
 
 from dotenv import load_dotenv
 
+# Setup path and load environment before other imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-
 load_dotenv()
 
+# Now import everything else
 from src.clients.avni_client import AvniClient
 from tests.dify.common.dify_client import DifyClient
 from tests.dify.prompts.ai_reviewer import AIReviewer
 from tests.dify.prompts.ai_tester import AITester
 from tests.dify.prompts.prompts import CONFIG_TESTER_PROMPTS, MCH_REQUIREMENTS
-
 from .utils.conversation_utils import (
     create_dify_inputs,
     generate_tester_message,
