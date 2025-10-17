@@ -23,17 +23,15 @@ from typing import Dict, Any
 
 from dotenv import load_dotenv
 
-# Setup path and load environment before other imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-load_dotenv()
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))  # noqa: E402
+load_dotenv()  # noqa: E402
 
-# Now import everything else
-from src.clients.avni_client import AvniClient
-from tests.dify.common.dify_client import DifyClient
-from tests.dify.prompts.ai_reviewer import AIReviewer
-from tests.dify.prompts.ai_tester import AITester
-from tests.dify.prompts.prompts import CONFIG_TESTER_PROMPTS, MCH_REQUIREMENTS
-from .utils.conversation_utils import (
+from src.clients.avni_client import AvniClient  # noqa: E402
+from tests.dify.common.dify_client import DifyClient  # noqa: E402
+from tests.dify.prompts.ai_reviewer import AIReviewer  # noqa: E402
+from tests.dify.prompts.ai_tester import AITester  # noqa: E402
+from tests.dify.prompts.prompts import CONFIG_TESTER_PROMPTS, MCH_REQUIREMENTS  # noqa: E402
+from .utils.conversation_utils import (  # noqa: E402
     create_dify_inputs,
     generate_tester_message,
     handle_normal_conversation_timeout,
@@ -42,7 +40,7 @@ from .utils.conversation_utils import (
     is_timeout_response,
     record_normal_conversation,
 )
-from .utils.test_utils import (
+from .utils.test_utils import (  # noqa: E402
     print_test_results,
     save_test_results,
     validate_environment_variables,
