@@ -135,7 +135,7 @@ Explain each score in detail:
                 result = json.loads(json_content)
 
                 if remaining_text:
-                    print(f"📝 Additional analysis found:")
+                    print("📝 Additional analysis found:")
                     print(remaining_text)
                     result["detailed_analysis"] = remaining_text
 
@@ -163,7 +163,7 @@ Explain each score in detail:
                     result = json.loads(json_part)
 
                     if remaining_text:
-                        print(f"📝 Additional analysis found:")
+                        print("📝 Additional analysis found:")
                         print(remaining_text)
                         # Add the analysis to the result
                         result["detailed_analysis"] = remaining_text

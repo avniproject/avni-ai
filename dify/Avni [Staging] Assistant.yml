@@ -1295,8 +1295,8 @@ workflow:
       type: custom
       width: 241
     - data:
-        code: "import json\nimport requests\nfrom typing import Dict, Any, Optional\n\
-          \n\ndef submit_async_config(\n    config: Dict[str, Any],\n    avni_auth_token:\
+        code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
+          \ submit_async_config(\n    config: Dict[str, Any],\n    avni_auth_token:\
           \ str,\n    avni_mcp_server_url: str,\n) -> Dict[str, Any]:\n\n    session\
           \ = requests.Session()\n\n    submit_url = f\"{avni_mcp_server_url}/process-config-async\"\
           \n\n    headers = {\"Content-Type\": \"application/json\", \"avni-auth-token\"\
@@ -1485,28 +1485,25 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\nimport requests\nfrom typing import Dict, Any\n\ndef check_task_status(\n\
-          \    task_id: str,avni_mcp_server_url: str\n) -> Dict[str, Any]:\n\n   \
-          \ session = requests.Session()\n\n    status_url = f\"{avni_mcp_server_url}/process-config-status/{task_id}\"\
+        code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
+          \ check_task_status(task_id: str, avni_mcp_server_url: str) -> Dict[str,\
+          \ Any]:\n    session = requests.Session()\n\n    status_url = f\"{avni_mcp_server_url}/process-config-status/{task_id}\"\
           \n\n    print(f\"\U0001F50D Checking task status: {task_id}\")\n\n    try:\n\
           \        status_response = session.get(status_url, timeout=10)\n\n     \
           \   if status_response.status_code != 200:\n            error_text = status_response.text\n\
           \            return {\n                \"error\": f\"Status check HTTP {status_response.status_code}\"\
           ,\n                \"message\": error_text,\n                \"task_id\"\
           : task_id,\n            }\n\n        status_result = status_response.json()\n\
-          \        status = status_result.get(\"status\")\n        progress = status_result.get(\"\
-          progress\", \"\")\n\n        if progress:\n            print(f\"\U0001F4DD\
-          \ Progress: {progress}\")\n\n        return status_result\n\n    except\
-          \ requests.exceptions.RequestException as e:\n        return {\"error\"\
-          : \"Status check failed\", \"message\": str(e), \"task_id\": task_id}\n\n\
-          \ndef main(output: Dict[str, Any], avni_mcp_server_url: str):\n\n    print(\"\
-          \U0001F680 Config Task Status Check\")\n    print(\"=\" * 40)\n    \n  \
-          \  task_id = output.get(\"task_id\")\n    result = check_task_status(task_id,avni_mcp_server_url)\n\
-          \n    status = result.get(\"status\")\n    if status in [\"completed\",\
-          \ \"failed\", \"expired\"]:\n        print(f\"✅ Terminal status reached:\
-          \ {status}\")\n\n    print(\"\\n\" + \"=\" * 40)\n    print(\"\U0001F3C1\
-          \ FINAL RESULT:\")\n    print(json.dumps(result, indent=2))\n\n    return\
-          \ {\"output\": result}\n"
+          \        return status_result\n\n    except requests.exceptions.RequestException\
+          \ as e:\n        return {\"error\": \"Status check failed\", \"message\"\
+          : str(e), \"task_id\": task_id}\n\n\ndef main(output: Dict[str, Any], avni_mcp_server_url:\
+          \ str):\n    print(\"\U0001F680 Config Task Status Check\")\n    print(\"\
+          =\" * 40)\n\n    task_id = output.get(\"task_id\")\n    result = check_task_status(task_id,\
+          \ avni_mcp_server_url)\n\n    status = result.get(\"status\")\n    if status\
+          \ in [\"completed\", \"failed\", \"expired\"]:\n        print(f\"✅ Terminal\
+          \ status reached: {status}\")\n\n    print(\"\\n\" + \"=\" * 40)\n    print(\"\
+          \U0001F3C1 FINAL RESULT:\")\n    print(json.dumps(result, indent=2))\n\n\
+          \    return {\"output\": result}\n"
         code_language: python3
         isInIteration: false
         isInLoop: true
@@ -1694,7 +1691,7 @@ workflow:
       type: custom
       width: 241
     viewport:
-      x: -1386.891296492277
-      y: -464.5385520902223
+      x: -1152.891296492277
+      y: -678.5385520902223
       zoom: 0.7402265329190929
   rag_pipeline_variables: []

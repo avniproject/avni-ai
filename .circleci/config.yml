@@ -187,10 +187,5 @@ workflows:
       - staging_deploy:
           requires:
             - staging_approve
-          filters:
-            branches:
-              only:
-                - main
-                - production
           context:
             - non-prod-deploy

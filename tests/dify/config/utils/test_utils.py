@@ -35,7 +35,7 @@ def print_test_results(result: Dict[str, Any], test_name: str) -> None:
 
     if result["success"]:
         validation = result["validation"]
-        print(f"\n🎯 Validation Scores:")
+        print("\n🎯 Validation Scores:")
         scores = validation["scores"]
         print(
             f"  • Functional Adequacy: {scores.get('functional_adequacy', 'N/A')}/100"
@@ -46,7 +46,7 @@ def print_test_results(result: Dict[str, Any], test_name: str) -> None:
         print(f"  • Completeness: {scores.get('completeness', 'N/A')}/100")
 
         config_assessment = validation["configuration_assessment"]
-        print(f"\n📋 Configuration Created:")
+        print("\n📋 Configuration Created:")
         print(
             f"  • Subject Types: {len(config_assessment.get('subject_types_created', []))}"
         )

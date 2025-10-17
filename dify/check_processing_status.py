@@ -22,12 +22,6 @@ def check_task_status(task_id: str, avni_mcp_server_url: str) -> Dict[str, Any]:
             }
 
         status_result = status_response.json()
-        status = status_result.get("status")
-        progress = status_result.get("progress", "")
-
-        if progress:
-            print(f"📝 Progress: {progress}")
-
         return status_result
 
     except requests.exceptions.RequestException as e:

@@ -19,30 +19,32 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any
+
 from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 load_dotenv()
 
-from tests.dify.prompts.ai_tester import AITester
-from tests.dify.common.dify_client import DifyClient
 from src.clients.avni_client import AvniClient
+from tests.dify.common.dify_client import DifyClient
 from tests.dify.prompts.ai_reviewer import AIReviewer
+from tests.dify.prompts.ai_tester import AITester
 from tests.dify.prompts.prompts import CONFIG_TESTER_PROMPTS, MCH_REQUIREMENTS
+
 from .utils.conversation_utils import (
-    generate_tester_message,
     create_dify_inputs,
+    generate_tester_message,
+    handle_normal_conversation_timeout,
+    handle_satisfaction_response,
     is_satisfaction_expressed,
     is_timeout_response,
-    handle_satisfaction_response,
-    handle_normal_conversation_timeout,
     record_normal_conversation,
 )
 from .utils.test_utils import (
-    save_test_results,
     print_test_results,
+    save_test_results,
     validate_environment_variables,
 )
 
