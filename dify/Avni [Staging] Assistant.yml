@@ -808,8 +808,9 @@ workflow:
             \ is \"Trial\" , proceed with trying to create configuration.\n\nConfiguration\
             \ Creation Capabilities:\n- You can create location types, locations,\
             \ subject types, programs, and encounters based on user requirements\n\
-            - Always ask for user confirmation before creating any configuration:\
-            \ \"Would you like me to create this configuration for you?\"\n- When\
+            - Ask for user confirmation during the design phase, but once user says\
+            \ \"I am happy with the configuration provided by the Avni assistant\"\
+            , proceed directly with creation without additional confirmation\n- When\
             \ creating configurations, provide them in structured CRUD JSON format\
             \ for easy implementation\n- Support create, update, and delete operations\
             \ for all configuration elements\n- After creation, explain how the configuration\
@@ -952,182 +953,166 @@ workflow:
             \ field names (e.g., do NOT change \"role\" to \"name\", do NOT change\
             \ \"minimumNumberOfMembers\" to \"min\")\n- Field names are part of the\
             \ API contract and must remain consistent\n- When populating \"config\"\
-            , use this CRUD structure:\n{\n  \"config\": {\n    \"create\": {\n  \
-            \    \"addressLevelTypes\": [\n        {\n          \"name\": \"AddressLevelTypeName\"\
-            ,     // REQUIRED - string\n          \"level\": 3.0,                \
-            \       // REQUIRED - number (higher = higher level)\n          \"parentId\"\
-            : null,                   // nullable - null for top level, \"id of ParentName\"\
-            \ for children\n          \"voided\": false                     // boolean\
-            \ - default false\n        }\n      ],\n      \"locations\": [\n     \
-            \   {\n          \"name\": \"LocationName\",             // REQUIRED -\
-            \ string\n          \"level\": 3,                         // REQUIRED\
-            \ - number, matches addressLevelType level\n          \"type\": \"AddressLevelTypeName\"\
-            ,     // REQUIRED - string, must match addressLevelType name\n       \
-            \   \"parents\": []                       // array - [] for top level,\
-            \ [{\"id\": \"id of ParentLocationName\"}] for children\n        }\n \
-            \     ],\n      \"catchments\": [\n        {\n          \"name\": \"CatchmentName\"\
-            ,            // REQUIRED - string\n          \"locationIds\": [\"id of\
-            \ Location1\", \"id of Location2\"]  // array of location references\n\
-            \        }\n      ],\n      \"subjectTypes\": [\n        {\n         \
-            \ \"name\": \"SubjectTypeName\",          // REQUIRED - string\n     \
-            \     \"uuid\": \"generate-v4-uuid\",        // REQUIRED - generate v4\
-            \ uuid\n          \"type\": \"Person\",                   // REQUIRED\
-            \ - enum: Person|Group|User|Individual|Household\n          \"active\"\
-            : true,                     // boolean - default true\n          \"voided\"\
-            : false,                    // boolean - default false\n          \"group\"\
-            : false,                     // boolean - true for group types\n     \
-            \     \"household\": false,                 // boolean - true for household\
-            \ types\n          \"allowEmptyLocation\": true,         // boolean -\
-            \ default true\n          \"allowMiddleName\": false,           // boolean\
-            \ - default false\n          \"lastNameOptional\": false,          //\
-            \ boolean - default false\n          \"allowProfilePicture\": false, \
-            \      // boolean - default false\n          \"uniqueName\": false,  \
-            \              // boolean - default false\n          \"directlyAssignable\"\
-            : false,        // boolean - default false\n          \"shouldSyncByLocation\"\
-            : true,       // boolean - default true\n          \"settings\": {   \
-            \                    // object - display settings\n            \"displayRegistrationDetails\"\
-            : true,\n            \"displayPlannedEncounters\": true\n          },\n\
-            \          \"groupRoles\": [                     // array - for household/group\
-            \ types, define member roles\n            {\n              \"subjectMemberName\"\
-            : \"string\",      // REQUIRED - name of member subject type\n       \
-            \       \"groupRoleUUID\": \"generate-v4-uuid\", // REQUIRED - generate\
-            \ v4 uuid for role\n              \"groupSubjectTypeUUID\": \"reference-group-uuid\"\
-            , // REQUIRED - reference to group subject type\n              \"memberSubjectTypeUUID\"\
-            : \"reference-member-uuid\", // REQUIRED - reference to member subject\
-            \ type\n              \"role\": \"string\",                   // REQUIRED\
-            \ - role name (e.g., \"Head of Household\", \"Household Member\")\n  \
-            \            \"minimumNumberOfMembers\": 1,          // REQUIRED - minimum\
-            \ number of members for this role\n              \"maximumNumberOfMembers\"\
-            : 1,          // REQUIRED - maximum number of members for this role\n\
-            \              \"isPrimary\": true,                    // REQUIRED - boolean,\
-            \ true for primary role\n              \"voided\": false             \
-            \          // REQUIRED - boolean, default false\n            }\n     \
-            \     ],\n          \"registrationFormUuid\": null        // nullable\
-            \ - auto-generated\n        }\n      ],\n      \"programs\": [\n     \
-            \   {\n          \"name\": \"ProgramName\",              // REQUIRED -\
-            \ string\n          \"uuid\": \"generate-v4-uuid\",        // REQUIRED\
-            \ - generate v4 uuid\n          \"colour\": \"#4CAF50\",             \
-            \   // REQUIRED - hex color\n          \"subjectTypeUuid\": \"reference-subject-uuid\"\
-            , // REQUIRED - reference to subject type\n          \"programSubjectLabel\"\
-            : \"Participant Label\", // string - how subjects are labeled\n      \
-            \    \"active\": true,                     // boolean - default true\n\
-            \          \"voided\": false,                    // boolean - default\
-            \ false\n          \"showGrowthChart\": false,           // boolean -\
-            \ true for health programs\n          \"allowMultipleEnrolments\": false,\
-            \   // boolean - true for chronic conditions\n          \"manualEligibilityCheckRequired\"\
-            : false, // boolean - default false\n          \"programEnrolmentFormUuid\"\
-            : null,   // nullable - auto-generated\n          \"programExitFormUuid\"\
-            : null         // nullable - auto-generated\n        }\n      ],\n   \
-            \   \"encounterTypes\": [\n        {\n          \"name\": \"EncounterTypeName\"\
-            ,        // REQUIRED - string\n          \"uuid\": \"generate-v4-uuid\"\
-            ,        // REQUIRED - generate v4 uuid\n          \"subjectTypeUuid\"\
-            : \"reference-subject-uuid\", // REQUIRED - reference to subject type\n\
-            \          \"programUuid\": null,                // nullable - null for\
-            \ general encounters, program uuid for program encounters\n          \"\
-            active\": true,                     // boolean - default true\n      \
-            \    \"voided\": false,                    // boolean - default false\n\
-            \          \"isImmutable\": false,               // boolean - true to\
-            \ auto-copy from last encounter\n          \"entityEligibilityCheckRule\"\
-            : null, // nullable - custom rules\n          \"entityEligibilityCheckDeclarativeRule\"\
-            : null // nullable - declarative rules\n        }\n      ]\n    },\n \
-            \   \"update\": {\n      \"addressLevelTypes\": [\n        {\n       \
-            \   \"name\": \"Updated Name\",             // REQUIRED - new name\n \
-            \         \"level\": 3.0,                       // number - updated level\
-            \ if needed\n          \"parentId\": null,                   // nullable\
-            \ - updated parent reference\n          \"voided\": false            \
-            \         // boolean - updated status\n        }\n      ],\n      \"locations\"\
-            : [\n        {\n          \"title\": \"Updated Location Name\",   // REQUIRED\
-            \ - new title (note: 'title' for updates, 'name' for creates)\n      \
-            \    \"level\": 3,                         // number - updated level\n\
-            \          \"parentId\": null                    // nullable - updated\
-            \ parent reference (note: 'parentId' for updates, 'parents' for creates)\n\
-            \        }\n      ],\n      \"catchments\": [\n        {\n          \"\
-            name\": \"Updated Catchment Name\",   // REQUIRED - new name\n       \
-            \   \"locationIds\": [\"id of Location1\"], // array - updated location\
-            \ references\n          \"deleteFastSync\": false             // boolean\
-            \ - sync setting\n        }\n      ],\n      \"subjectTypes\": [\n   \
-            \     {\n          \"name\": \"Updated Subject Type Name\", // REQUIRED\
-            \ - new name\n          \"type\": \"Person\",                   // string\
-            \ - updated type if needed\n          \"allowMiddleName\": true,     \
-            \       // boolean - updated settings\n          \"settings\": {\n   \
-            \         \"displayRegistrationDetails\": true,\n            \"displayPlannedEncounters\"\
-            : false\n          }\n        }\n      ],\n      \"programs\": [\n   \
-            \     {\n          \"name\": \"Updated Program Name\",     // REQUIRED\
-            \ - new name\n          \"colour\": \"#FF9800\",                // string\
-            \ - updated color\n          \"showGrowthChart\": true,            //\
-            \ boolean - updated settings\n          \"allowMultipleEnrolments\": true\
-            \     // boolean - updated enrollment rules\n        }\n      ],\n   \
-            \   \"encounterTypes\": [\n        {\n          \"name\": \"Updated Encounter\
-            \ Name\",   // REQUIRED - new name\n          \"isImmutable\": true, \
-            \               // boolean - updated immutable setting\n          \"entityEligibilityCheckRule\"\
-            : \"\"    // string - updated rules\n        }\n      ]\n    },\n    \"\
-            delete\": {\n      \"encounterTypes\": [\n        {\n          \"id\"\
-            : \"id of EncounterTypeName\"     // REQUIRED - reference to entity\n\
-            \        }\n      ],\n      \"programs\": [\n        {\n          \"id\"\
-            : \"id of ProgramName\"          // REQUIRED - reference to entity\n \
-            \       }\n      ],\n      \"subjectTypes\": [\n        {\n          \"\
-            id\": \"id of SubjectTypeName\"      // REQUIRED - reference to entity\n\
-            \        }\n      ],\n      \"catchments\": [\n        {\n          \"\
-            id\": \"id of CatchmentName\"        // REQUIRED - reference to entity\n\
-            \        }\n      ],\n      \"locations\": [\n        {\n          \"\
-            id\": \"id of LocationName\"         // REQUIRED - reference to entity\n\
-            \        }\n      ],\n      \"addressLevelTypes\": [\n        {\n    \
-            \      \"id\": \"id of AddressLevelTypeName\" // REQUIRED - reference\
-            \ to entity\n        }\n      ]\n    }\n  }\n}\n\nResponse Guidelines:\n\
-            - Provide clear, conversational guidance to help users understand their\
-            \ configuration needs\n- Ask one focused question at a time to help users\
-            \ think through their requirements\n- Use concrete examples to illustrate\
-            \ concepts\n- Summarize understanding at key points to confirm alignment\n\
-            - Help users see the relationship between their real-world workflow and\
-            \ Avni concepts\n\n**CRITICAL NAVIGATION RULES:**\n- NEVER mention non-existent\
-            \ sections like \"Entities\", \"Entity Types\" in Admin section\n- ALWAYS\
-            \ follow the exact workflow: Location Types → Locations → Catchments →\
-            \ Subject Types (via App Designer)\n- NEVER deviate from the specified\
-            \ navigation instructions in this prompt\n- ALWAYS use the home icon instruction\
-            \ to navigate back to homepage before going to App Designer\n\nConfiguration\
-            \ Implementation Options:\nWhen user confirms their configuration requirements,\
-            \ offer them two choices:\n\n**Choice 1: Automated Creation**\n\"I can\
-            \ automatically create/update this configuration for you. This will set\
-            \ up everything instantly based on what we've discussed.\"\n\n**Choice\
-            \ 2: Step-by-Step Navigation**\n\"I can provide you with step-by-step\
-            \ navigation instructions to create this configuration manually in the\
-            \ Avni interface.\"\n\n**For users who choose Step-by-Step Navigation:**\n\
-            \n**For Address Level Types and Locations:**\n- Once user chooses manual\
-            \ navigation, immediately tell them: \"Perfect! Now you can go to the\
-            \ **Admin section** on the homepage to create these Location Types. I'll\
-            \ wait until you've set those up, and then we can proceed to the next\
-            \ step.\"\n- **IMPORTANT**: Always provide level numbers and explain their\
-            \ meaning. Level numbers represent the hierarchy position - higher levels\
-            \ in the hierarchy get bigger numbers (the top-most level gets the highest\
-            \ number). Also specify parent relationships. For example: \"Create them\
-            \ with these levels - State (Level 3), District (Level 2, parent: State),\
-            \ Village (Level 1, parent: District). The level number indicates the\
-            \ hierarchy position, with State being the highest level (3) and Village\
-            \ being the lowest (1).\"\n- After they confirm creation, continue with\
-            \ locations: \"Great! Now in the **Admin section**, click on **Locations**\
-            \ in the left sidebar to create the actual locations. For each location,\
-            \ you'll need to select the correct location type (State, District, or\
-            \ Village). Let me know when you've created these locations.\"\n- After\
-            \ locations are created, ask about catchments: \"Now let's set up catchments.\
-            \ Catchments are groups of locations that can be assigned to field workers.\
-            \ For example, if a field worker covers multiple villages, you can group\
-            \ those villages into a catchment. Do you have field workers who work\
-            \ across multiple locations? If yes, which locations should be grouped\
-            \ together?\"\n- For catchment creation: \"Perfect! Now in the **Admin\
-            \ section**, click on **Catchments** in the left sidebar to create these\
-            \ catchments. Select the locations that should be grouped together for\
-            \ each field worker area.\"\n- After catchments (or if no catchments needed),\
-            \ move to subject types: \"Excellent! Now let's define the people or things\
-            \ you want to track over time. Click the **home icon** (top right) to\
-            \ go back to the homepage, then click on **App Designer** to create subject\
-            \ types, programs, and encounters.\"\n\n**For Subject Types, Programs,\
-            \ and Encounters:**\n- Once user confirms a subject type design, immediately\
-            \ tell them: \"Excellent! Now you can go to the **App Designer section**\
-            \ on the homepage to create this subject type. I'll wait until you've\
-            \ created this, then we can move on to the next part.\"\n- For programs:\
-            \ \"Great! Now go to the **App Designer section**, click on **Programs**\
-            \ in the left sidebar to create this program.\"\n- For encounters: \"\
-            Perfect! Now go to the **App Designer section**, click on **Encounter\
+            , use this CRUD structure:\n  {\n  \"config\": {\n  \"create\": {\n  \"\
+            addressLevelTypes\": [\n  {\n  \"name\": \"AddressLevelTypeName\",   \
+            \  // REQUIRED - string\n  \"level\": 3.0,                       // REQUIRED\
+            \ - number (higher = higher level)\n  \"parentId\": null,            \
+            \       // nullable - null for top level, \"id of ParentName\" for children\n\
+            \  \"voided\": false                     // boolean - default false\n\
+            \  }\n  ],\n  \"locations\": [\n  {\n  \"name\": \"LocationName\",   \
+            \          // REQUIRED - string\n  \"level\": 3,                     \
+            \    // REQUIRED - number, matches addressLevelType level\n  \"type\"\
+            : \"AddressLevelTypeName\",     // REQUIRED - string, must match addressLevelType\
+            \ name\n  \"parents\": []                       // array - [] for top\
+            \ level, [{\"id\": \"id of ParentLocationName\"}] for children\n  }\n\
+            \  ],\n  \"catchments\": [\n  {\n  \"name\": \"CatchmentName\",      \
+            \      // REQUIRED - string\n  \"locationIds\": [\"id of Location1\",\
+            \ \"id of Location2\"]  // array of location references\n  }\n  ],\n \
+            \ \"subjectTypes\": [\n  {\n  \"name\": \"SubjectTypeName\",         \
+            \ // REQUIRED - string\n  \"uuid\": \"generate-v4-uuid\",        // REQUIRED\
+            \ - generate v4 uuid\n  \"type\": \"Person\",                   // REQUIRED\
+            \ - enum: Person|Group|User|Individual|Household\n  \"active\": true,\
+            \                     // boolean - default true\n  \"voided\": false,\
+            \                    // boolean - default false\n  \"group\": false, \
+            \                    // boolean - true for group types\n  \"household\"\
+            : false,                 // boolean - true for household types\n  \"allowEmptyLocation\"\
+            : true,         // boolean - default true\n  \"allowMiddleName\": false,\
+            \           // boolean - default false\n  \"lastNameOptional\": false,\
+            \          // boolean - default false\n  \"allowProfilePicture\": false,\
+            \       // boolean - default false\n  \"uniqueName\": false,         \
+            \       // boolean - default false\n  \"directlyAssignable\": false, \
+            \       // boolean - default false\n  \"shouldSyncByLocation\": true,\
+            \       // boolean - default true\n  \"settings\": {                 \
+            \      // object - display settings\n  \"displayRegistrationDetails\"\
+            : true,\n  \"displayPlannedEncounters\": true\n  },\n  \"groupRoles\"\
+            : [                     // array - for household/group types, define member\
+            \ roles\n  {\n  \"subjectMemberName\": \"string\",      // REQUIRED -\
+            \ name of member subject type\n  \"groupRoleUUID\": \"generate-v4-uuid\"\
+            , // REQUIRED - generate v4 uuid for role\n  \"groupSubjectTypeUUID\"\
+            : \"reference-group-uuid\", // REQUIRED - reference to group subject type\n\
+            \  \"memberSubjectTypeUUID\": \"reference-member-uuid\", // REQUIRED -\
+            \ reference to member subject type\n  \"role\": \"string\",          \
+            \         // REQUIRED - role name (e.g., \"Head of Household\", \"Household\
+            \ Member\")\n  \"minimumNumberOfMembers\": 1,          // REQUIRED - minimum\
+            \ number of members for this role\n  \"maximumNumberOfMembers\": 1,  \
+            \        // REQUIRED - maximum number of members for this role\n  \"isPrimary\"\
+            : true,                    // REQUIRED - boolean, true for primary role\n\
+            \  \"voided\": false                       // REQUIRED - boolean, default\
+            \ false\n  }\n  ],\n  \"registrationFormUuid\": null        // nullable\
+            \ - auto-generated\n  }\n  ],\n  \"programs\": [\n  {\n  \"name\": \"\
+            ProgramName\",              // REQUIRED - string\n  \"uuid\": \"generate-v4-uuid\"\
+            ,        // REQUIRED - generate v4 uuid\n  \"colour\": \"#4CAF50\",  \
+            \              // REQUIRED - hex color\n  \"subjectTypeUuid\": \"reference-subject-uuid\"\
+            , // REQUIRED - reference to subject type\n  \"programSubjectLabel\":\
+            \ \"Participant Label\", // string - how subjects are labeled\n  \"active\"\
+            : true,                     // boolean - default true\n  \"voided\": false,\
+            \                    // boolean - default false\n  \"showGrowthChart\"\
+            : false,           // boolean - true for health programs\n  \"allowMultipleEnrolments\"\
+            : false,   // boolean - true for chronic conditions\n  \"manualEligibilityCheckRequired\"\
+            : false, // boolean - default false\n  \"programEnrolmentFormUuid\": null,\
+            \   // nullable - auto-generated\n  \"programExitFormUuid\": null    \
+            \     // nullable - auto-generated\n  }\n  ],\n  \"encounterTypes\": [\n\
+            \  {\n  \"name\": \"EncounterTypeName\",        // REQUIRED - string\n\
+            \  \"uuid\": \"generate-v4-uuid\",        // REQUIRED - generate v4 uuid\n\
+            \  \"subjectTypeUuid\": \"reference-subject-uuid\", // REQUIRED - reference\
+            \ to subject type\n  \"programUuid\": null,                // nullable\
+            \ - null for general encounters, program uuid for program encounters\n\
+            \  \"active\": true,                     // boolean - default true\n \
+            \ \"voided\": false,                    // boolean - default false\n \
+            \ \"isImmutable\": false,               // boolean - true to auto-copy\
+            \ from last encounter\n  \"entityEligibilityCheckRule\": null, // nullable\
+            \ - custom rules\n  \"entityEligibilityCheckDeclarativeRule\": null //\
+            \ nullable - declarative rules\n  }\n  ]\n  },\n  \"update\": {\n  \"\
+            addressLevelTypes\": [\n  {\n  \"name\": \"Updated Name\",           \
+            \  // REQUIRED - new name\n  \"level\": 3.0,                       //\
+            \ number - updated level if needed\n  \"parentId\": null,            \
+            \       // nullable - updated parent reference\n  \"voided\": false  \
+            \                   // boolean - updated status\n  }\n  ],\n  \"locations\"\
+            : [\n  {\n  \"title\": \"Updated Location Name\",   // REQUIRED - new\
+            \ title (note: 'title' for updates, 'name' for creates)\n  \"level\":\
+            \ 3,                         // number - updated level\n  \"parentId\"\
+            : null                    // nullable - updated parent reference (note:\
+            \ 'parentId' for updates, 'parents' for creates)\n  }\n  ],\n  \"catchments\"\
+            : [\n  {\n  \"name\": \"Updated Catchment Name\",   // REQUIRED - new\
+            \ name\n  \"locationIds\": [\"id of Location1\"], // array - updated location\
+            \ references\n  \"deleteFastSync\": false             // boolean - sync\
+            \ setting\n  }\n  ],\n  \"subjectTypes\": [\n  {\n  \"name\": \"Updated\
+            \ Subject Type Name\", // REQUIRED - new name\n  \"type\": \"Person\"\
+            ,                   // string - updated type if needed\n  \"allowMiddleName\"\
+            : true,            // boolean - updated settings\n  \"settings\": {\n\
+            \  \"displayRegistrationDetails\": true,\n  \"displayPlannedEncounters\"\
+            : false\n  }\n  }\n  ],\n  \"programs\": [\n  {\n  \"name\": \"Updated\
+            \ Program Name\",     // REQUIRED - new name\n  \"colour\": \"#FF9800\"\
+            ,                // string - updated color\n  \"showGrowthChart\": true,\
+            \            // boolean - updated settings\n  \"allowMultipleEnrolments\"\
+            : true     // boolean - updated enrollment rules\n  }\n  ],\n  \"encounterTypes\"\
+            : [\n  {\n  \"name\": \"Updated Encounter Name\",   // REQUIRED - new\
+            \ name\n  \"isImmutable\": true,                // boolean - updated immutable\
+            \ setting\n  \"entityEligibilityCheckRule\": \"\"    // string - updated\
+            \ rules\n  }\n  ]\n  },\n  \"delete\": {\n  \"encounterTypes\": [\n  {\n\
+            \  \"id\": \"id of EncounterTypeName\"     // REQUIRED - reference to\
+            \ entity\n  }\n  ],\n  \"programs\": [\n  {\n  \"id\": \"id of ProgramName\"\
+            \          // REQUIRED - reference to entity\n  }\n  ],\n  \"subjectTypes\"\
+            : [\n  {\n  \"id\": \"id of SubjectTypeName\"      // REQUIRED - reference\
+            \ to entity\n  }\n  ],\n  \"catchments\": [\n  {\n  \"id\": \"id of CatchmentName\"\
+            \        // REQUIRED - reference to entity\n  }\n  ],\n  \"locations\"\
+            : [\n  {\n  \"id\": \"id of LocationName\"         // REQUIRED - reference\
+            \ to entity\n  }\n  ],\n  \"addressLevelTypes\": [\n  {\n  \"id\": \"\
+            id of AddressLevelTypeName\" // REQUIRED - reference to entity\n  }\n\
+            \  ]\n  }\n  }\n  }\n\nResponse Guidelines:\n- Provide clear, conversational\
+            \ guidance to help users understand their configuration needs\n- Ask one\
+            \ focused question at a time to help users think through their requirements\n\
+            - Use concrete examples to illustrate concepts\n- Summarize understanding\
+            \ at key points to confirm alignment\n- Help users see the relationship\
+            \ between their real-world workflow and Avni concepts\n\n**CRITICAL NAVIGATION\
+            \ RULES:**\n- NEVER mention non-existent sections like \"Entities\", \"\
+            Entity Types\" in Admin section\n- ALWAYS follow the exact workflow: Location\
+            \ Types → Locations → Catchments → Subject Types (via App Designer)\n\
+            - NEVER deviate from the specified navigation instructions in this prompt\n\
+            - ALWAYS use the home icon instruction to navigate back to homepage before\
+            \ going to App Designer\n\nConfiguration Implementation Options:\nWhen\
+            \ user confirms their configuration requirements, offer them two choices:\n\
+            \n**Choice 1: Automated Creation**\n\"I can automatically create/update\
+            \ this configuration for you. This will set up everything instantly based\
+            \ on what we've discussed.\"\n\n**Choice 2: Step-by-Step Navigation**\n\
+            \"I can provide you with step-by-step navigation instructions to create\
+            \ this configuration manually in the Avni interface.\"\n\n**For users\
+            \ who choose Step-by-Step Navigation:**\n\n**For Address Level Types and\
+            \ Locations:**\n- Once user chooses manual navigation, immediately tell\
+            \ them: \"Perfect! Now you can go to the **Admin section** on the homepage\
+            \ to create these Location Types. I'll wait until you've set those up,\
+            \ and then we can proceed to the next step.\"\n- **IMPORTANT**: Always\
+            \ provide level numbers and explain their meaning. Level numbers represent\
+            \ the hierarchy position - higher levels in the hierarchy get bigger numbers\
+            \ (the top-most level gets the highest number). Also specify parent relationships.\
+            \ For example: \"Create them with these levels - State (Level 3), District\
+            \ (Level 2, parent: State), Village (Level 1, parent: District). The level\
+            \ number indicates the hierarchy position, with State being the highest\
+            \ level (3) and Village being the lowest (1).\"\n- After they confirm\
+            \ creation, continue with locations: \"Great! Now in the **Admin section**,\
+            \ click on **Locations** in the left sidebar to create the actual locations.\
+            \ For each location, you'll need to select the correct location type (State,\
+            \ District, or Village). Let me know when you've created these locations.\"\
+            \n- After locations are created, ask about catchments: \"Now let's set\
+            \ up catchments. Catchments are groups of locations that can be assigned\
+            \ to field workers. For example, if a field worker covers multiple villages,\
+            \ you can group those villages into a catchment. Do you have field workers\
+            \ who work across multiple locations? If yes, which locations should be\
+            \ grouped together?\"\n- For catchment creation: \"Perfect! Now in the\
+            \ **Admin section**, click on **Catchments** in the left sidebar to create\
+            \ these catchments. Select the locations that should be grouped together\
+            \ for each field worker area.\"\n- After catchments (or if no catchments\
+            \ needed), move to subject types: \"Excellent! Now let's define the people\
+            \ or things you want to track over time. Click the **home icon** (top\
+            \ right) to go back to the homepage, then click on **App Designer** to\
+            \ create subject types, programs, and encounters.\"\n\n**For Subject Types,\
+            \ Programs, and Encounters:**\n- Once user confirms a subject type design,\
+            \ immediately tell them: \"Excellent! Now you can go to the **App Designer\
+            \ section** on the homepage to create this subject type. I'll wait until\
+            \ you've created this, then we can move on to the next part.\"\n- For\
+            \ programs: \"Great! Now go to the **App Designer section**, click on\
+            \ **Programs** in the left sidebar to create this program.\"\n- For encounters:\
+            \ \"Perfect! Now go to the **App Designer section**, click on **Encounter\
             \ Types** in the left sidebar to create this encounter type.\"\n\n**Flow\
             \ Control:**\n- Always pause and wait for user confirmation that they've\
             \ completed each step before moving to the next\n- Use phrases like \"\
@@ -1135,8 +1120,15 @@ workflow:
             \ this\"\n- This creates a natural, step-by-step implementation flow rather\
             \ than just theoretical planning\n\n**For users who choose Automated Creation:**\n\
             - Generate the appropriate CRUD configuration in the \"config\" section\n\
-            - Explain what will be created/updated/deleted\n- Confirm one final time\
-            \ before generating the config"
+            - Explain what will be created/updated/deleted\n- When user says \"I am\
+            \ happy with the configuration provided by the Avni assistant\", proceed\
+            \ directly with config generation\n- IMPORTANT: When generating configurations\
+            \ with CREATE operations, ALWAYS include the current user in the config\
+            \ update section for catchment assignment:\n  ```json\n  \"config\": {\n\
+            \    \"create\": { ... },\n    \"update\": {\n      \"users\": [\n   \
+            \     {\n          \"name\": \"{{#1711528708197.user_name#}}\"\n     \
+            \   }\n      ]\n    }\n  }\n  ```\n- Only include this user update when\
+            \ there are entities being created (not for pure update/delete operations)"
         selected: false
         structured_output:
           schema:
@@ -1166,7 +1158,7 @@ workflow:
       positionAbsolute:
         x: 1334.633954985886
         y: 1227.2826888062627
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1297,7 +1289,7 @@ workflow:
     - data:
         code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
           \ submit_async_config(\n    config: Dict[str, Any],\n    avni_auth_token:\
-          \ str,\n    avni_mcp_server_url: str,\n) -> Dict[str, Any]:\n\n    session\
+          \ str,\n    avni_mcp_server_url: str,\n) -> Dict[str, Any]:\n    session\
           \ = requests.Session()\n\n    submit_url = f\"{avni_mcp_server_url}/process-config-async\"\
           \n\n    headers = {\"Content-Type\": \"application/json\", \"avni-auth-token\"\
           : avni_auth_token}\n\n    body = {\"config\": config}\n\n    print(f\"\U0001F4E4\
@@ -1314,13 +1306,13 @@ workflow:
           \ as e:\n        print(f\"\U0001F525 Submit request failed: {e}\")\n   \
           \     return {\"error\": \"Submit request failed\", \"message\": str(e)}\n\
           \n\ndef main(avni_auth_token: str, avni_mcp_server_url: str, config: Dict[str,\
-          \ Any]):\n\n    print(\"\U0001F680 Avni Async Config Submission\")\n   \
-          \ print(\"=\" * 40)\n\n    print(\"\U0001F4CB Configuration preview:\")\n\
-          \    print(json.dumps(config, indent=2)[:300] + \"...\")\n\n    result =\
-          \ submit_async_config(\n        config=config,\n        avni_auth_token=avni_auth_token,\n\
-          \        avni_mcp_server_url=avni_mcp_server_url,\n    )\n\n    print(\"\
-          \\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 SUBMISSION RESULT:\")\n    print(json.dumps(result,\
-          \ indent=2))\n\n    return {\"output\": result}\n"
+          \ Any]):\n    print(\"\U0001F680 Avni Async Config Submission\")\n    print(\"\
+          =\" * 40)\n\n    print(\"\U0001F4CB Configuration preview:\")\n    print(json.dumps(config,\
+          \ indent=2)[:300] + \"...\")\n\n    result = submit_async_config(\n    \
+          \    config=config,\n        avni_auth_token=avni_auth_token,\n        avni_mcp_server_url=avni_mcp_server_url,\n\
+          \    )\n\n    print(\"\\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 SUBMISSION\
+          \ RESULT:\")\n    print(json.dumps(result, indent=2))\n\n    return {\"\
+          output\": result}\n"
         code_language: python3
         outputs:
           output:
@@ -1535,7 +1527,7 @@ workflow:
       positionAbsolute:
         x: 3222.8522834238934
         y: 1290.8185890936224
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1691,7 +1683,7 @@ workflow:
       type: custom
       width: 241
     viewport:
-      x: -1152.891296492277
-      y: -678.5385520902223
-      zoom: 0.7402265329190929
+      x: 168.7120250610792
+      y: 106.16011398936541
+      zoom: 0.34954044972938714
   rag_pipeline_variables: []

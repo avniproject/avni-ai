@@ -103,3 +103,15 @@ class EncounterTypeFields(Enum):
     IS_IMMUTABLE = "isImmutable"
     ENTITY_ELIGIBILITY_CHECK_RULE = "entityEligibilityCheckRule"
     ENTITY_ELIGIBILITY_CHECK_DECLARATIVE_RULE = "entityEligibilityCheckDeclarativeRule"
+
+
+class UserFields(Enum):
+    """Field names for User API payloads."""
+
+    ID = "id"
+    NAME = "name"
+    USERNAME = "username"
+    PHONE_NUMBER = "phoneNumber"
+    EMAIL = "email"
+    ORGANISATION_ID = "organisationId"
+    CATCHMENT_ID = "catchmentId"

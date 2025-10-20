@@ -21,6 +21,7 @@ from .handlers import (
 from src.tools.admin.addressleveltypes import register_address_level_type_tools
 from src.tools.admin.catchments import register_catchment_tools
 from src.tools.admin.locations import register_location_tools
+from src.tools.admin.users import register_user_tools
 from src.tools.app_designer.encounters import register_encounter_tools
 from src.tools.app_designer.programs import register_program_tools
 from src.tools.app_designer.subject_types import register_subject_type_tools
@@ -62,6 +63,7 @@ def create_server():
     register_address_level_type_tools()
     register_catchment_tools()
     register_location_tools()
+    register_user_tools()
     register_encounter_tools()
     register_program_tools()
     register_subject_type_tools()

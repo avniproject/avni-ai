@@ -266,12 +266,33 @@ CRITICAL RULES FOR EACH OPERATION TYPE:
 - For locationIds in catchments: MUST be integers [123, 456, 789], NOT strings ["123", "456", "789"]
 - For parentId and location parents: MUST be integers, NOT strings
 - Wait for operation results to get actual IDs/UUIDs before proceeding to dependent operations
+- PROCESS USER UPDATES LAST: After all other CRUD operations are complete, process user updates for catchment assignment
 
 {json.dumps(input_data, indent=2)}
 
 
 
-Remember to respond in JSON format with the required fields and track all CRUD operations separately."""
+Remember to respond in JSON format with the required fields and track all CRUD operations separately.
+
+POST-PROCESSING USER CATCHMENT ASSIGNMENT:
+After ALL standard CRUD operations are complete, check for user catchment assignment:
+1. **CHECK USER UPDATE**: If there is a user in the update section (single user with name)
+2. **CATCHMENT ASSIGNMENT LOGIC**: For the user:
+   a. Find the user in the system by name
+   b. Check if the user already has a catchmentId assigned
+   c. If user has NO catchmentId (null or missing):
+      - First check if any catchments exist in the system
+      - If catchments exist: Assign user to the first available catchment
+      - If NO catchments exist AND locations exist: Create a new catchment using available locations
+      - If NO locations exist: Skip catchment creation (don't create without locations)
+3. **CATCHMENT CREATION RULES**: When creating a catchment for the user:
+   - Name: "Default Catchment for Users"
+   - locationIds: Use all available location IDs from the system (must be integers)
+   - Only create if at least one location exists
+4. **UPDATE USER WITH CATCHMENT**: After catchment assignment/creation, update the user with the catchmentId
+5. **RECORD IN RESULTS**: Track user update in "updated_users" and any created catchment in "created_catchments"
+
+This user catchment assignment should happen ONLY AFTER all other CRUD operations are completed and ONLY when a user is present in the update section."""
 
 
 def parse_llm_response(response_content: str) -> Dict[str, Any]:
