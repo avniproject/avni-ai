@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 from dataclasses import dataclass
 from contextvars import ContextVar, copy_context
-
+from .config_processor import ConfigProcessor
 from .enums import TaskStatus
 
 logger = logging.getLogger(__name__)
@@ -104,12 +104,12 @@ class TaskManager:
                 task.progress = progress
             logger.info(f"Updated task {task_id} status to {status.value}")
 
-    def start_background_task(self, task_id: str, processor) -> None:
+    def start_background_task(self, task_id: str) -> None:
         ctx = copy_context()
 
         background_task = ctx.run(
             asyncio.create_task,
-            self._process_config_background(task_id, processor),
+            self._process_config_background(task_id),
             name=f"config_task_{task_id}",
         )
 
@@ -118,7 +118,7 @@ class TaskManager:
 
         logger.info(f"Started background processing for task {task_id}")
 
-    async def _process_config_background(self, task_id: str, processor) -> None:
+    async def _process_config_background(self, task_id: str) -> None:
         try:
             set_current_task_id(task_id)
 
@@ -133,7 +133,7 @@ class TaskManager:
                 progress="Starting configuration processing...",
             )
 
-            result = await processor.process_config(
+            result = await ConfigProcessor.process_config(
                 config=task.config_data,
                 auth_token=task.auth_token,
                 task_id=task_id,
@@ -142,7 +142,7 @@ class TaskManager:
             self.update_task_status(
                 task_id,
                 TaskStatus.COMPLETED,
-                result=result,
+                result=result.to_dict(),
                 progress="Configuration processing completed successfully",
             )
 

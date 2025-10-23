@@ -9,7 +9,6 @@ This package contains various utility modules organized by functionality:
 - function_call_utils: OpenAI function call processing utilities
 - logging_utils: Session logging utilities
 - config_utils: Configuration processing utilities
-- response_utils: Response handling utilities
 """
 
 from .format_utils import format_list_response, format_creation_response
@@ -27,11 +26,6 @@ from .config_utils import (
     parse_llm_response,
     extract_text_content,
 )
-from .response_utils import (
-    create_success_result,
-    create_error_result,
-    create_max_iterations_result,
-)
 from .request_validation import validate_config_request
 
 __all__ = [
@@ -47,8 +41,5 @@ __all__ = [
     "build_initial_input",
     "parse_llm_response",
     "extract_text_content",
-    "create_success_result",
-    "create_error_result",
-    "create_max_iterations_result",
     "validate_config_request",
 ]

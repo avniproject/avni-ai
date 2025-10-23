@@ -2,7 +2,6 @@ import logging
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from ..core import create_config_processor
 from ..core.task_manager import task_manager
 from ..core.enums import TaskStatus
 from ..utils.request_validation import validate_config_request
@@ -76,8 +75,7 @@ async def process_config_async_request(request: Request) -> JSONResponse:
         )
 
         # Start background processing
-        processor = create_config_processor()
-        task_manager.start_background_task(task_id, processor)
+        task_manager.start_background_task(task_id)
 
         return create_success_response(
             {

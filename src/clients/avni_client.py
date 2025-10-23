@@ -39,22 +39,13 @@ class AvniClient:
         self.base_url = base_url
         self.timeout = timeout_seconds
 
-    def get_headers(self) -> Dict[str, str]:
+    @staticmethod
+    def get_headers() -> Dict[str, str]:
         return {
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
 
-    async def make_request(
-        self,
-        method: str,
-        endpoint: str,
-        auth_token: str,
-        data: Optional[Dict[str, Any]] = None,
-    ) -> ApiResult:
-        return await self.call_avni_server(
-            method, endpoint, auth_token, data
-        )
 
     async def fetch_complete_config(self, auth_token: str) -> Dict[str, Any]:
         try:
@@ -71,7 +62,7 @@ class AvniClient:
 
             for config_key, endpoint in endpoints.items():
                 logger.info(f"Fetching {config_key} from {endpoint}")
-                result = await self.make_request("GET", endpoint, auth_token)
+                result = await self.call_avni_server("GET", endpoint, auth_token)
 
                 if result.success:
                     complete_config[config_key] = result.data or []
@@ -100,7 +91,7 @@ class AvniClient:
 
         url = f"{self.base_url.rstrip('/')}{endpoint}"
 
-        headers = self.get_headers()
+        headers = AvniClient.get_headers()
         headers["AUTH-TOKEN"] = auth_token
 
         async with httpx.AsyncClient() as client:

@@ -1,7 +1,8 @@
 import json
 import logging
 import os
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
+from dataclasses import dataclass
 
 from ..clients import AvniClient, OpenAIResponsesClient
 from .tool_registry import tool_registry
@@ -15,22 +16,170 @@ from ..utils.config_utils import (
     log_input_list,
     log_openai_response_summary,
 )
-from ..utils.response_utils import (
-    create_success_result,
-    create_error_result,
-    create_max_iterations_result,
-)
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ConfigProcessResult:
+    """Result of configuration processing."""
+    done: bool
+    status: str
+    results: Dict[str, Any]
+    end_user_result: str
+    iterations: Optional[int] = None
+    function_calls_made: int = 0
+    message: Optional[str] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for JSON serialization."""
+        result = {
+            "done": self.done,
+            "status": self.status,
+            "results": self.results,
+            "endUserResult": self.end_user_result,
+            "function_calls_made": self.function_calls_made,
+        }
+        
+        if self.iterations is not None:
+            result["iterations"] = self.iterations
+        if self.message is not None:
+            result["message"] = self.message
+            
+        return result
+
+
+def create_success_result(
+    llm_result: Dict[str, Any], iterations: int
+) -> ConfigProcessResult:
+    """Create successful completion result.
+
+    Args:
+        llm_result: Result from LLM processing
+        iterations: Number of iterations completed
+
+    Returns:
+        Success result
+    """
+    results = llm_result.get("results", {})
+    end_user_result = llm_result.get("endUserResult", "")
+
+    return ConfigProcessResult(
+        done=True,
+        status="completed",
+        results=results,
+        end_user_result=end_user_result,
+        iterations=iterations,
+        function_calls_made=0,  # Not tracking individual function calls anymore
+    )
+
+
+def create_error_result(
+    error_message: str, additional_errors: list = None
+) -> ConfigProcessResult:
+    """Create error result.
+
+    Args:
+        error_message: Main error message
+        additional_errors: List of additional errors (optional)
+
+    Returns:
+        Error result
+    """
+    errors = [error_message]
+    if additional_errors:
+        errors.extend(additional_errors)
+
+    return ConfigProcessResult(
+        done=False,
+        status="error",
+        results={
+            "deleted_address_level_types": [],
+            "deleted_locations": [],
+            "deleted_catchments": [],
+            "deleted_subject_types": [],
+            "deleted_programs": [],
+            "deleted_encounter_types": [],
+            "updated_address_level_types": [],
+            "updated_locations": [],
+            "updated_catchments": [],
+            "updated_subject_types": [],
+            "updated_programs": [],
+            "updated_encounter_types": [],
+            "created_address_level_types": [],
+            "created_locations": [],
+            "created_catchments": [],
+            "created_subject_types": [],
+            "created_programs": [],
+            "created_encounter_types": [],
+            "existing_address_level_types": [],
+            "existing_locations": [],
+            "existing_catchments": [],
+            "existing_subject_types": [],
+            "existing_programs": [],
+            "existing_encounter_types": [],
+            "errors": errors,
+        },
+        end_user_result=f"❌ Configuration processing failed: {error_message}",
+        message=error_message,
+    )
+
+
+def create_max_iterations_result(max_iterations: int) -> ConfigProcessResult:
+    """Create result for when max iterations are reached.
+
+    Args:
+        max_iterations: Maximum number of iterations allowed
+
+    Returns:
+        Max iterations result
+    """
+    error_message = "Processing incomplete - reached maximum iterations"
+
+    return ConfigProcessResult(
+        done=False,
+        status="error",
+        results={
+            "deleted_address_level_types": [],
+            "deleted_locations": [],
+            "deleted_catchments": [],
+            "deleted_subject_types": [],
+            "deleted_programs": [],
+            "deleted_encounter_types": [],
+            "updated_address_level_types": [],
+            "updated_locations": [],
+            "updated_catchments": [],
+            "updated_subject_types": [],
+            "updated_programs": [],
+            "updated_encounter_types": [],
+            "created_address_level_types": [],
+            "created_locations": [],
+            "created_catchments": [],
+            "created_subject_types": [],
+            "created_programs": [],
+            "created_encounter_types": [],
+            "existing_address_level_types": [],
+            "existing_locations": [],
+            "existing_catchments": [],
+            "existing_subject_types": [],
+            "existing_programs": [],
+            "existing_encounter_types": [],
+            "errors": ["Maximum iterations reached"],
+        },
+        end_user_result=f"❌ {error_message}",
+        iterations=max_iterations,
+        message=error_message,
+    )
 
 
 class ConfigProcessor:
     def __init__(self, openai_api_key: str):
         self.openai_api_key = openai_api_key
 
+    @staticmethod
     async def process_config(
-        self, config: Dict[str, Any], auth_token: str, task_id: str
-    ) -> Dict[str, Any]:
+            config: Dict[str, Any], auth_token: str, task_id: str
+    ) -> ConfigProcessResult:
         """
         Process a config object using LLM with continuous loop until done=true.
 
@@ -40,7 +189,7 @@ class ConfigProcessor:
             task_id: Task ID to use for logging session
 
         Returns:
-            Dict with done flag, status, results, etc.
+            ConfigProcessResult with done flag, status, results, etc.
         """
         # Use task_id for logging session
         session_logger = setup_file_logging(task_id)
@@ -54,7 +203,7 @@ class ConfigProcessor:
             # Fetch complete existing configuration context
             logger.info("Fetching complete existing configuration")
             session_logger.info("STEP 1: Fetching complete existing configuration")
-            avni_client = AvniClient(30.0)
+            avni_client = AvniClient()
 
             # Get complete configuration using the new method
             complete_existing_config = await avni_client.fetch_complete_config(
@@ -215,6 +364,3 @@ class ConfigProcessor:
             return error_result
 
 
-def create_config_processor() -> ConfigProcessor:
-    """Factory function to create a config processor."""
-    return ConfigProcessor(os.getenv("OPENAI_API_KEY"))
