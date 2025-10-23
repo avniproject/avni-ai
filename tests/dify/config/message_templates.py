@@ -1,11 +1,4 @@
-"""
-Hardcoded message templates for Dify configuration testing.
-These messages are used to initiate conversations with the Dify workflow.
-"""
-
-
 def get_create_message() -> str:
-    """Get hardcoded CREATE configuration message"""
 
     return """Hi, I need help setting up an Avni configuration for my organization.
 
@@ -42,9 +35,6 @@ Can you help me create this configuration?"""
 
 
 def get_update_message() -> str:
-    """Get hardcoded UPDATE configuration message with existing context"""
-
-    # Since we're testing with dummy auth token, provide existing config context
     existing_config = """My current configuration includes:
 
 Address Level Types:
@@ -111,8 +101,6 @@ Can you help me update this configuration?"""
 
 
 def get_delete_message() -> str:
-    """Get hardcoded DELETE configuration message"""
-
     return """Hi, I need to remove some items from my Avni configuration.
 
 I need to delete these encounter types:

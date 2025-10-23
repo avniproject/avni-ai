@@ -1,14 +1,10 @@
-"""
-Conversation manager for Dify workflow testing.
-Handles the multi-round conversations with the Dify-built Avni AI Assistant.
-"""
-
 import os
 import json
 import logging
-from typing import Dict, Any, List, Tuple
-from .dify_client import DifyClient, extract_config_from_response
-from ..utils.message_templates import (
+from typing import Dict, Any, List, Optional
+from dataclasses import dataclass
+from ..common.dify_client import DifyClient, extract_config_from_response
+from .message_templates import (
     get_create_message,
     get_update_message,
     get_delete_message,
@@ -17,13 +13,19 @@ from ..utils.message_templates import (
 logger = logging.getLogger(__name__)
 
 
-class DifyConversationManager:
-    """
-    Manages conversations with the Dify workflow for configuration testing.
+@dataclass
+class ConversationResult:
+    success: bool
+    extracted_config: Optional[Dict[str, Any]] = None
+    conversation_history: Optional[List[Dict[str, Any]]] = None
+    error_message: Optional[str] = None
+    
+    @property
+    def has_config(self) -> bool:
+        return self.success and self.extracted_config is not None
 
-    This class handles the multi-round conversation flow and extracts
-    the final configuration from the Dify assistant's responses.
-    """
+
+class DifyConversationManager:
 
     def __init__(self, dify_api_key: str):
         self.dify_client = DifyClient(dify_api_key)
@@ -37,29 +39,13 @@ class DifyConversationManager:
         org_name: str = "Test Organization",
         org_type: str = "Demo",
         user_name: str = "Test User",
-    ) -> Tuple[bool, Dict[str, Any], List[Dict[str, Any]]]:
-        """
-        Conduct a complete conversation with Dify to generate configuration.
-
-        Args:
-            config_file_path: Path to the test config JSON file
-            auth_token: Avni authentication token
-            org_name: Organization name
-            org_type: Organization type
-            user_name: User name
-
-        Returns:
-            Tuple of (success, final_config, conversation_history)
-        """
+    ) -> ConversationResult:
         try:
-            # Load the test config to understand what we're asking for
             with open(config_file_path, "r") as f:
                 test_config = json.load(f)
 
-            # Reset conversation state
             self.conversation_id = ""
 
-            # Start the conversation
             initial_message = DifyConversationManager._create_initial_message(
                 test_config
             )
@@ -90,14 +76,16 @@ class DifyConversationManager:
                     self.conversation_id = response["conversation_id"]
 
                 if not response["success"]:
-                    logger.error(
-                        f"Dify API error in round {round_count}: {response.get('error')}"
+                    error_msg = f"Dify API error in round {round_count}: {response.get('error')}"
+                    logger.error(error_msg)
+                    return ConversationResult(
+                        success=False,
+                        conversation_history=conversation_history,
+                        error_message=error_msg
                     )
-                    return False, {}, conversation_history
 
                 assistant_response = response["answer"]
 
-                # Record the conversation
                 conversation_history.append(
                     {
                         "round": round_count,
@@ -115,26 +103,32 @@ class DifyConversationManager:
 
                 if extracted_config:
                     logger.info(f"Configuration extracted in round {round_count}")
-                    return True, extracted_config, conversation_history
+                    return ConversationResult(
+                        success=True,
+                        extracted_config=extracted_config,
+                        conversation_history=conversation_history
+                    )
 
-                # Generate follow-up message
                 current_message = DifyConversationManager._generate_follow_up_message()
 
-            # If we exit the loop, we've hit max rounds without finding config
-            logger.error(
-                f"Conversation reached max rounds ({self.max_rounds}) without extracting config"
+            error_msg = f"Conversation reached max rounds ({self.max_rounds}) without extracting config"
+            logger.error(error_msg)
+            return ConversationResult(
+                success=False,
+                conversation_history=conversation_history,
+                error_message=error_msg
             )
-            return False, {}, conversation_history
 
         except Exception as e:
-            logger.error(f"Error in conversation: {e}")
-            return False, {}, []
+            error_msg = f"Error in conversation: {e}"
+            logger.error(error_msg)
+            return ConversationResult(
+                success=False,
+                error_message=error_msg
+            )
 
     @staticmethod
     def _create_initial_message(test_config: Dict[str, Any]) -> str:
-        """Create a natural language initial message to send to Dify based on the test config"""
-
-        # Extract the operation type
         config_data = test_config.get("config", {})
 
         if "create" in config_data:

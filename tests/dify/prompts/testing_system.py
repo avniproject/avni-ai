@@ -1,18 +1,15 @@
-"""Main testing system that orchestrates the entire testing process."""
-
 import datetime
 from typing import List
-from models import ConversationResult
-from prompts import SCENARIO_NAMES, TESTER_PROMPTS
-from ai_tester import AITester
-from tests.dify.common.dify_client import DifyClient
-from ai_reviewer import AIReviewer
-from analytics import StatisticsCalculator, ReportGenerator
+from .models import ConversationResult
+from .prompts import SCENARIO_NAMES, TESTER_PROMPTS
+from .ai_tester import AITester
+from ..common.dify_client import DifyClient
+from .ai_reviewer import AIReviewer
+from .analytics import StatisticsCalculator, ReportGenerator
 import os
 
 
 class TestingSystem:
-    """Enhanced testing system with AI reviewer and comprehensive analytics"""
 
     def __init__(self, dify_api_key: str):
         self.tester = AITester(TESTER_PROMPTS)

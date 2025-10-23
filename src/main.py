@@ -1,12 +1,9 @@
 import logging
 import os
 
-from dotenv import load_dotenv
 from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-
-from .utils.env import OPENAI_API_KEY
 from .handlers import (
     process_config_async_request,
     get_task_status,
@@ -20,8 +17,7 @@ from .tools.app_designer.programs import register_program_tools
 from .tools.app_designer.subject_types import register_subject_type_tools
 from .http import create_cors_middleware
 
-load_dotenv()
-
+from .utils.env import OPENAI_API_KEY
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

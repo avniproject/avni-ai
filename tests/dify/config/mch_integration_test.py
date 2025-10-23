@@ -1,52 +1,48 @@
-"""
-MCH Integration Test - End-to-End Test for Maternal and Child Health Program
-
-This test simulates a realistic conversation between an MCH program manager and the
-Dify-Avni AI Assistant, triggers automatic configuration creation, and validates
-the results against program requirements.
-
-Flow:
-1. AI Tester (MCH Program Manager) → Dify Assistant → Natural conversation
-2. AI Tester says "I am happy with the configuration provided by the Avni assistant"
-3. Wait for auto-creation to complete
-4. Fetch actual configuration from Avni
-5. Validate using enhanced AI Reviewer
-"""
-
 import asyncio
 import logging
 import os
 import sys
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List
+from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))  # noqa: E402
-load_dotenv()  # noqa: E402
+load_dotenv()
 
-from src.clients.avni_client import AvniClient  # noqa: E402
-from tests.dify.common.dify_client import DifyClient  # noqa: E402
-from tests.dify.prompts.ai_reviewer import AIReviewer  # noqa: E402
-from tests.dify.prompts.ai_tester import AITester  # noqa: E402
-from tests.dify.prompts.prompts import CONFIG_TESTER_PROMPTS, MCH_REQUIREMENTS  # noqa: E402
-from .utils.conversation_utils import (  # noqa: E402
-    create_dify_inputs,
-    generate_tester_message,
-    handle_normal_conversation_timeout,
-    handle_satisfaction_response,
-    is_satisfaction_expressed,
-    is_timeout_response,
-    record_normal_conversation,
-)
-from .utils.test_utils import (  # noqa: E402
-    print_test_results,
-    save_test_results,
-    validate_environment_variables,
-)
+from src.clients.avni_client import AvniClient
+from tests.dify.common.dify_client import DifyClient
+from tests.dify.prompts.ai_reviewer import AIReviewer
+from tests.dify.prompts.ai_tester import AITester
+from tests.dify.prompts.prompts import CONFIG_TESTER_PROMPTS, MCH_REQUIREMENTS
+from tests.dify.common.utils import validate_all_env_variables
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ConversationResult:
+    rounds_completed: int
+    satisfaction_achieved: bool
+    total_messages: int
+
+
+@dataclass
+class ValidationResult:
+    scores: Dict[str, Any]
+    configuration_assessment: Dict[str, Any]
+    overall_success: bool
+    detailed_analysis: str
+
+
+@dataclass
+class MCHTestResult:
+    success: bool
+    conversation: ConversationResult = None
+    validation: ValidationResult = None
+    timestamp: str = None
+    error: str = None
+    details: Dict[str, Any] = None
 
 
 class MCHIntegrationTest:
@@ -58,29 +54,23 @@ class MCHIntegrationTest:
         self.ai_reviewer = AIReviewer()
         self.max_rounds = 15
 
-    async def run_test(self) -> Dict[str, Any]:
-        """Run the complete MCH integration test"""
-        test_id = f"mch_integration_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-
-        logger.info(f"🚀 Starting MCH integration test: {test_id}")
+    async def run_test(self) -> MCHTestResult:
 
         try:
-            # Step 1: Conduct realistic conversation
             conversation_result = await self._conduct_mch_conversation()
 
             if not conversation_result["success"]:
-                return {
-                    "test_id": test_id,
-                    "success": False,
-                    "error": "MCH conversation failed",
-                    "conversation": conversation_result,
-                }
+                return MCHTestResult(
+                    success=False,
+                    error="MCH conversation failed",
+                    details=conversation_result,
+                    timestamp=datetime.now().isoformat()
+                )
 
             logger.info(
-                f"✅ MCH conversation completed in {conversation_result['rounds']} rounds"
+                f" MCH conversation completed in {conversation_result['rounds']} rounds"
             )
 
-            # Step 2: Check if timeout was detected and wait accordingly
             timeout_detected = any(
                 msg.get("timeout_detected", False)
                 for msg in conversation_result.get("history", [])
@@ -88,92 +78,81 @@ class MCHIntegrationTest:
 
             if timeout_detected:
                 logger.info(
-                    "⏳ Timeout detected - waiting 180 seconds for configuration creation..."
+                    " Timeout detected - waiting 180 seconds for configuration creation..."
                 )
                 await asyncio.sleep(180)
             else:
                 logger.info(
-                    "⏳ Waiting 30 seconds for configuration creation to complete..."
+                    " Waiting 30 seconds for configuration creation to complete..."
                 )
                 await asyncio.sleep(30)
 
-            # Step 3: Fetch actual configuration
             logger.info("📥 Fetching created configuration from Avni...")
             actual_config = await self.avni_client.fetch_complete_config(
                 self.auth_token
             )
 
             if "error" in actual_config:
-                return {
-                    "test_id": test_id,
-                    "success": False,
-                    "error": "Failed to fetch configuration from Avni",
-                    "details": actual_config,
-                }
+                return MCHTestResult(
+                    success=False,
+                    error="Failed to fetch configuration from Avni",
+                    details=actual_config,
+                    timestamp=datetime.now().isoformat()
+                )
 
-            logger.info("✅ Configuration fetched successfully")
 
-            # Step 4: Validate configuration
-            logger.info("🔍 Validating configuration against MCH requirements...")
             validation_result = AIReviewer.validate_created_configuration(
                 actual_config=actual_config,
                 program_requirements=MCH_REQUIREMENTS,
                 scenario_name="Maternal and Child Health Program",
             )
 
-            # Step 5: Compile results
-            final_result = {
-                "test_id": test_id,
-                "success": validation_result.get("overall_success", False),
-                "conversation": {
-                    "rounds_completed": conversation_result["rounds"],
-                    "satisfaction_achieved": conversation_result[
-                        "satisfaction_achieved"
-                    ],
-                    "total_messages": len(conversation_result["history"]),
-                },
-                "validation": {
-                    "scores": validation_result.get("scores", {}),
-                    "configuration_assessment": validation_result.get(
-                        "configuration_assessment", {}
-                    ),
-                    "overall_success": validation_result.get("overall_success", False),
-                    "detailed_analysis": validation_result.get("detailed_analysis", ""),
-                },
-                "timestamp": datetime.now().isoformat(),
-            }
+            conversation = ConversationResult(
+                rounds_completed=conversation_result["rounds"],
+                satisfaction_achieved=conversation_result["satisfaction_achieved"],
+                total_messages=len(conversation_result["history"])
+            )
+            
+            validation = ValidationResult(
+                scores=validation_result.get("scores", {}),
+                configuration_assessment=validation_result.get("configuration_assessment", {}),
+                overall_success=validation_result.get("overall_success", False),
+                detailed_analysis=validation_result.get("detailed_analysis", "")
+            )
+            
+            final_result = MCHTestResult(
+                success=validation_result.get("overall_success", False),
+                conversation=conversation,
+                validation=validation,
+                timestamp=datetime.now().isoformat()
+            )
 
-            if final_result["success"]:
-                logger.info("🎉 MCH integration test PASSED!")
+            if final_result.success:
+                logger.info(" MCH integration test PASSED!")
             else:
-                logger.error("❌ MCH integration test FAILED")
+                logger.error(" MCH integration test FAILED")
 
             return final_result
 
         except Exception as e:
-            logger.error(f"💥 MCH integration test ERROR: {str(e)}")
-            return {
-                "test_id": test_id,
-                "success": False,
-                "error": str(e),
-                "timestamp": datetime.now().isoformat(),
-            }
+            logger.error(f" MCH integration test ERROR: {str(e)}")
+            return MCHTestResult(
+                success=False,
+                error=str(e),
+                timestamp=datetime.now().isoformat()
+            )
 
     async def _conduct_mch_conversation(self) -> Dict[str, Any]:
-        """Conduct realistic MCH conversation using AI Tester"""
         conversation_id = ""
         conversation_history = []
         round_count = 0
         satisfaction_achieved = False
 
-        logger.info("💬 Starting MCH conversation with AI Tester...")
-
         try:
             while round_count < self.max_rounds:
                 round_count += 1
 
-                # Generate tester message
-                user_message = generate_tester_message(
+                user_message = self.generate_tester_message(
                     self.ai_tester, conversation_history, round_count
                 )
 
@@ -183,17 +162,11 @@ class MCHIntegrationTest:
                     )
                     break
 
-                logger.info(
-                    f"Round {round_count}: Tester message ({len(user_message)} chars)"
-                )
+                inputs = MCHIntegrationTest.create_dify_inputs(self.auth_token)
 
-                # Prepare inputs for Dify
-                inputs = create_dify_inputs(self.auth_token)
-
-                # Check if AI Tester expressed satisfaction
-                if is_satisfaction_expressed(user_message):
+                if MCHIntegrationTest.is_satisfaction_expressed(user_message):
                     logger.info(
-                        "✅ AI Tester expressed satisfaction with configuration"
+                        " AI Tester expressed satisfaction with configuration"
                     )
                     satisfaction_achieved = True
 
@@ -205,7 +178,7 @@ class MCHIntegrationTest:
                         timeout=180,
                     )
 
-                    handle_satisfaction_response(
+                    MCHIntegrationTest.handle_satisfaction_response(
                         dify_response, conversation_history, user_message, round_count
                     )
                     break
@@ -219,8 +192,8 @@ class MCHIntegrationTest:
                 )
 
                 # Check for timeout in normal conversation
-                if is_timeout_response(dify_response):
-                    timeout_handled = handle_normal_conversation_timeout(
+                if MCHIntegrationTest.is_timeout_response(dify_response):
+                    timeout_handled = MCHIntegrationTest.handle_normal_conversation_timeout(
                         conversation_history, user_message, round_count
                     )
                     if timeout_handled:
@@ -234,23 +207,20 @@ class MCHIntegrationTest:
                         "history": conversation_history,
                     }
 
-                # Process successful response
                 conversation_id = dify_response["conversation_id"]
                 assistant_response = dify_response["answer"]
 
                 logger.info(
-                    f"Round {round_count}: Assistant response ({len(assistant_response)} chars)"
+                    f"Round {round_count}"
                 )
 
-                # Record normal conversation
-                record_normal_conversation(
+                MCHIntegrationTest.record_normal_conversation(
                     conversation_history, user_message, assistant_response, round_count
                 )
 
-                # Safety check for conversation length
                 if round_count >= self.max_rounds:
                     logger.warning(
-                        "⚠️ Conversation reached maximum rounds without satisfaction"
+                        " Conversation reached maximum rounds without satisfaction"
                     )
                     break
 
@@ -266,42 +236,176 @@ class MCHIntegrationTest:
             logger.error(f"Error in MCH conversation: {str(e)}")
             return {"success": False, "error": str(e), "history": conversation_history}
 
+    @staticmethod
+    def generate_tester_message(ai_tester, conversation_history: List[Dict[str, Any]], round_count: int) -> str:
+        if round_count == 1:
+            return ai_tester.generate_message([], 0)
+
+        # Convert conversation history to tester's perspective
+        tester_history = []
+        for msg in conversation_history:
+            if msg["role"] == "user":  # Tester's previous message
+                tester_history.append({"role": "assistant", "content": msg["content"]})
+            elif msg["role"] == "assistant":  # Dify's response becomes input to tester
+                tester_history.append({"role": "user", "content": msg["content"]})
+
+        return ai_tester.generate_message(tester_history, 0)
+
+    @staticmethod
+    def create_dify_inputs(auth_token: str) -> Dict[str, Any]:
+        return {
+            "auth_token": auth_token,
+            "org_name": "Jan Swasthya Sahyog",
+            "org_type": "Trial",
+            "user_name": "Atul",
+            "avni_mcp_server_url": os.getenv("AVNI_MCP_SERVER_URL"),
+        }
+
+    @staticmethod
+    def is_satisfaction_expressed(user_message: str) -> bool:
+        return (
+                "i am happy with the configuration provided by the avni assistant"
+                in user_message.lower()
+        )
+
+    @staticmethod
+    def is_timeout_response( dify_response: Dict[str, Any]) -> bool:
+        if dify_response["success"]:
+            return False
+
+        error_str = str(dify_response.get("error", "")).lower()
+        return "timeout" in error_str or "504" in error_str
+
+    @staticmethod
+    def handle_satisfaction_response(
+            dify_response: Dict[str, Any],
+            conversation_history: List[Dict[str, Any]],
+            user_message: str,
+            round_count: int,
+    ) -> None:
+        conversation_history.append(
+            {"role": "user", "content": user_message, "round": round_count}
+        )
+
+        if MCHIntegrationTest.is_timeout_response(dify_response):
+            logger.info(
+                "🔄 Dify timeout detected - configuration creation likely in progress "
+            )
+            conversation_history.append(
+                {
+                    "role": "assistant",
+                    "content": "Configuration creation in progress (timeout detected)",
+                    "round": round_count,
+                    "timeout_detected": True,
+                }
+            )
+        elif dify_response["success"]:
+            conversation_history.append(
+                {
+                    "role": "assistant",
+                    "content": dify_response["answer"],
+                    "round": round_count,
+                }
+            )
+        else:
+            logger.warning(
+                f"Dify error after satisfaction: {dify_response.get('error', 'Unknown')}"
+            )
+            conversation_history.append(
+                {
+                    "role": "assistant",
+                    "content": f"Error after satisfaction: {dify_response.get('error', 'Unknown')}",
+                    "round": round_count,
+                }
+            )
+
+    @staticmethod
+    def handle_normal_conversation_timeout(
+            conversation_history: List[Dict[str, Any]], user_message: str, round_count: int
+    ) -> bool:
+        logger.info("Dify timeout/504 detected during conversation - configuration creation in progress")
+
+        conversation_history.append(
+            {"role": "user", "content": user_message, "round": round_count}
+        )
+        conversation_history.append(
+            {
+                "role": "assistant",
+                "content": "Configuration creation in progress (timeout detected during conversation)",
+                "round": round_count,
+                "timeout_detected": True,
+            }
+        )
+
+        return True
+
+    @staticmethod
+    def record_normal_conversation(
+            conversation_history: List[Dict[str, Any]],
+            user_message: str,
+            assistant_response: str,
+            round_count: int,
+    ) -> None:
+        conversation_history.append(
+            {"role": "user", "content": user_message, "round": round_count}
+        )
+        conversation_history.append(
+            {
+                "role": "assistant",
+                "content": assistant_response,
+                "round": round_count,
+            }
+        )
+
+def print_test_results(result: MCHTestResult) -> None:
+    print("=" * 50)
+    print(f"Success: {' PASS' if result.success else ' FAIL'}")
+
+    if result.success:
+        validation = result.validation
+        print("\n Validation Scores:")
+        scores = validation.scores
+        print(
+            f"  • Functional Adequacy: {scores.get('functional_adequacy', 'N/A')}/100"
+        )
+        print(
+            f"  • Structural Correctness: {scores.get('structural_correctness', 'N/A')}/100"
+        )
+        print(f"  • Completeness: {scores.get('completeness', 'N/A')}/100")
+
+        config_assessment = validation.configuration_assessment
+        print("\n Configuration Created:")
+        print(
+            f"  • Subject Types: {len(config_assessment.get('subject_types_created', []))}"
+        )
+        print(f"  • Programs: {len(config_assessment.get('programs_created', []))}")
+        print(f"  • Encounters: {len(config_assessment.get('encounters_created', []))}")
+        print(f"  • Catchments: {len(config_assessment.get('catchments_created', []))}")
+
+    else:
+        print(f"\n Error: {result.error or 'Unknown error'}")
 
 async def main():
-    """Main function for running MCH integration test"""
 
-    # Setup logging
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
-    # Validate environment variables
-    if not validate_environment_variables(
-        "DIFY_API_KEY", "AVNI_AUTH_TOKEN", "AVNI_BASE_URL"
-    ):
+    if not validate_all_env_variables():
         sys.exit(1)
 
-    # Get environment variables
     dify_api_key = os.getenv("DIFY_API_KEY")
     avni_auth_token = os.getenv("AVNI_AUTH_TOKEN")
 
-    print("🏥 MCH Integration Test Starting...")
+    print("MCH Integration Test Starting")
     print("=" * 50)
 
-    # Run the test
     test = MCHIntegrationTest(dify_api_key, avni_auth_token)
     result = await test.run_test()
 
-    # Display results
-    print_test_results(result, "MCH")
+    print_test_results(result)
 
-    # Save detailed results to tests/logs directory
-    logs_dir = Path(__file__).parent.parent.parent / "logs"
-    output_file = save_test_results(result, "mch_integration", logs_dir)
-
-    print(f"\n📄 Detailed results saved to: {output_file}")
-
-    if result["success"]:
+    if result.success:
         print("\n🎉 MCH Integration Test completed successfully!")
         sys.exit(0)
     else:

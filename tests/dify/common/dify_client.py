@@ -1,5 +1,3 @@
-"""Dify API client for testing the Avni AI Assistant workflow."""
-
 import requests
 import json
 import logging
@@ -26,16 +24,7 @@ class DifyClient:
         inputs: Optional[Dict[str, Any]] = None,
         timeout: int = 120,
     ) -> Dict[str, Any]:
-        """
-        Send a message to Dify Avni AI Assistant.
 
-        Args:
-            query: The user query/message
-            conversation_id: Optional conversation ID for continuity
-            user: User identifier
-            inputs: Additional inputs for the workflow (auth_token, org_name, etc.)
-            timeout: Request timeout in seconds
-        """
         url = f"{self.base_url}/chat-messages"
 
         payload = {
@@ -45,12 +34,9 @@ class DifyClient:
             "conversation_id": conversation_id,
             "user": user,
         }
-        print(payload)
 
         try:
-            logger.info(f"Sending message to Dify: {query[:100]}...")
-            if inputs:
-                logger.info(f"With inputs: {list(inputs.keys())}")
+            logger.info(f"Sending message to Dify")
 
             response = requests.post(
                 url, headers=self.headers, data=json.dumps(payload), timeout=timeout
@@ -58,9 +44,6 @@ class DifyClient:
             response.raise_for_status()
 
             data = response.json()
-            logger.info(
-                f"Dify response received: {len(data.get('answer', ''))} characters"
-            )
 
             return {
                 "answer": data.get("answer", ""),
@@ -78,23 +61,9 @@ class DifyClient:
                 "success": False,
                 "error": str(e),
             }
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing Dify response: {e}")
-            return {
-                "answer": "Sorry, I received an invalid response from the assistant.",
-                "conversation_id": conversation_id,
-                "message_id": "",
-                "success": False,
-                "error": str(e),
-            }
 
 
 def extract_config_from_response(response_text: str) -> Optional[Dict[str, Any]]:
-    """
-    Extract configuration JSON from Dify workflow response.
-
-    The Dify workflow returns JSON starting with { when configuration is generated.
-    """
     # Check if the response starts with { (JSON config)
     response_text = response_text.strip()
     if response_text.startswith("{"):

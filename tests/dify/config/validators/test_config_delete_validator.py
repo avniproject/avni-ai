@@ -1,61 +1,55 @@
-"""
-Specific validator for test-config-delete.json structure.
-This validator knows exactly what should be in the test delete configuration.
-"""
-
 import logging
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List
+from .validation_result import ValidationResult
 
 logger = logging.getLogger(__name__)
 
 
 class TestConfigDeleteValidator:
-    """Validates the specific structure expected in test-config-delete.json"""
-
     @staticmethod
-    def validate_test_delete_config(config: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    def validate_test_delete_config(config: Dict[str, Any]) -> ValidationResult:
         """
         Validate that the generated config matches test-config-delete.json structure exactly.
 
         Returns:
-            Tuple of (is_valid, list_of_errors)
+            ValidationResult with validation status and any errors
         """
-        errors = []
-
         if not isinstance(config, dict):
-            return False, ["Config must be a dictionary"]
+            return ValidationResult.failure(["Config must be a dictionary"])
 
         if "delete" not in config:
-            return False, ["Config must have 'delete' key"]
+            return ValidationResult.failure(["Config must have 'delete' key"])
 
         delete_config = config["delete"]
         if not isinstance(delete_config, dict):
-            return False, ["'delete' must be a dictionary"]
+            return ValidationResult.failure(["'delete' must be a dictionary"])
+
+        result = ValidationResult.success()
 
         # Validate the deletion order and structure
         # Note: In test-config-delete.json, deletions are in reverse dependency order
-        errors.extend(
+        result.add_errors(
             TestConfigDeleteValidator._validate_delete_encounter_types(delete_config)
         )
-        errors.extend(
+        result.add_errors(
             TestConfigDeleteValidator._validate_delete_programs(delete_config)
         )
-        errors.extend(
+        result.add_errors(
             TestConfigDeleteValidator._validate_delete_subject_types(delete_config)
         )
-        errors.extend(
+        result.add_errors(
             TestConfigDeleteValidator._validate_delete_catchments(delete_config)
         )
-        errors.extend(
+        result.add_errors(
             TestConfigDeleteValidator._validate_delete_locations(delete_config)
         )
-        errors.extend(
+        result.add_errors(
             TestConfigDeleteValidator._validate_delete_address_level_types(
                 delete_config
             )
         )
 
-        return len(errors) == 0, errors
+        return result
 
     @staticmethod
     def _validate_delete_encounter_types(delete_config: Dict[str, Any]) -> List[str]:

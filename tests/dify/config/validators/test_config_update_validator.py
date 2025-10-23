@@ -4,7 +4,8 @@ This validator knows exactly what should be in the test update configuration.
 """
 
 import logging
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List
+from .validation_result import ValidationResult
 
 logger = logging.getLogger(__name__)
 
@@ -13,58 +14,58 @@ class TestConfigUpdateValidator:
     """Validates the specific structure expected in test-config-update.json"""
 
     @staticmethod
-    def validate_test_update_config(config: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    def validate_test_update_config(config: Dict[str, Any]) -> ValidationResult:
         """
         Validate that the generated config matches test-config-update.json structure exactly.
 
         Returns:
-            Tuple of (is_valid, list_of_errors)
+            ValidationResult with validation status and any errors
         """
-        errors = []
-
         if not isinstance(config, dict):
-            return False, ["Config must be a dictionary"]
+            return ValidationResult.failure(["Config must be a dictionary"])
 
         if "update" not in config:
-            return False, ["Config must have 'update' key"]
+            return ValidationResult.failure(["Config must have 'update' key"])
 
         update_config = config["update"]
         if not isinstance(update_config, dict):
-            return False, ["'update' must be a dictionary"]
+            return ValidationResult.failure(["'update' must be a dictionary"])
+
+        result = ValidationResult.success()
 
         # Validate address level types - expecting exactly 3 updated ones
-        errors.extend(
+        result.add_errors(
             TestConfigUpdateValidator._validate_updated_address_level_types(
                 update_config
             )
         )
 
         # Validate locations - expecting exactly 3 updated ones
-        errors.extend(
+        result.add_errors(
             TestConfigUpdateValidator._validate_updated_locations(update_config)
         )
 
         # Validate catchments - expecting exactly 2 updated ones
-        errors.extend(
+        result.add_errors(
             TestConfigUpdateValidator._validate_updated_catchments(update_config)
         )
 
         # Validate subject types - expecting exactly 2 updated ones
-        errors.extend(
+        result.add_errors(
             TestConfigUpdateValidator._validate_updated_subject_types(update_config)
         )
 
         # Validate programs - expecting exactly 2 updated ones
-        errors.extend(
+        result.add_errors(
             TestConfigUpdateValidator._validate_updated_programs(update_config)
         )
 
         # Validate encounter types - expecting exactly 3 updated ones
-        errors.extend(
+        result.add_errors(
             TestConfigUpdateValidator._validate_updated_encounter_types(update_config)
         )
 
-        return len(errors) == 0, errors
+        return result
 
     @staticmethod
     def _validate_updated_address_level_types(

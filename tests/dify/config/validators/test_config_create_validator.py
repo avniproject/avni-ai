@@ -1,64 +1,53 @@
-"""
-Specific validator for test-config-create.json structure.
-This validator knows exactly what should be in the test create configuration.
-"""
-
 import logging
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List
+from .validation_result import ValidationResult
 
 logger = logging.getLogger(__name__)
 
 
 class TestConfigCreateValidator:
-    """Validates the specific structure expected in test-config-create.json"""
 
     @staticmethod
-    def validate_test_create_config(config: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    def validate_test_create_config(config: Dict[str, Any]) -> ValidationResult:
         """
         Validate that the generated config matches test-config-create.json structure exactly.
 
         Returns:
-            Tuple of (is_valid, list_of_errors)
+            ValidationResult with validation status and any errors
         """
-        errors = []
-
         if not isinstance(config, dict):
-            return False, ["Config must be a dictionary"]
+            return ValidationResult.failure(["Config must be a dictionary"])
 
         if "create" not in config:
-            return False, ["Config must have 'create' key"]
+            return ValidationResult.failure(["Config must have 'create' key"])
 
         create_config = config["create"]
         if not isinstance(create_config, dict):
-            return False, ["'create' must be a dictionary"]
+            return ValidationResult.failure(["'create' must be a dictionary"])
 
-        # Validate address level types - expecting exactly 3
-        errors.extend(
+        result = ValidationResult.success()
+
+        result.add_errors(
             TestConfigCreateValidator._validate_crud_address_level_types(create_config)
         )
 
-        # Validate locations - expecting exactly 3
-        errors.extend(TestConfigCreateValidator._validate_crud_locations(create_config))
+        result.add_errors(TestConfigCreateValidator._validate_crud_locations(create_config))
 
-        # Validate catchments - expecting exactly 2
-        errors.extend(
+        result.add_errors(
             TestConfigCreateValidator._validate_crud_catchments(create_config)
         )
 
-        # Validate subject types - expecting exactly 2
-        errors.extend(
+        result.add_errors(
             TestConfigCreateValidator._validate_crud_subject_types(create_config)
         )
 
-        # Validate programs - expecting exactly 2
-        errors.extend(TestConfigCreateValidator._validate_crud_programs(create_config))
+        result.add_errors(TestConfigCreateValidator._validate_crud_programs(create_config))
 
-        # Validate encounter types - expecting exactly 3
-        errors.extend(
+        result.add_errors(
             TestConfigCreateValidator._validate_crud_encounter_types(create_config)
         )
 
-        return len(errors) == 0, errors
+        return result
 
     @staticmethod
     def _validate_crud_address_level_types(create_config: Dict[str, Any]) -> List[str]:

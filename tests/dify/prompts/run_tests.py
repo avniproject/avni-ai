@@ -3,27 +3,24 @@ Main entry point for the Avni AI Assistant testing system.
 """
 
 import os
+import sys
 import openai
-from testing_system import TestingSystem
+from .testing_system import TestingSystem
 from dotenv import load_dotenv
+
+from ..common.utils import validate_all_env_variables
 
 load_dotenv()
 
 
 def main():
     """Main function to run the enhanced testing system"""
+    if not validate_all_env_variables():
+        sys.exit(1)
+    
     # Set up API keys
     openai.api_key = os.getenv("OPENAI_API_KEY")
     dify_api_key = os.getenv("DIFY_API_KEY")
-
-    if not openai.api_key:
-        print("Error: OpenAI API key not set.")
-        return
-
-    if not dify_api_key or dify_api_key == "app-your-dify-key-here":
-        print("Error: DIFY_API_KEY environment variable not set.")
-        print("Please set your Dify API key to run this script.")
-        return
 
     print("Starting Enhanced Avni AI Assistant Testing System")
 

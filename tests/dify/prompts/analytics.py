@@ -3,7 +3,7 @@
 import datetime
 from collections import defaultdict
 from typing import List
-from models import ConversationResult, TestStatistics
+from .models import ConversationResult, TestStatistics
 
 
 class StatisticsCalculator:
