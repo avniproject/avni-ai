@@ -1,5 +1,3 @@
-"""Thread-safe task management system for async configuration processing."""
-
 import asyncio
 import logging
 import uuid
@@ -15,8 +13,6 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ConfigTask:
-    """Configuration processing task."""
-
     task_id: str
     status: TaskStatus
     created_at: datetime
@@ -40,25 +36,20 @@ class ConfigTask:
         }
 
 
-# Context variable to store the current task ID (thread-safe)
 _current_task_id: ContextVar[Optional[str]] = ContextVar(
     "current_task_id", default=None
 )
 
 
 def get_current_task_id() -> Optional[str]:
-    """Get the current task ID from context."""
     return _current_task_id.get()
 
 
 def set_current_task_id(task_id: str) -> None:
-    """Set the current task ID in context."""
     _current_task_id.set(task_id)
 
 
 class TaskManager:
-    """Concurrent task manager using context isolation for configuration processing."""
-
     def __init__(self, task_expiry_hours: int = 24):
         self._tasks: Dict[str, ConfigTask] = {}
         self._background_tasks: set = set()
@@ -69,7 +60,6 @@ class TaskManager:
         config_data: Dict[str, Any],
         auth_token: str,
     ) -> str:
-        """Create a new configuration processing task."""
         task_id = str(uuid.uuid4())
         now = datetime.utcnow()
 
@@ -88,10 +78,8 @@ class TaskManager:
         return task_id
 
     def get_task(self, task_id: str) -> Optional[ConfigTask]:
-        """Get task by ID."""
         task = self._tasks.get(task_id)
         if task:
-            # Check if task has expired
             if self._is_task_expired(task):
                 self._mark_task_expired(task)
         return task
@@ -104,7 +92,6 @@ class TaskManager:
         error: Optional[str] = None,
         progress: Optional[str] = None,
     ) -> None:
-        """Update task status and metadata."""
         task = self._tasks.get(task_id)
         if task:
             task.status = status
@@ -118,30 +105,23 @@ class TaskManager:
             logger.info(f"Updated task {task_id} status to {status.value}")
 
     def start_background_task(self, task_id: str, processor) -> None:
-        """Start background processing for a task with proper context isolation."""
-        # Copy the current context to isolate this background task
         ctx = copy_context()
 
-        # Create the background task within the copied context
         background_task = ctx.run(
             asyncio.create_task,
             self._process_config_background(task_id, processor),
             name=f"config_task_{task_id}",
         )
 
-        # Track background tasks
         self._background_tasks.add(background_task)
         background_task.add_done_callback(self._background_tasks.discard)
 
         logger.info(f"Started background processing for task {task_id}")
 
     async def _process_config_background(self, task_id: str, processor) -> None:
-        """Process configuration in background with proper context."""
         try:
-            # Set the current task ID in context for this background task
             set_current_task_id(task_id)
 
-            # Get the task data
             task = self.get_task(task_id)
             if not task:
                 logger.error(f"Task {task_id} not found")
@@ -153,14 +133,12 @@ class TaskManager:
                 progress="Starting configuration processing...",
             )
 
-            # Process the configuration using the existing processor
             result = await processor.process_config(
                 config=task.config_data,
                 auth_token=task.auth_token,
                 task_id=task_id,
             )
 
-            # Mark as completed
             self.update_task_status(
                 task_id,
                 TaskStatus.COMPLETED,
@@ -196,7 +174,6 @@ class TaskManager:
             logger.info(f"Marked task {task.task_id} as expired")
 
     def cleanup_expired_tasks(self) -> int:
-        """Clean up expired tasks and return count removed."""
         expired_tasks = []
         for task_id, task in self._tasks.items():
             if self._is_task_expired(task):
@@ -211,7 +188,6 @@ class TaskManager:
         return len(expired_tasks)
 
     def get_task_count(self) -> Dict[str, int]:
-        """Get count of tasks by status."""
         counts = {status.value: 0 for status in TaskStatus}
         for task in self._tasks.values():
             if self._is_task_expired(task):
@@ -219,6 +195,5 @@ class TaskManager:
             counts[task.status.value] += 1
         return counts
 
-
-# Global task manager instance
+# This is a singleton
 task_manager = TaskManager()

@@ -1,5 +1,5 @@
 import logging
-from src.clients import make_avni_request
+from src.clients import AvniClient
 from src.utils.format_utils import format_creation_response
 from src.utils.session_context import log_payload
 from src.schemas.program_contract import (
@@ -72,7 +72,7 @@ async def create_program(auth_token: str, contract: ProgramContract) -> str:
     # Log the actual API payload to both standard and session loggers
     log_payload("Program CREATE payload:", payload)
 
-    result = await make_avni_request("POST", "/web/program", auth_token, payload)
+    result = await AvniClient().call_avni_server("POST", "/web/program", auth_token, payload)
 
     if not result.success:
         return result.format_error("create program")
@@ -138,7 +138,7 @@ async def update_program(auth_token: str, contract: ProgramUpdateContract) -> st
     # Log the actual API payload to both standard and session loggers
     log_payload("Program UPDATE payload:", payload)
 
-    result = await make_avni_request(
+    result = await AvniClient().call_avni_server(
         "PUT", f"/web/program/{contract.id}", auth_token, payload
     )
 
@@ -158,7 +158,7 @@ async def delete_program(auth_token: str, contract: ProgramDeleteContract) -> st
     # Log the delete operation
     logger.info(f"Program DELETE: ID {contract.id}")
 
-    result = await make_avni_request(
+    result = await AvniClient().call_avni_server(
         "DELETE", f"/web/program/{contract.id}", auth_token
     )
 

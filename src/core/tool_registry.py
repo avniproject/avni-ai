@@ -1,5 +1,3 @@
-"""Tool registry for direct function calling with OpenAI."""
-
 import inspect
 from typing import Dict, List, Any, Callable, get_type_hints
 from dataclasses import dataclass
@@ -10,8 +8,6 @@ from ..utils.type_conversion_utils import convert_arguments_for_function
 
 @dataclass
 class ToolDefinition:
-    """Definition of a tool for OpenAI function calling."""
-
     name: str
     description: str
     function: Callable
@@ -19,19 +15,15 @@ class ToolDefinition:
 
 
 class ToolRegistry:
-    """Registry for managing tools that can be called directly."""
-
     def __init__(self):
         self.tools: Dict[str, ToolDefinition] = {}
 
     def register_tool(
         self, func: Callable, name: str = None, description: str = None
     ) -> None:
-        """Register a tool function for direct calling."""
         tool_name = name or func.__name__
         tool_description = description or func.__doc__ or f"Execute {tool_name}"
 
-        # Extract function signature and create OpenAI function schema
         sig = inspect.signature(func)
         type_hints = get_type_hints(func)
 
@@ -44,15 +36,12 @@ class ToolRegistry:
 
             param_type = type_hints.get(param_name, str)
 
-            # Convert Python type to JSON schema using utility function
             param_schema = type_to_json_schema(param_type)
 
-            # Add description
             param_schema["description"] = f"Parameter {param_name}"
 
             parameters["properties"][param_name] = param_schema
 
-            # Mark as required if no default value
             if param.default == inspect.Parameter.empty:
                 parameters["required"].append(param_name)
 
@@ -66,11 +55,6 @@ class ToolRegistry:
         self.tools[tool_name] = tool_def
 
     def get_openai_tools(self, filter_tools: List[str] = None) -> List[Dict[str, Any]]:
-        """Get tools in OpenAI function calling format.
-
-        Args:
-            filter_tools: List of tool names to include. If None, returns all tools.
-        """
         tools_to_include = self.tools.values()
         if filter_tools:
             tools_to_include = [
@@ -90,7 +74,6 @@ class ToolRegistry:
         ]
 
     async def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
-        """Call a registered tool with the given arguments."""
         if tool_name not in self.tools:
             raise ValueError(f"Tool '{tool_name}' not found")
 

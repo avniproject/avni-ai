@@ -3,8 +3,9 @@ import logging
 import os
 from typing import Dict, Any
 
-from ..clients import create_openai_client, create_avni_client
+from ..clients import AvniClient, OpenAIResponsesClient
 from .tool_registry import tool_registry
+from ..utils.env import OPENAI_API_KEY
 from ..utils.logging_utils import setup_file_logging
 from ..utils.config_utils import (
     build_system_instructions,
@@ -24,15 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class ConfigProcessor:
-    """Processes Avni configurations using LLM with continuous loop until completion."""
-
     def __init__(self, openai_api_key: str):
-        """
-        Initialize config processor.
-
-        Args:
-            openai_api_key: OpenAI API key for LLM calls
-        """
         self.openai_api_key = openai_api_key
 
     async def process_config(
@@ -61,7 +54,7 @@ class ConfigProcessor:
             # Fetch complete existing configuration context
             logger.info("Fetching complete existing configuration")
             session_logger.info("STEP 1: Fetching complete existing configuration")
-            avni_client = create_avni_client()
+            avni_client = AvniClient(30.0)
 
             # Get complete configuration using the new method
             complete_existing_config = await avni_client.fetch_complete_config(
@@ -94,9 +87,7 @@ class ConfigProcessor:
                 f"STEP 5: Starting LLM iteration loop (max {max_iterations} iterations)"
             )
 
-            async with create_openai_client(
-                self.openai_api_key, timeout=180.0
-            ) as client:
+            async with OpenAIResponsesClient(OPENAI_API_KEY, 120.0) as client:
                 # Initialize conversation input list once
                 current_response = None
 

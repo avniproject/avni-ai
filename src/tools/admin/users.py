@@ -1,5 +1,5 @@
 import logging
-from src.clients import make_avni_request
+from src.clients import AvniClient
 from src.utils.session_context import log_payload
 from src.schemas.user_contract import UserFindContract, UserUpdateContract
 from src.schemas.field_names import UserFields
@@ -21,7 +21,7 @@ async def find_user(auth_token: str, contract: UserFindContract) -> str:
     # Log the search operation
     log_payload("User SEARCH endpoint:", endpoint)
 
-    result = await make_avni_request("GET", endpoint, auth_token)
+    result = await AvniClient().call_avni_server("GET", endpoint, auth_token)
 
     if not result.success:
         return result.format_error("search for user")
@@ -52,7 +52,7 @@ async def update_user(auth_token: str, contract: UserUpdateContract) -> str:
     # Log the actual API payload
     log_payload("User UPDATE payload:", payload)
 
-    result = await make_avni_request("PUT", f"/user/{contract.id}", auth_token, payload)
+    result = await AvniClient().call_avni_server("PUT", f"/user/{contract.id}", auth_token, payload)
 
     if not result.success:
         return result.format_error("update user")

@@ -9,7 +9,7 @@ import pytest
 from dotenv import load_dotenv
 
 # Import our components
-from src.clients import create_openai_client
+from src.clients import OpenAIResponsesClient
 from src.tools.admin.addressleveltypes import register_address_level_type_tools
 from src.tools.admin.catchments import register_catchment_tools
 from src.tools.admin.locations import register_location_tools
@@ -19,6 +19,8 @@ from src.tools.app_designer.subject_types import register_subject_type_tools
 from src.core import tool_registry
 
 # Load environment variables
+from src.utils.env import OPENAI_API_KEY
+
 load_dotenv()
 
 # Set up logging
@@ -116,7 +118,7 @@ async def make_openai_call(messages, test_name):
         print(f"📋 Available tools: {len(available_tools)}")
 
         # Create OpenAI client
-        async with create_openai_client(api_key) as client:
+        async with OpenAIResponsesClient(OPENAI_API_KEY, 120.0) as client:
             print(f"🤖 Making OpenAI API call for: {test_name}")
 
             # First API call using Responses API

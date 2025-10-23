@@ -1,5 +1,5 @@
 import logging
-from src.clients import make_avni_request
+from src.clients import AvniClient
 from src.utils.format_utils import format_creation_response
 from src.utils.session_context import log_payload
 from src.schemas.subject_type_contract import (
@@ -102,7 +102,7 @@ async def create_subject_type(auth_token: str, contract: SubjectTypeContract) ->
     # Log the actual API payload to both standard and session loggers
     log_payload("SubjectType CREATE payload:", payload)
 
-    result = await make_avni_request("POST", "/web/subjectType", auth_token, payload)
+    result = await AvniClient().call_avni_server("POST", "/web/subjectType", auth_token, payload)
 
     if not result.success:
         return result.format_error("create subject type")
@@ -200,7 +200,7 @@ async def update_subject_type(
     # Log the actual API payload to both standard and session loggers
     log_payload("SubjectType UPDATE payload:", payload)
 
-    result = await make_avni_request(
+    result = await AvniClient().call_avni_server(
         "PUT", f"/web/subjectType/{contract.id}", auth_token, payload
     )
 
@@ -222,7 +222,7 @@ async def delete_subject_type(
     # Log the delete operation
     logger.info(f"SubjectType DELETE: ID {contract.id}")
 
-    result = await make_avni_request(
+    result = await AvniClient().call_avni_server(
         "DELETE", f"/web/subjectType/{contract.id}", auth_token
     )
 

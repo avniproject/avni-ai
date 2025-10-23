@@ -1,5 +1,5 @@
 import logging
-from src.clients import make_avni_request
+from src.clients import AvniClient
 from src.utils.format_utils import format_list_response, format_creation_response
 from src.utils.session_context import log_payload
 from src.schemas.catchment_contract import (
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 async def get_catchments(auth_token: str) -> str:
     """Retrieve a list of catchments for an organization to find IDs for assigning users."""
-    result = await make_avni_request("GET", "/catchment", auth_token)
+    result = await AvniClient().call_avni_server("GET", "/catchment", auth_token)
 
     if not result.success:
         return result.format_error("retrieve catchments")
@@ -42,7 +42,7 @@ async def create_catchment(auth_token: str, contract: CatchmentContract) -> str:
     # Log the actual API payload to both standard and session loggers
     log_payload("Catchment CREATE payload:", payload)
 
-    result = await make_avni_request("POST", "/catchment", auth_token, payload)
+    result = await AvniClient().call_avni_server("POST", "/catchment", auth_token, payload)
 
     if not result.success:
         return result.format_error("create catchment")
@@ -66,7 +66,7 @@ async def update_catchment(auth_token: str, contract: CatchmentUpdateContract) -
     # Log the actual API payload to both standard and session loggers
     log_payload("Catchment UPDATE payload:", payload)
 
-    result = await make_avni_request(
+    result = await AvniClient().call_avni_server(
         "PUT", f"/catchment/{contract.id}", auth_token, payload
     )
 
@@ -86,7 +86,7 @@ async def delete_catchment(auth_token: str, contract: CatchmentDeleteContract) -
     # Log the delete operation
     logger.info(f"Catchment DELETE: ID {contract.id}")
 
-    result = await make_avni_request("DELETE", f"/catchment/{contract.id}", auth_token)
+    result = await AvniClient().call_avni_server("DELETE", f"/catchment/{contract.id}", auth_token)
 
     if not result.success:
         return result.format_error("delete catchment")

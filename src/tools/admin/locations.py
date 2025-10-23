@@ -1,5 +1,5 @@
 import logging
-from src.clients import make_avni_request
+from src.clients import AvniClient
 from src.utils.format_utils import format_list_response, format_creation_response
 from src.utils.session_context import log_payload
 from src.schemas.location_contract import (
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 async def get_locations(auth_token: str) -> str:
     """Retrieve a list of location types for an organization to find IDs for creating locations or sub-location types."""
-    result = await make_avni_request("GET", "/locations", auth_token)
+    result = await AvniClient().call_avni_server("GET", "/locations", auth_token)
 
     if not result.success:
         return result.format_error("retrieve location types")
@@ -50,7 +50,7 @@ async def create_location(auth_token: str, contract: LocationContract) -> str:
     # Log the actual API payload to both standard and session loggers
     log_payload("Location CREATE payload:", payload)
 
-    result = await make_avni_request("POST", "/locations", auth_token, payload)
+    result = await AvniClient().call_avni_server("POST", "/locations", auth_token, payload)
 
     if not result.success:
         return result.format_error("create location")
@@ -93,7 +93,7 @@ async def update_location(auth_token: str, contract: LocationUpdateContract) -> 
     # Log the actual API payload to both standard and session loggers
     log_payload("Location UPDATE payload:", payload)
 
-    result = await make_avni_request(
+    result = await AvniClient().call_avni_server(
         "PUT", f"/locations/{contract.id}", auth_token, payload
     )
 
@@ -113,7 +113,7 @@ async def delete_location(auth_token: str, contract: LocationDeleteContract) -> 
     # Log the delete operation
     logger.info(f"Location DELETE: ID {contract.id}")
 
-    result = await make_avni_request("DELETE", f"/locations/{contract.id}", auth_token)
+    result = await AvniClient().call_avni_server("DELETE", f"/locations/{contract.id}", auth_token)
 
     if not result.success:
         return result.format_error("delete location")

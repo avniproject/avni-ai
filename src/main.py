@@ -1,10 +1,3 @@
-"""
-Avni MCP Server for OpenAI Integration
-
-This server implements the Model Context Protocol (MCP) with Avni health platform
-operations designed to work with OpenAI's chat and tool calling features.
-"""
-
 import logging
 import os
 
@@ -13,19 +6,19 @@ from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .auth import SimpleTokenVerifier
+from .utils.env import OPENAI_API_KEY
 from .handlers import (
     process_config_async_request,
     get_task_status,
 )
-from src.tools.admin.addressleveltypes import register_address_level_type_tools
-from src.tools.admin.catchments import register_catchment_tools
-from src.tools.admin.locations import register_location_tools
-from src.tools.admin.users import register_user_tools
-from src.tools.app_designer.encounters import register_encounter_tools
-from src.tools.app_designer.programs import register_program_tools
-from src.tools.app_designer.subject_types import register_subject_type_tools
-from .utils import create_cors_middleware
+from .tools.admin.addressleveltypes import register_address_level_type_tools
+from .tools.admin.catchments import register_catchment_tools
+from .tools.admin.locations import register_location_tools
+from .tools.admin.users import register_user_tools
+from .tools.app_designer.encounters import register_encounter_tools
+from .tools.app_designer.programs import register_program_tools
+from .tools.app_designer.subject_types import register_subject_type_tools
+from .http import create_cors_middleware
 
 load_dotenv()
 
@@ -33,31 +26,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-server_instructions = """
-You are an AI assistant that helps users (usually management personals of NGOs) interact with the Avni platform for their program data management.
-
-You have access to various tools to:
-- Manage locations and catchments
-- Create programs, subject types, and encounter types
-- List and retrieve information about these entities
-
-When users ask to perform operations, use the appropriate tools. Be helpful and explain what you're doing.
-Provide clear, concise responses about the operations performed.
-
-Important: All operations require the user to have provided their Avni API key which will be available to the tools automatically.
-"""
-
-
 def create_server():
-    """Starts an mcp server, though we have removed the mcp server tools as we do direct function calling now"""
-
-    mcp = FastMCP(
+    server = FastMCP(
         name="Avni AI Server",
-        instructions=server_instructions,
-        stateless_http=True,
-        auth=SimpleTokenVerifier(),
+        stateless_http=True
     )
 
     register_address_level_type_tools()
@@ -68,23 +40,20 @@ def create_server():
     register_program_tools()
     register_subject_type_tools()
 
-    @mcp.custom_route("/health", methods=["GET"])
+    @server.custom_route("/health", methods=["GET"])
     async def health_check(request: Request):
-        """
-        Health check endpoint for monitoring.
-        """
         return JSONResponse({"status": "healthy", "service": "Avni MCP Server"})
 
-    @mcp.custom_route("/process-config-async", methods=["POST"])
+    @server.custom_route("/process-config-async", methods=["POST"])
     async def process_config_async_endpoint(request: Request):
         return await process_config_async_request(request)
 
-    @mcp.custom_route("/process-config-status/{task_id}", methods=["GET"])
+    @server.custom_route("/process-config-status/{task_id}", methods=["GET"])
     async def get_config_task_status(request: Request):
         task_id = request.path_params["task_id"]
         return await get_task_status(task_id)
 
-    return mcp
+    return server
 
 
 if not OPENAI_API_KEY:
@@ -93,19 +62,16 @@ if not OPENAI_API_KEY:
     )
     raise ValueError("OpenAI API key is required")
 
-logger.info("Initializing Avni MCP Server for production deployment...")
+logger.info("Initializing Avni MCP Server...")
 
 ai_server = create_server()
 
-# Create ASGI application with proper HTTP middleware
 app = ai_server.http_app(middleware=[create_cors_middleware()])
 
 logger.info("ASGI application created successfully")
-logger.info("Deploy with: uvicorn main:app --host 0.0.0.0 --port 8023")
 
 
 def main():
-    """Main function for direct execution (development mode)."""
     port = int(os.getenv("PORT", 8023))
     logger.info(f"Starting Avni MCP server on 0.0.0.0:{port}")
 

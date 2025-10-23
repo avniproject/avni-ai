@@ -1,101 +1,49 @@
-"""Comprehensive Avni API Client for all operations"""
+from dataclasses import dataclass
 
 import httpx
 import logging
 import os
 from typing import Dict, Any, Optional
-from ..utils.api_utils import ApiResult
 
 logger = logging.getLogger(__name__)
 
+@dataclass
+class ApiResult:
+    """Result wrapper for API responses."""
 
-def get_headers() -> Dict[str, str]:
-    """Get base headers for API requests."""
-    return {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-    }
+    success: bool
+    data: Any = None
+    error: Optional[str] = None
 
+    @classmethod
+    def success_result(cls, data: Any) -> "ApiResult":
+        """Create a successful result."""
+        return cls(success=True, data=data)
 
-async def make_avni_request(
-    method: str,
-    endpoint: str,
-    auth_token: str,
-    data: Optional[Dict[str, Any]] = None,
-    base_url: Optional[str] = None,
-) -> ApiResult:
-    """
-    Make a request to the Avni API with proper error handling.
+    @classmethod
+    def error_result(cls, error: str) -> "ApiResult":
+        """Create an error result."""
+        return cls(success=False, error=error)
 
-    Args:
-        method: HTTP method (GET, POST, etc.)
-        endpoint: API endpoint (e.g., "/addressLevelType")
-        auth_token: Avni API authentication token
-        data: Request payload for POST requests
-        base_url: Base URL for Avni API (optional, uses env var if not provided)
+    def format_error(self, operation: str) -> str:
+        """Format error message for tool response."""
+        return f"Failed to {operation}: {self.error}"
 
-    Returns:
-        ApiResult with success/error status and data
-    """
-    if not base_url:
-        base_url = os.getenv("AVNI_BASE_URL")
-
-    url = f"{base_url.rstrip('/')}{endpoint}"
-
-    headers = get_headers()
-    headers["AUTH-TOKEN"] = auth_token
-
-    async with httpx.AsyncClient() as client:
-        try:
-            if method.upper() == "GET":
-                response = await client.get(url, headers=headers, timeout=30.0)
-            elif method.upper() == "POST":
-                response = await client.post(
-                    url, headers=headers, json=data, timeout=30.0
-                )
-            elif method.upper() == "PUT":
-                response = await client.put(
-                    url, headers=headers, json=data, timeout=30.0
-                )
-            elif method.upper() == "DELETE":
-                response = await client.delete(url, headers=headers, timeout=30.0)
-            else:
-                return ApiResult.error_result("Unsupported HTTP method")
-
-            response.raise_for_status()
-            response_data = response.json() if response.content else {}
-
-            return ApiResult.success_result(response_data or [])
-
-        except httpx.HTTPStatusError as e:
-            error_msg = f"HTTP {e.response.status_code}"
-            logger.error(
-                f"HTTP error for {endpoint}: {e.response.status_code} - {e.response.text}"
-            )
-            return ApiResult.error_result(error_msg)
-        except httpx.TimeoutException:
-            logger.error(f"Timeout error for {endpoint}")
-            return ApiResult.error_result("Request timeout")
-        except httpx.RequestError as e:
-            logger.error(f"Network error for {endpoint}: {str(e)}")
-            return ApiResult.error_result(f"Network error: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error for {endpoint}: {str(e)}")
-            return ApiResult.error_result(str(e))
-
+    @classmethod
+    def format_empty(cls, resource: str) -> str:
+        """Format empty result message."""
+        return f"No {resource} found."
 
 class AvniClient:
-    """Client for interacting with Avni API."""
+    def __init__(self, base_url = os.getenv("AVNI_BASE_URL"), timeout_seconds: float = 30.0):
+        self.base_url = base_url
+        self.timeout = timeout_seconds
 
-    def __init__(self, timeout: float = 30.0):
-        """
-        Initialize Avni client.
-
-        Args:
-            timeout: Request timeout in seconds
-        """
-        self.base_url = os.getenv("AVNI_BASE_URL")
-        self.timeout = timeout
+    def get_headers(self) -> Dict[str, str]:
+        return {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
 
     async def make_request(
         self,
@@ -104,36 +52,14 @@ class AvniClient:
         auth_token: str,
         data: Optional[Dict[str, Any]] = None,
     ) -> ApiResult:
-        """
-        Make a request using this client's base URL.
-
-        Args:
-            method: HTTP method (GET, POST, etc.)
-            endpoint: API endpoint
-            auth_token: Avni API authentication token
-            data: Request payload for POST requests
-
-        Returns:
-            ApiResult with success/error status and data
-        """
-        return await make_avni_request(
-            method, endpoint, auth_token, data, self.base_url
+        return await self.call_avni_server(
+            method, endpoint, auth_token, data
         )
 
     async def fetch_complete_config(self, auth_token: str) -> Dict[str, Any]:
-        """
-        Fetch complete configuration from Avni API by calling specific endpoints.
-
-        Args:
-            auth_token: Avni API authentication token
-
-        Returns:
-            Dictionary containing complete configuration data or error information
-        """
         try:
             complete_config = {}
 
-            # Define all endpoints to fetch
             endpoints = {
                 "addressLevelTypes": "/addressLevelType",
                 "locations": "/locations",
@@ -143,7 +69,6 @@ class AvniClient:
                 "encounterTypes": "/web/encounterType",
             }
 
-            # Fetch data from each endpoint
             for config_key, endpoint in endpoints.items():
                 logger.info(f"Fetching {config_key} from {endpoint}")
                 result = await self.make_request("GET", endpoint, auth_token)
@@ -165,15 +90,53 @@ class AvniClient:
             logger.error(error_msg)
             return {"error": error_msg}
 
+    async def call_avni_server(
+            self,
+            method: str,
+            endpoint: str,
+            auth_token: str,
+            data: Optional[Dict[str, Any]] = None,
+    ) -> ApiResult:
 
-def create_avni_client(timeout: float = 30.0) -> AvniClient:
-    """
-    Factory function to create an Avni client.
+        url = f"{self.base_url.rstrip('/')}{endpoint}"
 
-    Args:
-        timeout: Request timeout in seconds
+        headers = self.get_headers()
+        headers["AUTH-TOKEN"] = auth_token
 
-    Returns:
-        Configured Avni client
-    """
-    return AvniClient(timeout)
+        async with httpx.AsyncClient() as client:
+            try:
+                if method.upper() == "GET":
+                    response = await client.get(url, headers=headers, timeout=30.0)
+                elif method.upper() == "POST":
+                    response = await client.post(
+                        url, headers=headers, json=data, timeout=30.0
+                    )
+                elif method.upper() == "PUT":
+                    response = await client.put(
+                        url, headers=headers, json=data, timeout=30.0
+                    )
+                elif method.upper() == "DELETE":
+                    response = await client.delete(url, headers=headers, timeout=30.0)
+                else:
+                    return ApiResult.error_result("Unsupported HTTP method")
+
+                response.raise_for_status()
+                response_data = response.json() if response.content else {}
+
+                return ApiResult.success_result(response_data or [])
+
+            except httpx.HTTPStatusError as e:
+                error_msg = f"HTTP {e.response.status_code}"
+                logger.error(
+                    f"HTTP error for {endpoint}: {e.response.status_code} - {e.response.text}"
+                )
+                return ApiResult.error_result(error_msg)
+            except httpx.TimeoutException:
+                logger.error(f"Timeout error for {endpoint}")
+                return ApiResult.error_result("Request timeout")
+            except httpx.RequestError as e:
+                logger.error(f"Network error for {endpoint}: {str(e)}")
+                return ApiResult.error_result(f"Network error: {str(e)}")
+            except Exception as e:
+                logger.error(f"Unexpected error for {endpoint}: {str(e)}")
+                return ApiResult.error_result(str(e))

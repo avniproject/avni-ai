@@ -1,5 +1,5 @@
 import logging
-from src.clients import make_avni_request
+from src.clients import AvniClient
 from src.utils.format_utils import format_creation_response
 from src.utils.session_context import log_payload
 from src.schemas.address_level_type_contract import (
@@ -46,7 +46,7 @@ async def create_location_type(
     # Log the actual API payload to both standard and session loggers
     log_payload("AddressLevelType CREATE payload:", payload)
 
-    result = await make_avni_request("POST", "/addressLevelType", auth_token, payload)
+    result = await AvniClient().call_avni_server("POST", "/addressLevelType", auth_token, payload)
 
     if not result.success:
         return result.format_error("create location type")
@@ -103,7 +103,7 @@ async def update_location_type(
     # Log the actual API payload to both standard and session loggers
     log_payload("AddressLevelType UPDATE payload:", payload)
 
-    result = await make_avni_request(
+    result = await AvniClient().call_avni_server(
         "PUT", f"/addressLevelType/{contract.id}", auth_token, payload
     )
 
@@ -125,7 +125,7 @@ async def delete_location_type(
     # Log the delete operation
     logger.info(f"AddressLevelType DELETE: ID {contract.id}")
 
-    result = await make_avni_request(
+    result = await AvniClient().call_avni_server(
         "DELETE", f"/addressLevelType/{contract.id}", auth_token
     )
 

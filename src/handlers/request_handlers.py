@@ -5,10 +5,17 @@ from starlette.responses import JSONResponse
 from ..core import create_config_processor
 from ..core.task_manager import task_manager
 from ..core.enums import TaskStatus
-from ..utils import create_error_response, create_success_response
 from ..utils.request_validation import validate_config_request
 
 logger = logging.getLogger(__name__)
+
+
+def create_error_response(message: str, status_code: int = 400) -> JSONResponse:
+    return JSONResponse({"error": message}, status_code=status_code)
+
+
+def create_success_response(data: dict) -> JSONResponse:
+    return JSONResponse(data)
 
 
 async def process_config_async_request(request: Request) -> JSONResponse:

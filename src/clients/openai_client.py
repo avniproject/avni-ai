@@ -14,10 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAIResponsesClient:
-    """Client for OpenAI Responses API with direct function calling support."""
-
     def __init__(self, api_key: str, timeout: float = 120.0):
-        """Initialize the OpenAI Responses API client."""
         if not api_key:
             raise ValueError("OpenAI API key is required")
 
@@ -25,11 +22,9 @@ class OpenAIResponsesClient:
         self._client = AsyncOpenAI(api_key=api_key, timeout=timeout)
 
     async def __aenter__(self):
-        """Async context manager entry."""
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit."""
         await self._client.close()
 
     async def close(self):
@@ -165,7 +160,6 @@ class OpenAIResponsesClient:
                 continue
 
             try:
-                # Execute the function
                 result = await execute_function_call(
                     function_name,
                     function_args,
@@ -174,46 +168,27 @@ class OpenAIResponsesClient:
                     session_logger,
                 )
 
-                # Add successful result to input list
                 add_function_output(input_list, call_id, result, is_error=False)
                 function_calls_processed += 1
 
             except Exception as e:
                 logger.error(f"❌ Error executing function {function_name}: {e}")
-                # Add error result to input list
                 add_function_output(input_list, call_id, str(e), is_error=True)
 
         logger.info(f"📊 Processed {function_calls_processed} function calls")
 
         try:
-            # Format tools for continuation
             formatted_tools = format_tools_for_continuation(
                 available_tools, tool_registry
             )
 
-            # Make continuation call
             continue_response = await self._make_continuation_call(
                 input_list, formatted_tools, model, instructions
             )
 
-            # Store input list and return OpenAI response object
             setattr(continue_response, "_input_list", input_list)
             return continue_response
 
         except Exception as e:
             logger.error(f"OpenAI conversation continuation error: {e}")
             raise
-
-
-def create_openai_client(api_key: str, timeout: float = 120.0) -> OpenAIResponsesClient:
-    """
-    Factory function to create an OpenAI Responses client.
-
-    Args:
-        api_key: OpenAI API key
-        timeout: Request timeout in seconds (default: 120.0)
-
-    Returns:
-        Configured OpenAI Responses client with direct function calling
-    """
-    return OpenAIResponsesClient(api_key, timeout)
