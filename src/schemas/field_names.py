@@ -1,10 +1,6 @@
-"""Field name constants for API payloads to avoid hardcoded strings."""
-
 from enum import Enum
 
-
 class AddressLevelTypeFields(Enum):
-    """Field names for AddressLevelType API payloads."""
 
     NAME = "name"
     LEVEL = "level"
@@ -15,7 +11,6 @@ class AddressLevelTypeFields(Enum):
 
 
 class LocationFields(Enum):
-    """Field names for Location API payloads."""
 
     NAME = "name"
     TITLE = "title"
@@ -27,7 +22,6 @@ class LocationFields(Enum):
 
 
 class CatchmentFields(Enum):
-    """Field names for Catchment API payloads."""
 
     NAME = "name"
     LOCATION_IDS = "locationIds"
@@ -36,7 +30,6 @@ class CatchmentFields(Enum):
 
 
 class SubjectTypeFields(Enum):
-    """Field names for SubjectType API payloads."""
 
     NAME = "name"
     UUID = "uuid"
@@ -69,7 +62,6 @@ class SubjectTypeFields(Enum):
 
 
 class ProgramFields(Enum):
-    """Field names for Program API payloads."""
 
     NAME = "name"
     UUID = "uuid"
@@ -96,7 +88,6 @@ class ProgramFields(Enum):
 
 
 class EncounterTypeFields(Enum):
-    """Field names for EncounterType API payloads."""
 
     NAME = "name"
     UUID = "uuid"
@@ -111,7 +102,6 @@ class EncounterTypeFields(Enum):
 
 
 class UserFields(Enum):
-    """Field names for User API payloads."""
 
     ID = "id"
     NAME = "name"

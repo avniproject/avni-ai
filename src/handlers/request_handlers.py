@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -10,48 +11,47 @@ from ..core.enums import TaskStatus
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class ConfigRequestValidation:
+    config_data: Optional[Dict[str, Any]] = None
+    auth_token: Optional[str] = None
+    base_url: Optional[str] = None
+    error_message: Optional[str] = None
+    
+    @property
+    def is_valid(self) -> bool:
+        return self.error_message is None
+
+
 async def validate_config_request(
     request: Request,
-) -> Tuple[Optional[Dict[str, Any]], Optional[str], Optional[str], Optional[str]]:
-    """
-    Validate the config request and extract required data.
+) -> ConfigRequestValidation:
 
-    Args:
-        request: The incoming request object
-
-    Returns:
-        Tuple of (config_data, auth_token, base_url, error_message)
-        - Success: (config_data, auth_token, base_url, None)
-        - Error: (None, None, None, error_message)
-    """
     try:
-        # Parse request body
         body = await request.json()
         config_data = body.get("config")
         if not config_data:
-            return None, None, None, "config object is required"
+            return ConfigRequestValidation(error_message="config object is required")
 
-        # Validate that config has at least one operation
         if not any(op in config_data for op in ["create", "update", "delete"]):
-            return (
-                None,
-                None,
-                None,
-                "config must contain at least one of: create, update, delete",
+            return ConfigRequestValidation(
+                error_message="config must contain at least one of: create, update, delete"
             )
 
-        # Get auth token from header
         auth_token = request.headers.get("avni-auth-token")
         if not auth_token:
-            return None, None, None, "avni-auth-token header is required"
+            return ConfigRequestValidation(error_message="avni-auth-token header is required")
 
-        # Extract base URL with priority: query > header > env > default
-        base_url = os.getenv("AVNI_BASE_URL").rstrip("/")
+        base_url = os.getenv("AVNI_BASE_URL")
 
-        return config_data, auth_token, base_url, None
+        return ConfigRequestValidation(
+            config_data=config_data,
+            auth_token=auth_token,
+            base_url=base_url
+        )
 
     except Exception as e:
-        return None, None, None, f"Request validation error: {str(e)}"
+        return ConfigRequestValidation(error_message=f"Request validation error: {str(e)}")
 
 
 def create_error_response(message: str, status_code: int = 400) -> JSONResponse:
@@ -103,28 +103,23 @@ async def process_config_async_request(request: Request) -> JSONResponse:
     Use /process-config-status/{task_id} to check progress.
     """
     try:
-        # Validate request and extract data
-        config_data, auth_token, base_url, error = await validate_config_request(
-            request
-        )
-        if error:
-            status_code = 401 if "auth-token" in error else 400
-            return create_error_response(error, status_code)
+        validation = await validate_config_request(request)
+        if not validation.is_valid:
+            status_code = 401 if "auth-token" in validation.error_message else 400
+            return create_error_response(validation.error_message, status_code)
 
         logger.info("Starting async CRUD config processing")
-        logger.info(f"Operations requested: {list(config_data.keys())}")
+        logger.info(f"Operations requested: {list(validation.config_data.keys())}")
 
-        # Create a task
-        task_id = task_manager.create_task(
-            config_data=config_data, auth_token=auth_token
+        task = task_manager.create_task(
+            config_data=validation.config_data, auth_token=validation.auth_token
         )
 
-        # Start background processing
-        task_manager.start_background_task(task_id)
+        task_manager.start_background_task(task.task_id)
 
         return create_success_response(
             {
-                "task_id": task_id,
+                "task_id": task.task_id,
                 "status": TaskStatus.PROCESSING.value,
                 "message": "Configuration processing started. Use /process-config-status/{task_id} to check progress.",
             }
@@ -139,9 +134,6 @@ async def process_config_async_request(request: Request) -> JSONResponse:
 
 
 async def get_task_status(task_id: str) -> JSONResponse:
-    """
-    Get the status and result of a configuration processing task.
-    """
     try:
         task = task_manager.get_task(task_id)
 

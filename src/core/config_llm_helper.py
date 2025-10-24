@@ -1,5 +1,3 @@
-"""Configuration processing utilities for Avni MCP Server."""
-
 import json
 import logging
 from typing import Dict, Any
@@ -8,12 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_system_instructions() -> str:
-    """Build system instructions for the LLM.
 
-
-    Returns:
-        Complete system instructions string
-    """
     instructions = """You are an AI assistant that processes Avni platform configurations with CRUD operations (Create, Read, Update, Delete).
 
 Your task is to analyze the provided existing config and execute the requested CRUD operations using available tools.
@@ -347,7 +340,6 @@ def parse_llm_response(response_content: str) -> Dict[str, Any]:
             )
             return final_response
         else:
-            # Fallback if no valid JSON found
             logger.warning("No valid JSON blocks found in LLM response")
             return _create_fallback_response("Continue processing")
     except Exception as e:
@@ -356,15 +348,6 @@ def parse_llm_response(response_content: str) -> Dict[str, Any]:
 
 
 def extract_text_content(response) -> str:
-    """Extract text content from OpenAI response.
-
-    Args:
-        response: OpenAI response object
-
-    Returns:
-        Extracted text content or empty string
-    """
-    # Use OpenAI response object method
     if hasattr(response, "output_text"):
         return response.output_text or ""
 
@@ -372,20 +355,12 @@ def extract_text_content(response) -> str:
 
 
 def log_openai_response_summary(response, session_logger):
-    """Log OpenAI response summary with key fields, avoiding expensive full serialization.
-
-    Args:
-        response: OpenAI response object
-        session_logger: Logger instance to use
-    """
     try:
-        # Extract key fields without full serialization
         response_id = getattr(response, "id", "N/A")
         model = getattr(response, "model", "N/A")
         created_at = getattr(response, "created_at", "N/A")
         object_type = getattr(response, "object", "N/A")
 
-        # Check for choices and tool calls
         choices_count = 0
         tool_calls_count = 0
         if hasattr(response, "choices") and response.choices:
@@ -399,7 +374,6 @@ def log_openai_response_summary(response, session_logger):
                     else 0
                 )
 
-        # Check for other key fields
         temperature = getattr(response, "temperature", "N/A")
         tool_choice = getattr(response, "tool_choice", "N/A")
         parallel_tool_calls = getattr(response, "parallel_tool_calls", "N/A")
@@ -416,13 +390,6 @@ def log_openai_response_summary(response, session_logger):
 
 
 def log_input_list(input_list, session_logger, prefix="Current input list"):
-    """Log input list items for debugging.
-
-    Args:
-        input_list: List of input items to log
-        session_logger: Logger instance to use
-        prefix: Prefix message for the log
-    """
     session_logger.info(f"{prefix}:")
     for i, item in enumerate(input_list):
         if isinstance(item, dict):
@@ -434,14 +401,6 @@ def log_input_list(input_list, session_logger, prefix="Current input list"):
 
 
 def _create_fallback_response(next_action: str) -> Dict[str, Any]:
-    """Create fallback response structure when parsing fails.
-
-    Args:
-        next_action: Description of next action
-
-    Returns:
-        Fallback response dictionary
-    """
     return {
         "done": False,
         "status": "processing",

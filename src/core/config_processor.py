@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from ..clients import AvniClient, OpenAIResponsesClient
 from .tool_registry import tool_registry
 from ..utils.env import OPENAI_API_KEY
-from ..utils.config_utils import (
+from .config_llm_helper import (
     build_system_instructions,
     build_initial_input,
     parse_llm_response,
@@ -43,7 +43,6 @@ def setup_file_logging(task_id: str) -> logging.Logger:
 
 @dataclass
 class ConfigProcessResult:
-    """Result of configuration processing."""
     done: bool
     status: str
     results: Dict[str, Any]
@@ -73,15 +72,7 @@ class ConfigProcessResult:
 def create_success_result(
     llm_result: Dict[str, Any], iterations: int
 ) -> ConfigProcessResult:
-    """Create successful completion result.
 
-    Args:
-        llm_result: Result from LLM processing
-        iterations: Number of iterations completed
-
-    Returns:
-        Success result
-    """
     results = llm_result.get("results", {})
     end_user_result = llm_result.get("endUserResult", "")
 
@@ -98,15 +89,7 @@ def create_success_result(
 def create_error_result(
     error_message: str, additional_errors: list = None
 ) -> ConfigProcessResult:
-    """Create error result.
 
-    Args:
-        error_message: Main error message
-        additional_errors: List of additional errors (optional)
-
-    Returns:
-        Error result
-    """
     errors = [error_message]
     if additional_errors:
         errors.extend(additional_errors)
@@ -141,20 +124,12 @@ def create_error_result(
             "existing_encounter_types": [],
             "errors": errors,
         },
-        end_user_result=f"❌ Configuration processing failed: {error_message}",
+        end_user_result=f"Configuration processing failed: {error_message}",
         message=error_message,
     )
 
 
 def create_max_iterations_result(max_iterations: int) -> ConfigProcessResult:
-    """Create result for when max iterations are reached.
-
-    Args:
-        max_iterations: Maximum number of iterations allowed
-
-    Returns:
-        Max iterations result
-    """
     error_message = "Processing incomplete - reached maximum iterations"
 
     return ConfigProcessResult(
@@ -194,25 +169,11 @@ def create_max_iterations_result(max_iterations: int) -> ConfigProcessResult:
 
 
 class ConfigProcessor:
-    def __init__(self, openai_api_key: str):
-        self.openai_api_key = openai_api_key
-
     @staticmethod
     async def process_config(
             config: Dict[str, Any], auth_token: str, task_id: str
     ) -> ConfigProcessResult:
-        """
-        Process a config object using LLM with continuous loop until done=true.
 
-        Args:
-            config: Configuration object to process
-            auth_token: Avni API authentication token
-            task_id: Task ID to use for logging session
-
-        Returns:
-            ConfigProcessResult with done flag, status, results, etc.
-        """
-        # Use task_id for logging session
         session_logger = setup_file_logging(task_id)
 
         session_logger.info("=" * 80)
@@ -221,12 +182,8 @@ class ConfigProcessor:
         session_logger.info("=" * 80)
 
         try:
-            # Fetch complete existing configuration context
-            logger.info("Fetching complete existing configuration")
             session_logger.info("STEP 1: Fetching complete existing configuration")
             avni_client = AvniClient()
-
-            # Get complete configuration using the new method
             complete_existing_config = await avni_client.fetch_complete_config(
                 auth_token
             )
@@ -307,14 +264,10 @@ class ConfigProcessor:
                             )
                             break
 
-                    # Log response summary
                     log_openai_response_summary(response, session_logger)
-
-                    # Extract response content - check if it has text output
                     response_content = extract_text_content(response)
                     session_logger.info(f"LLM raw response: {response_content}")
 
-                    # Log the input list for debugging
                     if hasattr(response, "_input_list"):
                         input_list = getattr(response, "_input_list")
                         log_input_list(input_list, session_logger)
@@ -335,14 +288,12 @@ class ConfigProcessor:
                         f"Final LLM response after tools: {final_response_content}"
                     )
 
-                    # Parse JSON response from final LLM response
-                    # TODO (One possible way to avoid this is to tell the LLM to respond in a particular format)
+                    # TODO (One possible way to avoid parse_llm_response is to tell the LLM to respond in a particular format?)
                     llm_result = parse_llm_response(final_response_content)
                     session_logger.info(
                         f"Parsed LLM result: {json.dumps(llm_result, indent=2)}"
                     )
 
-                    # Check if LLM says it's done
                     if llm_result.get("done", False):
                         logger.info("LLM indicates processing is complete")
                         session_logger.info("✅ LLM indicates processing is COMPLETE!")
@@ -352,14 +303,12 @@ class ConfigProcessor:
                         )
                         return final_result
 
-                    # Log current conversation state for next iteration
                     if hasattr(current_response, "_input_list"):
                         input_list = getattr(current_response, "_input_list")
                         session_logger.info(
                             f"Conversation will continue with input_list length: {len(input_list)}"
                         )
 
-                # Max iterations reached
                 logger.warning(f"Reached maximum iterations ({max_iterations})")
                 session_logger.error(
                     f"❌ REACHED MAXIMUM ITERATIONS ({max_iterations}) WITHOUT COMPLETION"

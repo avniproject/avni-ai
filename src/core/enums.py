@@ -6,4 +6,3 @@ class TaskStatus(str, Enum):
     PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"
-    EXPIRED = "expired"

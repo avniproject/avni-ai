@@ -1,5 +1,3 @@
-"""Utilities for formatting API result messages."""
-
 from typing import Any, Dict, Optional
 from ..clients.avni_client import ApiResult
 
@@ -67,14 +65,6 @@ def format_creation_response(
 def format_update_response(
     resource: str, name: str, id_field: str, response_data: Dict[str, Any]
 ) -> str:
-    """Format update success response.
-
-    Args:
-        resource: Type of resource updated (e.g., "Location", "Program")
-        name: Name of the updated resource
-        id_field: Field name for the ID (e.g., "id", "uuid")
-        response_data: API response data
-    """
     id_value = response_data.get(id_field)
     return (
         f"{resource} '{name}' updated successfully with {id_field.upper()} {id_value}"

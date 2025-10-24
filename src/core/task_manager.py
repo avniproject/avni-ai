@@ -24,7 +24,6 @@ class ConfigTask:
     progress: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for JSON response."""
         return {
             "task_id": self.task_id,
             "status": self.status.value,
@@ -54,12 +53,30 @@ class TaskManager:
         self._tasks: Dict[str, ConfigTask] = {}
         self._background_tasks: set = set()
         self.task_expiry_hours = task_expiry_hours
+        self._cleanup_task = None
+
+    def _ensure_cleanup_started(self) -> None:
+        if self._cleanup_task is None:
+            self._cleanup_task = asyncio.create_task(self._periodic_cleanup())
+
+    async def _periodic_cleanup(self) -> None:
+        while True:
+            try:
+                await asyncio.sleep(3600 * 12)
+                cleaned = self.cleanup_old_tasks()
+                if cleaned > 0:
+                    logger.info(f"Periodic cleanup removed {cleaned} old tasks")
+            except Exception as e:
+                logger.error(f"Error in periodic cleanup: {e}")
 
     def create_task(
         self,
         config_data: Dict[str, Any],
         auth_token: str,
-    ) -> str:
+    ) -> ConfigTask:
+        # Start cleanup task lazily when the first task is created
+        self._ensure_cleanup_started()
+        
         task_id = str(uuid.uuid4())
         now = datetime.utcnow()
 
@@ -75,14 +92,10 @@ class TaskManager:
         self._tasks[task_id] = task
 
         logger.info(f"Created task {task_id}")
-        return task_id
+        return task
 
     def get_task(self, task_id: str) -> Optional[ConfigTask]:
-        task = self._tasks.get(task_id)
-        if task:
-            if self._is_task_expired(task):
-                self._mark_task_expired(task)
-        return task
+        return self._tasks.get(task_id)
 
     def update_task_status(
         self,
@@ -123,9 +136,6 @@ class TaskManager:
             set_current_task_id(task_id)
 
             task = self.get_task(task_id)
-            if not task:
-                logger.error(f"Task {task_id} not found")
-                return
 
             self.update_task_status(
                 task_id,
@@ -160,38 +170,26 @@ class TaskManager:
                 progress="Configuration processing failed",
             )
 
-    def _is_task_expired(self, task: ConfigTask) -> bool:
-        """Check if a task has expired."""
-        expiry_time = task.created_at + timedelta(hours=self.task_expiry_hours)
-        return datetime.utcnow() > expiry_time
-
-    def _mark_task_expired(self, task: ConfigTask) -> None:
-        """Mark task as expired."""
-        if task.status in [TaskStatus.PENDING, TaskStatus.PROCESSING]:
-            task.status = TaskStatus.EXPIRED
-            task.updated_at = datetime.datetime.utcnow()
-            task.error = "Task expired"
-            logger.info(f"Marked task {task.task_id} as expired")
-
-    def cleanup_expired_tasks(self) -> int:
-        expired_tasks = []
+    def cleanup_old_tasks(self) -> int:
+        cutoff = datetime.utcnow() - timedelta(hours=self.task_expiry_hours)
+        to_remove = []
+        
         for task_id, task in self._tasks.items():
-            if self._is_task_expired(task):
-                expired_tasks.append(task_id)
-
-        for task_id in expired_tasks:
+            if (task.status in [TaskStatus.COMPLETED, TaskStatus.FAILED] and 
+                task.updated_at < cutoff):
+                to_remove.append(task_id)
+        
+        for task_id in to_remove:
             del self._tasks[task_id]
-
-        if expired_tasks:
-            logger.info(f"Cleaned up {len(expired_tasks)} expired tasks")
-
-        return len(expired_tasks)
+        
+        if to_remove:
+            logger.info(f"Cleaned up {len(to_remove)} old completed/failed tasks")
+        
+        return len(to_remove)
 
     def get_task_count(self) -> Dict[str, int]:
         counts = {status.value: 0 for status in TaskStatus}
         for task in self._tasks.values():
-            if self._is_task_expired(task):
-                self._mark_task_expired(task)
             counts[task.status.value] += 1
         return counts
 
