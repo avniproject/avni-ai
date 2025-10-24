@@ -35,7 +35,7 @@ class DifyClient:
         }
 
         try:
-            logger.info(f"Sending message to Dify")
+            logger.info("Sending message to Dify")
 
             response = requests.post(
                 url, headers=self.headers, data=json.dumps(payload), timeout=timeout

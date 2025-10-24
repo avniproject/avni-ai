@@ -7,15 +7,14 @@ from typing import Dict, Any, List
 from dataclasses import dataclass
 
 from dotenv import load_dotenv
-
-load_dotenv()
-
 from src.clients.avni_client import AvniClient
 from tests.dify.common.dify_client import DifyClient
 from tests.dify.prompts.ai_reviewer import AIReviewer
 from tests.dify.prompts.ai_tester import AITester
 from tests.dify.prompts.prompts import CONFIG_TESTER_PROMPTS, MCH_REQUIREMENTS
 from tests.dify.common.utils import validate_all_env_variables
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

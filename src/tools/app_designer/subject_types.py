@@ -3,7 +3,6 @@ from src.clients import AvniClient
 from src.utils.session_context import log_payload
 from src.utils.result_utils import (
     format_error_message,
-    format_empty_message,
     format_creation_response,
     format_update_response,
     format_deletion_response,
