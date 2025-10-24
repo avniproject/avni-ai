@@ -134,11 +134,20 @@ IMPORTANT: You must respond in JSON format with these fields:
     "existing_encounter_types": [...],
     "errors": [...]    // any errors encountered
   },
-  "endUserResult": "✅ Successfully created 3 address level types (State, District, Block), 2 locations (Karnataka, Bangalore), and 1 health program. Configuration is ready for use!",
+  "endUserResult": "✅ Successfully created 3 address level types (State, District, Block), 2 locations (Karnataka, Bangalore), and 1 health program. Configuration is ready for use!",  // REQUIRED: Always provide meaningful progress summary
   "next_action": "description of what you plan to do next"
 }
 
 Only set done=true when you have successfully processed ALL requested CRUD operations.
+
+CRITICAL PROGRESS REPORTING:
+- ALWAYS include "endUserResult" field in EVERY response (not just when done=true)
+- Provide meaningful progress summaries like:
+  - "✅ Created 2 address level types, now processing locations..."
+  - "🔧 Processing location dependencies, created Karnataka state..."
+  - "⚠️ Found validation issues with subject types, retrying..."
+- Use emojis and clear language to show current status and what was accomplished
+- This helps users understand real-time progress during long operations
 
 Available tools will help you:
 - Get existing location types, locations, programs, subject types, encounter types

@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Callable, Optional
 from dataclasses import dataclass
 
 from ..clients import AvniClient, OpenAIResponsesClient
@@ -169,7 +169,10 @@ def create_max_iterations_result(max_iterations: int) -> ConfigProcessResult:
 class ConfigProcessor:
     @staticmethod
     async def process_config(
-        config: Dict[str, Any], auth_token: str, task_id: str
+        config: Dict[str, Any],
+        auth_token: str,
+        task_id: str,
+        progress_callback: Callable[[str], None],
     ) -> ConfigProcessResult:
         session_logger = setup_file_logging(task_id)
 
@@ -291,12 +294,15 @@ class ConfigProcessor:
                         f"Parsed LLM result: {json.dumps(llm_result, indent=2)}"
                     )
 
+                    if llm_result.get("endUserResult"):
+                        progress_callback(llm_result["endUserResult"])
+
                     if llm_result.get("done", False):
                         logger.info("LLM indicates processing is complete")
                         session_logger.info("✅ LLM indicates processing is COMPLETE!")
                         final_result = create_success_result(llm_result, iteration + 1)
                         session_logger.info(
-                            f"Final result: {json.dumps(final_result, indent=2)}"
+                            f"Final result: {json.dumps(final_result.to_dict(), indent=2)}"
                         )
                         return final_result
 
@@ -315,7 +321,7 @@ class ConfigProcessor:
                 )
                 max_iter_result = create_max_iterations_result(max_iterations)
                 session_logger.info(
-                    f"Max iterations result: {json.dumps(max_iter_result, indent=2)}"
+                    f"Max iterations result: {json.dumps(max_iter_result.to_dict(), indent=2)}"
                 )
                 return max_iter_result
 
@@ -327,5 +333,7 @@ class ConfigProcessor:
 
             session_logger.error(f"Traceback: {traceback.format_exc()}")
             error_result = create_error_result(f"Processing failed: {str(e)}")
-            session_logger.info(f"Error result: {json.dumps(error_result, indent=2)}")
+            session_logger.info(
+                f"Error result: {json.dumps(error_result.to_dict(), indent=2)}"
+            )
             return error_result

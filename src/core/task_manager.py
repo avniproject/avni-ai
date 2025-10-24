@@ -2,11 +2,11 @@ import asyncio
 import logging
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Callable
 from dataclasses import dataclass
 from contextvars import ContextVar, copy_context
-from .config_processor import ConfigProcessor
 from .enums import TaskStatus
+from .config_processor import ConfigProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -131,6 +131,14 @@ class TaskManager:
 
         logger.info(f"Started background processing for task {task_id}")
 
+    def _create_progress_updater(self, task_id: str) -> Callable[[str], None]:
+        """Create a progress updater callback for the given task."""
+
+        def updater(message: str):
+            self.update_task_status(task_id, TaskStatus.PROCESSING, progress=message)
+
+        return updater
+
     async def _process_config_background(self, task_id: str) -> None:
         try:
             set_current_task_id(task_id)
@@ -143,10 +151,13 @@ class TaskManager:
                 progress="Starting configuration processing...",
             )
 
+            progress_updater = self._create_progress_updater(task_id)
+
             result = await ConfigProcessor.process_config(
                 config=task.config_data,
                 auth_token=task.auth_token,
                 task_id=task_id,
+                progress_callback=progress_updater,
             )
 
             self.update_task_status(
