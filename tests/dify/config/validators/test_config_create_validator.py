@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestConfigCreateValidator:
-
     @staticmethod
     def validate_test_create_config(config: Dict[str, Any]) -> ValidationResult:
         """
@@ -31,7 +30,9 @@ class TestConfigCreateValidator:
             TestConfigCreateValidator._validate_crud_address_level_types(create_config)
         )
 
-        result.add_errors(TestConfigCreateValidator._validate_crud_locations(create_config))
+        result.add_errors(
+            TestConfigCreateValidator._validate_crud_locations(create_config)
+        )
 
         result.add_errors(
             TestConfigCreateValidator._validate_crud_catchments(create_config)
@@ -41,7 +42,9 @@ class TestConfigCreateValidator:
             TestConfigCreateValidator._validate_crud_subject_types(create_config)
         )
 
-        result.add_errors(TestConfigCreateValidator._validate_crud_programs(create_config))
+        result.add_errors(
+            TestConfigCreateValidator._validate_crud_programs(create_config)
+        )
 
         result.add_errors(
             TestConfigCreateValidator._validate_crud_encounter_types(create_config)

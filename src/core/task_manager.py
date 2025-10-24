@@ -76,7 +76,7 @@ class TaskManager:
     ) -> ConfigTask:
         # Start cleanup task lazily when the first task is created
         self._ensure_cleanup_started()
-        
+
         task_id = str(uuid.uuid4())
         now = datetime.utcnow()
 
@@ -173,18 +173,20 @@ class TaskManager:
     def cleanup_old_tasks(self) -> int:
         cutoff = datetime.utcnow() - timedelta(hours=self.task_expiry_hours)
         to_remove = []
-        
+
         for task_id, task in self._tasks.items():
-            if (task.status in [TaskStatus.COMPLETED, TaskStatus.FAILED] and 
-                task.updated_at < cutoff):
+            if (
+                task.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+                and task.updated_at < cutoff
+            ):
                 to_remove.append(task_id)
-        
+
         for task_id in to_remove:
             del self._tasks[task_id]
-        
+
         if to_remove:
             logger.info(f"Cleaned up {len(to_remove)} old completed/failed tasks")
-        
+
         return len(to_remove)
 
     def get_task_count(self) -> Dict[str, int]:
@@ -192,6 +194,7 @@ class TaskManager:
         for task in self._tasks.values():
             counts[task.status.value] += 1
         return counts
+
 
 # This is a singleton
 task_manager = TaskManager()

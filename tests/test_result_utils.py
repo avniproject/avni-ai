@@ -2,8 +2,8 @@
 
 from src.clients.avni_client import ApiResult
 from src.utils.result_utils import (
-    format_error_message, 
-    format_empty_message, 
+    format_error_message,
+    format_empty_message,
     format_list_response,
     format_creation_response,
     format_update_response,
@@ -36,10 +36,7 @@ class TestResultUtils:
 
     def test_format_list_response_basic(self):
         """Test basic list response formatting."""
-        items = [
-            {"id": 1, "name": "Item 1"},
-            {"id": 2, "name": "Item 2"}
-        ]
+        items = [{"id": 1, "name": "Item 1"}, {"id": 2, "name": "Item 2"}]
 
         result = format_list_response(items)
         expected = "ID: 1, Name: Item 1\nID: 2, Name: Item 2"
@@ -49,7 +46,7 @@ class TestResultUtils:
         """Test list response formatting with extra key."""
         items = [
             {"id": 1, "name": "State", "level": 3.0},
-            {"id": 2, "name": "District", "level": 2.0}
+            {"id": 2, "name": "District", "level": 2.0},
         ]
 
         result = format_list_response(items, extra_key="level")
@@ -77,6 +74,10 @@ class TestResultUtils:
 
     def test_format_validation_error(self):
         """Test validation error formatting."""
-        result = format_validation_error("create location type", "Invalid parentId '0': Cannot be zero")
-        expected = "Failed to create location type: Invalid parentId '0': Cannot be zero"
+        result = format_validation_error(
+            "create location type", "Invalid parentId '0': Cannot be zero"
+        )
+        expected = (
+            "Failed to create location type: Invalid parentId '0': Cannot be zero"
+        )
         assert result == expected

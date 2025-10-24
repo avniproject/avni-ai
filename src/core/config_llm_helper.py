@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 
 def build_system_instructions() -> str:
-
     instructions = """You are an AI assistant that processes Avni platform configurations with CRUD operations (Create, Read, Update, Delete).
 
 Your task is to analyze the provided existing config and execute the requested CRUD operations using available tools.

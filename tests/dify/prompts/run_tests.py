@@ -17,7 +17,7 @@ def main():
     """Main function to run the enhanced testing system"""
     if not validate_all_env_variables():
         sys.exit(1)
-    
+
     # Set up API keys
     openai.api_key = os.getenv("OPENAI_API_KEY")
     dify_api_key = os.getenv("DIFY_API_KEY")

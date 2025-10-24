@@ -10,14 +10,12 @@ def format_empty_message(resource: str) -> str:
     return f"No {resource} found."
 
 
-
 def format_list_response(
     items,
     id_key: str = "id",
     name_key: str = "name",
     extra_key: Optional[str] = None,
 ) -> str:
-
     if isinstance(items, dict):
         if "content" in items:
             items = items["content"]
@@ -55,7 +53,6 @@ def format_list_response(
 def format_creation_response(
     resource: str, name: str, id_field: str, response_data: Dict[str, Any]
 ) -> str:
-
     id_value = response_data.get(id_field)
     return (
         f"{resource} '{name}' created successfully with {id_field.upper()} {id_value}"

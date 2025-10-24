@@ -1,7 +1,7 @@
 from enum import Enum
 
-class AddressLevelTypeFields(Enum):
 
+class AddressLevelTypeFields(Enum):
     NAME = "name"
     LEVEL = "level"
     PARENT_ID = "parentId"
@@ -11,7 +11,6 @@ class AddressLevelTypeFields(Enum):
 
 
 class LocationFields(Enum):
-
     NAME = "name"
     TITLE = "title"
     LEVEL = "level"
@@ -22,7 +21,6 @@ class LocationFields(Enum):
 
 
 class CatchmentFields(Enum):
-
     NAME = "name"
     LOCATION_IDS = "locationIds"
     DELETE_FAST_SYNC = "deleteFastSync"
@@ -30,7 +28,6 @@ class CatchmentFields(Enum):
 
 
 class SubjectTypeFields(Enum):
-
     NAME = "name"
     UUID = "uuid"
     ID = "id"
@@ -62,7 +59,6 @@ class SubjectTypeFields(Enum):
 
 
 class ProgramFields(Enum):
-
     NAME = "name"
     UUID = "uuid"
     ID = "id"
@@ -88,7 +84,6 @@ class ProgramFields(Enum):
 
 
 class EncounterTypeFields(Enum):
-
     NAME = "name"
     UUID = "uuid"
     ID = "id"
@@ -102,7 +97,6 @@ class EncounterTypeFields(Enum):
 
 
 class UserFields(Enum):
-
     ID = "id"
     NAME = "name"
     USERNAME = "username"

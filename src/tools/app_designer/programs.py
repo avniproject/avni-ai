@@ -1,7 +1,13 @@
 import logging
 from src.clients import AvniClient
 from src.utils.session_context import log_payload
-from src.utils.result_utils import format_error_message, format_empty_message, format_creation_response, format_update_response, format_deletion_response
+from src.utils.result_utils import (
+    format_error_message,
+    format_empty_message,
+    format_creation_response,
+    format_update_response,
+    format_deletion_response,
+)
 from src.schemas.program_contract import (
     ProgramContract,
     ProgramUpdateContract,
@@ -64,12 +70,16 @@ async def create_program(auth_token: str, contract: ProgramContract) -> str:
 
     log_payload("Program CREATE payload:", payload)
 
-    result = await AvniClient().call_avni_server("POST", "/web/program", auth_token, payload)
+    result = await AvniClient().call_avni_server(
+        "POST", "/web/program", auth_token, payload
+    )
 
     if not result.success:
         return format_error_message(result, "create program")
 
-    return format_creation_response("Program", contract.name, ProgramFields.UUID.value, result.data)
+    return format_creation_response(
+        "Program", contract.name, ProgramFields.UUID.value, result.data
+    )
 
 
 async def update_program(auth_token: str, contract: ProgramUpdateContract) -> str:
@@ -128,7 +138,9 @@ async def update_program(auth_token: str, contract: ProgramUpdateContract) -> st
     if not result.success:
         return format_error_message(result, "update program")
 
-    return format_update_response("Program", contract.name, ProgramFields.ID.value, result.data)
+    return format_update_response(
+        "Program", contract.name, ProgramFields.ID.value, result.data
+    )
 
 
 async def delete_program(auth_token: str, contract: ProgramDeleteContract) -> str:

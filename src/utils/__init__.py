@@ -11,8 +11,8 @@ This package contains various utility modules organized by functionality:
 """
 
 from .result_utils import (
-    format_error_message, 
-    format_empty_message, 
+    format_error_message,
+    format_empty_message,
     format_list_response,
     format_creation_response,
     format_update_response,

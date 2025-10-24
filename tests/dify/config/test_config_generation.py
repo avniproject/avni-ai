@@ -16,6 +16,7 @@ from .validators.test_config_delete_validator import (
     TestConfigDeleteValidator,
 )
 from ..common.utils import validate_all_env_variables
+
 load_dotenv()
 
 
@@ -61,9 +62,7 @@ async def run_dify_config_test(test_type: str, dify_api_key: str, avni_auth_toke
         )
 
     if not validation_result.is_valid:
-        error_msg = (
-            f"Configuration validation failed with {validation_result.error_count} errors:\n"
-        )
+        error_msg = f"Configuration validation failed with {validation_result.error_count} errors:\n"
         for i, error in enumerate(validation_result.errors[:10], 1):
             error_msg += f"  {i}. {error}\n"
         if validation_result.error_count > 10:
@@ -72,29 +71,35 @@ async def run_dify_config_test(test_type: str, dify_api_key: str, avni_auth_toke
 
     return True
 
+
 @pytest.mark.asyncio
 async def test_dify_create_config():
     if not validate_all_env_variables():
         pytest.skip("Required environment variables not set")
-    await run_dify_config_test("create", os.getenv("DIFY_STAGING_TEST_API_KEY"), os.getenv("AVNI_AUTH_TOKEN"))
+    await run_dify_config_test(
+        "create", os.getenv("DIFY_STAGING_TEST_API_KEY"), os.getenv("AVNI_AUTH_TOKEN")
+    )
 
 
 @pytest.mark.asyncio
 async def test_dify_update_config():
     if not validate_all_env_variables():
         pytest.skip("Required environment variables not set")
-    await run_dify_config_test("update", os.getenv("DIFY_STAGING_TEST_API_KEY"), os.getenv("AVNI_AUTH_TOKEN"))
+    await run_dify_config_test(
+        "update", os.getenv("DIFY_STAGING_TEST_API_KEY"), os.getenv("AVNI_AUTH_TOKEN")
+    )
 
 
 @pytest.mark.asyncio
 async def test_dify_delete_config():
     if not validate_all_env_variables():
         pytest.skip("Required environment variables not set")
-    await run_dify_config_test("delete", os.getenv("DIFY_STAGING_TEST_API_KEY"), os.getenv("AVNI_AUTH_TOKEN"))
+    await run_dify_config_test(
+        "delete", os.getenv("DIFY_STAGING_TEST_API_KEY"), os.getenv("AVNI_AUTH_TOKEN")
+    )
 
 
 async def main():
-
     if not validate_all_env_variables():
         sys.exit(1)
 
@@ -111,9 +116,7 @@ async def main():
             print(f"{test_type.upper()} test passed!")
         except Exception as e:
             print(f"{test_type.upper()} test failed: {e}")
-            print(
-                f"Stopping test execution due to failure in {test_type.upper()} test"
-            )
+            print(f"Stopping test execution due to failure in {test_type.upper()} test")
             sys.exit(1)
 
     print("\nAll tests passed successfully!")

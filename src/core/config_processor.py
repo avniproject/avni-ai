@@ -50,7 +50,7 @@ class ConfigProcessResult:
     iterations: Optional[int] = None
     function_calls_made: int = 0
     message: Optional[str] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         result = {
@@ -60,19 +60,18 @@ class ConfigProcessResult:
             "endUserResult": self.end_user_result,
             "function_calls_made": self.function_calls_made,
         }
-        
+
         if self.iterations is not None:
             result["iterations"] = self.iterations
         if self.message is not None:
             result["message"] = self.message
-            
+
         return result
 
 
 def create_success_result(
     llm_result: Dict[str, Any], iterations: int
 ) -> ConfigProcessResult:
-
     results = llm_result.get("results", {})
     end_user_result = llm_result.get("endUserResult", "")
 
@@ -89,7 +88,6 @@ def create_success_result(
 def create_error_result(
     error_message: str, additional_errors: list = None
 ) -> ConfigProcessResult:
-
     errors = [error_message]
     if additional_errors:
         errors.extend(additional_errors)
@@ -171,9 +169,8 @@ def create_max_iterations_result(max_iterations: int) -> ConfigProcessResult:
 class ConfigProcessor:
     @staticmethod
     async def process_config(
-            config: Dict[str, Any], auth_token: str, task_id: str
+        config: Dict[str, Any], auth_token: str, task_id: str
     ) -> ConfigProcessResult:
-
         session_logger = setup_file_logging(task_id)
 
         session_logger.info("=" * 80)
@@ -332,5 +329,3 @@ class ConfigProcessor:
             error_result = create_error_result(f"Processing failed: {str(e)}")
             session_logger.info(f"Error result: {json.dumps(error_result, indent=2)}")
             return error_result
-
-

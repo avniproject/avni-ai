@@ -1,7 +1,14 @@
 import logging
 from src.clients import AvniClient
 from src.utils.session_context import log_payload
-from src.utils.result_utils import format_error_message, format_empty_message, format_list_response, format_creation_response, format_update_response, format_deletion_response
+from src.utils.result_utils import (
+    format_error_message,
+    format_empty_message,
+    format_list_response,
+    format_creation_response,
+    format_update_response,
+    format_deletion_response,
+)
 from src.schemas.catchment_contract import (
     CatchmentContract,
     CatchmentUpdateContract,
@@ -34,12 +41,16 @@ async def create_catchment(auth_token: str, contract: CatchmentContract) -> str:
 
     log_payload("Catchment CREATE payload:", payload)
 
-    result = await AvniClient().call_avni_server("POST", "/catchment", auth_token, payload)
+    result = await AvniClient().call_avni_server(
+        "POST", "/catchment", auth_token, payload
+    )
 
     if not result.success:
         return format_error_message(result, "create catchment")
 
-    return format_creation_response("Catchment", contract.name, CatchmentFields.ID.value, result.data)
+    return format_creation_response(
+        "Catchment", contract.name, CatchmentFields.ID.value, result.data
+    )
 
 
 async def update_catchment(auth_token: str, contract: CatchmentUpdateContract) -> str:
@@ -58,11 +69,15 @@ async def update_catchment(auth_token: str, contract: CatchmentUpdateContract) -
     if not result.success:
         return format_error_message(result, "update catchment")
 
-    return format_update_response("Catchment", contract.name, CatchmentFields.ID.value, result.data)
+    return format_update_response(
+        "Catchment", contract.name, CatchmentFields.ID.value, result.data
+    )
 
 
 async def delete_catchment(auth_token: str, contract: CatchmentDeleteContract) -> str:
-    result = await AvniClient().call_avni_server("DELETE", f"/catchment/{contract.id}", auth_token)
+    result = await AvniClient().call_avni_server(
+        "DELETE", f"/catchment/{contract.id}", auth_token
+    )
 
     if not result.success:
         return format_error_message(result, "delete catchment")

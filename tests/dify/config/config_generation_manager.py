@@ -19,14 +19,13 @@ class ConversationResult:
     extracted_config: Optional[Dict[str, Any]] = None
     conversation_history: Optional[List[Dict[str, Any]]] = None
     error_message: Optional[str] = None
-    
+
     @property
     def has_config(self) -> bool:
         return self.success and self.extracted_config is not None
 
 
 class DifyConversationManager:
-
     def __init__(self, dify_api_key: str):
         self.dify_client = DifyClient(dify_api_key)
         self.conversation_id = ""
@@ -81,7 +80,7 @@ class DifyConversationManager:
                     return ConversationResult(
                         success=False,
                         conversation_history=conversation_history,
-                        error_message=error_msg
+                        error_message=error_msg,
                     )
 
                 assistant_response = response["answer"]
@@ -106,7 +105,7 @@ class DifyConversationManager:
                     return ConversationResult(
                         success=True,
                         extracted_config=extracted_config,
-                        conversation_history=conversation_history
+                        conversation_history=conversation_history,
                     )
 
                 current_message = DifyConversationManager._generate_follow_up_message()
@@ -116,16 +115,13 @@ class DifyConversationManager:
             return ConversationResult(
                 success=False,
                 conversation_history=conversation_history,
-                error_message=error_msg
+                error_message=error_msg,
             )
 
         except Exception as e:
             error_msg = f"Error in conversation: {e}"
             logger.error(error_msg)
-            return ConversationResult(
-                success=False,
-                error_message=error_msg
-            )
+            return ConversationResult(success=False, error_message=error_msg)
 
     @staticmethod
     def _create_initial_message(test_config: Dict[str, Any]) -> str:

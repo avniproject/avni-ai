@@ -1,7 +1,14 @@
 import logging
 from src.clients import AvniClient
 from src.utils.session_context import log_payload
-from src.utils.result_utils import format_error_message, format_empty_message, format_list_response, format_creation_response, format_update_response, format_deletion_response
+from src.utils.result_utils import (
+    format_error_message,
+    format_empty_message,
+    format_list_response,
+    format_creation_response,
+    format_update_response,
+    format_deletion_response,
+)
 from src.schemas.location_contract import (
     LocationContract,
     LocationUpdateContract,
@@ -42,16 +49,19 @@ async def create_location(auth_token: str, contract: LocationContract) -> str:
 
     log_payload("Location CREATE payload:", payload)
 
-    result = await AvniClient().call_avni_server("POST", "/locations", auth_token, payload)
+    result = await AvniClient().call_avni_server(
+        "POST", "/locations", auth_token, payload
+    )
 
     if not result.success:
         return format_error_message(result, "create location")
 
-    return format_creation_response("Location", contract.name, LocationFields.ID.value, result.data)
+    return format_creation_response(
+        "Location", contract.name, LocationFields.ID.value, result.data
+    )
 
 
 async def update_location(auth_token: str, contract: LocationUpdateContract) -> str:
-
     # Auto-correct self-referencing parentId (common LLM mistake)
     if contract.parentId is not None and contract.parentId == contract.id:
         logger.info(
@@ -85,11 +95,15 @@ async def update_location(auth_token: str, contract: LocationUpdateContract) -> 
     if not result.success:
         return format_error_message(result, "update location")
 
-    return format_update_response("Location", contract.title, LocationFields.ID.value, result.data)
+    return format_update_response(
+        "Location", contract.title, LocationFields.ID.value, result.data
+    )
 
 
 async def delete_location(auth_token: str, contract: LocationDeleteContract) -> str:
-    result = await AvniClient().call_avni_server("DELETE", f"/locations/{contract.id}", auth_token)
+    result = await AvniClient().call_avni_server(
+        "DELETE", f"/locations/{contract.id}", auth_token
+    )
 
     if not result.success:
         return format_error_message(result, "delete location")

@@ -7,6 +7,7 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ApiResult:
     success: bool
@@ -23,7 +24,9 @@ class ApiResult:
 
 
 class AvniClient:
-    def __init__(self, base_url = os.getenv("AVNI_BASE_URL"), timeout_seconds: float = 30.0):
+    def __init__(
+        self, base_url=os.getenv("AVNI_BASE_URL"), timeout_seconds: float = 30.0
+    ):
         self.base_url = base_url
         self.timeout = timeout_seconds
 
@@ -33,7 +36,6 @@ class AvniClient:
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
-
 
     async def fetch_complete_config(self, auth_token: str) -> Dict[str, Any]:
         try:
@@ -70,13 +72,12 @@ class AvniClient:
             return {"error": error_msg}
 
     async def call_avni_server(
-            self,
-            method: str,
-            endpoint: str,
-            auth_token: str,
-            data: Optional[Dict[str, Any]] = None,
+        self,
+        method: str,
+        endpoint: str,
+        auth_token: str,
+        data: Optional[Dict[str, Any]] = None,
     ) -> ApiResult:
-
         url = f"{self.base_url.rstrip('/')}{endpoint}"
 
         headers = AvniClient.get_headers()

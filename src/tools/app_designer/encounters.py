@@ -1,7 +1,13 @@
 import logging
 from src.clients import AvniClient
 from src.utils.session_context import log_payload
-from src.utils.result_utils import format_error_message, format_empty_message, format_creation_response, format_update_response, format_deletion_response
+from src.utils.result_utils import (
+    format_error_message,
+    format_empty_message,
+    format_creation_response,
+    format_update_response,
+    format_deletion_response,
+)
 from src.schemas.encounter_type_contract import (
     EncounterTypeContract,
     EncounterTypeUpdateContract,
@@ -45,7 +51,9 @@ async def create_encounter_type(
 
     log_payload("EncounterType CREATE payload:", payload)
 
-    result = await AvniClient().call_avni_server("POST", "/web/encounterType", auth_token, payload)
+    result = await AvniClient().call_avni_server(
+        "POST", "/web/encounterType", auth_token, payload
+    )
 
     if not result.success:
         return format_error_message(result, "create encounter type")
@@ -88,7 +96,9 @@ async def update_encounter_type(
     if not result.success:
         return format_error_message(result, "update encounter type")
 
-    return format_update_response("Encounter type", contract.name, EncounterTypeFields.ID.value, result.data)
+    return format_update_response(
+        "Encounter type", contract.name, EncounterTypeFields.ID.value, result.data
+    )
 
 
 async def delete_encounter_type(

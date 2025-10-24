@@ -19,7 +19,6 @@ class OpenAIResponsesClient:
     def _parse_function_arguments(
         arguments_str: str, call_id: str
     ) -> Optional[Dict[str, Any]]:
-
         try:
             if isinstance(arguments_str, str):
                 return json.loads(arguments_str)
@@ -51,7 +50,6 @@ class OpenAIResponsesClient:
     def _format_tools_for_continuation(
         available_tools: Optional[List[Dict[str, Any]]], tool_registry
     ) -> List[Dict[str, Any]]:
-
         formatted_tools = []
         tools_to_use = (
             available_tools if available_tools else tool_registry.get_openai_tools()
@@ -72,7 +70,6 @@ class OpenAIResponsesClient:
 
     @staticmethod
     def _extract_function_calls(response) -> List[Dict[str, Any]]:
-
         function_calls = []
 
         for i, item in enumerate(response.output):

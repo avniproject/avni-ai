@@ -1,5 +1,4 @@
 def get_create_message() -> str:
-
     return """Hi, I need help setting up an Avni configuration for my organization.
 
 I need address level types:

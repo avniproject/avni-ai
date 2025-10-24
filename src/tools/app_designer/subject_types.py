@@ -1,7 +1,13 @@
 import logging
 from src.clients import AvniClient
 from src.utils.session_context import log_payload
-from src.utils.result_utils import format_error_message, format_empty_message, format_creation_response, format_update_response, format_deletion_response
+from src.utils.result_utils import (
+    format_error_message,
+    format_empty_message,
+    format_creation_response,
+    format_update_response,
+    format_deletion_response,
+)
 from src.schemas.subject_type_contract import (
     SubjectTypeContract,
     SubjectTypeUpdateContract,
@@ -93,12 +99,16 @@ async def create_subject_type(auth_token: str, contract: SubjectTypeContract) ->
 
     log_payload("SubjectType CREATE payload:", payload)
 
-    result = await AvniClient().call_avni_server("POST", "/web/subjectType", auth_token, payload)
+    result = await AvniClient().call_avni_server(
+        "POST", "/web/subjectType", auth_token, payload
+    )
 
     if not result.success:
         return format_error_message(result, "create subject type")
 
-    return format_creation_response("Subject type", contract.name, SubjectTypeFields.UUID.value, result.data)
+    return format_creation_response(
+        "Subject type", contract.name, SubjectTypeFields.UUID.value, result.data
+    )
 
 
 async def update_subject_type(
@@ -189,13 +199,14 @@ async def update_subject_type(
     if not result.success:
         return format_error_message(result, "update subject type")
 
-    return format_update_response("Subject type", contract.name, SubjectTypeFields.ID.value, result.data)
+    return format_update_response(
+        "Subject type", contract.name, SubjectTypeFields.ID.value, result.data
+    )
 
 
 async def delete_subject_type(
     auth_token: str, contract: SubjectTypeDeleteContract
 ) -> str:
-
     result = await AvniClient().call_avni_server(
         "DELETE", f"/web/subjectType/{contract.id}", auth_token
     )

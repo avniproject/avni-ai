@@ -18,15 +18,13 @@ from .tools.app_designer.subject_types import register_subject_type_tools
 from .http import create_cors_middleware
 
 from .utils.env import OPENAI_API_KEY
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 def create_server():
-    server = FastMCP(
-        name="Avni AI Server",
-        stateless_http=True
-    )
+    server = FastMCP(name="Avni AI Server", stateless_http=True)
 
     register_address_level_type_tools()
     register_catchment_tools()

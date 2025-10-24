@@ -17,7 +17,7 @@ class ConfigRequestValidation:
     auth_token: Optional[str] = None
     base_url: Optional[str] = None
     error_message: Optional[str] = None
-    
+
     @property
     def is_valid(self) -> bool:
         return self.error_message is None
@@ -26,7 +26,6 @@ class ConfigRequestValidation:
 async def validate_config_request(
     request: Request,
 ) -> ConfigRequestValidation:
-
     try:
         body = await request.json()
         config_data = body.get("config")
@@ -40,18 +39,20 @@ async def validate_config_request(
 
         auth_token = request.headers.get("avni-auth-token")
         if not auth_token:
-            return ConfigRequestValidation(error_message="avni-auth-token header is required")
+            return ConfigRequestValidation(
+                error_message="avni-auth-token header is required"
+            )
 
         base_url = os.getenv("AVNI_BASE_URL")
 
         return ConfigRequestValidation(
-            config_data=config_data,
-            auth_token=auth_token,
-            base_url=base_url
+            config_data=config_data, auth_token=auth_token, base_url=base_url
         )
 
     except Exception as e:
-        return ConfigRequestValidation(error_message=f"Request validation error: {str(e)}")
+        return ConfigRequestValidation(
+            error_message=f"Request validation error: {str(e)}"
+        )
 
 
 def create_error_response(message: str, status_code: int = 400) -> JSONResponse:

@@ -24,7 +24,6 @@ class DifyClient:
         inputs: Optional[Dict[str, Any]] = None,
         timeout: int = 120,
     ) -> Dict[str, Any]:
-
         url = f"{self.base_url}/chat-messages"
 
         payload = {

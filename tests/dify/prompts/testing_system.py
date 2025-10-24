@@ -10,7 +10,6 @@ import os
 
 
 class TestingSystem:
-
     def __init__(self, dify_api_key: str):
         self.tester = AITester(TESTER_PROMPTS)
         self.dify_client = DifyClient(dify_api_key)
