@@ -11,6 +11,7 @@ class AddressLevelTypeFields(Enum):
     PARENT_ID = "parentId"
     UUID = "uuid"
     VOIDED = "voided"
+    ID = "id"
 
 
 class LocationFields(Enum):
@@ -31,6 +32,7 @@ class CatchmentFields(Enum):
     NAME = "name"
     LOCATION_IDS = "locationIds"
     DELETE_FAST_SYNC = "deleteFastSync"
+    ID = "id"
 
 
 class SubjectTypeFields(Enum):
@@ -38,6 +40,7 @@ class SubjectTypeFields(Enum):
 
     NAME = "name"
     UUID = "uuid"
+    ID = "id"
     TYPE = "type"
     ACTIVE = "active"
     VOIDED = "voided"
@@ -70,6 +73,7 @@ class ProgramFields(Enum):
 
     NAME = "name"
     UUID = "uuid"
+    ID = "id"
     COLOUR = "colour"
     SUBJECT_TYPE_UUID = "subjectTypeUuid"
     PROGRAM_SUBJECT_LABEL = "programSubjectLabel"
@@ -96,6 +100,7 @@ class EncounterTypeFields(Enum):
 
     NAME = "name"
     UUID = "uuid"
+    ID = "id"
     SUBJECT_TYPE_UUID = "subjectTypeUuid"
     PROGRAM_UUID = "programUuid"
     ACTIVE = "active"

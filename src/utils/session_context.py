@@ -11,12 +11,10 @@ _session_logger: ContextVar[Optional[logging.Logger]] = ContextVar(
 
 
 def get_session_logger() -> Optional[logging.Logger]:
-    """Get the current session logger from context."""
     return _session_logger.get()
 
 
 def set_session_logger(logger: logging.Logger) -> None:
-    """Set the session logger in context."""
     _session_logger.set(logger)
 
 

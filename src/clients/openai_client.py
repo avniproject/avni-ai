@@ -1,14 +1,8 @@
+import json
 import logging
 from typing import Dict, List, Any, Optional
 from openai import AsyncOpenAI
-
-from ..utils.function_call_utils import (
-    parse_function_arguments,
-    add_function_output,
-    format_tools_for_continuation,
-    extract_function_calls,
-    execute_function_call,
-)
+from ..utils.session_context import set_session_logger
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +14,120 @@ class OpenAIResponsesClient:
 
         self.api_key = api_key
         self._client = AsyncOpenAI(api_key=api_key, timeout=timeout)
+
+    @staticmethod
+    def _parse_function_arguments(
+        arguments_str: str, call_id: str
+    ) -> Optional[Dict[str, Any]]:
+
+        try:
+            if isinstance(arguments_str, str):
+                return json.loads(arguments_str)
+            else:
+                return arguments_str
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in function arguments for call {call_id}: {e}")
+            return None
+
+    @staticmethod
+    def _add_function_output(
+        input_list: List, call_id: str, result: Any, is_error: bool = False
+    ) -> None:
+        if is_error:
+            output_data = {"error": str(result)}
+            logger.info("   Added error output to input_list")
+        else:
+            output_data = result  # Direct result, not wrapped in {"result": ...}
+            logger.info("   Added function output to input_list")
+
+        function_output = {
+            "type": "function_call_output",
+            "call_id": call_id,
+            "output": json.dumps(output_data),
+        }
+        input_list.append(function_output)
+
+    @staticmethod
+    def _format_tools_for_continuation(
+        available_tools: Optional[List[Dict[str, Any]]], tool_registry
+    ) -> List[Dict[str, Any]]:
+
+        formatted_tools = []
+        tools_to_use = (
+            available_tools if available_tools else tool_registry.get_openai_tools()
+        )
+
+        for tool in tools_to_use:
+            if tool.get("type") == "function":
+                formatted_tools.append(
+                    {
+                        "type": "function",
+                        "name": tool["function"]["name"],
+                        "description": tool["function"]["description"],
+                        "parameters": tool["function"]["parameters"],
+                    }
+                )
+
+        return formatted_tools
+
+    @staticmethod
+    def _extract_function_calls(response) -> List[Dict[str, Any]]:
+
+        function_calls = []
+
+        for i, item in enumerate(response.output):
+            if item.type == "function_call":
+                function_calls.append(
+                    {
+                        "name": item.name,
+                        "call_id": item.call_id,
+                        "arguments": item.arguments,
+                    }
+                )
+
+        return function_calls
+
+    @staticmethod
+    async def _execute_function_call(
+        function_name: str,
+        function_args: Dict[str, Any],
+        tool_registry,
+        auth_token: str,
+        session_logger: Optional[logging.Logger] = None,
+    ) -> Any:
+        """Execute a single function call and return the result.
+
+        Args:
+            function_name: Name of the function to call
+            function_args: Arguments for the function
+            tool_registry: The tool registry to execute functions
+            auth_token: Authentication token to inject
+            session_logger: Optional session logger for detailed logging
+
+        Returns:
+            The function execution result
+        """
+        # Inject auth_token for all function calls
+        function_args["auth_token"] = auth_token
+
+        logger.info(f"🔧 Executing function: {function_name}")
+
+        # Always log to session logger during config processing
+        if session_logger:
+            session_logger.info(f"🔧 EXECUTING FUNCTION: {function_name}")
+            session_logger.info(f"   Arguments: {json.dumps(function_args, indent=2)}")
+            # Set session logger context for tools to use
+            set_session_logger(session_logger)
+
+        result = await tool_registry.call_tool(function_name, function_args)
+        logger.info(f"   Function result: {str(result)[:200]}...")
+
+        # Always log result to session logger
+        if session_logger:
+            session_logger.info(f"   Function result: {str(result)}")
+            session_logger.info("   ---")
+
+        return result
 
     async def __aenter__(self):
         return self
@@ -134,7 +242,7 @@ class OpenAIResponsesClient:
 
         input_list += response.output
 
-        function_calls = extract_function_calls(response)
+        function_calls = self._extract_function_calls(response)
 
         if not function_calls:
             logger.info("ℹ️  No function calls made, returning original response")
@@ -151,16 +259,16 @@ class OpenAIResponsesClient:
             logger.info(f"   Arguments: {arguments_str}")
             logger.info(f"   Call ID: {call_id}")
 
-            function_args = parse_function_arguments(arguments_str, call_id)
+            function_args = self._parse_function_arguments(arguments_str, call_id)
             if function_args is None:
                 # Add error for invalid JSON
-                add_function_output(
+                self._add_function_output(
                     input_list, call_id, f"Invalid JSON: {arguments_str}", is_error=True
                 )
                 continue
 
             try:
-                result = await execute_function_call(
+                result = await self._execute_function_call(
                     function_name,
                     function_args,
                     tool_registry,
@@ -168,17 +276,17 @@ class OpenAIResponsesClient:
                     session_logger,
                 )
 
-                add_function_output(input_list, call_id, result, is_error=False)
+                self._add_function_output(input_list, call_id, result, is_error=False)
                 function_calls_processed += 1
 
             except Exception as e:
                 logger.error(f"❌ Error executing function {function_name}: {e}")
-                add_function_output(input_list, call_id, str(e), is_error=True)
+                self._add_function_output(input_list, call_id, str(e), is_error=True)
 
         logger.info(f"📊 Processed {function_calls_processed} function calls")
 
         try:
-            formatted_tools = format_tools_for_continuation(
+            formatted_tools = self._format_tools_for_continuation(
                 available_tools, tool_registry
             )
 

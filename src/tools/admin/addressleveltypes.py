@@ -1,7 +1,7 @@
 import logging
 from src.clients import AvniClient
-from src.utils.format_utils import format_creation_response
 from src.utils.session_context import log_payload
+from src.utils.result_utils import format_error_message, format_creation_response, format_update_response, format_deletion_response, format_validation_error
 from src.schemas.address_level_type_contract import (
     AddressLevelTypeContract,
     AddressLevelTypeUpdateContract,
@@ -16,23 +16,16 @@ logger = logging.getLogger(__name__)
 async def create_location_type(
     auth_token: str, contract: AddressLevelTypeContract
 ) -> str:
-    """Create a location type (e.g., State, District) for hierarchical location setup in Avni.
 
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: AddressLevelTypeContract with location type details
-    """
     payload = {
         AddressLevelTypeFields.NAME.value: contract.name,
         AddressLevelTypeFields.LEVEL.value: contract.level,
     }
 
     if contract.parentId is not None and contract.parentId != "":
-        # Convert parentId to int if it's a string, but only include if not empty
         try:
             if isinstance(contract.parentId, str):
                 if contract.parentId.strip() == "":
-                    # Empty string means no parent - don't include parentId in payload
                     pass
                 else:
                     payload[AddressLevelTypeFields.PARENT_ID.value] = int(
@@ -41,41 +34,28 @@ async def create_location_type(
             else:
                 payload[AddressLevelTypeFields.PARENT_ID.value] = contract.parentId
         except ValueError as e:
-            return f"Error converting parentId to integer for '{contract.name}': {e}. parentId: {contract.parentId}"
+            return format_validation_error("create location type", f"Invalid parentId '{contract.parentId}': {str(e)}")
 
-    # Log the actual API payload to both standard and session loggers
     log_payload("AddressLevelType CREATE payload:", payload)
 
     result = await AvniClient().call_avni_server("POST", "/addressLevelType", auth_token, payload)
 
     if not result.success:
-        return result.format_error("create location type")
+        return format_error_message(result, "create location type")
 
-    return format_creation_response("Location type", contract.name, "id", result.data)
+    return format_creation_response("Location type", contract.name, AddressLevelTypeFields.ID.value, result.data)
 
 
 async def update_location_type(
     auth_token: str, contract: AddressLevelTypeUpdateContract
 ) -> str:
-    """Update an existing location type (e.g., State, District) in Avni.
-
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: AddressLevelTypeUpdateContract with update details
-    """
 
     # Auto-correct self-referencing parentId (common LLM mistake)
     if contract.parentId is not None and contract.parentId == contract.id:
-        logger.info(
-            f"Auto-correcting self-referencing parentId from {contract.parentId} to null for location type {contract.id}"
-        )
         contract.parentId = None
 
     # Auto-correct parentId: 0 to null (common LLM mistake)
     if contract.parentId == 0:
-        logger.info(
-            f"Auto-correcting parentId from 0 to null for location type {contract.id}"
-        )
         contract.parentId = None
 
     payload = {
@@ -98,9 +78,8 @@ async def update_location_type(
             else:
                 payload[AddressLevelTypeFields.PARENT_ID.value] = contract.parentId
         except ValueError as e:
-            return f"Error converting parentId to integer for '{contract.name}': {e}. parentId: {contract.parentId}"
+            return format_validation_error("update location type", f"Invalid parentId '{contract.parentId}': {str(e)}")
 
-    # Log the actual API payload to both standard and session loggers
     log_payload("AddressLevelType UPDATE payload:", payload)
 
     result = await AvniClient().call_avni_server(
@@ -108,31 +87,21 @@ async def update_location_type(
     )
 
     if not result.success:
-        return result.format_error("update location type")
+        return format_error_message(result, "update location type")
 
-    return format_creation_response("Location type", contract.name, "id", result.data)
+    return format_update_response("Location type", contract.name, AddressLevelTypeFields.ID.value, result.data)
 
 
-async def delete_location_type(
-    auth_token: str, contract: AddressLevelTypeDeleteContract
-) -> str:
-    """Delete (void) an existing location type in Avni.
-
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: AddressLevelTypeDeleteContract with ID to delete
-    """
-    # Log the delete operation
-    logger.info(f"AddressLevelType DELETE: ID {contract.id}")
+async def delete_location_type( auth_token: str, contract: AddressLevelTypeDeleteContract) -> str:
 
     result = await AvniClient().call_avni_server(
         "DELETE", f"/addressLevelType/{contract.id}", auth_token
     )
 
     if not result.success:
-        return result.format_error("delete location type")
+        return format_error_message(result, "delete location type")
 
-    return f"Location type with ID {contract.id} successfully deleted (voided)"
+    return format_deletion_response("Location type", contract.id)
 
 
 def register_address_level_type_tools() -> None:

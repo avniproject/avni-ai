@@ -1,7 +1,7 @@
 import logging
 from src.clients import AvniClient
-from src.utils.format_utils import format_list_response, format_creation_response
 from src.utils.session_context import log_payload
+from src.utils.result_utils import format_error_message, format_empty_message, format_list_response, format_creation_response, format_update_response, format_deletion_response
 from src.schemas.catchment_contract import (
     CatchmentContract,
     CatchmentUpdateContract,
@@ -14,56 +14,41 @@ logger = logging.getLogger(__name__)
 
 
 async def get_catchments(auth_token: str) -> str:
-    """Retrieve a list of catchments for an organization to find IDs for assigning users."""
     result = await AvniClient().call_avni_server("GET", "/catchment", auth_token)
 
     if not result.success:
-        return result.format_error("retrieve catchments")
+        return format_error_message(result, "retrieve catchments")
 
     if not result.data:
-        return result.format_empty("catchments")
+        return format_empty_message("catchments")
 
     return format_list_response(result.data)
 
 
 async def create_catchment(auth_token: str, contract: CatchmentContract) -> str:
-    """Create a catchment grouping locations for data collection in Avni.
-
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: CatchmentContract with catchment details
-    """
     payload = {
         CatchmentFields.DELETE_FAST_SYNC.value: False,
         CatchmentFields.NAME.value: contract.name,
         CatchmentFields.LOCATION_IDS.value: contract.locationIds,
     }
 
-    # Log the actual API payload to both standard and session loggers
     log_payload("Catchment CREATE payload:", payload)
 
     result = await AvniClient().call_avni_server("POST", "/catchment", auth_token, payload)
 
     if not result.success:
-        return result.format_error("create catchment")
+        return format_error_message(result, "create catchment")
 
-    return format_creation_response("Catchment", contract.name, "id", result.data)
+    return format_creation_response("Catchment", contract.name, CatchmentFields.ID.value, result.data)
 
 
 async def update_catchment(auth_token: str, contract: CatchmentUpdateContract) -> str:
-    """Update an existing catchment in Avni.
-
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: CatchmentUpdateContract with update details
-    """
     payload = {
         CatchmentFields.NAME.value: contract.name,
         CatchmentFields.LOCATION_IDS.value: contract.locationIds,
         CatchmentFields.DELETE_FAST_SYNC.value: contract.deleteFastSync,
     }
 
-    # Log the actual API payload to both standard and session loggers
     log_payload("Catchment UPDATE payload:", payload)
 
     result = await AvniClient().call_avni_server(
@@ -71,27 +56,18 @@ async def update_catchment(auth_token: str, contract: CatchmentUpdateContract) -
     )
 
     if not result.success:
-        return result.format_error("update catchment")
+        return format_error_message(result, "update catchment")
 
-    return format_creation_response("Catchment", contract.name, "id", result.data)
+    return format_update_response("Catchment", contract.name, CatchmentFields.ID.value, result.data)
 
 
 async def delete_catchment(auth_token: str, contract: CatchmentDeleteContract) -> str:
-    """Delete (void) an existing catchment in Avni.
-
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: CatchmentDeleteContract with ID to delete
-    """
-    # Log the delete operation
-    logger.info(f"Catchment DELETE: ID {contract.id}")
-
     result = await AvniClient().call_avni_server("DELETE", f"/catchment/{contract.id}", auth_token)
 
     if not result.success:
-        return result.format_error("delete catchment")
+        return format_error_message(result, "delete catchment")
 
-    return f"Catchment with ID {contract.id} successfully deleted (voided)"
+    return format_deletion_response("Catchment", contract.id)
 
 
 def register_catchment_tools() -> None:

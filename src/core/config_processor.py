@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from ..clients import AvniClient, OpenAIResponsesClient
 from .tool_registry import tool_registry
 from ..utils.env import OPENAI_API_KEY
-from ..utils.logging_utils import setup_file_logging
 from ..utils.config_utils import (
     build_system_instructions,
     build_initial_input,
@@ -18,6 +17,28 @@ from ..utils.config_utils import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def setup_file_logging(task_id: str) -> logging.Logger:
+    logs_dir = "logs"
+    os.makedirs(logs_dir, exist_ok=True)
+
+    task_logger = logging.getLogger(f"config_session_{task_id}")
+    task_logger.setLevel(logging.INFO)
+
+    for handler in task_logger.handlers[:]:
+        task_logger.removeHandler(handler)
+
+    log_file = os.path.join(logs_dir, f"config_session_{task_id}.log")
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(logging.INFO)
+
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    file_handler.setFormatter(formatter)
+
+    task_logger.addHandler(file_handler)
+
+    return task_logger
 
 
 @dataclass

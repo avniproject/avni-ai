@@ -1,7 +1,7 @@
 import logging
 from src.clients import AvniClient
-from src.utils.format_utils import format_creation_response
 from src.utils.session_context import log_payload
+from src.utils.result_utils import format_error_message, format_empty_message, format_creation_response, format_update_response, format_deletion_response
 from src.schemas.program_contract import (
     ProgramContract,
     ProgramUpdateContract,
@@ -14,12 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 async def create_program(auth_token: str, contract: ProgramContract) -> str:
-    """Create a program in Avni for managing data collection activities.
-
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: ProgramContract with program details
-    """
     payload = {
         ProgramFields.NAME.value: contract.name,
         ProgramFields.UUID.value: contract.uuid,
@@ -32,7 +26,6 @@ async def create_program(auth_token: str, contract: ProgramContract) -> str:
         ProgramFields.ALLOW_MULTIPLE_ENROLMENTS.value: contract.allowMultipleEnrolments,
     }
 
-    # Add optional fields only if they are not None
     if contract.programSubjectLabel is not None:
         payload[ProgramFields.PROGRAM_SUBJECT_LABEL.value] = (
             contract.programSubjectLabel
@@ -53,6 +46,7 @@ async def create_program(auth_token: str, contract: ProgramContract) -> str:
         payload[
             ProgramFields.MANUAL_ENROLMENT_ELIGIBILITY_CHECK_DECLARATIVE_RULE.value
         ] = contract.manualEnrolmentEligibilityCheckDeclarativeRule
+
     if contract.programEnrolmentFormUuid is not None:
         payload[ProgramFields.PROGRAM_ENROLMENT_FORM_UUID.value] = (
             contract.programEnrolmentFormUuid
@@ -62,31 +56,23 @@ async def create_program(auth_token: str, contract: ProgramContract) -> str:
             contract.programExitFormUuid
         )
 
-    # Handle the manualEnrolmentEligibilityCheckRule field (boolean to string conversion if needed)
     payload[ProgramFields.MANUAL_ENROLMENT_ELIGIBILITY_CHECK_RULE.value] = (
         str(contract.manualEnrolmentEligibilityCheckRule)
         if isinstance(contract.manualEnrolmentEligibilityCheckRule, bool)
         else contract.manualEnrolmentEligibilityCheckRule
     )
 
-    # Log the actual API payload to both standard and session loggers
     log_payload("Program CREATE payload:", payload)
 
     result = await AvniClient().call_avni_server("POST", "/web/program", auth_token, payload)
 
     if not result.success:
-        return result.format_error("create program")
+        return format_error_message(result, "create program")
 
-    return format_creation_response("Program", contract.name, "uuid", result.data)
+    return format_creation_response("Program", contract.name, ProgramFields.UUID.value, result.data)
 
 
 async def update_program(auth_token: str, contract: ProgramUpdateContract) -> str:
-    """Update an existing program in Avni.
-
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: ProgramUpdateContract with update details
-    """
     payload = {
         ProgramFields.NAME.value: contract.name,
         ProgramFields.COLOUR.value: contract.colour,
@@ -98,7 +84,6 @@ async def update_program(auth_token: str, contract: ProgramUpdateContract) -> st
         ProgramFields.ALLOW_MULTIPLE_ENROLMENTS.value: contract.allowMultipleEnrolments,
     }
 
-    # Add optional fields only if they are not None
     if contract.programSubjectLabel is not None:
         payload[ProgramFields.PROGRAM_SUBJECT_LABEL.value] = (
             contract.programSubjectLabel
@@ -128,14 +113,12 @@ async def update_program(auth_token: str, contract: ProgramUpdateContract) -> st
             contract.programExitFormUuid
         )
 
-    # Handle the manualEnrolmentEligibilityCheckRule field (boolean to string conversion if needed)
     payload[ProgramFields.MANUAL_ENROLMENT_ELIGIBILITY_CHECK_RULE.value] = (
         str(contract.manualEnrolmentEligibilityCheckRule)
         if isinstance(contract.manualEnrolmentEligibilityCheckRule, bool)
         else contract.manualEnrolmentEligibilityCheckRule
     )
 
-    # Log the actual API payload to both standard and session loggers
     log_payload("Program UPDATE payload:", payload)
 
     result = await AvniClient().call_avni_server(
@@ -143,29 +126,20 @@ async def update_program(auth_token: str, contract: ProgramUpdateContract) -> st
     )
 
     if not result.success:
-        return result.format_error("update program")
+        return format_error_message(result, "update program")
 
-    return format_creation_response("Program", contract.name, "id", result.data)
+    return format_update_response("Program", contract.name, ProgramFields.ID.value, result.data)
 
 
 async def delete_program(auth_token: str, contract: ProgramDeleteContract) -> str:
-    """Delete (void) an existing program in Avni.
-
-    Args:
-        auth_token: Authentication token for Avni API
-        contract: ProgramDeleteContract with ID to delete
-    """
-    # Log the delete operation
-    logger.info(f"Program DELETE: ID {contract.id}")
-
     result = await AvniClient().call_avni_server(
         "DELETE", f"/web/program/{contract.id}", auth_token
     )
 
     if not result.success:
-        return result.format_error("delete program")
+        return format_error_message(result, "delete program")
 
-    return f"Program with ID {contract.id} successfully deleted (voided)"
+    return format_deletion_response("Program", contract.id)
 
 
 def register_program_tools() -> None:
