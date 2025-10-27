@@ -356,8 +356,24 @@ def parse_llm_response(response_content: str) -> Dict[str, Any]:
 
 
 def extract_text_content(response) -> str:
-    if hasattr(response, "output_text"):
-        return response.output_text or ""
+    """
+    Extracts readable text from an OpenAI response, handling both text and structured outputs.
+    """
+    # Prefer the simple case
+    if hasattr(response, "output_text") and response.output_text:
+        return response.output_text.strip()
+
+    # Handle structured response outputs (tool calls, messages, etc.)
+    if hasattr(response, "output") and response.output:
+        texts = []
+        for output in response.output:
+            # ResponseOutputMessage → contains text content pieces
+            if hasattr(output, "content") and output.content:
+                for item in output.content:
+                    if hasattr(item, "text") and item.text:
+                        texts.append(item.text)
+        if texts:
+            return "\n".join(texts).strip()
 
     return ""
 
