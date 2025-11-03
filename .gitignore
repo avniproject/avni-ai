@@ -45,9 +45,13 @@ Thumbs.db
 *.log
 local_settings.py
 db.sqlite3
+logs/
 
 # Testing
 .coverage
+coverage.xml
 htmlcov/
 .pytest_cache/
 .mypy_cache/
+.env
+*.egg-info/

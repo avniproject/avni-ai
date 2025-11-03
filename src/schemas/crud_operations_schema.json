@@ -1,0 +1,197 @@
+{
+  "operations": {
+    "create": {
+      "addressLevelTypes": [
+        {
+          "name": "string",
+          "level": "number", 
+          "parentId": "number|null",
+          "voided": "boolean"
+        }
+      ],
+      "locations": [
+        {
+          "name": "string",
+          "level": "number",
+          "type": "string",
+          "parents": "[{id: number}]",
+          "voided": "boolean",
+          "legacyId": "string|null",
+          "locationProperties": "object"
+        }
+      ],
+      "catchments": [
+        {
+          "name": "string",
+          "locationIds": "[number]",
+          "deleteFastSync": "boolean"
+        }
+      ],
+      "subjectTypes": [
+        {
+          "name": "string",
+          "uuid": "string",
+          "type": "Person|Group|User|Household|Individual",
+          "active": "boolean",
+          "voided": "boolean",
+          "group": "boolean",
+          "household": "boolean",
+          "allowEmptyLocation": "boolean",
+          "allowMiddleName": "boolean",
+          "lastNameOptional": "boolean",
+          "allowProfilePicture": "boolean",
+          "uniqueName": "boolean",
+          "directlyAssignable": "boolean",
+          "shouldSyncByLocation": "boolean",
+          "settings": {
+            "displayRegistrationDetails": "boolean",
+            "displayPlannedEncounters": "boolean"
+          },
+          "subjectSummaryRule": "string|null",
+          "programEligibilityCheckRule": "string|null",
+          "memberAdditionEligibilityCheckRule": "string|null",
+          "validFirstNameFormat": "object|null",
+          "validMiddleNameFormat": "object|null",
+          "validLastNameFormat": "object|null",
+          "iconFileS3Key": "string|null",
+          "syncRegistrationConcept1": "string|null",
+          "syncRegistrationConcept2": "string|null",
+          "syncRegistrationConcept1Usable": "boolean",
+          "syncRegistrationConcept2Usable": "boolean",
+          "nameHelpText": "string|null",
+          "groupRoles": [
+            {
+              "subjectMemberName": "string",
+              "groupRoleUUID": "string",
+              "role": "string",
+              "minimumNumberOfMembers": "number",
+              "maximumNumberOfMembers": "number",
+              "voided": "boolean"
+            }
+          ],
+          "memberSubjectType": "string|null",
+          "registrationFormUuid": "string"
+        }
+      ],
+      "programs": [
+        {
+          "name": "string",
+          "uuid": "string",
+          "colour": "string",
+          "active": "boolean",
+          "voided": "boolean",
+          "subjectTypeUuid": "string",
+          "programSubjectLabel": "string",
+          "enrolmentSummaryRule": "string|null",
+          "enrolmentEligibilityCheckRule": "string|null",
+          "enrolmentEligibilityCheckDeclarativeRule": "object|null",
+          "manualEligibilityCheckRequired": "boolean",
+          "showGrowthChart": "boolean",
+          "manualEnrolmentEligibilityCheckRule": "string|null",
+          "manualEnrolmentEligibilityCheckDeclarativeRule": "object|null",
+          "allowMultipleEnrolments": "boolean",
+          "programEnrolmentFormUuid": "string",
+          "programExitFormUuid": "string"
+        }
+      ],
+      "encounterTypes": [
+        {
+          "name": "string",
+          "uuid": "string",
+          "active": "boolean",
+          "voided": "boolean",
+          "isImmutable": "boolean",
+          "subjectTypeUuid": "string",
+          "programUuid": "string|null",
+          "entityEligibilityCheckRule": "string",
+          "entityEligibilityCheckDeclarativeRule": "null"
+        }
+      ]
+    },
+    "update": {
+      "addressLevelTypes": [
+        {
+          "id": "number",
+          "name": "string",
+          "level": "number",
+          "parentId": "number|null"
+        }
+      ],
+      "locations": [
+        {
+          "id": "number",
+          "title": "string",
+          "type": "string",
+          "parents": "[{id: number}]"
+        }
+      ],
+      "catchments": [
+        {
+          "id": "number",
+          "name": "string",
+          "locationIds": "[number]",
+          "deleteFastSync": "boolean"
+        }
+      ],
+      "subjectTypes": [
+        {
+          "id": "number",
+          "name": "string",
+          "type": "string",
+          "active": "boolean",
+          "settings": "object",
+          "groupRoles": "array"
+        }
+      ],
+      "programs": [
+        {
+          "id": "number",
+          "name": "string",
+          "colour": "string",
+          "active": "boolean",
+          "programSubjectLabel": "string"
+        }
+      ],
+      "encounterTypes": [
+        {
+          "id": "number",
+          "name": "string",
+          "active": "boolean",
+          "isImmutable": "boolean"
+        }
+      ]
+    },
+    "delete": {
+      "addressLevelTypes": [
+        {
+          "id": "number"
+        }
+      ],
+      "locations": [
+        {
+          "id": "number"
+        }
+      ],
+      "catchments": [
+        {
+          "id": "number"
+        }
+      ],
+      "subjectTypes": [
+        {
+          "id": "number"
+        }
+      ],
+      "programs": [
+        {
+          "id": "number"
+        }
+      ],
+      "encounterTypes": [
+        {
+          "id": "number"
+        }
+      ]
+    }
+  }
+}

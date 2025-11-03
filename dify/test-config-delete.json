@@ -1,0 +1,51 @@
+{
+  "config": {
+    "delete": {
+      "encounterTypes": [
+        {
+          "id": "id of Updated Family Survey"
+        }
+      ],
+      "programs": [
+        {
+          "id": "id of Updated Family Welfare"
+        }
+      ],
+      "subjectTypes": [
+        {
+          "id": "id of Updated Household"
+        }
+      ],
+      "catchments": [
+        {
+          "id": "id of Updated Rural Catchment"
+        },
+        {
+          "id": "id of Updated Urban Catchment"
+        }
+      ],
+      "locations": [
+        {
+          "id": "id of Updated Electronic City"
+        },
+        {
+          "id": "id of Updated Bangalore"
+        },
+        {
+          "id": "id of Updated Karnataka"
+        }
+      ],
+      "addressLevelTypes": [
+        {
+          "id": "id of Updated Block"
+        },
+        {
+          "id": "id of Updated District"
+        },
+        {
+          "id": "id of Updated State"
+        }
+      ]
+    }
+  }
+}

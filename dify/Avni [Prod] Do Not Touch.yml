@@ -6,11 +6,11 @@ app:
   name: Avni [Prod] Do Not Touch
   use_icon_as_answer_icon: true
 dependencies:
-- current_identifier: null
-  type: marketplace
-  value:
-    marketplace_plugin_unique_identifier: langgenius/openai:0.2.6@e2665624a156f52160927bceac9e169bd7e5ae6b936ae82575e14c90af390e6e
-    version: null
+  - current_identifier: null
+    type: marketplace
+    value:
+      marketplace_plugin_unique_identifier: langgenius/openai:0.2.6@e2665624a156f52160927bceac9e169bd7e5ae6b936ae82575e14c90af390e6e
+      version: null
 kind: app
 version: 0.4.0
 workflow:
@@ -19,17 +19,17 @@ workflow:
   features:
     file_upload:
       allowed_file_extensions:
-      - .JPG
-      - .JPEG
-      - .PNG
-      - .GIF
-      - .WEBP
-      - .SVG
+        - .JPG
+        - .JPEG
+        - .PNG
+        - .GIF
+        - .WEBP
+        - .SVG
       allowed_file_types:
-      - image
+        - image
       allowed_file_upload_methods:
-      - local_file
-      - remote_url
+        - local_file
+        - remote_url
       enabled: false
       fileUploadConfig:
         audio_file_size_limit: 50
@@ -42,10 +42,10 @@ workflow:
         enabled: false
         number_limits: 3
         transfer_methods:
-        - local_file
-        - remote_url
+          - local_file
+          - remote_url
       number_limits: 3
-    opening_statement: Hello! How can I help you?
+    opening_statement: 👋 Hey! Let’s get started with configuring Avni.
     retriever_resource:
       enabled: false
     sensitive_word_avoidance:
@@ -61,364 +61,364 @@ workflow:
       voice: ''
   graph:
     edges:
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: llm
-        targetType: if-else
-      id: 1757492907627-source-1757493270484-target
-      selected: false
-      source: '1757492907627'
-      sourceHandle: source
-      target: '1757493270484'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: llm
-        targetType: answer
-      id: 1757495664531-source-1757495688732-target
-      selected: false
-      source: '1757495664531'
-      sourceHandle: source
-      target: '1757495688732'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: llm
-      id: 1757493270484-00ce954d-b2ca-42aa-b302-dc2c163dd1d0-17580163919060-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
-      target: '17580163919060'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1757493270484-3489d477-53a2-4b99-9f40-af010262a1c1-1758608702077-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 3489d477-53a2-4b99-9f40-af010262a1c1
-      target: '1758608702077'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: if-else
-      id: 1758693281998-source-1758693567975-target
-      selected: false
-      source: '1758693281998'
-      sourceHandle: source
-      target: '1758693567975'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1758693567975-true-1758692827777-target
-      selected: false
-      source: '1758693567975'
-      sourceHandle: 'true'
-      target: '1758692827777'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: http-request
-      id: 1758693567975-false-1758695000001-target
-      selected: false
-      source: '1758693567975'
-      sourceHandle: 'false'
-      target: '1758695000001'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: if-else
-      id: 1758695000001-source-1758695000002-target
-      selected: false
-      source: '1758695000001'
-      sourceHandle: source
-      target: '1758695000002'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: http-request
-      id: 1758695000002-true-1758694151292-target
-      selected: false
-      source: '1758695000002'
-      sourceHandle: 'true'
-      target: '1758694151292'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1758695000002-false-1758695000003-target
-      selected: false
-      source: '1758695000002'
-      sourceHandle: 'false'
-      target: '1758695000003'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: answer
-      id: 1758694151292-source-1758693816149-target
-      selected: false
-      source: '1758694151292'
-      sourceHandle: source
-      target: '1758693816149'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1758624264402-blocked_config-1758624264404-target
-      selected: false
-      source: '1758624264402'
-      sourceHandle: blocked_config
-      target: '1758624264404'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1758624264402-production_uat-1758695198689-target
-      selected: false
-      source: '1758624264402'
-      sourceHandle: production_uat
-      target: '1758695198689'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1758624264402-no_config-1757496045338-target
-      selected: false
-      source: '1758624264402'
-      sourceHandle: no_config
-      target: '1757496045338'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: llm
-      id: 1758624264402-success_or_failure-1758693281998-target
-      selected: false
-      source: '1758624264402'
-      sourceHandle: success_or_failure
-      target: '1758693281998'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1758624264402-complete_success-1758695100001-target
-      selected: false
-      source: '1758624264402'
-      sourceHandle: complete_success
-      target: '1758695100001'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1758624264402-analyze_failures-1758695100002-target
-      selected: false
-      source: '1758624264402'
-      sourceHandle: analyze_failures
-      target: '1758695100002'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1757493270484-8ad5b2c6-6d29-4e4f-9f13-7682d4803a70-1758699378772-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
-      target: '1758699378772'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: start
-        targetType: knowledge-retrieval
-      id: 1711528708197-source-1758713692744-target
-      selected: false
-      source: '1711528708197'
-      sourceHandle: source
-      target: '1758713692744'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: knowledge-retrieval
-        targetType: llm
-      id: 1758713692744-source-1757492907627-target
-      selected: false
-      source: '1758713692744'
-      sourceHandle: source
-      target: '1757492907627'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: llm
-      id: 1757493270484-false-1757495664531-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 'false'
-      target: '1757495664531'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: llm
-      id: 1757493270484-true-1757495664531-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 'true'
-      target: '1757495664531'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: if-else
-      id: 1758624264401-source-1758624264402-target
-      selected: false
-      source: '1758624264401'
-      sourceHandle: source
-      target: '1758624264402'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: code
-      id: 17580163919060-source-1758624264401-target
-      selected: false
-      source: '17580163919060'
-      sourceHandle: source
-      target: '1758624264401'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    nodes:
-    - data:
-        desc: Define the initial parameters for launching a workflow
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: llm
+          targetType: if-else
+        id: 1757492907627-source-1757493270484-target
         selected: false
-        title: Start
-        type: start
-        variables:
-        - hide: true
-          label: auth_token
-          max_length: 2000
-          options: []
-          required: false
-          type: paragraph
-          variable: auth_token
-        - hide: true
-          label: org_name
-          max_length: 200
-          options: []
-          required: false
-          type: text-input
-          variable: org_name
-        - hide: true
-          label: org_type
-          max_length: 48
-          options: []
-          required: false
-          type: text-input
-          variable: org_type
-        - hide: true
-          hint: ''
-          label: user_name
-          max_length: 48
-          options: []
-          placeholder: ''
-          required: false
-          type: text-input
-          variable: user_name
-      height: 210
-      id: '1711528708197'
-      position:
-        x: 79.5
-        y: 714.5
-      positionAbsolute:
-        x: 79.5
-        y: 714.5
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        context:
-          enabled: true
-          variable_selector:
-          - '1758713692744'
-          - result
-        desc: ''
-        memory:
-          query_prompt_template: '{{#sys.files#}} {{#sys.query#}}'
-          role_prefix:
-            assistant: ''
-            user: ''
-          window:
-            enabled: false
-            size: 50
-        model:
-          completion_params:
-            json_schema: "{\n  \"name\": \"RoutingDecision\",\n  \"schema\": {\n \
+        source: '1757492907627'
+        sourceHandle: source
+        target: '1757493270484'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: llm
+          targetType: answer
+        id: 1757495664531-source-1757495688732-target
+        selected: false
+        source: '1757495664531'
+        sourceHandle: source
+        target: '1757495688732'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: llm
+        id: 1757493270484-00ce954d-b2ca-42aa-b302-dc2c163dd1d0-17580163919060-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+        target: '17580163919060'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1757493270484-3489d477-53a2-4b99-9f40-af010262a1c1-1758608702077-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 3489d477-53a2-4b99-9f40-af010262a1c1
+        target: '1758608702077'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: llm
+          targetType: if-else
+        id: 1758693281998-source-1758693567975-target
+        selected: false
+        source: '1758693281998'
+        sourceHandle: source
+        target: '1758693567975'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1758693567975-true-1758692827777-target
+        selected: false
+        source: '1758693567975'
+        sourceHandle: 'true'
+        target: '1758692827777'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: http-request
+        id: 1758693567975-false-1758695000001-target
+        selected: false
+        source: '1758693567975'
+        sourceHandle: 'false'
+        target: '1758695000001'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: llm
+          targetType: if-else
+        id: 1758695000001-source-1758695000002-target
+        selected: false
+        source: '1758695000001'
+        sourceHandle: source
+        target: '1758695000002'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: http-request
+        id: 1758695000002-true-1758694151292-target
+        selected: false
+        source: '1758695000002'
+        sourceHandle: 'true'
+        target: '1758694151292'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1758695000002-false-1758695000003-target
+        selected: false
+        source: '1758695000002'
+        sourceHandle: 'false'
+        target: '1758695000003'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: http-request
+          targetType: answer
+        id: 1758694151292-source-1758693816149-target
+        selected: false
+        source: '1758694151292'
+        sourceHandle: source
+        target: '1758693816149'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1758624264402-blocked_config-1758624264404-target
+        selected: false
+        source: '1758624264402'
+        sourceHandle: blocked_config
+        target: '1758624264404'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1758624264402-production_uat-1758695198689-target
+        selected: false
+        source: '1758624264402'
+        sourceHandle: production_uat
+        target: '1758695198689'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1758624264402-no_config-1757496045338-target
+        selected: false
+        source: '1758624264402'
+        sourceHandle: no_config
+        target: '1757496045338'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: llm
+        id: 1758624264402-success_or_failure-1758693281998-target
+        selected: false
+        source: '1758624264402'
+        sourceHandle: success_or_failure
+        target: '1758693281998'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1758624264402-complete_success-1758695100001-target
+        selected: false
+        source: '1758624264402'
+        sourceHandle: complete_success
+        target: '1758695100001'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1758624264402-analyze_failures-1758695100002-target
+        selected: false
+        source: '1758624264402'
+        sourceHandle: analyze_failures
+        target: '1758695100002'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1757493270484-8ad5b2c6-6d29-4e4f-9f13-7682d4803a70-1758699378772-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+        target: '1758699378772'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: start
+          targetType: knowledge-retrieval
+        id: 1711528708197-source-1758713692744-target
+        selected: false
+        source: '1711528708197'
+        sourceHandle: source
+        target: '1758713692744'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: knowledge-retrieval
+          targetType: llm
+        id: 1758713692744-source-1757492907627-target
+        selected: false
+        source: '1758713692744'
+        sourceHandle: source
+        target: '1757492907627'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: llm
+        id: 1757493270484-false-1757495664531-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 'false'
+        target: '1757495664531'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: llm
+        id: 1757493270484-true-1757495664531-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 'true'
+        target: '1757495664531'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: code
+          targetType: if-else
+        id: 1758624264401-source-1758624264402-target
+        selected: false
+        source: '1758624264401'
+        sourceHandle: source
+        target: '1758624264402'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: llm
+          targetType: code
+        id: 17580163919060-source-1758624264401-target
+        selected: false
+        source: '17580163919060'
+        sourceHandle: source
+        target: '1758624264401'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+    nodes:
+      - data:
+          desc: Define the initial parameters for launching a workflow
+          selected: false
+          title: Start
+          type: start
+          variables:
+            - hide: true
+              label: auth_token
+              max_length: 2000
+              options: []
+              required: false
+              type: paragraph
+              variable: auth_token
+            - hide: true
+              label: org_name
+              max_length: 200
+              options: []
+              required: false
+              type: text-input
+              variable: org_name
+            - hide: true
+              label: org_type
+              max_length: 48
+              options: []
+              required: false
+              type: text-input
+              variable: org_type
+            - hide: true
+              hint: ''
+              label: user_name
+              max_length: 48
+              options: []
+              placeholder: ''
+              required: false
+              type: text-input
+              variable: user_name
+        height: 208
+        id: '1711528708197'
+        position:
+          x: 79.5
+          y: 714.5
+        positionAbsolute:
+          x: 79.5
+          y: 714.5
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          context:
+            enabled: true
+            variable_selector:
+              - '1758713692744'
+              - result
+          desc: ''
+          memory:
+            query_prompt_template: '{{#sys.files#}} {{#sys.query#}}'
+            role_prefix:
+              assistant: ''
+              user: ''
+            window:
+              enabled: false
+              size: 50
+          model:
+            completion_params:
+              json_schema: "{\n  \"name\": \"RoutingDecision\",\n  \"schema\": {\n \
               \   \"type\": \"object\",\n    \"properties\": {\n      \"service\"\
               : {\n        \"type\": \"string\",\n        \"enum\": [\"RAG\", \"ASSISTANT\"\
               , \"TEMPLATE\"],\n        \"description\": \"Service to which the request\
@@ -441,15 +441,15 @@ workflow:
               \  \"confidence\",\n      \"question_type\",\n      \"routing_reason\"\
               ,\n      \"clarification_needed\"\n    ],\n    \"additionalProperties\"\
               : false\n  }\n}"
-            response_format: json_schema
-            temperature: 0.1
-          mode: chat
-          name: gpt-4o-mini
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: b14eb575-d615-41dd-aac1-00663db3a6eb
-          role: system
-          text: "You are the Avni Platform Orchestrator of the Avni AI Assistant.\
+              response_format: json_schema
+              temperature: 0.1
+            mode: chat
+            name: gpt-4o-mini
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: b14eb575-d615-41dd-aac1-00663db3a6eb
+              role: system
+              text: "You are the Avni Platform Orchestrator of the Avni AI Assistant.\
             \ Route user messages based on their PRIMARY INTENT, not the complexity\
             \ or specificity of their\nquestion.\n\n<context>\n{{#context#}}\n</context>\n\
             \n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
@@ -553,158 +553,158 @@ workflow:
             \ (\"We need...\", \"Help us set up...\", \"Our org wants...\")?\n   \
             \     │   └── YES → ASSISTANT\n        │\n        └── UNCLEAR → Default\
             \ to RAG (safer for capability questions)"
-        - id: 36b2faa1-0e45-4962-8107-74a07045af09
-          role: user
-          text: ''
-        selected: false
-        structured_output:
-          schema:
-            additionalProperties: false
-            properties:
-              clarification_needed:
-                type: boolean
-              clarifying_questions:
-                items:
+            - id: 36b2faa1-0e45-4962-8107-74a07045af09
+              role: user
+              text: ''
+          selected: false
+          structured_output:
+            schema:
+              additionalProperties: false
+              properties:
+                clarification_needed:
+                  type: boolean
+                clarifying_questions:
+                  items:
+                    type: string
+                  type: array
+                confidence:
+                  type: number
+                question_type:
                   type: string
-                type: array
-              confidence:
-                type: number
-              question_type:
-                type: string
-              routing_reason:
-                type: string
-              service:
-                type: string
-            required:
-            - service
-            - confidence
-            - question_type
-            - routing_reason
-            - clarification_needed
-            - clarifying_questions
-            type: object
-        structured_output_enabled: true
-        title: Orchestrator
-        type: llm
-        variables: []
-        vision:
-          enabled: false
-      height: 88
-      id: '1757492907627'
-      position:
-        x: 679.5208847590508
-        y: 739.0449267741175
-      positionAbsolute:
-        x: 679.5208847590508
-        y: 739.0449267741175
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        cases:
-        - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
-          conditions:
-          - comparison_operator: is
-            id: 93fbecf3-5468-4878-84ce-37c7cfa15625
-            value: 'true'
-            varType: object
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - clarification_needed
-          - comparison_operator: <
-            id: 964871af-0fc9-45e9-a795-d2fda4b4ad34
-            value: '0.8'
-            varType: number
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - confidence
-          id: 3489d477-53a2-4b99-9f40-af010262a1c1
-          logical_operator: and
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: is
-            id: fb0a1b2b-46e8-4a67-8b98-b44ea87869db
-            value: RAG
-            varType: string
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - service
-          id: 'true'
-          logical_operator: and
-        - case_id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
-          conditions:
-          - comparison_operator: is
-            id: 1931b24c-c74e-4a09-b0c1-afeb220851bd
-            value: ASSISTANT
-            varType: string
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - service
-          id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
-          logical_operator: and
-        - case_id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
-          conditions:
-          - comparison_operator: is
-            id: beb8a551-f66d-4add-9480-bb9c185119f4
-            value: OUT_OF_SCOPE
-            varType: string
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - service
-          id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
-          logical_operator: and
-        desc: ''
+                routing_reason:
+                  type: string
+                service:
+                  type: string
+              required:
+                - service
+                - confidence
+                - question_type
+                - routing_reason
+                - clarification_needed
+                - clarifying_questions
+              type: object
+          structured_output_enabled: true
+          title: Orchestrator
+          type: llm
+          variables: []
+          vision:
+            enabled: false
+        height: 86
+        id: '1757492907627'
+        position:
+          x: 679.5208847590508
+          y: 739.0449267741175
+        positionAbsolute:
+          x: 679.5208847590508
+          y: 739.0449267741175
         selected: false
-        title: IF/ELSE
-        type: if-else
-      height: 294
-      id: '1757493270484'
-      position:
-        x: 1017.6514583301542
-        y: 702.2275366129412
-      positionAbsolute:
-        x: 1017.6514583301542
-        y: 702.2275366129412
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        context:
-          enabled: true
-          variable_selector:
-          - '1758713692744'
-          - result
-        desc: ''
-        memory:
-          query_prompt_template: '{{#sys.query#}}
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          cases:
+            - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
+              conditions:
+                - comparison_operator: is
+                  id: 93fbecf3-5468-4878-84ce-37c7cfa15625
+                  value: 'true'
+                  varType: object
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - clarification_needed
+                - comparison_operator: <
+                  id: 964871af-0fc9-45e9-a795-d2fda4b4ad34
+                  value: '0.8'
+                  varType: number
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - confidence
+              id: 3489d477-53a2-4b99-9f40-af010262a1c1
+              logical_operator: and
+            - case_id: 'true'
+              conditions:
+                - comparison_operator: is
+                  id: fb0a1b2b-46e8-4a67-8b98-b44ea87869db
+                  value: RAG
+                  varType: string
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - service
+              id: 'true'
+              logical_operator: and
+            - case_id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+              conditions:
+                - comparison_operator: is
+                  id: 1931b24c-c74e-4a09-b0c1-afeb220851bd
+                  value: ASSISTANT
+                  varType: string
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - service
+              id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+              logical_operator: and
+            - case_id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+              conditions:
+                - comparison_operator: is
+                  id: beb8a551-f66d-4add-9480-bb9c185119f4
+                  value: OUT_OF_SCOPE
+                  varType: string
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - service
+              id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+              logical_operator: and
+          desc: ''
+          selected: false
+          title: IF/ELSE
+          type: if-else
+        height: 292
+        id: '1757493270484'
+        position:
+          x: 1017.6514583301542
+          y: 702.2275366129412
+        positionAbsolute:
+          x: 1017.6514583301542
+          y: 702.2275366129412
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          context:
+            enabled: true
+            variable_selector:
+              - '1758713692744'
+              - result
+          desc: ''
+          memory:
+            query_prompt_template: '{{#sys.query#}}
 
 
             {{#sys.files#}}'
-          role_prefix:
-            assistant: ''
-            user: ''
-          window:
-            enabled: false
-            size: 50
-        model:
-          completion_params:
-            temperature: 0.1
-          mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
-          role: system
-          text: "Use the following context as your learned knowledge, inside <context></context>\
+            role_prefix:
+              assistant: ''
+              user: ''
+            window:
+              enabled: false
+              size: 50
+          model:
+            completion_params:
+              temperature: 0.1
+            mode: chat
+            name: gpt-4o
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
+              role: system
+              text: "Use the following context as your learned knowledge, inside <context></context>\
             \ XML tags.\n<context>\n{{#context#}}\n</context>\nYou are talking to\
             \ {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\nYou\
             \ are part of the Avni AI Assistant. The Avni AI Assistant is currently\
@@ -718,93 +718,93 @@ workflow:
             \ in every response. \nAvoid mentioning that you obtained the information\
             \ from the context.\nAnd answer according to the language of the user's\
             \ question."
+          selected: false
+          title: RAG LLM
+          type: llm
+          variables: []
+          vision:
+            enabled: false
+        height: 86
+        id: '1757495664531'
+        position:
+          x: 1843.5141755407374
+          y: 550.5645879473302
+        positionAbsolute:
+          x: 1843.5141755407374
+          y: 550.5645879473302
         selected: false
-        title: RAG LLM
-        type: llm
-        variables: []
-        vision:
-          enabled: false
-      height: 88
-      id: '1757495664531'
-      position:
-        x: 1843.5141755407374
-        y: 550.5645879473302
-      positionAbsolute:
-        x: 1843.5141755407374
-        y: 550.5645879473302
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: '{{#1757495664531.text#}}'
-        desc: ''
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: '{{#1757495664531.text#}}'
+          desc: ''
+          selected: false
+          title: RAG Answer
+          type: answer
+          variables: []
+        height: 101
+        id: '1757495688732'
+        position:
+          x: 2278.5095654341676
+          y: 403.98998746465634
+        positionAbsolute:
+          x: 2278.5095654341676
+          y: 403.98998746465634
         selected: false
-        title: RAG Answer
-        type: answer
-        variables: []
-      height: 103
-      id: '1757495688732'
-      position:
-        x: 2278.5095654341676
-        y: 403.98998746465634
-      positionAbsolute:
-        x: 2278.5095654341676
-        y: 403.98998746465634
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: '{{#17580163919060.text#}}'
-        desc: ''
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: '{{#17580163919060.text#}}'
+          desc: ''
+          selected: false
+          title: Answer 5
+          type: answer
+          variables: []
+        height: 101
+        id: '1757496045338'
+        position:
+          x: 3276.9696999300368
+          y: 1381.9454319487072
+        positionAbsolute:
+          x: 3276.9696999300368
+          y: 1381.9454319487072
         selected: false
-        title: Answer 5
-        type: answer
-        variables: []
-      height: 103
-      id: '1757496045338'
-      position:
-        x: 3276.9696999300368
-        y: 1381.9454319487072
-      positionAbsolute:
-        x: 3276.9696999300368
-        y: 1381.9454319487072
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        context:
-          enabled: true
-          variable_selector:
-          - '1757492907627'
-          - text
-        desc: ''
-        memory:
-          query_prompt_template: 'Previous conversation context for {{#1711528708197.user_name#}}:
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          context:
+            enabled: true
+            variable_selector:
+              - '1757492907627'
+              - text
+          desc: ''
+          memory:
+            query_prompt_template: 'Previous conversation context for {{#1711528708197.user_name#}}:
             {{#conversation_history#}}
 
             Current query: {{#sys.query#}} {{#sys.files#}}'
-          role_prefix:
-            assistant: 'Assistant: '
-            user: '{{#1711528708197.user_name#}}: '
-          window:
-            enabled: true
-            size: 20
-        model:
-          completion_params:
-            temperature: 0.1
-          mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
-          role: system
-          text: "Instructions:\nYou are Avni Copilot, an expert assistant for the\
+            role_prefix:
+              assistant: 'Assistant: '
+              user: '{{#1711528708197.user_name#}}: '
+            window:
+              enabled: true
+              size: 20
+          model:
+            completion_params:
+              temperature: 0.1
+            mode: chat
+            name: gpt-4o
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
+              role: system
+              text: "Instructions:\nYou are Avni Copilot, an expert assistant for the\
             \ Avni data collection platform.\nYour primary role is to guide NGOs,\
             \ program managers, and implementers in designing their Avni configuration\
             \ and confirm that the configuration matches their requirements.\n- Arrive\
@@ -837,7 +837,12 @@ workflow:
             \ question at a time.\n- Use a nudging style: ask clarifying questions,\
             \ provide concrete examples, and help me refine my answers step by step.\n\
             - Keep the conversation practical and oriented toward my real-world workflow\
-            \ rather than technical details of Avni.\n\nCRITICAL ATTRIBUTE HANDLING\
+            \ rather than technical details of Avni.\n\nIMPORTANT LIMITATION:\n- I\
+            \ cannot help with writing, debugging, or creating Avni rules (JavaScript\
+            \ code for custom logic in forms)\n- If asked about rules, clearly respond:\
+            \ \"I can't help you with writing Avni rules right now. For creating or\
+            \ implementing rules in Avni, please consult the Avni documentation or\
+            \ reach out to the Avni support team.\"\n\nCRITICAL ATTRIBUTE HANDLING\
             \ RULES:\n- If a subject type already exists (from validation), do NOT\
             \ ask for attributes\n- Only ask for attributes when creating NEW subject\
             \ types\n- Skip attribute questions for entities that won't be created\
@@ -983,227 +988,227 @@ workflow:
             \ that up\" or \"Let me know when you've created this\"\n- This creates\
             \ a natural, step-by-step implementation flow rather than just theoretical\
             \ planning"
+          selected: false
+          structured_output:
+            schema:
+              additionalProperties: false
+              properties:
+                config:
+                  properties:
+                    addressLevelTypes:
+                      items:
+                        properties:
+                          level:
+                            type: number
+                          name:
+                            type: string
+                          parentId:
+                            type:
+                              - integer
+                              - 'null'
+                          uuid:
+                            type: string
+                          voided:
+                            type: boolean
+                        required:
+                          - name
+                          - level
+                        type: object
+                      type: array
+                    encounterTypes:
+                      items:
+                        properties:
+                          active:
+                            type: boolean
+                          entityEligibilityCheckRule:
+                            type:
+                              - string
+                              - 'null'
+                          isImmutable:
+                            type: boolean
+                          name:
+                            type: string
+                          voided:
+                            type: boolean
+                        required:
+                          - name
+                        type: object
+                      type: array
+                    locations:
+                      items:
+                        properties:
+                          addressLevelTypeUUID:
+                            type: string
+                          gpsCoordinates:
+                            type:
+                              - object
+                              - 'null'
+                          legacyId:
+                            type:
+                              - string
+                              - 'null'
+                          level:
+                            type: number
+                          locationProperties:
+                            type: object
+                          name:
+                            type: string
+                          organisationUUID:
+                            type: string
+                          type:
+                            type: string
+                          uuid:
+                            type: string
+                          voided:
+                            type: boolean
+                        required:
+                          - name
+                          - level
+                          - type
+                          - addressLevelTypeUUID
+                          - organisationUUID
+                        type: object
+                      type: array
+                    programs:
+                      items:
+                        properties:
+                          active:
+                            type: boolean
+                          allowMultipleEnrolments:
+                            type: boolean
+                          colour:
+                            type: string
+                          enrolmentEligibilityCheckRule:
+                            type:
+                              - string
+                              - 'null'
+                          enrolmentSummaryRule:
+                            type:
+                              - string
+                              - 'null'
+                          manualEligibilityCheckRequired:
+                            type: boolean
+                          name:
+                            type: string
+                          showGrowthChart:
+                            type: boolean
+                          voided:
+                            type: boolean
+                        required:
+                          - name
+                          - colour
+                        type: object
+                      type: array
+                    subjectTypes:
+                      items:
+                        properties:
+                          active:
+                            type: boolean
+                          allowEmptyLocation:
+                            type: boolean
+                          allowMiddleName:
+                            type: boolean
+                          allowProfilePicture:
+                            type: boolean
+                          directlyAssignable:
+                            type: boolean
+                          group:
+                            type: boolean
+                          household:
+                            type: boolean
+                          lastNameOptional:
+                            type: boolean
+                          memberAdditionEligibilityCheckRule:
+                            type:
+                              - string
+                              - 'null'
+                          name:
+                            type: string
+                          programEligibilityCheckRule:
+                            type:
+                              - string
+                              - 'null'
+                          shouldSyncByLocation:
+                            type: boolean
+                          subjectSummaryRule:
+                            type:
+                              - string
+                              - 'null'
+                          type:
+                            type: string
+                          uniqueName:
+                            type: boolean
+                        required:
+                          - name
+                          - type
+                        type: object
+                      type: array
+                  type: object
+                response:
+                  type: string
+              required:
+                - response
+                - config
+              type: object
+          structured_output_enabled: false
+          title: Assistant LLM
+          type: llm
+          variables: []
+          vision:
+            enabled: false
+        height: 86
+        id: '17580163919060'
+        position:
+          x: 1340.6439991246866
+          y: 1263.3429536390665
+        positionAbsolute:
+          x: 1340.6439991246866
+          y: 1263.3429536390665
         selected: false
-        structured_output:
-          schema:
-            additionalProperties: false
-            properties:
-              config:
-                properties:
-                  addressLevelTypes:
-                    items:
-                      properties:
-                        level:
-                          type: number
-                        name:
-                          type: string
-                        parentId:
-                          type:
-                          - integer
-                          - 'null'
-                        uuid:
-                          type: string
-                        voided:
-                          type: boolean
-                      required:
-                      - name
-                      - level
-                      type: object
-                    type: array
-                  encounterTypes:
-                    items:
-                      properties:
-                        active:
-                          type: boolean
-                        entityEligibilityCheckRule:
-                          type:
-                          - string
-                          - 'null'
-                        isImmutable:
-                          type: boolean
-                        name:
-                          type: string
-                        voided:
-                          type: boolean
-                      required:
-                      - name
-                      type: object
-                    type: array
-                  locations:
-                    items:
-                      properties:
-                        addressLevelTypeUUID:
-                          type: string
-                        gpsCoordinates:
-                          type:
-                          - object
-                          - 'null'
-                        legacyId:
-                          type:
-                          - string
-                          - 'null'
-                        level:
-                          type: number
-                        locationProperties:
-                          type: object
-                        name:
-                          type: string
-                        organisationUUID:
-                          type: string
-                        type:
-                          type: string
-                        uuid:
-                          type: string
-                        voided:
-                          type: boolean
-                      required:
-                      - name
-                      - level
-                      - type
-                      - addressLevelTypeUUID
-                      - organisationUUID
-                      type: object
-                    type: array
-                  programs:
-                    items:
-                      properties:
-                        active:
-                          type: boolean
-                        allowMultipleEnrolments:
-                          type: boolean
-                        colour:
-                          type: string
-                        enrolmentEligibilityCheckRule:
-                          type:
-                          - string
-                          - 'null'
-                        enrolmentSummaryRule:
-                          type:
-                          - string
-                          - 'null'
-                        manualEligibilityCheckRequired:
-                          type: boolean
-                        name:
-                          type: string
-                        showGrowthChart:
-                          type: boolean
-                        voided:
-                          type: boolean
-                      required:
-                      - name
-                      - colour
-                      type: object
-                    type: array
-                  subjectTypes:
-                    items:
-                      properties:
-                        active:
-                          type: boolean
-                        allowEmptyLocation:
-                          type: boolean
-                        allowMiddleName:
-                          type: boolean
-                        allowProfilePicture:
-                          type: boolean
-                        directlyAssignable:
-                          type: boolean
-                        group:
-                          type: boolean
-                        household:
-                          type: boolean
-                        lastNameOptional:
-                          type: boolean
-                        memberAdditionEligibilityCheckRule:
-                          type:
-                          - string
-                          - 'null'
-                        name:
-                          type: string
-                        programEligibilityCheckRule:
-                          type:
-                          - string
-                          - 'null'
-                        shouldSyncByLocation:
-                          type: boolean
-                        subjectSummaryRule:
-                          type:
-                          - string
-                          - 'null'
-                        type:
-                          type: string
-                        uniqueName:
-                          type: boolean
-                      required:
-                      - name
-                      - type
-                      type: object
-                    type: array
-                type: object
-              response:
-                type: string
-            required:
-            - response
-            - config
-            type: object
-        structured_output_enabled: false
-        title: Assistant LLM
-        type: llm
-        variables: []
-        vision:
-          enabled: false
-      height: 88
-      id: '17580163919060'
-      position:
-        x: 1340.6439991246866
-        y: 1263.3429536390665
-      positionAbsolute:
-        x: 1340.6439991246866
-        y: 1263.3429536390665
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
+          selected: false
+          title: Clarify the question
+          type: answer
+          variables: []
+        height: 136
+        id: '1758608702077'
+        position:
+          x: 1409.7669821360873
+          y: 414.79698163829846
+        positionAbsolute:
+          x: 1409.7669821360873
+          y: 414.79698163829846
         selected: false
-        title: Clarify the question
-        type: answer
-        variables: []
-      height: 137
-      id: '1758608702077'
-      position:
-        x: 1409.7669821360873
-        y: 414.79698163829846
-      positionAbsolute:
-        x: 1409.7669821360873
-        y: 414.79698163829846
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: '{{#17580163919060.text#}}'
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: '{{#17580163919060.text#}}'
+          selected: false
+          title: Answer 4
+          type: answer
+          variables: []
+        height: 101
+        id: '1758692827777'
+        position:
+          x: 4781.118291097593
+          y: 1753.0656052341733
+        positionAbsolute:
+          x: 4781.118291097593
+          y: 1753.0656052341733
         selected: false
-        title: Answer 4
-        type: answer
-        variables: []
-      height: 103
-      id: '1758692827777'
-      position:
-        x: 4781.118291097593
-        y: 1753.0656052341733
-      positionAbsolute:
-        x: 4781.118291097593
-        y: 1753.0656052341733
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        code: "import requests\nimport json\nimport uuid\nfrom copy import deepcopy\n\
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          code: "import requests\nimport json\nimport uuid\nfrom copy import deepcopy\n\
           import time\nimport re\ndef sort_locations_by_hierarchy(locations):\n  \
           \  \"\"\"\n    Sort locations by hierarchy level (parents first, then children)\n\
           \    This ensures parent locations are created before child locations\n\
@@ -1654,100 +1659,100 @@ workflow:
           \      'flow_action': 'handle_exception',\n                'message': error_msg,\n\
           \                'summary': {'total': 0, 'successful': 0, 'failed': 0, 'skipped':\
           \ 0},\n                'blocked': True\n            }\n        }"
-        code_language: python3
-        outputs:
-          configResult:
-            children: null
-            type: object
+          code_language: python3
+          outputs:
+            configResult:
+              children: null
+              type: object
+          selected: false
+          title: Comprehensive Configuration Manager
+          type: code
+          variables:
+            - value_selector:
+                - '1711528708197'
+                - auth_token
+              value_type: string
+              variable: auth_token
+            - value_selector:
+                - '1711528708197'
+                - org_type
+              value_type: string
+              variable: org_type
+            - value_selector:
+                - '1711528708197'
+                - user_name
+              value_type: string
+              variable: user_name
+            - value_selector:
+                - '1711528708197'
+                - org_name
+              value_type: string
+              variable: org_name
+        height: 50
+        id: '1758624264401'
+        position:
+          x: 1696.9959119567468
+          y: 1291.8452689845076
+        positionAbsolute:
+          x: 1696.9959119567468
+          y: 1291.8452689845076
         selected: false
-        title: Comprehensive Configuration Manager
-        type: code
-        variables:
-        - value_selector:
-          - '1711528708197'
-          - auth_token
-          value_type: string
-          variable: auth_token
-        - value_selector:
-          - '1711528708197'
-          - org_type
-          value_type: string
-          variable: org_type
-        - value_selector:
-          - '1711528708197'
-          - user_name
-          value_type: string
-          variable: user_name
-        - value_selector:
-          - '1711528708197'
-          - org_name
-          value_type: string
-          variable: org_name
-      height: 52
-      id: '1758624264401'
-      position:
-        x: 1696.9959119567468
-        y: 1291.8452689845076
-      positionAbsolute:
-        x: 1696.9959119567468
-        y: 1291.8452689845076
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        context:
-          enabled: false
-          variable_selector: []
-        model:
-          completion_params:
-            temperature: 0.7
-          mode: chat
-          name: gpt-4o-mini
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: a0a936ba-619a-46d1-a1b5-146a4416c836
-          role: system
-          text: '{{#1758624264401.configResult.result#}}
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          context:
+            enabled: false
+            variable_selector: []
+          model:
+            completion_params:
+              temperature: 0.7
+            mode: chat
+            name: gpt-4o-mini
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: a0a936ba-619a-46d1-a1b5-146a4416c836
+              role: system
+              text: '{{#1758624264401.configResult.result#}}
 
             Based on the result from configuration creation, respond with a single
             word. If result is "success" then say "Success". If result is "failure"
             or "error" then say "Failure". Reply only in a single word either "Success"
             or "Failure"'
+          selected: false
+          structured_output_enabled: false
+          title: Check Responses
+          type: llm
+          vision:
+            enabled: false
+        height: 86
+        id: '1758693281998'
+        position:
+          x: 3129.4764325533256
+          y: 1712.722906333997
+        positionAbsolute:
+          x: 3129.4764325533256
+          y: 1712.722906333997
         selected: false
-        structured_output_enabled: false
-        title: Check Responses
-        type: llm
-        vision:
-          enabled: false
-      height: 88
-      id: '1758693281998'
-      position:
-        x: 3129.4764325533256
-        y: 1712.722906333997
-      positionAbsolute:
-        x: 3129.4764325533256
-        y: 1712.722906333997
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        context:
-          enabled: false
-          variable_selector: []
-        model:
-          completion_params:
-            temperature: 0.7
-          mode: chat
-          name: gpt-4o-mini
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: 8e8b2b4a-1b2c-4d3e-9f0a-1b2c3d4e5f6a
-          role: system
-          text: 'You are a safety assistant for Avni configuration management. The
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          context:
+            enabled: false
+            variable_selector: []
+          model:
+            completion_params:
+              temperature: 0.7
+            mode: chat
+            name: gpt-4o-mini
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: 8e8b2b4a-1b2c-4d3e-9f0a-1b2c3d4e5f6a
+              role: system
+              text: 'You are a safety assistant for Avni configuration management. The
             user is about to delete an implementation in a {{#1711528708197.org_type#}}
             environment.
 
@@ -1768,370 +1773,370 @@ workflow:
 
 
             Be very strict about confirmation - only accept clear, unambiguous confirmation.'
-        - id: 9f1a2b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
-          role: user
-          text: The configuration creation failed and the system wants to delete the
-            implementation. This is a {{#1711528708197.org_type#}} environment. Should
-            I proceed with deletion?
+            - id: 9f1a2b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+              role: user
+              text: The configuration creation failed and the system wants to delete the
+                implementation. This is a {{#1711528708197.org_type#}} environment. Should
+                I proceed with deletion?
+          selected: false
+          title: Deletion Confirmation
+          type: llm
+          variables:
+            - value_selector:
+                - '1711528708197'
+                - org_type
+              value_type: string
+              variable: org_type
+        height: 86
+        id: '1758695000001'
+        position:
+          x: 4200
+          y: 1300
+        positionAbsolute:
+          x: 4200
+          y: 1300
         selected: false
-        title: Deletion Confirmation
-        type: llm
-        variables:
-        - value_selector:
-          - '1711528708197'
-          - org_type
-          value_type: string
-          variable: org_type
-      height: 88
-      id: '1758695000001'
-      position:
-        x: 4200
-        y: 1300
-      positionAbsolute:
-        x: 4200
-        y: 1300
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        cases:
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: contains
-            id: conf-check-001
-            value: CONFIRMED
-            varType: string
-            variable_selector:
-            - '1758695000001'
-            - text
-          id: 'true'
-          logical_operator: and
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          cases:
+            - case_id: 'true'
+              conditions:
+                - comparison_operator: contains
+                  id: conf-check-001
+                  value: CONFIRMED
+                  varType: string
+                  variable_selector:
+                    - '1758695000001'
+                    - text
+              id: 'true'
+              logical_operator: and
+          selected: false
+          title: Check Confirmation
+          type: if-else
+        height: 122
+        id: '1758695000002'
+        position:
+          x: 4500
+          y: 1300
+        positionAbsolute:
+          x: 4500
+          y: 1300
         selected: false
-        title: Check Confirmation
-        type: if-else
-      height: 124
-      id: '1758695000002'
-      position:
-        x: 4500
-        y: 1300
-      positionAbsolute:
-        x: 4500
-        y: 1300
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: 'Deletion cancelled by user. The implementation was not deleted to
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: 'Deletion cancelled by user. The implementation was not deleted to
           prevent data loss in the {{#1711528708197.org_type#}} environment.
 
 
           To proceed with deletion, you must explicitly confirm the operation when
           prompted.'
+          selected: false
+          title: Deletion Cancelled
+          type: answer
+          variables:
+            - value_selector:
+                - '1711528708197'
+                - org_type
+              value_type: string
+              variable: org_type
+        height: 197
+        id: '1758695000003'
+        position:
+          x: 4800
+          y: 1400
+        positionAbsolute:
+          x: 4800
+          y: 1400
         selected: false
-        title: Deletion Cancelled
-        type: answer
-        variables:
-        - value_selector:
-          - '1711528708197'
-          - org_type
-          value_type: string
-          variable: org_type
-      height: 199
-      id: '1758695000003'
-      position:
-        x: 4800
-        y: 1400
-      positionAbsolute:
-        x: 4800
-        y: 1400
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        cases:
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: is
-            id: bc017f4c-6d6f-466d-bb74-222e3922f34e
-            value: Success
-            varType: string
-            variable_selector:
-            - '1758693281998'
-            - text
-          id: 'true'
-          logical_operator: and
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          cases:
+            - case_id: 'true'
+              conditions:
+                - comparison_operator: is
+                  id: bc017f4c-6d6f-466d-bb74-222e3922f34e
+                  value: Success
+                  varType: string
+                  variable_selector:
+                    - '1758693281998'
+                    - text
+              id: 'true'
+              logical_operator: and
+          selected: false
+          title: IF/ELSE 6
+          type: if-else
+        height: 122
+        id: '1758693567975'
+        position:
+          x: 3579.896879696961
+          y: 1656.070135115822
+        positionAbsolute:
+          x: 3579.896879696961
+          y: 1656.070135115822
         selected: false
-        title: IF/ELSE 6
-        type: if-else
-      height: 124
-      id: '1758693567975'
-      position:
-        x: 3579.896879696961
-        y: 1656.070135115822
-      positionAbsolute:
-        x: 3579.896879696961
-        y: 1656.070135115822
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: There were errors while creating this configuration. Would you like
-          to restart and try again?
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: There were errors while creating this configuration. Would you like
+            to restart and try again?
+          selected: false
+          title: Answer 5
+          type: answer
+          variables: []
+        height: 130
+        id: '1758693816149'
+        position:
+          x: 5224.107042065841
+          y: 1281.553168727894
+        positionAbsolute:
+          x: 5224.107042065841
+          y: 1281.553168727894
         selected: false
-        title: Answer 5
-        type: answer
-        variables: []
-      height: 132
-      id: '1758693816149'
-      position:
-        x: 5224.107042065841
-        y: 1281.553168727894
-      positionAbsolute:
-        x: 5224.107042065841
-        y: 1281.553168727894
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        authorization:
-          config: null
-          type: no-auth
-        body:
-          data: []
-          type: none
-        headers: auth-token:{{#1711528708197.auth_token#}}
-        method: delete
-        params: 'deleteMetadata:true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          authorization:
+            config: null
+            type: no-auth
+          body:
+            data: []
+            type: none
+          headers: auth-token:{{#1711528708197.auth_token#}}
+          method: delete
+          params: 'deleteMetadata:true
 
           deleteAdminConfig:false'
-        retry_config:
-          max_retries: 3
-          retry_enabled: true
-          retry_interval: 100
+          retry_config:
+            max_retries: 3
+            retry_enabled: true
+            retry_interval: 100
+          selected: false
+          ssl_verify: true
+          timeout:
+            max_connect_timeout: 0
+            max_read_timeout: 0
+            max_write_timeout: 0
+          title: Delete Implementation
+          type: http-request
+          url: https://staging.avniproject.org/implementation/delete
+          variables: []
+        height: 151
+        id: '1758694151292'
+        position:
+          x: 4893.962172072561
+          y: 1172.59864330601
+        positionAbsolute:
+          x: 4893.962172072561
+          y: 1172.59864330601
         selected: false
-        ssl_verify: true
-        timeout:
-          max_connect_timeout: 0
-          max_read_timeout: 0
-          max_write_timeout: 0
-        title: Delete Implementation
-        type: http-request
-        url: https://staging.avniproject.org/implementation/delete
-        variables: []
-      height: 153
-      id: '1758694151292'
-      position:
-        x: 4893.962172072561
-        y: 1172.59864330601
-      positionAbsolute:
-        x: 4893.962172072561
-        y: 1172.59864330601
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: Cannot create configuration because you have a {{#1711528708197.org_type#}}
-          account.
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: Cannot create configuration because you have a {{#1711528708197.org_type#}}
+            account.
+          selected: false
+          title: Answer 6
+          type: answer
+          variables: []
+        height: 133
+        id: '1758695198689'
+        position:
+          x: 3359.5667470351527
+          y: 1153.6064292006101
+        positionAbsolute:
+          x: 3359.5667470351527
+          y: 1153.6064292006101
         selected: false
-        title: Answer 6
-        type: answer
-        variables: []
-      height: 135
-      id: '1758695198689'
-      position:
-        x: 3359.5667470351527
-        y: 1153.6064292006101
-      positionAbsolute:
-        x: 3359.5667470351527
-        y: 1153.6064292006101
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: This assistant can help you with any questions related to Avni. This
-          does not seem relevant to Avni.
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: This assistant can help you with any questions related to Avni. This
+            does not seem relevant to Avni.
+          selected: false
+          title: Unrelated Question
+          type: answer
+          variables: []
+        height: 130
+        id: '1758699378772'
+        position:
+          x: 1625.82809511913
+          y: 914.4985346267281
+        positionAbsolute:
+          x: 1625.82809511913
+          y: 914.4985346267281
         selected: false
-        title: Unrelated Question
-        type: answer
-        variables: []
-      height: 132
-      id: '1758699378772'
-      position:
-        x: 1625.82809511913
-        y: 914.4985346267281
-      positionAbsolute:
-        x: 1625.82809511913
-        y: 914.4985346267281
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        dataset_ids:
-        - EcEHhfyw2lTA/pRvqDse3E7RCHi8WmJgNSgzX1pQN+8cN6n17MR+Rps3VogupFsu
-        multiple_retrieval_config:
-          reranking_enable: true
-          reranking_mode: weighted_score
-          top_k: 4
-          weights:
-            keyword_setting:
-              keyword_weight: 0.3
-            vector_setting:
-              embedding_model_name: text-embedding-3-large
-              embedding_provider_name: langgenius/openai/openai
-              vector_weight: 0.7
-        query_variable_selector:
-        - '1711528708197'
-        - sys.query
-        retrieval_mode: multiple
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          dataset_ids:
+            - EcEHhfyw2lTA/pRvqDse3E7RCHi8WmJgNSgzX1pQN+8cN6n17MR+Rps3VogupFsu
+          multiple_retrieval_config:
+            reranking_enable: true
+            reranking_mode: weighted_score
+            top_k: 4
+            weights:
+              keyword_setting:
+                keyword_weight: 0.3
+              vector_setting:
+                embedding_model_name: text-embedding-3-large
+                embedding_provider_name: langgenius/openai/openai
+                vector_weight: 0.7
+          query_variable_selector:
+            - '1711528708197'
+            - sys.query
+          retrieval_mode: multiple
+          selected: false
+          title: Knowledge Retrieval
+          type: knowledge-retrieval
+        height: 88
+        id: '1758713692744'
+        position:
+          x: 382.02759711954866
+          y: 745.9078304270952
+        positionAbsolute:
+          x: 382.02759711954866
+          y: 745.9078304270952
         selected: false
-        title: Knowledge Retrieval
-        type: knowledge-retrieval
-      height: 90
-      id: '1758713692744'
-      position:
-        x: 382.02759711954866
-        y: 745.9078304270952
-      positionAbsolute:
-        x: 382.02759711954866
-        y: 745.9078304270952
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        cases:
-        - case_id: blocked_config
-          conditions:
-          - comparison_operator: is
-            id: blocked-check
-            value: true
-            varType: boolean
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - blocked
-          id: blocked_config
-          logical_operator: and
-        - case_id: production_uat
-          conditions:
-          - comparison_operator: is
-            id: prod-uat-check
-            value: error
-            varType: string
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - result
-          - comparison_operator: is
-            id: prod-uat-status-check
-            value: production_uat_blocked
-            varType: string
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - status
-          id: production_uat
-          logical_operator: and
-        - case_id: no_config
-          conditions:
-          - comparison_operator: is
-            id: no-config-check
-            value: error
-            varType: string
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - result
-          - comparison_operator: is
-            id: no-config-status-check
-            value: no_config
-            varType: string
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - status
-          id: no_config
-          logical_operator: and
-        - case_id: complete_success
-          conditions:
-          - comparison_operator: is
-            id: complete-success-check
-            value: complete_success
-            varType: string
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - flow_action
-          id: complete_success
-          logical_operator: and
-        - case_id: analyze_failures
-          conditions:
-          - comparison_operator: is
-            id: analyze-failures-check
-            value: analyze_failures
-            varType: string
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - flow_action
-          id: analyze_failures
-          logical_operator: and
-        - case_id: success_or_failure
-          conditions:
-          - comparison_operator: is
-            id: success-check
-            value: success
-            varType: string
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - result
-          - comparison_operator: is
-            id: failure-check
-            value: failure
-            varType: string
-            variable_selector:
-            - '1758624264401'
-            - configResult
-            - result
-          id: success_or_failure
-          logical_operator: or
-        desc: Route based on configuration creation result
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          cases:
+            - case_id: blocked_config
+              conditions:
+                - comparison_operator: is
+                  id: blocked-check
+                  value: true
+                  varType: boolean
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - blocked
+              id: blocked_config
+              logical_operator: and
+            - case_id: production_uat
+              conditions:
+                - comparison_operator: is
+                  id: prod-uat-check
+                  value: error
+                  varType: string
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - result
+                - comparison_operator: is
+                  id: prod-uat-status-check
+                  value: production_uat_blocked
+                  varType: string
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - status
+              id: production_uat
+              logical_operator: and
+            - case_id: no_config
+              conditions:
+                - comparison_operator: is
+                  id: no-config-check
+                  value: error
+                  varType: string
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - result
+                - comparison_operator: is
+                  id: no-config-status-check
+                  value: no_config
+                  varType: string
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - status
+              id: no_config
+              logical_operator: and
+            - case_id: complete_success
+              conditions:
+                - comparison_operator: is
+                  id: complete-success-check
+                  value: complete_success
+                  varType: string
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - flow_action
+              id: complete_success
+              logical_operator: and
+            - case_id: analyze_failures
+              conditions:
+                - comparison_operator: is
+                  id: analyze-failures-check
+                  value: analyze_failures
+                  varType: string
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - flow_action
+              id: analyze_failures
+              logical_operator: and
+            - case_id: success_or_failure
+              conditions:
+                - comparison_operator: is
+                  id: success-check
+                  value: success
+                  varType: string
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - result
+                - comparison_operator: is
+                  id: failure-check
+                  value: failure
+                  varType: string
+                  variable_selector:
+                    - '1758624264401'
+                    - configResult
+                    - result
+              id: success_or_failure
+              logical_operator: or
+          desc: Route based on configuration creation result
+          selected: false
+          title: Route Config Result
+          type: if-else
+        height: 484
+        id: '1758624264402'
+        position:
+          x: 2117.3397569645485
+          y: 1303.656726907239
+        positionAbsolute:
+          x: 2117.3397569645485
+          y: 1303.656726907239
         selected: false
-        title: Route Config Result
-        type: if-else
-      height: 486
-      id: '1758624264402'
-      position:
-        x: 2117.3397569645485
-        y: 1303.656726907239
-      positionAbsolute:
-        x: 2117.3397569645485
-        y: 1303.656726907239
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: '✅ **Configuration Created Successfully!**
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: '✅ **Configuration Created Successfully!**
 
 
           {{#1758624264401.configResult.message#}}
@@ -2153,25 +2158,25 @@ workflow:
 
 
           Your Avni configuration is now ready to use! 🎉'
+          selected: false
+          title: Complete Success
+          type: answer
+          variables: []
+        height: 371
+        id: '1758695100001'
+        position:
+          x: 2805.0001008799063
+          y: 1547.729583611873
+        positionAbsolute:
+          x: 2805.0001008799063
+          y: 1547.729583611873
         selected: false
-        title: Complete Success
-        type: answer
-        variables: []
-      height: 371
-      id: '1758695100001'
-      position:
-        x: 2805.0001008799063
-        y: 1547.729583611873
-      positionAbsolute:
-        x: 2805.0001008799063
-        y: 1547.729583611873
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: "⚠️ **Partial Configuration Results**\n\n{{#1758624264401.configResult.message#}}\n\
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: "⚠️ **Partial Configuration Results**\n\n{{#1758624264401.configResult.message#}}\n\
           \n**What happened:**\n- ✅ Successfully created: {{#1758624264401.configResult.summary.successful#}}\
           \ entities\n- ⏭️ Skipped (already exist): {{#1758624264401.configResult.summary.skipped#}}\
           \ entities  \n- ❌ Failed: {{#1758624264401.configResult.summary.failed#}}\
@@ -2181,44 +2186,44 @@ workflow:
           4. **Contact support** if you encounter persistent API or system errors\n\
           \n**Note:** The successfully created entities are already in your system\
           \ and don't need to be recreated. \U0001F527"
+          selected: false
+          title: Analyze Failures
+          type: answer
+          variables: []
+        height: 413
+        id: '1758695100002'
+        position:
+          x: 2570.7246610736015
+          y: 1955.3866405884426
+        positionAbsolute:
+          x: 2570.7246610736015
+          y: 1955.3866405884426
         selected: false
-        title: Analyze Failures
-        type: answer
-        variables: []
-      height: 414
-      id: '1758695100002'
-      position:
-        x: 2570.7246610736015
-        y: 1955.3866405884426
-      positionAbsolute:
-        x: 2570.7246610736015
-        y: 1955.3866405884426
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: '{{#17580163919060.text#}}'
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: '{{#17580163919060.text#}}'
+          selected: false
+          title: Assistant LLM Response
+          type: answer
+          variables: []
+        height: 101
+        id: '1758624264404'
+        position:
+          x: 2485.822496688369
+          y: 1105.3697644210463
+        positionAbsolute:
+          x: 2485.822496688369
+          y: 1105.3697644210463
         selected: false
-        title: Assistant LLM Response
-        type: answer
-        variables: []
-      height: 103
-      id: '1758624264404'
-      position:
-        x: 2485.822496688369
-        y: 1105.3697644210463
-      positionAbsolute:
-        x: 2485.822496688369
-        y: 1105.3697644210463
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
     viewport:
-      x: 176.3114859404959
-      y: 132.9780087842271
-      zoom: 0.29459301021708606
+      x: -1438.050317642887
+      y: -420.4749714176596
+      zoom: 0.7980786415671234
   rag_pipeline_variables: []

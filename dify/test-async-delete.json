@@ -1,0 +1,63 @@
+{
+  "config": {
+    "delete": {
+      "encounterTypes": [
+        {
+          "id": "id of Async Family Assessment"
+        },
+        {
+          "id": "id of Async Wellness Checkup"
+        },
+        {
+          "id": "id of Async Health Screening"
+        }
+      ],
+      "programs": [
+        {
+          "id": "id of Async Family Support"
+        },
+        {
+          "id": "id of Async Wellness Program"
+        }
+      ],
+      "subjectTypes": [
+        {
+          "id": "id of Async Test Family"
+        },
+        {
+          "id": "id of Async Test Person"
+        }
+      ],
+      "catchments": [
+        {
+          "id": "id of Async Rural Catchment"
+        },
+        {
+          "id": "id of Async Metro Catchment"
+        }
+      ],
+      "locations": [
+        {
+          "id": "id of Kalyan Async Village"
+        },
+        {
+          "id": "id of Thane Async District"
+        },
+        {
+          "id": "id of Mumbai Async"
+        }
+      ],
+      "addressLevelTypes": [
+        {
+          "id": "id of Async Test Village"
+        },
+        {
+          "id": "id of Async Test District"
+        },
+        {
+          "id": "id of Async Test State"
+        }
+      ]
+    }
+  }
+}

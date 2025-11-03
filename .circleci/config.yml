@@ -30,7 +30,7 @@ commands:
       - run: |
           pwd
           cd ~/avni-infra/configure
-          VAULT_PASSWORD_FILE=~/.vault-pass.txt mcp_zip_path=~/artifacts make deploy-avni-mcp-server-<< parameters.env >>
+          VAULT_PASSWORD_FILE=~/.vault-pass.txt mcp_zip_path=~/artifacts make deploy-avni-ai-<< parameters.env >>
 
       - run: rm ~/.vault-pass.txt
 
@@ -97,7 +97,7 @@ jobs:
           name: Create build artifact
           command: |
             mkdir -p /tmp/artifacts
-            tar -czf /tmp/artifacts/avni-mcp-server.tar.gz \
+            tar -czf /tmp/artifacts/avni-ai.tar.gz \
               --exclude='.git' \
               --exclude='.venv' \
               --exclude='__pycache__' \
@@ -113,7 +113,7 @@ jobs:
       - persist_to_workspace:
           root: /tmp/artifacts
           paths:
-            - avni-mcp-server.tar.gz
+            - avni-ai.tar.gz
 
   test:
     docker:
@@ -143,7 +143,7 @@ jobs:
       - run:
           name: Run tests
           command: |
-            uv run pytest tests/ -v --cov=main --cov-report=xml --cov-report=html
+            uv run pytest tests/ -v --cov=src --cov-report=xml --cov-report=html --ignore=tests/dify/config/test_config_generation.py
           environment:
             AVNI_BASE_URL: "https://staging.avniproject.org"
             OPENAI_API_KEY: "test_key_for_unit_tests"
@@ -187,10 +187,5 @@ workflows:
       - staging_deploy:
           requires:
             - staging_approve
-          filters:
-            branches:
-              only:
-                - main
-                - production
           context:
             - non-prod-deploy

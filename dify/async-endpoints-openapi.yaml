@@ -1,0 +1,732 @@
+openapi: 3.0.3
+info:
+  title: Avni Configuration API - Async Endpoints
+  description: |
+    Async configuration processing endpoints for the Avni platform.
+    These endpoints handle long-running configuration operations without timing out.
+  version: 1.0.0
+  contact:
+    name: Avni Platform
+    url: https://avni.org
+
+servers:
+  - url: https://your-server.com
+    description: Production server
+  - url: http://localhost:8000
+    description: Development server
+
+paths:
+  /process-config-async:
+    post:
+      summary: Start async configuration processing
+      description: |
+        Starts asynchronous processing of Avni configuration (create, update, delete operations).
+        Returns immediately with a task ID. Use the status endpoint to check progress.
+        
+        **Key Features:**
+        - Handles long-running operations (2+ minutes)
+        - No timeout issues with AWS ALB or other proxies  
+        - Concurrent request support
+        - Progress tracking via task ID
+      operationId: startConfigProcessing
+      tags:
+        - Configuration
+      security:
+        - AvniAuth: []
+      parameters:
+        - name: avni-auth-token
+          in: header
+          required: true
+          description: Avni platform authentication token
+          schema:
+            type: string
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        - name: avni-base-url
+          in: header
+          required: false
+          description: Optional Avni API base URL (overrides default)
+          schema:
+            type: string
+            example: "https://app.avni.org"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigRequest'
+            examples:
+              createExample:
+                summary: Create new entities
+                value:
+                  config:
+                    create:
+                      addressLevelTypes:
+                        - name: "Test State"
+                          level: 3.0
+                          parentId: null
+                          voided: false
+                      locations:
+                        - name: "Test Location"
+                          level: 3
+                          type: "Test State"
+                          parents: []
+              updateExample:
+                summary: Update existing entities
+                value:
+                  config:
+                    update:
+                      locations:
+                        - title: "Updated Location Name"
+                          level: 3
+                          parentId: null
+              deleteExample:
+                summary: Delete entities
+                value:
+                  config:
+                    delete:
+                      locations:
+                        - id: "id of Test Location"
+      responses:
+        '200':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncStartResponse'
+              example:
+                task_id: "550e8400-e29b-41d4-a716-446655440000"
+                status: "processing"
+                message: "Configuration processing started. Use /process-config-status/{task_id} to check progress."
+        '400':
+          description: Bad request - invalid config format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingConfig:
+                  summary: Missing config object
+                  value:
+                    error: "config object is required"
+                invalidOperations:
+                  summary: No valid operations
+                  value:
+                    error: "config must contain at least one of: create, update, delete"
+        '401':
+          description: Unauthorized - missing or invalid auth token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "avni-auth-token header is required"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal server error"
+
+  /process-config-status/{task_id}:
+    get:
+      summary: Get configuration task status
+      description: |
+        Retrieves the current status and results of an async configuration processing task.
+        
+        **Task Statuses:**
+        - `pending`: Task created but not started
+        - `processing`: Task currently being processed
+        - `completed`: Task finished successfully
+        - `failed`: Task failed with error
+        - `expired`: Task expired (default: 24 hours)
+      operationId: getTaskStatus
+      tags:
+        - Configuration
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: UUID of the configuration task
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        '200':
+          description: Task status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatusResponse'
+              examples:
+                processing:
+                  summary: Task in progress
+                  value:
+                    task_id: "550e8400-e29b-41d4-a716-446655440000"
+                    status: "processing"
+                    created_at: "2025-01-13T10:30:00.000Z"
+                    updated_at: "2025-01-13T10:31:30.000Z"
+                    progress: "Creating address level types..."
+                    result: null
+                    error: null
+                completed:
+                  summary: Task completed successfully
+                  value:
+                    task_id: "550e8400-e29b-41d4-a716-446655440000"
+                    status: "completed"
+                    created_at: "2025-01-13T10:30:00.000Z"
+                    updated_at: "2025-01-13T10:33:45.000Z"
+                    progress: "Configuration processing completed successfully"
+                    result:
+                      done: true
+                      status: "completed"
+                      results:
+                        created_address_level_types: ["Test State created with ID 1234"]
+                        created_locations: ["Test Location created with ID 5678"]
+                        errors: []
+                    error: null
+                failed:
+                  summary: Task failed
+                  value:
+                    task_id: "550e8400-e29b-41d4-a716-446655440000"
+                    status: "failed"
+                    created_at: "2025-01-13T10:30:00.000Z"
+                    updated_at: "2025-01-13T10:32:15.000Z"
+                    progress: "Configuration processing failed"
+                    result: null
+                    error: "Failed to create location: HTTP 400"
+        '404':
+          description: Task not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Task 550e8400-e29b-41d4-a716-446655440000 not found or expired"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal server error"
+
+components:
+  securitySchemes:
+    AvniAuth:
+      type: apiKey
+      in: header
+      name: avni-auth-token
+      description: Avni platform authentication token
+
+  schemas:
+    ConfigRequest:
+      type: object
+      required:
+        - config
+      properties:
+        config:
+          $ref: '#/components/schemas/ConfigOperations'
+
+    ConfigOperations:
+      type: object
+      description: CRUD operations to perform
+      minProperties: 1
+      properties:
+        create:
+          $ref: '#/components/schemas/CreateOperations'
+        update:
+          $ref: '#/components/schemas/UpdateOperations'
+        delete:
+          $ref: '#/components/schemas/DeleteOperations'
+
+    CreateOperations:
+      type: object
+      properties:
+        addressLevelTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateAddressLevelType'
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateLocation'
+        catchments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateCatchment'
+        subjectTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateSubjectType'
+        programs:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateProgram'
+        encounterTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateEncounterType'
+
+    UpdateOperations:
+      type: object
+      properties:
+        addressLevelTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateAddressLevelType'
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateLocation'
+        catchments:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateCatchment'
+        subjectTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateSubjectType'
+        programs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateProgram'
+        encounterTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateEncounterType'
+
+    DeleteOperations:
+      type: object
+      properties:
+        encounterTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteEntity'
+        programs:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteEntity'
+        subjectTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteEntity'
+        catchments:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteEntity'
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteEntity'
+        addressLevelTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteEntity'
+
+    CreateAddressLevelType:
+      type: object
+      required: [name, level]
+      properties:
+        name:
+          type: string
+          example: "State"
+        level:
+          type: number
+          example: 3.0
+        parentId:
+          oneOf:
+            - type: "null"
+            - type: string
+          example: null
+        voided:
+          type: boolean
+          default: false
+
+    CreateLocation:
+      type: object
+      required: [name, level, type, parents]
+      properties:
+        name:
+          type: string
+          example: "Karnataka"
+        level:
+          type: number
+          example: 3
+        type:
+          type: string
+          example: "State"
+        parents:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id:
+                type: string
+                example: "id of Parent Location"
+
+    CreateCatchment:
+      type: object
+      required: [name, locationIds]
+      properties:
+        name:
+          type: string
+          example: "Urban Catchment"
+        locationIds:
+          type: array
+          items:
+            type: string
+            example: "id of Location1"
+
+    CreateSubjectType:
+      type: object
+      required: [name, uuid, type]
+      properties:
+        name:
+          type: string
+          example: "Individual"
+        uuid:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        type:
+          type: string
+          enum: [Person, Group, User, Individual, Household]
+          example: "Person"
+        active:
+          type: boolean
+          default: true
+        voided:
+          type: boolean
+          default: false
+        group:
+          type: boolean
+          default: false
+        household:
+          type: boolean
+          default: false
+        allowEmptyLocation:
+          type: boolean
+          default: true
+        allowMiddleName:
+          type: boolean
+          default: false
+        lastNameOptional:
+          type: boolean
+          default: false
+        allowProfilePicture:
+          type: boolean
+          default: false
+        uniqueName:
+          type: boolean
+          default: false
+        directlyAssignable:
+          type: boolean
+          default: false
+        shouldSyncByLocation:
+          type: boolean
+          default: true
+        settings:
+          type: object
+          example:
+            displayRegistrationDetails: true
+            displayPlannedEncounters: true
+        groupRoles:
+          type: array
+          default: []
+        registrationFormUuid:
+          oneOf:
+            - type: "null"
+            - type: string
+          default: null
+
+    CreateProgram:
+      type: object
+      required: [name, uuid, colour, subjectTypeUuid]
+      properties:
+        name:
+          type: string
+          example: "Health Program"
+        uuid:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        colour:
+          type: string
+          pattern: "^#[0-9A-Fa-f]{6}$"
+          example: "#4CAF50"
+        subjectTypeUuid:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        programSubjectLabel:
+          type: string
+          example: "Health Participant"
+        active:
+          type: boolean
+          default: true
+        voided:
+          type: boolean
+          default: false
+        showGrowthChart:
+          type: boolean
+          default: false
+        allowMultipleEnrolments:
+          type: boolean
+          default: false
+        manualEligibilityCheckRequired:
+          type: boolean
+          default: false
+        programEnrolmentFormUuid:
+          oneOf:
+            - type: "null"
+            - type: string
+          default: null
+        programExitFormUuid:
+          oneOf:
+            - type: "null"
+            - type: string
+          default: null
+
+    CreateEncounterType:
+      type: object
+      required: [name, uuid, subjectTypeUuid]
+      properties:
+        name:
+          type: string
+          example: "Health Checkup"
+        uuid:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        subjectTypeUuid:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        programUuid:
+          oneOf:
+            - type: "null"
+            - type: string
+          description: "null for general encounters, UUID for program encounters"
+          example: null
+        active:
+          type: boolean
+          default: true
+        voided:
+          type: boolean
+          default: false
+        isImmutable:
+          type: boolean
+          default: false
+        entityEligibilityCheckRule:
+          oneOf:
+            - type: "null"
+            - type: string
+          default: null
+        entityEligibilityCheckDeclarativeRule:
+          oneOf:
+            - type: "null"
+            - type: object
+          default: null
+
+    UpdateAddressLevelType:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Updated State"
+        level:
+          type: number
+          example: 3.0
+        parentId:
+          oneOf:
+            - type: "null"
+            - type: string
+          example: null
+        voided:
+          type: boolean
+          example: false
+
+    UpdateLocation:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          description: "Note: 'title' for updates, 'name' for creates"
+          example: "Updated Karnataka"
+        level:
+          type: number
+          example: 3
+        parentId:
+          oneOf:
+            - type: "null"
+            - type: string
+          description: "Note: 'parentId' for updates, 'parents' array for creates"
+          example: null
+
+    UpdateCatchment:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Updated Catchment"
+        locationIds:
+          type: array
+          items:
+            type: string
+            example: "id of Location1"
+        deleteFastSync:
+          type: boolean
+          default: false
+
+    UpdateSubjectType:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Updated Individual"
+        type:
+          type: string
+          example: "Person"
+        allowMiddleName:
+          type: boolean
+          example: true
+        allowProfilePicture:
+          type: boolean
+          example: true
+        settings:
+          type: object
+          example:
+            displayRegistrationDetails: true
+            displayPlannedEncounters: false
+        groupRoles:
+          type: array
+          default: []
+
+    UpdateProgram:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Updated Health Program"
+        colour:
+          type: string
+          pattern: "^#[0-9A-Fa-f]{6}$"
+          example: "#FF9800"
+        showGrowthChart:
+          type: boolean
+          example: true
+        allowMultipleEnrolments:
+          type: boolean
+          example: true
+        manualEligibilityCheckRequired:
+          type: boolean
+          example: false
+        programSubjectLabel:
+          type: string
+          example: "Updated Participant"
+
+    UpdateEncounterType:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Updated Health Checkup"
+        isImmutable:
+          type: boolean
+          example: true
+        entityEligibilityCheckRule:
+          oneOf:
+            - type: "null"
+            - type: string
+          example: ""
+
+    DeleteEntity:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+          description: "Reference to entity using descriptive format"
+          example: "id of Entity Name"
+
+    AsyncStartResponse:
+      type: object
+      required: [task_id, status, message]
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        status:
+          type: string
+          enum: [processing]
+          example: "processing"
+        message:
+          type: string
+          example: "Configuration processing started. Use /process-config-status/{task_id} to check progress."
+
+    TaskStatusResponse:
+      type: object
+      required: [task_id, status, created_at, updated_at]
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        status:
+          type: string
+          enum: [pending, processing, completed, failed, expired]
+          example: "processing"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-13T10:30:00.000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-01-13T10:31:30.000Z"
+        progress:
+          oneOf:
+            - type: "null"
+            - type: string
+          example: "Creating address level types..."
+        result:
+          oneOf:
+            - type: "null"
+            - type: object
+          description: "Processing result when status is 'completed'"
+          example:
+            done: true
+            status: "completed"
+            results:
+              created_address_level_types: ["Test State created with ID 1234"]
+              errors: []
+        error:
+          oneOf:
+            - type: "null"
+            - type: string
+          description: "Error message when status is 'failed'"
+          example: null
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: "config object is required"
+
+tags:
+  - name: Configuration
+    description: Async configuration processing operations
