@@ -15,6 +15,7 @@ from .tools.admin.users import register_user_tools
 from .tools.app_designer.encounters import register_encounter_tools
 from .tools.app_designer.programs import register_program_tools
 from .tools.app_designer.subject_types import register_subject_type_tools
+from .tools.implementation.implementations import register_implementation_tools
 from .http import create_cors_middleware
 
 from .utils.env import OPENAI_API_KEY
@@ -33,6 +34,7 @@ def create_server():
     register_encounter_tools()
     register_program_tools()
     register_subject_type_tools()
+    register_implementation_tools()
 
     @server.custom_route("/health", methods=["GET"])
     async def health_check(request: Request):

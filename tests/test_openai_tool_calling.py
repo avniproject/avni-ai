@@ -16,6 +16,7 @@ from src.tools.admin.locations import register_location_tools
 from src.tools.app_designer.encounters import register_encounter_tools
 from src.tools.app_designer.programs import register_program_tools
 from src.tools.app_designer.subject_types import register_subject_type_tools
+from src.tools.implementation.implementations import register_implementation_tools
 from src.core import tool_registry
 
 # Load environment variables
@@ -169,6 +170,7 @@ async def main():
     register_encounter_tools()
     register_program_tools()
     register_subject_type_tools()
+    register_implementation_tools()
 
     tools = tool_registry.list_tools()
     print(f"✅ Registered {len(tools)} tools: {', '.join(tools)}")

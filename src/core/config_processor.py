@@ -96,6 +96,7 @@ def create_error_result(
         done=False,
         status="error",
         results={
+            "deleted_implementation": [],
             "deleted_address_level_types": [],
             "deleted_locations": [],
             "deleted_catchments": [],
@@ -134,6 +135,7 @@ def create_max_iterations_result(max_iterations: int) -> ConfigProcessResult:
         done=False,
         status="error",
         results={
+            "deleted_implementation": [],
             "deleted_address_level_types": [],
             "deleted_locations": [],
             "deleted_catchments": [],

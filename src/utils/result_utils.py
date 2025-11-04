@@ -74,3 +74,7 @@ def format_deletion_response(resource: str, resource_id: Any) -> str:
 
 def format_validation_error(operation: str, error_message: str) -> str:
     return f"Failed to {operation}: {error_message}"
+
+
+def format_implementation_deletion_response() -> str:
+    return "Implementation deleted successfully"
