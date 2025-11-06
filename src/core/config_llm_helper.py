@@ -16,7 +16,7 @@ CRITICAL CRUD OPERATION RULES:
 2. For DELETE operations: Make contract objects with only the 'id' field
 3. For UPDATE operations: Make contract objects with 'id' field plus all fields to update
 4. For CREATE operations: Make contract objects with all required fields (no 'id' field)
-5. For IMPLEMENTATION DELETE: If "implementation": true is present in delete section, use delete_implementation tool to clear entire configuration
+5. For IMPLEMENTATION DELETE: If "implementation" object is present in delete section, use delete_implementation tool with the provided deleteMetadata and deleteAdminConfig parameters to clear entire configuration
 
 CRITICAL CONTRACT-BASED TOOL USAGE:
 - We require proper objects as parameters, we dont have primitives as arguments
@@ -157,7 +157,7 @@ Available tools will help you:
 
 CRUD Processing order should be:
 1. DELETE operations first (in any order since they remove dependencies)
-   - If "implementation": true is present in delete section, use delete_implementation tool first to clear all configuration
+   - If "implementation" object is present in delete section, use delete_implementation tool with the provided deleteMetadata and deleteAdminConfig parameters first to clear all configuration
 2. UPDATE operations next (modify existing items)
 3. CREATE operations last (in dependency order):
    a. Address Level Types (location types) - CREATE TOP LEVEL FIRST, then children with actual parent IDs

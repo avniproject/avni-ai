@@ -5,13 +5,16 @@ from src.utils.result_utils import (
     format_implementation_deletion_response,
 )
 from src.core import tool_registry
+from src.schemas.implementation_contract import ImplementationDeleteContract
 
 logger = logging.getLogger(__name__)
 
 
-async def delete_implementation(auth_token: str) -> str:
-    query_params = "deleteMetadata=true&deleteAdminConfig=true"
-    
+async def delete_implementation(
+    contract: ImplementationDeleteContract, auth_token: str
+) -> str:
+    query_params = f"deleteMetadata={str(contract.deleteMetadata).lower()}&deleteAdminConfig={str(contract.deleteAdminConfig).lower()}"
+
     result = await AvniClient().call_avni_server(
         "DELETE", f"/implementation/delete?{query_params}", auth_token
     )
@@ -19,7 +22,9 @@ async def delete_implementation(auth_token: str) -> str:
     if not result.success:
         return format_error_message(result, "delete implementation")
 
-    return format_implementation_deletion_response()
+    return format_implementation_deletion_response(
+        contract.deleteMetadata, contract.deleteAdminConfig
+    )
 
 
 def register_implementation_tools() -> None:

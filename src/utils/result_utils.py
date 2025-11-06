@@ -76,5 +76,23 @@ def format_validation_error(operation: str, error_message: str) -> str:
     return f"Failed to {operation}: {error_message}"
 
 
-def format_implementation_deletion_response() -> str:
-    return "Implementation deleted successfully"
+def format_implementation_deletion_response(
+    delete_metadata: bool = True, delete_admin_config: bool = True
+) -> str:
+    deleted_items = []
+
+    if delete_metadata:
+        deleted_items.append(
+            "app designer config (subject types, programs, encounters)"
+        )
+
+    if delete_admin_config:
+        deleted_items.append(
+            "admin configuration (location types, locations, catchments)"
+        )
+
+    if not deleted_items:
+        return "No items were selected for deletion"
+
+    items_text = " and ".join(deleted_items)
+    return f"✅ Implementation successfully cleared: {items_text}. Your Avni workspace is now ready for a fresh configuration."
