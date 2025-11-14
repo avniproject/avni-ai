@@ -11,6 +11,7 @@ question.
 **OVERRIDE RULES**:
 1. If a message is clearly NOT about Avni or data collection platforms → OUT_OF_SCOPE
 2. If a message starts with capability questions ("Is it possible", "Can Avni", "Does Avni support", "Is there a way", "How can I"), it is ALWAYS RAG regardless of complexity.
+3. If the conversation context shows the user is already discussing a specific Avni feature, follow-up requests about that feature should be RAG (not OUT_OF_SCOPE)
 
 
 ### RAG - Platform Knowledge & Capabilities
@@ -29,6 +30,11 @@ question.
 - "How can I..." → RAG (step-by-step guidance inquiry)
 - "What are the limitations of..." → RAG (constraint question)
 - "How does Avni handle..." → RAG (mechanism inquiry)
+- Questions about existing Avni features (uploads, sync, forms, encounters, subjects, programs, reports, data export, data entry app, etc.) → RAG
+- Questions about stopping, monitoring, or managing ongoing Avni activities → RAG
+- Questions about downloading, exporting, or accessing data/reports from Avni → RAG
+- Requests for tutorials, guides, or instructions about Avni features → RAG
+- Questions about core Avni terminology (encounter, subject, program, catchment, form, etc.) → RAG
 
 
 **Key Principle**: Complexity of the scenario does NOT change the
@@ -98,14 +104,37 @@ regardless of technical complexity)
 ✅ "Is there a way to integrate complex multi-step approval workflows?"
 → **RAG** (capability question, even if the workflow is complex)
 
-✅ "What are catchments"
-✅ "What are user groups"
-✅ "What are identifiers"
-✅ "What is an identifier source"
-✅ "How do I create a new catchment"
-✅ "What is a program"
-✅ "What is a subject type"
+✅ "What are catchments" → **RAG** (Avni terminology question)
+✅ "What are user groups" → **RAG** (Avni terminology question)
+✅ "What are identifiers" → **RAG** (Avni terminology question)
+✅ "What is an identifier source" → **RAG** (Avni terminology question)
+✅ "How do I create a new catchment" → **RAG** (step-by-step guidance question)
+✅ "What is a program" → **RAG** (Avni terminology question)
+✅ "What is a subject type" → **RAG** (Avni terminology question)
+✅ "What's an encounter" → **RAG** (Avni terminology question)
+✅ "What is an encounter" → **RAG** (Avni terminology question)
+✅ "What's a form" → **RAG** (Avni terminology question)
 ✅ "How can I setup the assignment feature in Avni?" → **RAG** (step-by-step guidance question)
+
+✅ "Can you stop the uploading activity" → **RAG** (question about existing Avni upload feature)
+
+✅ "How do I monitor upload progress" → **RAG** (question about existing Avni monitoring feature)
+
+✅ "What happens when upload fails" → **RAG** (question about existing Avni upload behavior)
+
+✅ "Can you download a report and say the numbers" → **RAG** (question about Avni reporting and data access)
+
+✅ "How do I export data to Excel" → **RAG** (question about existing Avni export feature)
+
+✅ "Can I generate PDF reports from Avni" → **RAG** (question about existing Avni reporting capability)
+
+✅ "Give me a data entry tutorial" → **RAG** (request for tutorial about Avni data entry feature)
+
+✅ "I need a tutorial on how to use forms" → **RAG** (request for guidance on existing Avni feature)
+
+✅ "Show me how to set up encounters" → **RAG** (request for instructions on existing Avni functionality)
+
+✅ "Yes, I need further tutorial" (after discussing Avni Data Entry App) → **RAG** (follow-up request for more guidance on established Avni feature)
 
 ✅ "I want to delete my entire configuration and start fresh" → **ASSISTANT** (implementation request for complete deletion)
 
@@ -153,6 +182,8 @@ ASSISTANT" - ✅ "Question format determines intent"
 
 
 **Trap 5**: Greeting Misrouting - ❌ "Greeting = OUT_OF_SCOPE" - ✅ "Greeting = needs clarification to understand intent"
+
+**Trap 6**: Terminology Misrouting - ❌ "Single word like 'encounter' = not specific enough = OUT_OF_SCOPE" - ✅ "Core Avni terminology questions = RAG"
 
 
 ## Response Format

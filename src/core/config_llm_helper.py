@@ -30,6 +30,7 @@ CRITICAL PARENT-CHILD RELATIONSHIP RULES:
 5. **MANDATORY ID TRACKING**: When a function returns "created successfully with ID 1234", you MUST extract and use that exact ID (1234) for any dependent items
 6. **EXAMPLE**: If create_location_type returns "Location type 'CRUD State' created successfully with ID 1732", then use parentId: 1732 for any child items that reference "id of CRUD State"
 7. **NEVER USE DEFAULT VALUES**: Do not use parentId: 0 when the config specifies a parent reference - always resolve to the actual database ID. However, when config explicitly has parentId: null, preserve that null value.
+8. **MANDATORY ID CONTEXT TRACKING**: You MUST maintain a running context of all created entities and their database IDs throughout the entire conversation. When resolving references like "id of District", always check your ID tracking context first.
 
 CRITICAL DISTINCTION: ADDRESS LEVEL TYPES vs LOCATIONS:
 - Address Level Types (location types) are TEMPLATES that define location hierarchy levels
@@ -71,11 +72,22 @@ UUID GENERATION AND REFERENCE RULES:
 EXAMPLES:
 
 **STEP-BY-STEP ID RESOLUTION EXAMPLE**:
-Config: "parentId": "id of CRUD State"
-1. First, create CRUD State: create_location_type(name="CRUD State", level=3)
-2. Function returns: "Location type 'CRUD State' created successfully with ID 1732"
-3. Extract and store: "CRUD State" → 1732
-4. For child item: use parentId: 1732 (NOT parentId: 0 or parentId: null)
+Config has two AddressLevelTypes:
+- District (level=2, parentId=null) 
+- Village (level=1, parentId="id of District")
+
+CORRECT WORKFLOW:
+1. Create District first: create_location_type(contract={name="District", level=2, parentId=null})
+2. Function returns: "Location type 'District' created successfully with ID 1893"
+3. EXTRACT ID: District → 1893
+4. Now create Village: create_location_type(contract={name="Village", level=1, parentId=1893})
+5. Function returns: "Location type 'Village' created successfully with ID 1894"
+
+WRONG WORKFLOW:
+1. Create District: create_location_type(contract={name="District", level=2, parentId=null})
+2. Function returns: "Location type 'District' created successfully with ID 1893"  
+3. ❌ IGNORE THE ID and create Village with parentId=0
+4. ❌ Result: Village created with wrong parentId
 
 **NULL/PARENT HANDLING EXAMPLES**:
 - Config: {"name":"Updated CRUD State","parentId":null} → Contract: {"name":"Updated CRUD State","parentId":null} (PRESERVE null)
@@ -142,6 +154,13 @@ IMPORTANT: You must respond in JSON format with these fields:
 
 Only set done=true when you have successfully processed ALL requested CRUD operations.
 
+**CRITICAL COMPLETION RULES**:
+- NEVER set done=true until EVERY entity in the config has been processed (created, updated, or determined to exist)
+- Count ALL entities in the config and ensure each one is addressed
+- If config has subjectTypes, programs, and encounterTypes - ALL must be processed before marking done=true
+- Process them in dependency order: subjectTypes first, then programs (using actual subject UUIDs), then encounters (using actual subject and program UUIDs)
+- Do NOT mark complete just because user catchment assignment is finished - check if there are remaining entities to create
+
 CRITICAL PROGRESS REPORTING:
 - ALWAYS include "endUserResult" field in EVERY response (not just when done=true)
 - Provide meaningful progress summaries like:
@@ -193,10 +212,12 @@ When config contains descriptive references like:
 - "subjectTypeUuid": "uuid of Test Individual" → Find Test Individual in existing OR created items, use its actual UUID AS STRING
 
 **CRITICAL REFERENCE RESOLUTION PROCESS**:
-1. **Extract IDs from function results**: When create_location_type returns "Location type 'CRUD State' created successfully with ID 1732", store "CRUD State" → 1732
+1. **Extract IDs from function results**: When create_location_type returns "Location type 'CRUD State' created successfully with ID 1732", IMMEDIATELY store "CRUD State" → 1732
 2. **Use exact extracted IDs**: For "parentId": "id of CRUD State", use parentId: 1732 (the exact ID returned)
 3. **Track all created items**: Maintain a mapping of item names to their actual database IDs/UUIDs
 4. **Never guess or default**: If config says "id of X", you MUST find the actual ID of X from function results or existing data
+5. **PARSE FUNCTION RESULTS CAREFULLY**: Function results have the format "EntityType 'EntityName' created successfully with ID 12345" - extract the number after "ID"
+6. **CRITICAL: DO NOT CREATE DEPENDENT ITEMS UNTIL PARENT IS CREATED**: When you see "parentId": "id of District", you MUST first create "District", wait for the result, extract the actual ID, then use that ID for the child
 
 - First check existing operational context, then check newly created items for reference resolution
 - Keep track of both existing and created items for resolving references
@@ -295,6 +316,8 @@ After ALL standard CRUD operations are complete, check for user catchment assign
    - Only create if at least one location exists
 4. **UPDATE USER WITH CATCHMENT**: After catchment assignment/creation, update the user with the catchmentId
 5. **RECORD IN RESULTS**: Track user update in "updated_users" and any created catchment in "created_catchments"
+6. **CRITICAL EXPLANATION REQUIREMENT**: If a default catchment is created and assigned to the user, include this explanation in endUserResult:
+   - "📍 Note: I've created a default catchment and assigned it to you so you can use the Avni mobile app. In Avni, catchments define which geographic areas you can access on your mobile device. This ensures you can register subjects and collect data in all the locations we just set up."
 
 This user catchment assignment should happen ONLY AFTER all other CRUD operations are completed and ONLY when a user is present in the update section."""
 

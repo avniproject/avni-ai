@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 
@@ -8,15 +9,14 @@ from .handlers import (
     process_config_async_request,
     get_task_status,
 )
-from .handlers.dspy_handlers import (
-    analyze_form_request,
-    batch_analyze_forms_request,
-    predict_field_type_request,
-    validate_form_structure_request,
-    get_dspy_service_status_request,
-    retrain_avni_analyzer_request,
-)
-from .services.dspy_service import get_dspy_service
+# from .handlers.dspy_handlers import (
+#     analyze_form_request,
+#     batch_analyze_forms_request,
+#     predict_field_type_request,
+#     validate_form_structure_request,
+#     get_dspy_service_status_request,
+# )
+# from .services.dspy_service import get_dspy_service
 from .tools.admin.addressleveltypes import register_address_level_type_tools
 from .tools.admin.catchments import register_catchment_tools
 from .tools.admin.locations import register_location_tools
@@ -45,15 +45,15 @@ async def create_server():
     register_subject_type_tools()
     register_implementation_tools()
 
-    # Initialize DSPy service with MIPROv2 training at startup
-    logger.info("🚀 Initializing DSPy service with MIPROv2 training...")
-    try:
-        # This will trigger MIPROv2 training
-        dspy_service = await get_dspy_service()
-        logger.info("✅ DSPy service initialized successfully with MIPROv2")
-    except Exception as e:
-        logger.error(f"❌ DSPy initialization failed: {e}")
-        # Continue startup even if DSPy fails
+    # # Initialize DSPy service with MIPROv2 training at startup
+    # logger.info("🚀 Initializing DSPy service with MIPROv2 training...")
+    # try:
+    #     # This will trigger MIPROv2 training
+    #     await get_dspy_service()
+    #     logger.info("✅ DSPy service initialized successfully with MIPROv2")
+    # except Exception as e:
+    #     logger.error(f"❌ DSPy initialization failed: {e}")
+    #     # Continue startup even if DSPy fails
 
     @server.custom_route("/health", methods=["GET"])
     async def health_check(request: Request):
@@ -68,32 +68,31 @@ async def create_server():
         task_id = request.path_params["task_id"]
         return await get_task_status(task_id)
 
-    # DSPy Smart Form Builder endpoints
-    @server.custom_route("/dspy/analyze-form", methods=["POST"])
-    async def analyze_form_endpoint(request: Request):
-        """Analyze a single form using DSPy AI for improvements and suggestions."""
-        return await analyze_form_request(request)
+    # # DSPy Smart Form Builder endpoints
+    # @server.custom_route("/dspy/analyze-form", methods=["POST"])
+    # async def analyze_form_endpoint(request: Request):
+    #     """Analyze a single form using DSPy AI for improvements and suggestions."""
+    #     return await analyze_form_request(request)
 
-    @server.custom_route("/dspy/batch-analyze", methods=["POST"])
-    async def batch_analyze_endpoint(request: Request):
-        """Analyze multiple forms concurrently using DSPy AI."""
-        return await batch_analyze_forms_request(request)
+    # @server.custom_route("/dspy/batch-analyze", methods=["POST"])
+    # async def batch_analyze_endpoint(request: Request):
+    #     """Analyze multiple forms concurrently using DSPy AI."""
+    #     return await batch_analyze_forms_request(request)
 
-    @server.custom_route("/dspy/predict-field-type", methods=["POST"])
-    async def predict_field_type_endpoint(request: Request):
-        """Predict optimal field type for a form question using DSPy AI."""
-        return await predict_field_type_request(request)
+    # @server.custom_route("/dspy/predict-field-type", methods=["POST"])
+    # async def predict_field_type_endpoint(request: Request):
+    #     """Predict optimal field type for a form question using DSPy AI."""
+    #     return await predict_field_type_request(request)
 
-    @server.custom_route("/dspy/validate-form", methods=["POST"])
-    async def validate_form_endpoint(request: Request):
-        """Validate form structure and identify issues using DSPy AI."""
-        return await validate_form_structure_request(request)
+    # @server.custom_route("/dspy/validate-form", methods=["POST"])
+    # async def validate_form_endpoint(request: Request):
+    #     """Validate form structure and identify issues using DSPy AI."""
+    #     return await validate_form_structure_request(request)
 
-
-    @server.custom_route("/dspy/status", methods=["GET"])
-    async def dspy_status_endpoint(request: Request):
-        """Get DSPy service status and health information."""
-        return await get_dspy_service_status_request(request)
+    # @server.custom_route("/dspy/status", methods=["GET"])
+    # async def dspy_status_endpoint(request: Request):
+    #     """Get DSPy service status and health information."""
+    #     return await get_dspy_service_status_request(request)
 
     return server
 
@@ -106,11 +105,11 @@ if not OPENAI_API_KEY:
 
 logger.info("Initializing Avni MCP Server...")
 
-import asyncio
 
 # Initialize server with DSPy training
 async def initialize_server():
     return await create_server()
+
 
 ai_server = asyncio.run(initialize_server())
 

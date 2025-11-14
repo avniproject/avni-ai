@@ -14,13 +14,14 @@ load_dotenv()
 @dataclass
 class DSPyConfig:
     """DSPy configuration container."""
+
     model_provider: str = "openai"
     model_name: str = "gpt-4o-mini"
     api_key: str = ""
     max_tokens: int = 4000
     temperature: float = 0.7
     enable_tracing: bool = True
-    
+
     def __post_init__(self):
         if not self.api_key:
             self.api_key = os.getenv("OPENAI_API_KEY", "")
@@ -34,5 +35,5 @@ def get_dspy_config() -> DSPyConfig:
         api_key=os.getenv("OPENAI_API_KEY", ""),
         max_tokens=int(os.getenv("DSPY_MAX_TOKENS", "4000")),
         temperature=float(os.getenv("DSPY_TEMPERATURE", "0.7")),
-        enable_tracing=os.getenv("DSPY_TRACING", "true").lower() == "true"
+        enable_tracing=os.getenv("DSPY_TRACING", "true").lower() == "true",
     )

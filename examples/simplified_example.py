@@ -8,12 +8,12 @@ This example demonstrates the new simplified approach with two modules:
 """
 
 import asyncio
-import json
 import logging
 from pathlib import Path
 
 # Add src to path for imports
 import sys
+
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from src.dspy_modules import FormImprovementProgram
@@ -38,36 +38,31 @@ def create_sample_form_with_issues():
                     {
                         "name": "Name",
                         "uuid": "name-field-123",
-                        "concept": {
-                            "dataType": "Text"
-                        }
+                        "concept": {"dataType": "Text"},
                     },
                     {
                         "name": "Age",
-                        "uuid": "age-field-456", 
+                        "uuid": "age-field-456",
                         "concept": {
                             "dataType": "Text"  # Should be Numeric
-                        }
+                        },
                     },
                     {
                         "name": "Phone Number",
                         "uuid": "phone-field-789",
                         "concept": {
                             "dataType": "Text"  # Should be PhoneNumber
-                        }
+                        },
                     },
                     {
                         "name": "Do you have insurance?",
                         "uuid": "insurance-field-101",
-                        "concept": {
-                            "dataType": "Coded",
-                            "answers": ["yes", "no"]
-                        },
-                        "type": "MultiSelect"  # Should be SingleSelect
-                    }
-                ]
+                        "concept": {"dataType": "Coded", "answers": ["yes", "no"]},
+                        "type": "MultiSelect",  # Should be SingleSelect
+                    },
+                ],
             }
-        ]
+        ],
     }
 
 
@@ -86,33 +81,33 @@ def create_good_form():
                             "dataType": "Numeric",
                             "lowAbsolute": 1,
                             "highAbsolute": 200,
-                            "unit": "kg"
-                        }
+                            "unit": "kg",
+                        },
                     },
                     {
-                        "name": "Blood Group", 
+                        "name": "Blood Group",
                         "uuid": "blood-field-456",
                         "concept": {
                             "dataType": "Coded",
-                            "answers": ["A+", "B+", "O+", "AB+"]
+                            "answers": ["A+", "B+", "O+", "AB+"],
                         },
-                        "type": "SingleSelect"
-                    }
-                ]
+                        "type": "SingleSelect",
+                    },
+                ],
             }
-        ]
+        ],
     }
 
 
 async def demonstrate_issue_identification():
     """Demonstrate the IssueIdentifier module."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("ISSUE IDENTIFICATION EXAMPLE")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Initialize issue identifier
     identifier = IssueIdentifier()
-    
+
     # Test with problematic form
     problematic_form = create_sample_form_with_issues()
     print(f"\nAnalyzing form: {problematic_form['name']}")
@@ -121,45 +116,49 @@ async def demonstrate_issue_identification():
     print("- Age as Text instead of Numeric")
     print("- Phone without validation")
     print("- MultiSelect for Yes/No question")
-    
+
     # Identify issues
     issue_results = identifier.forward(problematic_form)
-    
-    print(f"\nISSUES FOUND:")
-    issues = issue_results.get('issues', [])
+
+    print("\nISSUES FOUND:")
+    issues = issue_results.get("issues", [])
     for issue in issues:
-        print(f"- {issue.get('severity', 'Unknown').upper()}: {issue.get('message', 'No message')}")
+        print(
+            f"- {issue.get('severity', 'Unknown').upper()}: {issue.get('message', 'No message')}"
+        )
         print(f"  Element: {issue.get('formElementName', 'Unknown')}")
         print(f"  Fix: {issue.get('suggestedFix', 'No fix suggested')}")
         print()
-    
+
     print(f"Summary: {issue_results.get('summary', 'No summary')}")
 
 
 async def demonstrate_suggestion_generation():
     """Demonstrate the SuggestionGenerator module."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("SUGGESTION GENERATION EXAMPLE")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Initialize modules
     identifier = IssueIdentifier()
     suggester = SuggestionGenerator()
-    
+
     # First identify issues
     form = create_sample_form_with_issues()
     issue_results = identifier.forward(form)
-    issues = issue_results.get('issues', [])
-    
+    issues = issue_results.get("issues", [])
+
     print(f"Generating suggestions for {len(issues)} identified issues...")
-    
+
     # Generate suggestions based on issues
     suggestion_results = suggester.forward(form, issues)
-    
-    print(f"\nSUGGESTIONS GENERATED:")
-    suggestions = suggestion_results.get('suggestions', [])
+
+    print("\nSUGGESTIONS GENERATED:")
+    suggestions = suggestion_results.get("suggestions", [])
     for suggestion in suggestions:
-        print(f"- {suggestion.get('priority', 'Unknown')} Priority: {suggestion.get('title', 'No title')}")
+        print(
+            f"- {suggestion.get('priority', 'Unknown')} Priority: {suggestion.get('title', 'No title')}"
+        )
         print(f"  Type: {suggestion.get('type', 'Unknown')}")
         print(f"  Description: {suggestion.get('description', 'No description')}")
         print(f"  Element: {suggestion.get('formElementUuid', 'No UUID')}")
@@ -168,37 +167,34 @@ async def demonstrate_suggestion_generation():
 
 async def demonstrate_full_analysis():
     """Demonstrate the complete FormImprovementProgram."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("COMPLETE FORM ANALYSIS EXAMPLE")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Initialize the main program
     analyzer = FormImprovementProgram()
-    
+
     # Test with both problematic and good forms
-    forms = [
-        create_sample_form_with_issues(),
-        create_good_form()
-    ]
-    
+    forms = [create_sample_form_with_issues(), create_good_form()]
+
     for form in forms:
         print(f"\nAnalyzing: {form.get('name', 'Unnamed Form')}")
         print("-" * 40)
-        
+
         # Perform complete analysis
         results = analyzer.forward(form)
-        
+
         # Display results
-        metadata = results.get('analysis_metadata', {})
+        metadata = results.get("analysis_metadata", {})
         print(f"Analysis completed in {metadata.get('duration_seconds', 0):.2f}s")
-        
-        exec_summary = results.get('executive_summary', {})
+
+        exec_summary = results.get("executive_summary", {})
         print(f"Total Issues: {exec_summary.get('total_issues', 0)}")
         print(f"Critical Issues: {exec_summary.get('critical_issues', 0)}")
         print(f"Total Suggestions: {exec_summary.get('total_suggestions', 0)}")
         print(f"Overall Score: {exec_summary.get('overall_score', 0)}/100")
         print(f"Top Priority: {exec_summary.get('top_priority', 'None')}")
-        
+
         print(f"Assessment: {exec_summary.get('overview', 'No overview')}")
 
 
@@ -209,22 +205,22 @@ async def main():
         lm = dspy.LM(
             model="openai/gpt-4o-mini",
             api_key="your_openai_key_here",  # Replace with actual key
-            max_tokens=2000
+            max_tokens=2000,
         )
         dspy.configure(lm=lm)
-        
+
         print("DSPy Simplified Form Analysis Example")
         print("=====================================")
-        
+
         # Run demonstrations
         await demonstrate_issue_identification()
         await demonstrate_suggestion_generation()
         await demonstrate_full_analysis()
-        
-        print("\n" + "="*60)
+
+        print("\n" + "=" * 60)
         print("EXAMPLE COMPLETED SUCCESSFULLY")
-        print("="*60)
-        
+        print("=" * 60)
+
     except Exception as e:
         logger.error(f"Example failed: {e}")
         print(f"\nExample failed: {e}")

@@ -11,8 +11,4 @@ from .issue_identifier import IssueIdentifier
 from .suggestion_generator import SuggestionGenerator
 from .form_improvement_program import FormImprovementProgram
 
-__all__ = [
-    "IssueIdentifier",
-    "SuggestionGenerator",
-    "FormImprovementProgram"
-]
+__all__ = ["IssueIdentifier", "SuggestionGenerator", "FormImprovementProgram"]
