@@ -15,7 +15,7 @@ from src.schemas.catchment_contract import (
     CatchmentDeleteContract,
 )
 from src.schemas.field_names import CatchmentFields
-from src.core import tool_registry
+from src.services import tool_registry
 
 logger = logging.getLogger(__name__)
 

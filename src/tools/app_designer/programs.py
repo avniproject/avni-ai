@@ -13,7 +13,7 @@ from src.schemas.program_contract import (
     ProgramDeleteContract,
 )
 from src.schemas.field_names import ProgramFields
-from src.core import tool_registry
+from src.services import tool_registry
 
 logger = logging.getLogger(__name__)
 

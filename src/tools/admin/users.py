@@ -8,7 +8,7 @@ from src.utils.result_utils import (
 )
 from src.schemas.user_contract import UserFindContract, UserUpdateContract
 from src.schemas.field_names import UserFields
-from src.core import tool_registry
+from src.services import tool_registry
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ from src.utils.result_utils import (
     format_error_message,
     format_implementation_deletion_response,
 )
-from src.core import tool_registry
+from src.services import tool_registry
 from src.schemas.implementation_contract import ImplementationDeleteContract
 
 logger = logging.getLogger(__name__)

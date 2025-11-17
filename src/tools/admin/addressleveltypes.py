@@ -14,7 +14,7 @@ from src.schemas.address_level_type_contract import (
     AddressLevelTypeDeleteContract,
 )
 from src.schemas.field_names import AddressLevelTypeFields
-from src.core import tool_registry
+from src.services import tool_registry
 
 logger = logging.getLogger(__name__)
 

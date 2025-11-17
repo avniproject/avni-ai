@@ -17,7 +17,7 @@ from src.tools.app_designer.encounters import register_encounter_tools
 from src.tools.app_designer.programs import register_program_tools
 from src.tools.app_designer.subject_types import register_subject_type_tools
 from src.tools.implementation.implementations import register_implementation_tools
-from src.core import tool_registry
+from src.services import tool_registry
 
 # Load environment variables
 from src.utils.env import OPENAI_API_KEY

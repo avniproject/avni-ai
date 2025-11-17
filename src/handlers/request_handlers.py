@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from ..core.task_manager import task_manager
-from ..core.enums import TaskStatus
+from ..services.task_manager import task_manager
+from ..services.enums import TaskStatus
 
 logger = logging.getLogger(__name__)
 
