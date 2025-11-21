@@ -280,7 +280,7 @@ class OpenAIResponsesClient:
                 logger.error(f"❌ Error executing function {function_name}: {e}")
                 self._add_function_output(input_list, call_id, str(e), is_error=True)
 
-        logger.info(f"📊 Processed {function_calls_processed} function calls")
+        logger.info(f"Processed {function_calls_processed} function calls")
 
         try:
             formatted_tools = self._format_tools_for_continuation(
