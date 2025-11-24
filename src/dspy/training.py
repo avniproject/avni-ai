@@ -12,8 +12,6 @@ Can be run directly: python simplified_training.py [options]
 import dspy
 from typing import List, Dict, Any
 import logging
-import json
-import pickle
 import os
 import asyncio
 import argparse

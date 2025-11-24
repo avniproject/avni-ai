@@ -8,7 +8,7 @@ Tracks baseline performance, compares optimized models, and maintains optimizati
 import json
 import os
 from datetime import datetime
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List
 import logging
 import dspy
 from training import (

@@ -32,6 +32,14 @@ async def validate_config_request(
         if not config_data:
             return ConfigRequestValidation(error_message="config object is required")
 
+        org_type = body.get("org_type", "")
+        if org_type in ["Production", "UAT"]:
+            return ConfigRequestValidation(
+                error_message=f"Configuration creation is not supported for {org_type} organization type. Automated configuration creation is only available for Non Prod/UAT organizations."
+            )
+
+        config_data["org_type"] = org_type
+
         if not any(op in config_data for op in ["create", "update", "delete"]):
             return ConfigRequestValidation(
                 error_message="config must contain at least one of: create, update, delete"
