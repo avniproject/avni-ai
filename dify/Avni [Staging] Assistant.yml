@@ -1272,7 +1272,7 @@ workflow:
       positionAbsolute:
         x: 1334.633954985886
         y: 1227.2826888062627
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1402,31 +1402,32 @@ workflow:
       width: 241
     - data:
         code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
-          \ submit_async_config(\n    config: Dict[str, Any],\n    avni_auth_token:\
+          \ submit_async_config(\n    configuration: Dict[str, Any],\n    avni_auth_token:\
           \ str,\n    avni_mcp_server_url: str,\n) -> Dict[str, Any]:\n    session\
           \ = requests.Session()\n\n    submit_url = f\"{avni_mcp_server_url}/process-config-async\"\
           \n\n    headers = {\"Content-Type\": \"application/json\", \"avni-auth-token\"\
-          : avni_auth_token}\n\n    body = {\"config\": config}\n\n    print(f\"\U0001F4E4\
-          \ Submitting config to: {submit_url}\")\n    print(f\"\U0001F4CB Headers:\
-          \ {json.dumps(headers, indent=2)}\")\n    print(f\"\U0001F4E6 Body size:\
-          \ {len(json.dumps(body).encode('utf-8'))} bytes\")\n\n    try:\n       \
-          \ response = session.post(submit_url, headers=headers, json=body, timeout=30)\n\
-          \n        if response.status_code != 200:\n            error_text = response.text\n\
-          \            return {\"error\": f\"HTTP {response.status_code}\", \"message\"\
-          : error_text}\n\n        result = response.json()\n        task_id = result.get(\"\
-          task_id\")\n\n        if not task_id:\n            return {\"error\": \"\
-          No task_id returned\", \"response\": result}\n\n        return {\"task_id\"\
-          : task_id, \"status\": \"submitted\"}\n\n    except requests.exceptions.RequestException\
-          \ as e:\n        print(f\"\U0001F525 Submit request failed: {e}\")\n   \
-          \     return {\"error\": \"Submit request failed\", \"message\": str(e)}\n\
-          \n\ndef main(avni_auth_token: str, avni_mcp_server_url: str, config: Dict[str,\
-          \ Any]):\n    print(\"\U0001F680 Avni Async Config Submission\")\n    print(\"\
-          =\" * 40)\n\n    print(\"\U0001F4CB Configuration preview:\")\n    print(json.dumps(config,\
+          : avni_auth_token}\n\n    body = {\"configuration\": configuration}\n\n\
+          \    print(f\"\U0001F4E4 Submitting configuration to: {submit_url}\")\n\
+          \    print(f\"\U0001F4CB Headers: {json.dumps(headers, indent=2)}\")\n \
+          \   print(f\"\U0001F4E6 Body size: {len(json.dumps(body).encode('utf-8'))}\
+          \ bytes\")\n\n    try:\n        response = session.post(submit_url, headers=headers,\
+          \ json=body, timeout=30)\n\n        if response.status_code != 200:\n  \
+          \          error_text = response.text\n            return {\"error\": f\"\
+          HTTP {response.status_code}\", \"message\": error_text}\n\n        result\
+          \ = response.json()\n        task_id = result.get(\"task_id\")\n\n     \
+          \   if not task_id:\n            return {\"error\": \"No task_id returned\"\
+          , \"response\": result}\n\n        return {\"task_id\": task_id, \"status\"\
+          : \"submitted\"}\n\n    except requests.exceptions.RequestException as e:\n\
+          \        print(f\"\U0001F525 Submit request failed: {e}\")\n        return\
+          \ {\"error\": \"Submit request failed\", \"message\": str(e)}\n\n\ndef main(avni_auth_token:\
+          \ str, avni_mcp_server_url: str, configuration: Dict[str, Any]):\n    print(\"\
+          \U0001F680 Avni Async Config Submission\")\n    print(\"=\" * 40)\n\n  \
+          \  print(\"\U0001F4CB Configuration preview:\")\n    print(json.dumps(configuration,\
           \ indent=2)[:300] + \"...\")\n\n    result = submit_async_config(\n    \
-          \    config=config,\n        avni_auth_token=avni_auth_token,\n        avni_mcp_server_url=avni_mcp_server_url,\n\
-          \    )\n\n    print(\"\\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 SUBMISSION\
-          \ RESULT:\")\n    print(json.dumps(result, indent=2))\n\n    return {\"\
-          output\": result}\n"
+          \    configuration=configuration,\n        avni_auth_token=avni_auth_token,\n\
+          \        avni_mcp_server_url=avni_mcp_server_url,\n    )\n\n    print(\"\
+          \\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 SUBMISSION RESULT:\")\n    print(json.dumps(result,\
+          \ indent=2))\n\n    return {\"output\": result}\n"
         code_language: python3
         error_strategy: fail-branch
         outputs:
@@ -1446,7 +1447,7 @@ workflow:
           - '17580163919060'
           - structured_output
           value_type: object
-          variable: config
+          variable: configuration
         - value_selector:
           - '1711528708197'
           - avni_mcp_server_url
@@ -1460,7 +1461,7 @@ workflow:
       positionAbsolute:
         x: 2073.257076977748
         y: 1166.429215134067
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1817,7 +1818,7 @@ workflow:
       type: custom
       width: 241
     viewport:
-      x: -449.07180938846295
-      y: -594.9579586949953
-      zoom: 0.9602565171366391
+      x: -1021.0727167579737
+      y: -402.2807049202015
+      zoom: 0.8078677854350997
   rag_pipeline_variables: []
