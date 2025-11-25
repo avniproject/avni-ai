@@ -28,11 +28,20 @@ async def validate_config_request(
 ) -> ConfigRequestValidation:
     try:
         body = await request.json()
-        config_data = body.get("config")
-        if not config_data:
-            return ConfigRequestValidation(error_message="config object is required")
 
-        org_type = body.get("org_type", "")
+        configuration_wrapper = body.get("configuration")
+        if not configuration_wrapper:
+            return ConfigRequestValidation(
+                error_message="configuration object is required"
+            )
+
+        config_data = configuration_wrapper.get("config")
+        if not config_data:
+            return ConfigRequestValidation(
+                error_message="config object is required inside configuration"
+            )
+
+        org_type = configuration_wrapper.get("org_type", "")
         if org_type in ["Production", "UAT"]:
             return ConfigRequestValidation(
                 error_message=f"Configuration creation is not supported for {org_type} organization type. Automated configuration creation is only available for Non Prod/UAT organizations."
@@ -80,31 +89,36 @@ async def process_config_async_request(request: Request) -> JSONResponse:
 
     Expected body:
     {
-        "config": {
-            "create": {
-                "addressLevelTypes": [...],
-                "locations": [...],
-                "catchments": [...],
-                "subjectTypes": [...],
-                "programs": [...],
-                "encounterTypes": [...]
+        "configuration": {
+            "response": "Assistant response message",
+            "config": {
+                "create": {
+                    "addressLevelTypes": [...],
+                    "locations": [...],
+                    "catchments": [...],
+                    "subjectTypes": [...],
+                    "programs": [...],
+                    "encounterTypes": [...]
+                },
+                "update": {
+                    "addressLevelTypes": [...],
+                    "locations": [...],
+                    "catchments": [...],
+                    "subjectTypes": [...],
+                    "programs": [...],
+                    "encounterTypes": [...]
+                },
+                "delete": {
+                    "addressLevelTypes": [...],
+                    "locations": [...],
+                    "catchments": [...],
+                    "subjectTypes": [...],
+                    "programs": [...],
+                    "encounterTypes": [...]
+                }
             },
-            "update": {
-                "addressLevelTypes": [...],
-                "locations": [...],
-                "catchments": [...],
-                "subjectTypes": [...],
-                "programs": [...],
-                "encounterTypes": [...]
-            },
-            "delete": {
-                "addressLevelTypes": [...],
-                "locations": [...],
-                "catchments": [...],
-                "subjectTypes": [...],
-                "programs": [...],
-                "encounterTypes": [...]
-            }
+            "next_step": "Optional next step instruction",
+            "org_type": "Trial|Production|UAT"
         }
     }
 
