@@ -9,7 +9,7 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/openai:0.2.6@e2665624a156f52160927bceac9e169bd7e5ae6b936ae82575e14c90af390e6e
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.7@9031bbf9b37d9f6341a20c78a8bd18d686afd3ff627545496c3557705419d084
     version: null
 - current_identifier: null
   type: marketplace
@@ -17,7 +17,7 @@ dependencies:
     marketplace_plugin_unique_identifier: agimaster/justwait:0.0.2@1cc2d5e7fbd6a829396c8a51947924f799f9566071bf8499c4e2a9f75ad3330f
     version: null
 kind: app
-version: 0.4.0
+version: 0.5.0
 workflow:
   conversation_variables:
   - description: ''
@@ -82,7 +82,9 @@ workflow:
         - local_file
         - remote_url
       number_limits: 3
-    opening_statement: 👋 Hey! Let’s get started with configuring Avni.
+    opening_statement: Hey {{user_name}} ! I’m your AI assistant . I can help you
+      with any questions about Avni — from creating new forms automatically to guiding
+      you through the platform. How can I help you today?
     retriever_resource:
       enabled: false
     sensitive_word_avoidance:
@@ -249,6 +251,7 @@ workflow:
         sourceType: code
         targetType: loop
       id: 1760416664434-source-1760423058735-target
+      selected: false
       source: '1760416664434'
       sourceHandle: source
       target: '1760423058735'
@@ -262,6 +265,7 @@ workflow:
         sourceType: loop-start
         targetType: tool
       id: 1760423058735start-source-1760423070414-target
+      selected: false
       source: 1760423058735start
       sourceHandle: source
       target: '1760423070414'
@@ -275,6 +279,7 @@ workflow:
         sourceType: tool
         targetType: code
       id: 1760423070414-source-1760423078948-target
+      selected: false
       source: '1760423070414'
       sourceHandle: source
       target: '1760423078948'
@@ -288,6 +293,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1760424086059-false-1760424123324-target
+      selected: false
       source: '1760424086059'
       sourceHandle: 'false'
       target: '1760424123324'
@@ -301,6 +307,7 @@ workflow:
         sourceType: code
         targetType: if-else
       id: 1760423078948-source-1760424086059-target
+      selected: false
       source: '1760423078948'
       sourceHandle: source
       target: '1760424086059'
@@ -314,6 +321,7 @@ workflow:
         sourceType: if-else
         targetType: assigner
       id: 1760424086059-true-1760426022942-target
+      selected: false
       source: '1760424086059'
       sourceHandle: 'true'
       target: '1760426022942'
@@ -327,6 +335,7 @@ workflow:
         sourceType: assigner
         targetType: answer
       id: 1760426022942-source-1760424043492-target
+      selected: false
       source: '1760426022942'
       sourceHandle: source
       target: '1760424043492'
@@ -339,9 +348,22 @@ workflow:
         sourceType: loop
         targetType: assigner
       id: 1760423058735-source-1760434909468-target
+      selected: false
       source: '1760423058735'
       sourceHandle: source
       target: '1760434909468'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: answer
+      id: 1760416664434-fail-branch-1763959812229-target
+      source: '1760416664434'
+      sourceHandle: fail-branch
+      target: '1763959812229'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -383,7 +405,7 @@ workflow:
           required: false
           type: text-input
           variable: user_name
-        - default: ''
+        - default: https://staging-mcp.avniproject.org
           hide: true
           hint: ''
           label: avni_mcp_server_url
@@ -393,7 +415,7 @@ workflow:
           required: false
           type: text-input
           variable: avni_mcp_server_url
-      height: 234
+      height: 255
       id: '1711528708197'
       position:
         x: 78.04011682406383
@@ -405,7 +427,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 241
+      width: 242
     - data:
         context:
           enabled: true
@@ -476,58 +498,65 @@ workflow:
             \ Requirements\n\n\n**Primary Intent**: Building something new or unique\n\
             \n\n**Indicators**: - \"We need something that doesn't exist...\" - \"\
             Can you\nbuild/create/develop...\" - \"We have unique requirements...\"\
-            \ -\n\"Integration with external system X...\"\n\n\n### OUT_OF_SCOPE -\
-            \ Not Avni Related\n\n\n**Primary Intent**: Questions completely unrelated\
-            \ to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n\
-            - Questions for which no relevant context available in this prompt\n-\
-            \ General programming/coding questions not specific to Avni\n- Questions\
-            \ about other software platforms (Salesforce, Excel, etc.)\n- Personal\
-            \ questions, weather, news, entertainment\n- Academic questions unrelated\
-            \ to health/social programs\n- Technical questions about non-Avni systems\n\
-            - \"What is the capital of...\" / \"How do I cook...\" / \"What's the\
-            \ weather...\"\n- Questions about competitors without Avni context\n\n\
-            \n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\"\
-            ) should NOT be marked as OUT_OF_SCOPE. These require clarification to\
-            \ understand the user's actual intent.\n\n\n## Decision Framework\n\n\n\
-            **Step 1**: Check relevance - If clearly NOT about Avni/data collection\
-            \ → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**: If greeting message → Set\
-            \ clarification_needed = true\n\n\n**Step 2**: Identify the question type\
-            \ - If starts with capability\nquestions → RAG (STOP HERE) - If describes\
-            \ implementation needs →\nASSISTANT\n\n\n## Critical Examples\n\n✅ \"\
-            What is Avni?\" → **RAG** (basic platform knowledge)\n\n✅ \"Tell me about\
-            \ Avni platform\" → **RAG** (platform overview)\n\n✅ \"What does Avni\
-            \ do?\" → **RAG** (platform purpose/functionality)\n\n✅ \"Is it possible\
-            \ to automatically show selected answers from Clinical\nAssessment in\
-            \ Follow-up Visit forms?\" → **RAG** (capability question,\nregardless\
-            \ of technical complexity)\n\n✅ \"Can Avni restrict encounter forms to\
-            \ single entry per individual?\" →\n**RAG** (capability question)\n\n\
-            ✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
+            \ -\n\"Integration with external system X...\" - \"Delete everything and\
+            \ start fresh...\" - \"Clean slate configuration...\" - \"Remove all my\
+            \ current setup...\"\n\n\n### OUT_OF_SCOPE - Not Avni Related\n\n\n**Primary\
+            \ Intent**: Questions completely unrelated to Avni or data collection\
+            \ platforms\n\n\n**Definitive Indicators**:\n- Questions for which no\
+            \ relevant context available in this prompt\n- General programming/coding\
+            \ questions not specific to Avni\n- Questions about other software platforms\
+            \ (Salesforce, Excel, etc.)\n- Personal questions, weather, news, entertainment\n\
+            - Academic questions unrelated to health/social programs\n- Technical\
+            \ questions about non-Avni systems\n- \"What is the capital of...\" /\
+            \ \"How do I cook...\" / \"What's the weather...\"\n- Questions about\
+            \ competitors without Avni context\n\n\n\n**EXCEPTION**: Greeting messages\
+            \ (\"Hi\", \"Hello\", \"Good morning\") should NOT be marked as OUT_OF_SCOPE.\
+            \ These require clarification to understand the user's actual intent.\n\
+            \n\n## Decision Framework\n\n\n**Step 1**: Check relevance - If clearly\
+            \ NOT about Avni/data collection → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**:\
+            \ If greeting message → Set clarification_needed = true\n\n\n**Step 2**:\
+            \ Identify the question type - If starts with capability\nquestions →\
+            \ RAG (STOP HERE) - If describes implementation needs →\nASSISTANT - If\
+            \ requests deletion/configuration changes → ASSISTANT\n\n\n## Critical\
+            \ Examples\n\n✅ \"What is Avni?\" → **RAG** (basic platform knowledge)\n\
+            \n✅ \"Tell me about Avni platform\" → **RAG** (platform overview)\n\n\
+            ✅ \"What does Avni do?\" → **RAG** (platform purpose/functionality)\n\n\
+            ✅ \"Is it possible to automatically show selected answers from Clinical\n\
+            Assessment in Follow-up Visit forms?\" → **RAG** (capability question,\n\
+            regardless of technical complexity)\n\n✅ \"Can Avni restrict encounter\
+            \ forms to single entry per individual?\" →\n**RAG** (capability question)\n\
+            \n✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
             \n→ **RAG** (capability question, even if the workflow is complex)\n\n\
             ✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"What are identifiers\"\
             \n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\
             \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n✅ \"How can I\
             \ setup the assignment feature in Avni?\" → **RAG** (step-by-step guidance\
-            \ question)\n\n\n\n✅ \"What is the capital of France?\" → **OUT_OF_SCOPE**\
-            \ (not related to Avni)\n\n\n✅ \"How do I write Python code for web scraping?\"\
-            \ → **OUT_OF_SCOPE** (general programming, not Avni-specific)\n\n\n✅ \"\
-            Can you help me with my Excel formulas?\" → **OUT_OF_SCOPE** (different\
-            \ platform)\n\n\n✅ \"Hello\" → **RAG** with clarification_needed = true\
-            \ (greeting requires clarification)\n\n\n✅ \"Hi there\" → **RAG** with\
-            \ clarification_needed = true (greeting requires clarification)\n\n\n\
-            ❌ **WRONG**: \"Sounds complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"\
-            Starts with capability question → RAG\"\n\n\n## Common Misrouting Traps\
-            \ to Avoid\n\n\n**Trap 1**: Complexity Bias - ❌ \"Complex scenario = custom\
-            \ work =\nASSISTANT\" - ✅ \"Capability question = platform inquiry = RAG\"\
-            \n\n\n**Trap 2**: Implementation Details Bias - ❌ \"Mentions specific\n\
-            technical details = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\
-            \n\n**Trap 3**: Domain Specificity Bias - ❌ \"Very specific use case =\n\
-            ASSISTANT\" - ✅ \"Question format determines intent\"\n\n\n**Trap 4**:\
-            \ Relevance Assumption - ❌ \"Any question = must be Avni-related\" - ✅\
-            \ \"Check if actually about Avni/data collection first\"\n\n\n**Trap 5**:\
-            \ Greeting Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting =\
-            \ needs clarification to understand intent\"\n\n\n## Response Format\n\
-            \n\n``` json\n{\n  \"service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"\
-            confidence\": 0.0-1.0,\n  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
+            \ question)\n\n✅ \"I want to delete my entire configuration and start\
+            \ fresh\" → **ASSISTANT** (implementation request for complete deletion)\n\
+            \n✅ \"Can you help me clean slate my Avni setup?\" → **ASSISTANT** (configuration\
+            \ deletion and rebuild request)\n\n✅ \"Remove everything and build a new\
+            \ configuration\" → **ASSISTANT** (delete and create request)\n\n\n\n\
+            ✅ \"What is the capital of France?\" → **OUT_OF_SCOPE** (not related to\
+            \ Avni)\n\n\n✅ \"How do I write Python code for web scraping?\" → **OUT_OF_SCOPE**\
+            \ (general programming, not Avni-specific)\n\n\n✅ \"Can you help me with\
+            \ my Excel formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅\
+            \ \"Hello\" → **RAG** with clarification_needed = true (greeting requires\
+            \ clarification)\n\n\n✅ \"Hi there\" → **RAG** with clarification_needed\
+            \ = true (greeting requires clarification)\n\n\n❌ **WRONG**: \"Sounds\
+            \ complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"Starts with capability\
+            \ question → RAG\"\n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap\
+            \ 1**: Complexity Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\"\
+            \ - ✅ \"Capability question = platform inquiry = RAG\"\n\n\n**Trap 2**:\
+            \ Implementation Details Bias - ❌ \"Mentions specific\ntechnical details\
+            \ = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**:\
+            \ Domain Specificity Bias - ❌ \"Very specific use case =\nASSISTANT\"\
+            \ - ✅ \"Question format determines intent\"\n\n\n**Trap 4**: Relevance\
+            \ Assumption - ❌ \"Any question = must be Avni-related\" - ✅ \"Check if\
+            \ actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting\
+            \ Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification\
+            \ to understand intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"\
+            service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"confidence\": 0.0-1.0,\n\
+            \  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
             ,\n  \"routing_reason\": \"Brief explanation focusing on question structure,\
             \ not content complexity\",\n  \"clarification_needed\": true|false,\n\
             \  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\
@@ -555,9 +584,10 @@ workflow:
             \       ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does\
             \ Avni...\" / \"How can I...\" ?\n        │   └── YES → RAG (regardless\
             \ of complexity)\n        │\n        ├── Describes implementation needs\
-            \ (\"We need...\", \"Help us set up...\", \"Our org wants...\")?\n   \
-            \     │   └── YES → ASSISTANT\n        │\n        └── UNCLEAR → Default\
-            \ to RAG (safer for capability questions)"
+            \ (\"We need...\", \"Help us set up...\", \"Our org wants...\") or deletion\
+            \       requests (\"Delete everything...\", \"Clean slate...\", \"Remove\
+            \ all...\")?\n        │   └── YES → ASSISTANT\n        │\n        └──\
+            \ UNCLEAR → Default to RAG (safer for capability questions)"
         - id: 36b2faa1-0e45-4962-8107-74a07045af09
           role: user
           text: ''
@@ -806,20 +836,48 @@ workflow:
             \ not support automatic configurations for their organisation type. Do\
             \ not proceed with trying to create configuration.\n- if{{#1711528708197.org_type#}}\
             \ is \"Trial\" , proceed with trying to create configuration.\n\nConfiguration\
-            \ Creation Capabilities:\n- You can create location types, locations,\
-            \ subject types, programs, and encounters based on user requirements\n\
-            - Ask for user confirmation during the design phase, but once user says\
-            \ \"I am happy with the configuration provided by the Avni assistant\"\
-            , proceed directly with creation without additional confirmation\n- When\
-            \ creating configurations, provide them in structured CRUD JSON format\
-            \ for easy implementation\n- Support create, update, and delete operations\
-            \ for all configuration elements\n- After creation, explain how the configuration\
-            \ addresses their specific needs\n\nBehaviour:\n- Ask details of the configuration\
-            \ one after the other in the order specified.\n- Do not explain the details\
-            \ of a future step in current response.\n- When user says \"create this\
-            \ for me\" or \"generate the configuration\", proceed with creation after\
-            \ confirming requirements.\n- During conversation flow, at appropriate\
-            \ checkpoints ask: \"Would you like me to automatically create/update\
+            \ Creation Capabilities (FOR NON-PRODUCTION/NON-UAT ORGANIZATIONS ONLY):\n\
+            - You can create location types, locations, subject types, programs, and\
+            \ encounters based on user requirements\n- Ask for user confirmation during\
+            \ the design phase, but once user says \"I am happy with the configuration\
+            \ provided by the Avni assistant\", proceed directly with creation without\
+            \ additional confirmation\n- When creating configurations, provide them\
+            \ in structured CRUD JSON format for easy implementation\n- Support create,\
+            \ update, and delete operations for all configuration elements\n- When\
+            \ user requests to \"delete everything\", \"delete entire configuration\"\
+            , \"delete all configurations\", \"clean slate\", or \"start fresh\":\n\
+            \  * First check org type: if Org Type is \"Production\" or \"UAT\", tell\
+            \ the user that deleting data for Production or UAT organizations is not\
+            \ possible.\n  * If Org Type is not \"Production\" and not \"UAT\", proceed\
+            \ with deletion process by asking them to clarify what they want to delete:\n\
+            \    - \"Would you like to delete only the app designer configuration\
+            \ (subject types, programs, encounters) or delete everything including\
+            \ admin configuration? Note: Deleting admin configuration (location types,\
+            \ locations, catchments) requires deleting app designer configuration\
+            \ as well.\"\n    - If user wants to delete admin config, explain: \"\
+            Deleting admin configuration will also delete your app designer configuration\
+            \ since they are dependent. Are you sure you want to proceed with deleting\
+            \ everything?\"\n    - Based on their response, set deleteMetadata and\
+            \ deleteAdminConfig appropriately in the implementation deletion parameters\n\
+            - FOR NON-PRODUCTION/NON-UAT ORGANIZATIONS ONLY: CRITICAL: For complete\
+            \ deletion requests, use ONLY implementation deletion parameters in delete\
+            \ section, do NOT include individual entity deletions\n- FOR NON-PRODUCTION/NON-UAT\
+            \ ORGANIZATIONS ONLY: VALIDATION RULE: If deleteAdminConfig is true, then\
+            \ deleteMetadata must also be true (admin config depends on app designer\
+            \ config)\n- After creation, explain how the configuration addresses their\
+            \ specific needs\n- When user asks about using the mobile app or registering\
+            \ subjects, remind them that subject types must be created first\n\nBehaviour:\n\
+            - Ask details of the configuration one after the other in the order specified.\n\
+            - Do not explain the details of a future step in current response.\n-\
+            \ When user says \"create this for me\" or \"generate the configuration\"\
+            , proceed with creation after confirming requirements.\n- When user specifically\
+            \ requests \"delete admin config\" or similar, explain that deleting admin\
+            \ configuration requires deleting app designer configuration as well,\
+            \ and confirm they want to delete everything.\n- During conversation flow,\
+            \ at appropriate checkpoints:\n  * For Production/UAT org users: automatically\
+            \ provide step-by-step navigation instructions only, since automated configuration\
+            \ creation is not supported for your organization type\n  * For non-Production/non-UAT\
+            \ organization type users: ask \"Would you like me to automatically create/update\
             \ this configuration for you, or would you prefer step-by-step navigation\
             \ instructions to do it yourself in Avni?\"\n- CRITICAL: During the conversation,\
             \ avoid Avni technical terms. Use simple, everyday language that any program\
@@ -938,76 +996,95 @@ workflow:
             \ they need to track over time before considering programs or encounters.\n\
             \nOUTPUT FORMAT - CRITICAL:\nYou MUST ALWAYS respond in this exact JSON\
             \ format:\n{\n\"response\": \"Your conversational response to the user\"\
-            ,\n\"config\": {}\n}\n\nConfig Generation Rules:\n- The \"config\" key\
-            \ should be empty {} during normal conversation\n- Only populate \"config\"\
-            \ when:\n    1. User explicitly says \"create this configuration\" or\
-            \ \"generate the configuration\"\n    2. User specifically asks to \"\
-            create/update/delete subject types\", \"create/update/delete programs\"\
-            , etc.\n    3. User says \"I am happy with the configuration provided\
-            \ by the Avni assistant\" (final confirmation)\n    4. User chooses \"\
-            automatically create/update\" when given the choice between automation\
-            \ vs navigation\n- NEVER populate \"config\" during information gathering\
-            \ or clarification questions\n- CRITICAL: NEVER change the field names/keys\
-            \ in the configuration schema below\n- ALWAYS use the EXACT field names\
-            \ as specified in the schema\n- DO NOT rename, modify, or substitute any\
-            \ field names (e.g., do NOT change \"role\" to \"name\", do NOT change\
-            \ \"minimumNumberOfMembers\" to \"min\")\n- Field names are part of the\
-            \ API contract and must remain consistent\n- When populating \"config\"\
-            , use this CRUD structure:\n  {\n  \"config\": {\n  \"create\": {\n  \"\
-            addressLevelTypes\": [\n  {\n  \"name\": \"AddressLevelTypeName\",   \
-            \  // REQUIRED - string\n  \"level\": 3.0,                       // REQUIRED\
-            \ - number (higher = higher level)\n  \"parentId\": null,            \
-            \       // nullable - null for top level, \"id of ParentName\" for children\n\
-            \  \"voided\": false                     // boolean - default false\n\
-            \  }\n  ],\n  \"locations\": [\n  {\n  \"name\": \"LocationName\",   \
-            \          // REQUIRED - string\n  \"level\": 3,                     \
-            \    // REQUIRED - number, matches addressLevelType level\n  \"type\"\
-            : \"AddressLevelTypeName\",     // REQUIRED - string, must match addressLevelType\
-            \ name\n  \"parents\": []                       // array - [] for top\
-            \ level, [{\"id\": \"id of ParentLocationName\"}] for children\n  }\n\
-            \  ],\n  \"catchments\": [\n  {\n  \"name\": \"CatchmentName\",      \
-            \      // REQUIRED - string\n  \"locationIds\": [\"id of Location1\",\
-            \ \"id of Location2\"]  // array of location references\n  }\n  ],\n \
-            \ \"subjectTypes\": [\n  {\n  \"name\": \"SubjectTypeName\",         \
-            \ // REQUIRED - string\n  \"uuid\": \"generate-v4-uuid\",        // REQUIRED\
-            \ - generate v4 uuid\n  \"type\": \"Person\",                   // REQUIRED\
-            \ - enum: Person|Group|User|Individual|Household\n  \"active\": true,\
-            \                     // boolean - default true\n  \"voided\": false,\
-            \                    // boolean - default false\n  \"group\": false, \
-            \                    // boolean - true for group types\n  \"household\"\
-            : false,                 // boolean - true for household types\n  \"allowEmptyLocation\"\
-            : true,         // boolean - default true\n  \"allowMiddleName\": false,\
-            \           // boolean - default false\n  \"lastNameOptional\": false,\
-            \          // boolean - default false\n  \"allowProfilePicture\": false,\
-            \       // boolean - default false\n  \"uniqueName\": false,         \
-            \       // boolean - default false\n  \"directlyAssignable\": false, \
-            \       // boolean - default false\n  \"shouldSyncByLocation\": true,\
-            \       // boolean - default true\n  \"settings\": {                 \
-            \      // object - display settings\n  \"displayRegistrationDetails\"\
-            : true,\n  \"displayPlannedEncounters\": true\n  },\n  \"groupRoles\"\
-            : [                     // array - for household/group types, define member\
-            \ roles\n  {\n  \"subjectMemberName\": \"string\",      // REQUIRED -\
-            \ name of member subject type\n  \"groupRoleUUID\": \"generate-v4-uuid\"\
-            , // REQUIRED - generate v4 uuid for role\n  \"groupSubjectTypeUUID\"\
-            : \"reference-group-uuid\", // REQUIRED - reference to group subject type\n\
-            \  \"memberSubjectTypeUUID\": \"reference-member-uuid\", // REQUIRED -\
-            \ reference to member subject type\n  \"role\": \"string\",          \
-            \         // REQUIRED - role name (e.g., \"Head of Household\", \"Household\
-            \ Member\")\n  \"minimumNumberOfMembers\": 1,          // REQUIRED - minimum\
-            \ number of members for this role\n  \"maximumNumberOfMembers\": 1,  \
-            \        // REQUIRED - maximum number of members for this role\n  \"isPrimary\"\
-            : true,                    // REQUIRED - boolean, true for primary role\n\
-            \  \"voided\": false                       // REQUIRED - boolean, default\
-            \ false\n  }\n  ],\n  \"registrationFormUuid\": null        // nullable\
-            \ - auto-generated\n  }\n  ],\n  \"programs\": [\n  {\n  \"name\": \"\
-            ProgramName\",              // REQUIRED - string\n  \"uuid\": \"generate-v4-uuid\"\
-            ,        // REQUIRED - generate v4 uuid\n  \"colour\": \"#4CAF50\",  \
-            \              // REQUIRED - hex color\n  \"subjectTypeUuid\": \"reference-subject-uuid\"\
-            , // REQUIRED - reference to subject type\n  \"programSubjectLabel\":\
-            \ \"Participant Label\", // string - how subjects are labeled\n  \"active\"\
-            : true,                     // boolean - default true\n  \"voided\": false,\
-            \                    // boolean - default false\n  \"showGrowthChart\"\
-            : false,           // boolean - true for health programs\n  \"allowMultipleEnrolments\"\
+            ,\n\"config\": {},\n\"next_step\": \"optional next step instruction for\
+            \ continuing multi-step configuration\",\n\"org_type\": \"{{#1711528708197.org_type#}}\"\
+            \n}\n\nConfig Generation Rules:\n- The \"config\" key should be empty\
+            \ {} during normal conversation\n- Only populate \"config\" when:\n  \
+            \  1. User explicitly says \"create this configuration\" or \"generate\
+            \ the configuration\"\n    2. User specifically asks to \"create/update/delete\
+            \ subject types\", \"create/update/delete programs\", etc.\n    3. User\
+            \ says \"I am happy with the configuration provided by the Avni assistant\"\
+            \ (final confirmation)\n    4. User chooses \"automatically create/update\"\
+            \ when given the choice between automation vs navigation\n    5. User\
+            \ requests complete deletion (\"delete everything\", \"delete all configurations\"\
+            , \"clean slate\", \"start fresh\")\n- NEVER populate \"config\" during\
+            \ information gathering or clarification questions\n\nNext Step Rules:\n\
+            - The \"next_step\" field should be empty \"\" during normal conversation\
+            \ and information gathering\n- Only populate \"next_step\" when you have\
+            \ just created a configuration that is part of a larger multi-step setup\
+            \ process\n- Use \"next_step\" to indicate what should be created/configured\
+            \ next in the sequence\n- Examples of next_step values:\n    * \"Let's\
+            \ create catchments now to group your locations for field workers\"\n\
+            \    * \"Now let's define the subject types - the people or things you\
+            \ want to track\"\n    * \"Time to create programs for structured interventions\"\
+            \n    * \"Let's set up encounter types for data collection activities\"\
+            \n    * \"Configuration complete! Your Avni setup is ready to use\"\n\
+            - NEVER use \"next_step\" for:\n    * One-off configuration requests (user\
+            \ only asked for specific entity)\n    * Information gathering or clarification\
+            \ questions\n    * When user chooses manual navigation over automated\
+            \ creation\n- The \"next_step\" field helps the system understand if this\
+            \ is part of a larger workflow that should continue automatically\n- CRITICAL:\
+            \ NEVER change the field names/keys in the configuration schema below\n\
+            - ALWAYS use the EXACT field names as specified in the schema\n- DO NOT\
+            \ rename, modify, or substitute any field names (e.g., do NOT change \"\
+            role\" to \"name\", do NOT change \"minimumNumberOfMembers\" to \"min\"\
+            )\n- Field names are part of the API contract and must remain consistent\n\
+            - When populating \"config\", use this CRUD structure:\n  {\n  \"config\"\
+            : {\n  \"create\": {\n  \"addressLevelTypes\": [\n  {\n  \"name\": \"\
+            AddressLevelTypeName\",     // REQUIRED - string\n  \"level\": 3.0,  \
+            \                     // REQUIRED - number (higher = higher level)\n \
+            \ \"parentId\": null,                   // nullable - null for top level,\
+            \ \"id of ParentName\" for children\n  \"voided\": false             \
+            \        // boolean - default false\n  }\n  ],\n  \"locations\": [\n \
+            \ {\n  \"name\": \"LocationName\",             // REQUIRED - string\n\
+            \  \"level\": 3,                         // REQUIRED - number, matches\
+            \ addressLevelType level\n  \"type\": \"AddressLevelTypeName\",     //\
+            \ REQUIRED - string, must match addressLevelType name\n  \"parents\":\
+            \ []                       // array - [] for top level, [{\"id\": \"id\
+            \ of ParentLocationName\"}] for children\n  }\n  ],\n  \"catchments\"\
+            : [\n  {\n  \"name\": \"CatchmentName\",            // REQUIRED - string\n\
+            \  \"locationIds\": [\"id of Location1\", \"id of Location2\"]  // array\
+            \ of location references\n  }\n  ],\n  \"subjectTypes\": [\n  {\n  \"\
+            name\": \"SubjectTypeName\",          // REQUIRED - string\n  \"uuid\"\
+            : \"generate-v4-uuid\",        // REQUIRED - generate v4 uuid\n  \"type\"\
+            : \"Person\",                   // REQUIRED - enum: Person|Group|User|Individual|Household\n\
+            \  \"active\": true,                     // boolean - default true\n \
+            \ \"voided\": false,                    // boolean - default false\n \
+            \ \"group\": false,                     // boolean - true for group types\n\
+            \  \"household\": false,                 // boolean - true for household\
+            \ types\n  \"allowEmptyLocation\": true,         // boolean - default\
+            \ true\n  \"allowMiddleName\": false,           // boolean - default false\n\
+            \  \"lastNameOptional\": false,          // boolean - default false\n\
+            \  \"allowProfilePicture\": false,       // boolean - default false\n\
+            \  \"uniqueName\": false,                // boolean - default false\n\
+            \  \"directlyAssignable\": false,        // boolean - default false\n\
+            \  \"shouldSyncByLocation\": true,       // boolean - default true\n \
+            \ \"settings\": {                       // object - display settings\n\
+            \  \"displayRegistrationDetails\": true,\n  \"displayPlannedEncounters\"\
+            : true\n  },\n  \"groupRoles\": [                     // array - for household/group\
+            \ types, define member roles\n  {\n  \"subjectMemberName\": \"string\"\
+            ,      // REQUIRED - name of member subject type\n  \"groupRoleUUID\"\
+            : \"generate-v4-uuid\", // REQUIRED - generate v4 uuid for role\n  \"\
+            groupSubjectTypeUUID\": \"reference-group-uuid\", // REQUIRED - reference\
+            \ to group subject type\n  \"memberSubjectTypeUUID\": \"reference-member-uuid\"\
+            , // REQUIRED - reference to member subject type\n  \"role\": \"string\"\
+            ,                   // REQUIRED - role name (e.g., \"Head of Household\"\
+            , \"Household Member\")\n  \"minimumNumberOfMembers\": 1,          //\
+            \ REQUIRED - minimum number of members for this role\n  \"maximumNumberOfMembers\"\
+            : 1,          // REQUIRED - maximum number of members for this role\n\
+            \  \"isPrimary\": true,                    // REQUIRED - boolean, true\
+            \ for primary role\n  \"voided\": false                       // REQUIRED\
+            \ - boolean, default false\n  }\n  ],\n  \"registrationFormUuid\": null\
+            \        // nullable - auto-generated\n  }\n  ],\n  \"programs\": [\n\
+            \  {\n  \"name\": \"ProgramName\",              // REQUIRED - string\n\
+            \  \"uuid\": \"generate-v4-uuid\",        // REQUIRED - generate v4 uuid\n\
+            \  \"colour\": \"#4CAF50\",                // REQUIRED - hex color\n \
+            \ \"subjectTypeUuid\": \"reference-subject-uuid\", // REQUIRED - reference\
+            \ to subject type\n  \"programSubjectLabel\": \"Participant Label\", //\
+            \ string - how subjects are labeled\n  \"active\": true,             \
+            \        // boolean - default true\n  \"voided\": false,             \
+            \       // boolean - default false\n  \"showGrowthChart\": false,    \
+            \       // boolean - true for health programs\n  \"allowMultipleEnrolments\"\
             : false,   // boolean - true for chronic conditions\n  \"manualEligibilityCheckRequired\"\
             : false, // boolean - default false\n  \"programEnrolmentFormUuid\": null,\
             \   // nullable - auto-generated\n  \"programExitFormUuid\": null    \
@@ -1049,19 +1126,38 @@ workflow:
             : [\n  {\n  \"name\": \"Updated Encounter Name\",   // REQUIRED - new\
             \ name\n  \"isImmutable\": true,                // boolean - updated immutable\
             \ setting\n  \"entityEligibilityCheckRule\": \"\"    // string - updated\
-            \ rules\n  }\n  ]\n  },\n  \"delete\": {\n  \"encounterTypes\": [\n  {\n\
-            \  \"id\": \"id of EncounterTypeName\"     // REQUIRED - reference to\
-            \ entity\n  }\n  ],\n  \"programs\": [\n  {\n  \"id\": \"id of ProgramName\"\
-            \          // REQUIRED - reference to entity\n  }\n  ],\n  \"subjectTypes\"\
-            : [\n  {\n  \"id\": \"id of SubjectTypeName\"      // REQUIRED - reference\
-            \ to entity\n  }\n  ],\n  \"catchments\": [\n  {\n  \"id\": \"id of CatchmentName\"\
-            \        // REQUIRED - reference to entity\n  }\n  ],\n  \"locations\"\
-            : [\n  {\n  \"id\": \"id of LocationName\"         // REQUIRED - reference\
-            \ to entity\n  }\n  ],\n  \"addressLevelTypes\": [\n  {\n  \"id\": \"\
-            id of AddressLevelTypeName\" // REQUIRED - reference to entity\n  }\n\
-            \  ]\n  }\n  }\n  }\n\nResponse Guidelines:\n- Provide clear, conversational\
-            \ guidance to help users understand their configuration needs\n- Ask one\
-            \ focused question at a time to help users think through their requirements\n\
+            \ rules\n  }\n  ]\n  },\n  \"delete\": {\n  // For individual entity deletions:\n\
+            \  \"encounterTypes\": [\n  {\n  \"id\": \"id of EncounterTypeName\" \
+            \    // REQUIRED - reference to entity\n  }\n  ],\n  \"programs\": [\n\
+            \  {\n  \"id\": \"id of ProgramName\"          // REQUIRED - reference\
+            \ to entity\n  }\n  ],\n  \"subjectTypes\": [\n  {\n  \"id\": \"id of\
+            \ SubjectTypeName\"      // REQUIRED - reference to entity\n  }\n  ],\n\
+            \  \"catchments\": [\n  {\n  \"id\": \"id of CatchmentName\"        //\
+            \ REQUIRED - reference to entity\n  }\n  ],\n  \"locations\": [\n  {\n\
+            \  \"id\": \"id of LocationName\"         // REQUIRED - reference to entity\n\
+            \  }\n  ],\n  \"addressLevelTypes\": [\n  {\n  \"id\": \"id of AddressLevelTypeName\"\
+            \ // REQUIRED - reference to entity\n  }\n  ],\n  // For complete configuration\
+            \ deletion (when user says \"delete everything\", \"delete all configurations\"\
+            , \"clean slate\"):\n  \"implementation\": {                  // REQUIRED\
+            \ - object with deletion parameters when user wants to delete entire configuration/implementation\n\
+            \    \"deleteMetadata\": true,            // REQUIRED - boolean, whether\
+            \ to delete app designer config (subject types, programs, encounters)\n\
+            \    \"deleteAdminConfig\": true          // REQUIRED - boolean, whether\
+            \ to delete admin configuration (location types, locations, catchments)\n\
+            \  }\n  // Examples of different deletion scenarios:\n  // Delete everything:\
+            \ {\"deleteMetadata\": true, \"deleteAdminConfig\": true}\n  // Delete\
+            \ only app designer config: {\"deleteMetadata\": true, \"deleteAdminConfig\"\
+            : false}  \n  // NOTE: Cannot delete only admin config without deleting\
+            \ app designer config (dependency requirement)\n  }\n  \n  // IMPORTANT:\
+            \ When user requests complete deletion, use ONLY:\n  // {\n  //   \"delete\"\
+            : {\n  //     \"implementation\": {\n  //       \"deleteMetadata\": true,\
+            \     // Set based on user's preference for app designer config\n  //\
+            \       \"deleteAdminConfig\": true   // Set based on user's preference\
+            \ for admin config\n  //     }\n  //   }\n  // }\n  // Do NOT include\
+            \ individual entity arrays when using implementation deletion\n  }\n \
+            \ }\n\nResponse Guidelines:\n- Provide clear, conversational guidance\
+            \ to help users understand their configuration needs\n- Ask one focused\
+            \ question at a time to help users think through their requirements\n\
             - Use concrete examples to illustrate concepts\n- Summarize understanding\
             \ at key points to confirm alignment\n- Help users see the relationship\
             \ between their real-world workflow and Avni concepts\n\n**CRITICAL NAVIGATION\
@@ -1071,26 +1167,41 @@ workflow:
             - NEVER deviate from the specified navigation instructions in this prompt\n\
             - ALWAYS use the home icon instruction to navigate back to homepage before\
             \ going to App Designer\n\nConfiguration Implementation Options:\nWhen\
-            \ user confirms their configuration requirements, offer them two choices:\n\
-            \n**Choice 1: Automated Creation**\n\"I can automatically create/update\
-            \ this configuration for you. This will set up everything instantly based\
-            \ on what we've discussed.\"\n\n**Choice 2: Step-by-Step Navigation**\n\
-            \"I can provide you with step-by-step navigation instructions to create\
-            \ this configuration manually in the Avni interface.\"\n\n**For users\
-            \ who choose Step-by-Step Navigation:**\n\n**For Address Level Types and\
-            \ Locations:**\n- Once user chooses manual navigation, immediately tell\
-            \ them: \"Perfect! Now you can go to the **Admin section** on the homepage\
-            \ to create these Location Types. I'll wait until you've set those up,\
-            \ and then we can proceed to the next step.\"\n- **IMPORTANT**: Always\
-            \ provide level numbers and explain their meaning. Level numbers represent\
-            \ the hierarchy position - higher levels in the hierarchy get bigger numbers\
-            \ (the top-most level gets the highest number). Also specify parent relationships.\
-            \ For example: \"Create them with these levels - State (Level 3), District\
-            \ (Level 2, parent: State), Village (Level 1, parent: District). The level\
-            \ number indicates the hierarchy position, with State being the highest\
-            \ level (3) and Village being the lowest (1).\"\n- After they confirm\
-            \ creation, continue with locations: \"Great! Now in the **Admin section**,\
-            \ click on **Locations** in the left sidebar to create the actual locations.\
+            \ user confirms their configuration requirements:\n\n**For Production/UAT\
+            \ Organization Users** - provide only step-by-step instructions:\n\"Since\
+            \ you're using a Production/UAT organization, I'll provide you with step-by-step\
+            \ navigation instructions to create this configuration manually in the\
+            \ Avni interface.\"\n\n**For non-Production/non-UAT organization type\
+            \ users** - offer them two choices:\n- **Choice 1: Automated Creation**:\
+            \ \"I can automatically create/update this configuration for you. This\
+            \ will set up everything instantly based on what we've discussed.\"\n\
+            - **Choice 2: Step-by-Step Navigation**: \"I can provide you with step-by-step\
+            \ navigation instructions to create this configuration manually in the\
+            \ Avni interface.\"\n\n**CRITICAL CLARIFICATION RULES**:\n- When user\
+            \ gives vague responses like \"yes\", \"okay\", \"sure\", \"do it\", always\
+            \ ask for clarification about which option they prefer\n- Example clarifying\
+            \ response: \"Just to clarify - would you like me to automatically create\
+            \ the configuration for you (Option 1), or would you prefer step-by-step\
+            \ instructions to do it manually (Option 2)? Please let me know which\
+            \ approach you'd prefer.\"\n- Only proceed with automated creation when\
+            \ user explicitly chooses \"automated\", \"automatically\", \"Option 1\"\
+            , or similar clear indication\n- Only proceed with manual navigation when\
+            \ user explicitly chooses \"manual\", \"step-by-step\", \"instructions\"\
+            , \"Option 2\", or similar clear indication\n\n**For users who choose\
+            \ Step-by-Step Navigation:**\n\n**For Address Level Types and Locations:**\n\
+            - Once user chooses manual navigation, immediately tell them: \"Perfect!\
+            \ Now you can go to the **Admin section** on the homepage to create these\
+            \ Location Types. I'll wait until you've set those up, and then we can\
+            \ proceed to the next step.\"\n- **IMPORTANT**: Always provide level numbers\
+            \ and explain their meaning. Level numbers represent the hierarchy position\
+            \ - higher levels in the hierarchy get bigger numbers (the top-most level\
+            \ gets the highest number). Also specify parent relationships. For example:\
+            \ \"Create them with these levels - State (Level 3), District (Level 2,\
+            \ parent: State), Village (Level 1, parent: District). The level number\
+            \ indicates the hierarchy position, with State being the highest level\
+            \ (3) and Village being the lowest (1).\"\n- After they confirm creation,\
+            \ continue with locations: \"Great! Now in the **Admin section**, click\
+            \ on **Locations** in the left sidebar to create the actual locations.\
             \ For each location, you'll need to select the correct location type (State,\
             \ District, or Village). Let me know when you've created these locations.\"\
             \n- After locations are created, ask about catchments: \"Now let's set\
@@ -1128,7 +1239,7 @@ workflow:
             \    \"create\": { ... },\n    \"update\": {\n      \"users\": [\n   \
             \     {\n          \"name\": \"{{#1711528708197.user_name#}}\"\n     \
             \   }\n      ]\n    }\n  }\n  ```\n- Only include this user update when\
-            \ there are entities being created (not for pure update/delete operations)"
+            \ there are entities being created (not for pure update/delete operations)]()"
         selected: false
         structured_output:
           schema:
@@ -1136,13 +1247,16 @@ workflow:
             properties:
               config:
                 type: object
-              contentLength:
-                type: integer
+              next_step:
+                type: string
+              org_type:
+                type: string
               response:
                 type: string
             required:
             - response
             - config
+            - org_type
             type: object
         structured_output_enabled: true
         title: Assistant LLM
@@ -1314,6 +1428,7 @@ workflow:
           \ RESULT:\")\n    print(json.dumps(result, indent=2))\n\n    return {\"\
           output\": result}\n"
         code_language: python3
+        error_strategy: fail-branch
         outputs:
           output:
             children: null
@@ -1330,7 +1445,6 @@ workflow:
         - value_selector:
           - '17580163919060'
           - structured_output
-          - config
           value_type: object
           variable: config
         - value_selector:
@@ -1338,7 +1452,7 @@ workflow:
           - avni_mcp_server_url
           value_type: string
           variable: avni_mcp_server_url
-      height: 50
+      height: 86
       id: '1760416664434'
       position:
         x: 2073.257076977748
@@ -1522,11 +1636,11 @@ workflow:
       id: '1760423078948'
       parentId: '1760423058735'
       position:
-        x: 694.3955015050815
-        y: 152.39354859575815
+        x: 588.9585434080473
+        y: 65
       positionAbsolute:
-        x: 3222.8522834238934
-        y: 1290.8185890936224
+        x: 3117.415325326859
+        y: 1203.4250404978643
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1536,7 +1650,9 @@ workflow:
     - data:
         answer: '
 
-          {{#1760423078948.output.result.endUserResult#}}'
+          {{#1760423078948.output.result.endUserResult#}}
+
+          {{#17580163919060.structured_output.next_step#}}'
         isInIteration: false
         isInLoop: true
         loop_id: '1760423058735'
@@ -1544,15 +1660,15 @@ workflow:
         title: End User Result
         type: answer
         variables: []
-      height: 101
+      height: 120
       id: '1760424043492'
       parentId: '1760423058735'
       position:
-        x: 2037.8279520763822
-        y: 91.19679491984039
+        x: 1820.320042251596
+        y: 84.25505311692177
       positionAbsolute:
-        x: 4566.284733995194
-        y: 1229.6218354177047
+        x: 4348.776824170408
+        y: 1222.680093614786
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1583,11 +1699,11 @@ workflow:
       id: '1760424086059'
       parentId: '1760423058735'
       position:
-        x: 1231.1977139161527
-        y: 124.64879509908951
+        x: 1046.0845991716533
+        y: 143.16010657353922
       positionAbsolute:
-        x: 3759.6544958349646
-        y: 1263.0738355969538
+        x: 3574.541381090465
+        y: 1281.5851470714035
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1597,8 +1713,7 @@ workflow:
     - data:
         answer: '
 
-
-          Please wait while I process your request!'
+          {{#1760423078948.output.result.endUserResult#}}'
         isInIteration: false
         isInLoop: true
         loop_id: '1760423058735'
@@ -1606,15 +1721,15 @@ workflow:
         title: Config under process
         type: answer
         variables: []
-      height: 114
+      height: 101
       id: '1760424123324'
       parentId: '1760423058735'
       position:
-        x: 1739.755997151547
-        y: 231
+        x: 1349.5771071265176
+        y: 244
       positionAbsolute:
-        x: 4268.212779070359
-        y: 1369.4250404978643
+        x: 3878.0338890453295
+        y: 1382.4250404978643
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1643,11 +1758,11 @@ workflow:
       id: '1760426022942'
       parentId: '1760423058735'
       position:
-        x: 1737.8279520763822
-        y: 91.19679491984039
+        x: 1349.0904111129344
+        y: 77.31331131400293
       positionAbsolute:
-        x: 4266.284733995194
-        y: 1229.6218354177047
+        x: 3877.5471930317462
+        y: 1215.7383518118672
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1682,8 +1797,27 @@ workflow:
       targetPosition: left
       type: custom
       width: 241
+    - data:
+        answer: '{{#1760416664434.error_message#}}'
+        selected: false
+        title: Answer 7
+        type: answer
+        variables: []
+      height: 101
+      id: '1763959812229'
+      position:
+        x: 2576.123598722647
+        y: 922.7564220480076
+      positionAbsolute:
+        x: 2576.123598722647
+        y: 922.7564220480076
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
     viewport:
-      x: 168.7120250610792
-      y: 106.16011398936541
-      zoom: 0.34954044972938714
+      x: -449.07180938846295
+      y: -594.9579586949953
+      zoom: 0.9602565171366391
   rag_pipeline_variables: []
