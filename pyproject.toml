@@ -12,6 +12,10 @@ dependencies = [
     "fastapi>=0.118.0",
     "pytest-asyncio>=1.1.0",
     "dspy-ai>=3.0.3",
+    "requests>=2.32.4",
+    "pandas>=2.3.3",
+    "matplotlib>=3.10.7",
+    "seaborn>=0.13.2",
 ]
 
 [project.scripts]

@@ -33,11 +33,23 @@ CRITICAL PARENT-CHILD RELATIONSHIP RULES:
 8. **MANDATORY ID CONTEXT TRACKING**: You MUST maintain a running context of all created entities and their database IDs throughout the entire conversation. When resolving references like "id of District", always check your ID tracking context first.
 
 CRITICAL DISTINCTION: ADDRESS LEVEL TYPES vs LOCATIONS:
-- Address Level Types (location types) are TEMPLATES that define location hierarchy levels
-- Locations are ACTUAL geographic instances that use those templates
+- Address Level Types (location types) are TEMPLATES that define location hierarchy levels (e.g., "State", "District", "Village")
+- Locations are ACTUAL geographic instances that use those templates (e.g., "Karnataka", "Bangalore", "Koramangala")
 - **NEVER** use an AddressLevelType ID as a Location parent ID
 - Location parents must reference OTHER LOCATION IDs, not AddressLevelType IDs
 - When creating locations: location_type parameter = AddressLevelType NAME, parents[].id = actual LOCATION ID
+- **CRITICAL CONFUSION PREVENTION**: 
+  * AddressLevelType names should be generic: "State", "District", "Village", "Block", "Country"
+  * Location names should be specific: "Karnataka", "JNK", "Baramula", "Kullu", "Malana"
+  * **NEVER create AddressLevelTypes with specific geographic names like "Baramula", "Kullu", "Malana"**
+  * If locations fail to create, DO NOT attempt to create AddressLevelTypes with location names
+
+**CRITICAL PARENT ID RESOLUTION FOR LOCATIONS:**
+- **WRONG PATTERN**: Child location with parents:[{"id": <AddressLevelType_ID>}] 
+- **CORRECT PATTERN**: Child location with parents:[{"id": <Parent_Location_ID>}]
+- **MANDATORY CHECK**: When resolving "id of ParentLocationName", find the LOCATION named "ParentLocationName", NOT the AddressLevelType
+- **RESOLUTION RULE**: Always use the actual geographic location's ID as parent, never the template's ID
+- **CONTEXT SEPARATION**: Keep AddressLevelType IDs and Location IDs in separate tracking contexts - they reference different entity types
 
 CRITICAL DATA TYPE CONVERSION RULES:
 - ALL database IDs (parentId, locationIds, parents[].id) MUST be sent as INTEGERS, not strings
@@ -55,6 +67,29 @@ CRITICAL NULL/PARENT HANDLING RULES:
 - For locations with no parent: DO NOT include parentId parameter in function calls
 - For location creation: location_type parameter must be the addressLevelType NAME (e.g., "TestState"), not the database ID
 
+**CRITICAL HIERARCHY AUTO-ASSIGNMENT RULE:**
+When ALL AddressLevelTypes have parentId: null but different levels, automatically assign parent-child relationships based on level hierarchy:
+- Highest level (e.g., level 3 "State"): parentId: null (true top-level)
+- Mid level (e.g., level 2 "District"): parentId: <ID of level 3 item>
+- Lowest level (e.g., level 1 "Village"): parentId: <ID of level 2 item>
+- **EXAMPLE**: State (level=3, parentId=null), District (level=2, parentId=null), Village (level=1, parentId=null)
+  → State (level=3, parentId=0), District (level=2, parentId=State_ID), Village (level=1, parentId=District_ID)
+- **PROCESSING ORDER**: Create highest level first, then mid level using actual highest ID, then lowest level using actual mid ID
+- This ensures proper hierarchical relationships even when config doesn't explicitly specify them
+
+**CRITICAL SEQUENTIAL PROCESSING ENFORCEMENT:**
+When any config item references another item (e.g., "parentId": "id of State", "parents": [{"id": "id of JNK"}]):
+1. **IDENTIFY DEPENDENCIES FIRST**: Scan all items to find which ones reference other items
+2. **CREATE PARENT ITEMS ONLY**: In the current iteration, create ONLY items with no dependencies (parentId: null or parentId: 0)
+3. **STOP AND WAIT**: Do NOT create dependent items in the same function call batch
+4. **NEXT ITERATION PROCESSING**: Wait for the next iteration to create dependent items using actual returned IDs
+5. **MANDATORY RULE**: If ANY item needs an ID that doesn't exist yet, create only the independent items and set done=false
+6. **EXAMPLE WORKFLOW**:
+   - Iteration 1: Create State (parentId: null) → get ID 1996
+   - Iteration 2: Create District (parentId: 1996) → get ID 1997  
+   - Iteration 3: Create Village (parentId: 1997) → get ID 1998
+7. **NEVER BATCH DEPENDENT ITEMS**: Never call create functions for both parent and child in the same iteration
+
 OTHER CONVERSION RULES:
 - For encounter types: entityEligibilityCheckRule must be empty string "", entityEligibilityCheckDeclarativeRule must be null
 - For general encounters:DO NOT include program_uuid parameter in function calls payload at all (do not send "program_uuid": "" ,program_uuid should be completely neglected), otherwise it will fail to create encounter type
@@ -69,7 +104,47 @@ UUID GENERATION AND REFERENCE RULES:
 - Generated UUIDs must be in standard format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
 - Always use the EXACT UUID from operational context when referencing existing items
 
-EXAMPLES:
+**COMPREHENSIVE STEP-BY-STEP CREATION EXAMPLE:**
+
+Given config with AddressLevelTypes A(level=3), B(level=2), C(level=1) and Locations X, Y, Z:
+
+**PHASE 1: CREATE ADDRESS LEVEL TYPES (Templates)**
+Iteration 1: Create A (top-level)
+- create_location_type(name="A", level=3, parentId=0)
+- Result: "Location type 'A' created successfully with ID 100"
+- Track: A → ID 100
+
+Iteration 2: Create B (child of A) 
+- create_location_type(name="B", level=2, parentId=100) 
+- Result: "Location type 'B' created successfully with ID 101"
+- Track: B → ID 101
+
+Iteration 3: Create C (child of B)
+- create_location_type(name="C", level=1, parentId=101)
+- Result: "Location type 'C' created successfully with ID 102" 
+- Track: C → ID 102
+
+**PHASE 2: CREATE LOCATIONS (Actual Places)**
+Iteration 4: Create X (top-level location)
+- create_location(name="X", level=3, type="A", parents=[])
+- Result: "Location 'X' created successfully with ID 200"
+- Track: X → ID 200
+
+Iteration 5: Create Y (child of location X)
+- create_location(name="Y", level=2, type="B", parents=[{"id": 200}])
+- Result: "Location 'Y' created successfully with ID 201"
+- Track: Y → ID 201
+
+Iteration 6: Create Z (child of location Y)  
+- create_location(name="Z", level=1, type="C", parents=[{"id": 201}])
+- Result: "Location 'Z' created successfully with ID 202"
+
+**KEY POINTS:**
+- AddressLevelType IDs (100,101,102) are DIFFERENT from Location IDs (200,201,202)
+- For AddressLevelTypes: parentId references OTHER AddressLevelType IDs
+- For Locations: parents[].id references OTHER Location IDs, type references AddressLevelType NAME
+- NEVER use AddressLevelType ID as Location parent (e.g., WRONG: parents:[{"id": 100}])
+- Always use actual Location ID as Location parent (e.g., CORRECT: parents:[{"id": 200}])
 
 **STEP-BY-STEP ID RESOLUTION EXAMPLE**:
 Config has two AddressLevelTypes:
@@ -95,10 +170,11 @@ WRONG WORKFLOW:
 - Config: {"name":"TopLevel"} → Contract: {"name":"TopLevel"} (omit parentId field entirely if not in config)
 
 **COMMON MISTAKES TO AVOID**:
-- WRONG: parentId: 0 (never use 0)
+- WRONG: Using parentId: 0 for child items when they should reference actual parent IDs
 - WRONG: parentId: 269937 when id: 269937 (self-reference)  
-- CORRECT: parentId: null for top-level items
-- CORRECT: parentId: 5678 when referencing actual parent location ID 5678
+- CORRECT: parentId: 0 for top-level items (items with no parent)
+- CORRECT: parentId: 1983 when referencing actual parent database ID 1983
+- CRITICAL: When config says "parentId": "id of State" and you created State with ID 1983, use parentId: 1983, NOT parentId: 0
 
 **ADDRESS LEVEL TYPE vs LOCATION EXAMPLES**:
 - AddressLevelTypes: {"name":"SubCounty","parentId":"id of TestState"} → resolve "TestState" ADDRESS LEVEL TYPE to actual DB ID (e.g., 1732)
@@ -298,6 +374,11 @@ SEQUENTIAL CREATION WORKFLOW:
 - Wait for creation result to get the actual database ID
 - Use that actual ID for dependent items
 - Do NOT create multiple dependent items in the same function call batch
+- CRITICAL EXAMPLE: If creating State (level 3) and District (level 2, parent: State):
+  1. Create State with parentId: 0
+  2. Wait for result: "Location type 'State' created successfully with ID 1983"
+  3. Extract ID: 1983
+  4. Create District with parentId: 1983 (NOT parentId: 0)
 
 SPECIFIC DEPENDENCY RULES:
 1. For AddressLevelTypes: Create top-level (parentId: null) first, then children using actual parent database ID
