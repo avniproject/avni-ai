@@ -22,7 +22,6 @@ class IssueIdentifier(dspy.Module):
             class ErrorResult:
                 def __init__(self):
                     self.issues = "[]"
-                    self.summary = f"Issue identification failed: {error_msg}"
 
             return ErrorResult()
 
@@ -86,8 +85,7 @@ class AvniIssueIdentificationSignature(dspy.Signature):
 
     Output Format Requirements:
     - Issues: JSON array with formElementUuid, formElementName, message
-    - Summary: Brief text summary of total issues found
-
+    
     Always reference specific form element UUIDs when available so the UI can highlight exact fields needing changes."""
 
     form_structure = dspy.InputField(

@@ -39,7 +39,11 @@
       "formName": "Location Attribute Form"
     },
     "expected_issues": [],
-    "test_priority": "HIGH"
+    "test_priority": "HIGH",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "violation_name_field_individual_profile",
@@ -66,7 +70,11 @@
     "expected_issues": [
       "CRITICAL: Name field should not be in IndividualProfile form"
     ],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "violation_age_as_text_instead_of_numeric",
@@ -93,7 +101,11 @@
     "expected_issues": [
       "HIGH: Age field using Text dataType instead of Numeric"
     ],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_age_as_numeric",
@@ -120,7 +132,11 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "violation_phone_as_text",
@@ -147,7 +163,11 @@
     "expected_issues": [
       "MEDIUM: Phone field should use PhoneNumber dataType"
     ],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_phone_as_phonenumber",
@@ -172,7 +192,11 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "violation_binary_question_multiselect",
@@ -216,7 +240,11 @@
     "expected_issues": [
       "MEDIUM: Binary question should use SingleSelect instead of MultiSelect"
     ],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_binary_question_singleselect",
@@ -258,7 +286,11 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "violation_subject_for_categorical_data",
@@ -285,7 +317,11 @@
     "expected_issues": [
       "MEDIUM: Subject dataType should only be used for relationships"
     ],
-    "test_priority": "HIGH"
+    "test_priority": "HIGH",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_coded_for_categorical_data",
@@ -335,7 +371,11 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [],
-    "test_priority": "HIGH"
+    "test_priority": "HIGH",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_date_field",
@@ -360,7 +400,11 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [],
-    "test_priority": "HIGH"
+    "test_priority": "HIGH",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_exit_date_program_exit",
@@ -385,7 +429,11 @@
       "formName": "Program Exit Form"
     },
     "expected_issues": [],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_cancellation_date",
@@ -410,7 +458,11 @@
       "formName": "Encounter Cancellation Form"
     },
     "expected_issues": [],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_cancellation_reason_coded",
@@ -460,7 +512,11 @@
       "formName": "Encounter Cancellation Form"
     },
     "expected_issues": [],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_exit_reason_coded",
@@ -510,7 +566,11 @@
       "formName": "Program Exit Form"
     },
     "expected_issues": [],
-    "test_priority": "CRITICAL"
+    "test_priority": "CRITICAL",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_followup_plan_text",
@@ -535,7 +595,11 @@
       "formName": "Program Exit Form"
     },
     "expected_issues": [],
-    "test_priority": "HIGH"
+    "test_priority": "HIGH",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "violation_weight_as_text",
@@ -562,7 +626,11 @@
     "expected_issues": [
       "HIGH: Weight field should use Numeric dataType"
     ],
-    "test_priority": "HIGH"
+    "test_priority": "HIGH",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   },
   {
     "test_case_name": "valid_weight_as_numeric",
@@ -590,6 +658,10 @@
       "formName": "Growth Monitoring"
     },
     "expected_issues": [],
-    "test_priority": "HIGH"
+    "test_priority": "HIGH",
+    "performance_expectations": {
+      "ideal_response_time_ms": 500,
+      "max_response_time_ms": 2500
+    }
   }
 ]

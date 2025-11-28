@@ -26,7 +26,8 @@ class FormElementValidationJudgeStrategyWrapper(DifyFormValidationJudgeStrategy)
                 "validation_correctness",
                 "rule_coverage", 
                 "recommendation_quality",
-                "completeness"
+                "completeness",
+                "performance_score"
             ]
         
         # Set default success thresholds if not provided
@@ -35,7 +36,8 @@ class FormElementValidationJudgeStrategyWrapper(DifyFormValidationJudgeStrategy)
                 "validation_correctness": 75.0,
                 "rule_coverage": 70.0,
                 "recommendation_quality": 75.0,
-                "completeness": 70.0
+                "completeness": 70.0,
+                "performance_score": 75.0  # Require acceptable performance (≤1500ms)
             }
         
         super().__init__(config)

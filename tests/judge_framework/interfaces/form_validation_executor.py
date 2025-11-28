@@ -4,6 +4,7 @@ Form Validation Executor interface for the Judge Framework
 
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
+import time
 from .result_models import TestConfiguration
 
 
@@ -67,11 +68,19 @@ class DifyFormValidationExecutor(FormValidationExecutor):
         """
         Execute form validation using Dify workflow
         """
+        start_time = time.time()
+        
         if not self.dify_client:
+            end_time = time.time()
             return {
                 "success": False,
                 "error": "Dify client not initialized",
-                "validation_feedback": None
+                "validation_feedback": None,
+                "performance_metrics": {
+                    "response_time_ms": round((end_time - start_time) * 1000, 2),
+                    "within_ideal_threshold": False,
+                    "within_max_threshold": False
+                }
             }
         
         try:
@@ -83,6 +92,7 @@ class DifyFormValidationExecutor(FormValidationExecutor):
             query_text = self._format_form_validation_query(form_element, form_context)
             
             # Execute via Dify
+            dify_start_time = time.time()
             response = self.dify_client.send_message(
                 query=query_text,
                 inputs={
@@ -93,13 +103,27 @@ class DifyFormValidationExecutor(FormValidationExecutor):
                     "avni_mcp_server_url": test_input.get("avni_mcp_server_url")
                 }
             )
+            dify_end_time = time.time()
             
             # Parse validation response
             validation_feedback = response.get("answer", "")
             
+            # Calculate performance metrics
+            total_end_time = time.time()
+            total_response_time_ms = round((total_end_time - start_time) * 1000, 2)
+            dify_response_time_ms = round((dify_end_time - dify_start_time) * 1000, 2)
+            
+            performance_metrics = {
+                "total_response_time_ms": total_response_time_ms,
+                "dify_api_time_ms": dify_response_time_ms,
+                "within_ideal_threshold": total_response_time_ms <= 500,
+                "within_max_threshold": total_response_time_ms <= 1500
+            }
+            
             return {
                 "success": True,
                 "validation_feedback": validation_feedback,
+                "performance_metrics": performance_metrics,
                 "response_metadata": {
                     "conversation_id": response.get("conversation_id", ""),
                     "message_id": response.get("message_id", "")
@@ -107,10 +131,16 @@ class DifyFormValidationExecutor(FormValidationExecutor):
             }
             
         except Exception as e:
+            end_time = time.time()
             return {
                 "success": False,
                 "error": str(e),
-                "validation_feedback": None
+                "validation_feedback": None,
+                "performance_metrics": {
+                    "response_time_ms": round((end_time - start_time) * 1000, 2),
+                    "within_ideal_threshold": False,
+                    "within_max_threshold": False
+                }
             }
     
     def _format_form_validation_query(self, form_element: Dict[str, Any], form_context: Dict[str, Any]) -> str:

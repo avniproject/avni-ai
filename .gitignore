@@ -55,3 +55,4 @@ htmlcov/
 .mypy_cache/
 .env
 *.egg-info/
+reference_forms/**/*
