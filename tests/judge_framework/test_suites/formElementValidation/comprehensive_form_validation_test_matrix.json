@@ -1,0 +1,691 @@
+[
+  {
+    "test_case_name": "name_field_individual_profile",
+    "form_element": {
+      "name": "First Name",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "First Name"
+      },
+      "mandatory": true,
+      "uuid": "name-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [
+      "CRITICAL: Name field should not be in IndividualProfile form"
+    ],
+    "test_priority": "CRITICAL"
+  },
+  {
+    "test_case_name": "age_as_text_violation",
+    "form_element": {
+      "name": "Age",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Age"
+      },
+      "mandatory": true,
+      "uuid": "age-text-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [
+      "HIGH: Age field using Text dataType instead of Numeric"
+    ],
+    "test_priority": "CRITICAL"
+  },
+  {
+    "test_case_name": "phone_as_text_violation",
+    "form_element": {
+      "name": "Phone Number",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Phone Number"
+      },
+      "mandatory": false,
+      "uuid": "phone-text-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [
+      "MEDIUM: Phone field should use PhoneNumber dataType"
+    ],
+    "test_priority": "CRITICAL"
+  },
+  {
+    "test_case_name": "binary_yes_no_multiselect",
+    "form_element": {
+      "name": "Has Ration Card",
+      "type": "MultiSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Has Ration Card",
+        "answers": [
+          {
+            "name": "Yes"
+          },
+          {
+            "name": "No"
+          }
+        ]
+      },
+      "mandatory": true,
+      "uuid": "binary-multiselect-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [
+      "MEDIUM: Binary question should use SingleSelect instead of MultiSelect"
+    ],
+    "test_priority": "CRITICAL"
+  },
+  {
+    "test_case_name": "weight_as_text",
+    "form_element": {
+      "name": "Weight",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Weight"
+      },
+      "mandatory": false,
+      "uuid": "weight-text-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramEncounter",
+      "domain": "health",
+      "formName": "Growth Monitoring"
+    },
+    "expected_issues": [
+      "HIGH: Weight field should use Numeric dataType"
+    ],
+    "test_priority": "HIGH"
+  },
+  {
+    "test_case_name": "height_as_text",
+    "form_element": {
+      "name": "Height",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Height"
+      },
+      "mandatory": false,
+      "uuid": "height-text-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramEncounter",
+      "domain": "health",
+      "formName": "Growth Monitoring"
+    },
+    "expected_issues": [
+      "HIGH: Height field should use Numeric dataType"
+    ],
+    "test_priority": "HIGH"
+  },
+  {
+    "test_case_name": "subject_for_categorical_data",
+    "form_element": {
+      "name": "Education Level",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Subject",
+        "name": "Education Level"
+      },
+      "mandatory": false,
+      "uuid": "subject-categorical-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [
+      "MEDIUM: Subject dataType should only be used for relationships"
+    ],
+    "test_priority": "HIGH"
+  },
+  {
+    "test_case_name": "children_as_question_group",
+    "form_element": {
+      "name": "Children Details",
+      "type": "QuestionGroup",
+      "concept": {
+        "dataType": "QuestionGroup",
+        "name": "Children Details"
+      },
+      "mandatory": false,
+      "repeatable": true,
+      "uuid": "children-group-uuid"
+    },
+    "form_context": {
+      "formType": "HouseholdProfile",
+      "domain": "health",
+      "formName": "Household Registration"
+    },
+    "expected_issues": [
+      "HIGH: Children should be separate subject types, not QuestionGroup"
+    ],
+    "test_priority": "HIGH"
+  },
+  {
+    "test_case_name": "improper_date_usage",
+    "form_element": {
+      "name": "Improper Date Field",
+      "type": "Text",
+      "concept": {
+        "dataType": "Date",
+        "name": "Improper Date"
+      },
+      "mandatory": false,
+      "uuid": "improper-date-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: Date dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_datetime_usage",
+    "form_element": {
+      "name": "Improper DateTime Field",
+      "type": "Text",
+      "concept": {
+        "dataType": "DateTime",
+        "name": "Improper DateTime"
+      },
+      "mandatory": false,
+      "uuid": "improper-datetime-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: DateTime dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_notes_usage",
+    "form_element": {
+      "name": "Improper Notes Field",
+      "type": "Text",
+      "concept": {
+        "dataType": "Notes",
+        "name": "Improper Notes"
+      },
+      "mandatory": false,
+      "uuid": "improper-notes-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: Notes dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_singleselect_usage",
+    "form_element": {
+      "name": "Improper SingleSelect Field",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "SingleSelect",
+        "name": "Improper SingleSelect"
+      },
+      "mandatory": false,
+      "uuid": "improper-singleselect-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: SingleSelect dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_multiselect_usage",
+    "form_element": {
+      "name": "Improper MultiSelect Field",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "MultiSelect",
+        "name": "Improper MultiSelect"
+      },
+      "mandatory": false,
+      "uuid": "improper-multiselect-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: MultiSelect dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_image_usage",
+    "form_element": {
+      "name": "Improper Image Field",
+      "type": "Text",
+      "concept": {
+        "dataType": "Image",
+        "name": "Improper Image"
+      },
+      "mandatory": false,
+      "uuid": "improper-image-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: Image dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_video_usage",
+    "form_element": {
+      "name": "Improper Video Field",
+      "type": "Text",
+      "concept": {
+        "dataType": "Video",
+        "name": "Improper Video"
+      },
+      "mandatory": false,
+      "uuid": "improper-video-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: Video dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_audio_usage",
+    "form_element": {
+      "name": "Improper Audio Field",
+      "type": "Text",
+      "concept": {
+        "dataType": "Audio",
+        "name": "Improper Audio"
+      },
+      "mandatory": false,
+      "uuid": "improper-audio-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: Audio dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_file_usage",
+    "form_element": {
+      "name": "Improper File Field",
+      "type": "Text",
+      "concept": {
+        "dataType": "File",
+        "name": "Improper File"
+      },
+      "mandatory": false,
+      "uuid": "improper-file-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: File dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "improper_phonenumber_usage",
+    "form_element": {
+      "name": "Improper PhoneNumber Field",
+      "type": "Text",
+      "concept": {
+        "dataType": "PhoneNumber",
+        "name": "Improper PhoneNumber"
+      },
+      "mandatory": false,
+      "uuid": "improper-phonenumber-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Test Form"
+    },
+    "expected_issues": [
+      "MEDIUM: PhoneNumber dataType used inappropriately"
+    ],
+    "test_priority": "MEDIUM"
+  },
+  {
+    "test_case_name": "valid_numeric_age",
+    "form_element": {
+      "name": "Age",
+      "type": "Text",
+      "concept": {
+        "dataType": "Numeric",
+        "name": "Age",
+        "lowAbsolute": 0,
+        "highAbsolute": 120
+      },
+      "mandatory": true,
+      "uuid": "valid-age-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [],
+    "test_priority": "VALID"
+  },
+  {
+    "test_case_name": "valid_phone_number",
+    "form_element": {
+      "name": "Phone Number",
+      "type": "Text",
+      "concept": {
+        "dataType": "PhoneNumber",
+        "name": "Phone Number"
+      },
+      "mandatory": false,
+      "uuid": "valid-phone-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [],
+    "test_priority": "VALID"
+  },
+  {
+    "test_case_name": "valid_date_field",
+    "form_element": {
+      "name": "Date of Birth",
+      "type": "Text",
+      "concept": {
+        "dataType": "Date",
+        "name": "Date of Birth"
+      },
+      "mandatory": true,
+      "uuid": "valid-dob-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [],
+    "test_priority": "VALID"
+  },
+  {
+    "test_case_name": "cancellation_form_mandatory_reason",
+    "form_element": {
+      "name": "Cancellation Reason",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Cancellation Reason",
+        "answers": [
+          {
+            "name": "User Request"
+          },
+          {
+            "name": "System Error"
+          },
+          {
+            "name": "Data Entry Error"
+          },
+          {
+            "name": "Duplicate Entry"
+          }
+        ]
+      },
+      "mandatory": false,
+      "uuid": "cancellation-reason-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualEncounterCancellation",
+      "domain": "health",
+      "formName": "Encounter Cancellation"
+    },
+    "expected_issues": [
+      "HIGH: Cancellation reason should be mandatory in cancellation forms"
+    ],
+    "test_priority": "HIGH",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "cancellation_form_text_reason_instead_of_coded",
+    "form_element": {
+      "name": "Cancellation Reason",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Cancellation Reason"
+      },
+      "mandatory": true,
+      "uuid": "cancellation-text-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramEncounterCancellation",
+      "domain": "health",
+      "formName": "Program Encounter Cancellation"
+    },
+    "expected_issues": [
+      "MEDIUM: Cancellation reason should use Coded dataType with predefined options"
+    ],
+    "test_priority": "MEDIUM",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "cancellation_form_datetime_validation",
+    "form_element": {
+      "name": "Cancellation Date",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Cancellation Date"
+      },
+      "mandatory": true,
+      "uuid": "cancellation-date-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualEncounterCancellation",
+      "domain": "health",
+      "formName": "Encounter Cancellation"
+    },
+    "expected_issues": [
+      "HIGH: Date fields should use Date dataType, not Text"
+    ],
+    "test_priority": "HIGH",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "program_exit_mandatory_exit_reason",
+    "form_element": {
+      "name": "Exit Reason",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Exit Reason",
+        "answers": [
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Transferred Out"
+          },
+          {
+            "name": "Lost to Follow-up"
+          },
+          {
+            "name": "Deceased"
+          },
+          {
+            "name": "Withdrawn Consent"
+          }
+        ]
+      },
+      "mandatory": false,
+      "uuid": "exit-reason-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramExit",
+      "domain": "health",
+      "formName": "Program Exit Form"
+    },
+    "expected_issues": [
+      "HIGH: Exit reason should be mandatory in program exit forms"
+    ],
+    "test_priority": "HIGH",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "program_exit_exit_date_validation",
+    "form_element": {
+      "name": "Exit Date",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Exit Date"
+      },
+      "mandatory": true,
+      "uuid": "exit-date-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramExit",
+      "domain": "health",
+      "formName": "Program Exit Form"
+    },
+    "expected_issues": [
+      "HIGH: Date fields should use Date dataType, not Text"
+    ],
+    "test_priority": "HIGH",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "program_exit_followup_plan_text_instead_of_notes",
+    "form_element": {
+      "name": "Follow-up Plan",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Follow-up Plan"
+      },
+      "mandatory": false,
+      "uuid": "followup-plan-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramExit",
+      "domain": "health",
+      "formName": "Program Exit Form"
+    },
+    "expected_issues": [
+      "LOW: Follow-up plans should use Notes dataType for detailed text"
+    ],
+    "test_priority": "LOW",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "valid_cancellation_form_proper_setup",
+    "form_element": {
+      "name": "Cancellation Reason",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Cancellation Reason",
+        "answers": [
+          {
+            "name": "User Request"
+          },
+          {
+            "name": "System Error"
+          },
+          {
+            "name": "Data Entry Error"
+          }
+        ]
+      },
+      "mandatory": true,
+      "uuid": "valid-cancellation-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualEncounterCancellation",
+      "domain": "health",
+      "formName": "Encounter Cancellation"
+    },
+    "expected_issues": [],
+    "test_priority": "VALID",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "valid_program_exit_form_proper_setup",
+    "form_element": {
+      "name": "Exit Date",
+      "type": "Text",
+      "concept": {
+        "dataType": "Date",
+        "name": "Exit Date"
+      },
+      "mandatory": true,
+      "uuid": "valid-exit-date-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramExit",
+      "domain": "health",
+      "formName": "Program Exit Form"
+    },
+    "expected_issues": [],
+    "test_priority": "VALID",
+    "source": "new_form_type_analysis"
+  }
+]

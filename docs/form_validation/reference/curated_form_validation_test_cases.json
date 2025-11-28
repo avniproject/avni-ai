@@ -1,0 +1,195 @@
+[
+  {
+    "test_case_name": "first_name_individual_profile",
+    "form_element": {
+      "name": "First name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "First name",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "4ffc2c7c-080f-4425-8b17-b7a9ceb2d2ba"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "CRITICAL: Name fields should not be manually added to IndividualProfile forms"
+    ]
+  },
+  {
+    "test_case_name": "age_text_data_type",
+    "form_element": {
+      "name": "Age",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Age",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "age-field-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": [
+      "HIGH: Age field using Text dataType instead of Numeric"
+    ]
+  },
+  {
+    "test_case_name": "weight_text_data_type",
+    "form_element": {
+      "name": "Weight",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Weight",
+        "answers": []
+      },
+      "mandatory": false,
+      "uuid": "weight-field-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramEncounter",
+      "domain": "health",
+      "formName": "Growth Monitoring"
+    },
+    "expected_issues": [
+      "HIGH: Weight field using Text dataType instead of Numeric"
+    ]
+  },
+  {
+    "test_case_name": "phone_text_no_validation",
+    "form_element": {
+      "name": "Phone Number",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Phone Number",
+        "answers": []
+      },
+      "mandatory": false,
+      "uuid": "phone-field-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Individual Registration"
+    },
+    "expected_issues": [
+      "MEDIUM: Phone field missing proper validation - should use PhoneNumber dataType"
+    ]
+  },
+  {
+    "test_case_name": "binary_yes_no_multiselect",
+    "form_element": {
+      "name": "Has Ration Card",
+      "type": "MultiSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Has Ration Card",
+        "answers": [
+          {
+            "name": "Yes",
+            "uuid": "yes-uuid"
+          },
+          {
+            "name": "No",
+            "uuid": "no-uuid"
+          }
+        ]
+      },
+      "mandatory": true,
+      "uuid": "ration-card-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Individual Registration"
+    },
+    "expected_issues": [
+      "MEDIUM: Binary Yes/No question should use SingleSelect instead of MultiSelect"
+    ]
+  },
+  {
+    "test_case_name": "correct_numeric_age",
+    "form_element": {
+      "name": "Age",
+      "type": "Text",
+      "concept": {
+        "dataType": "Numeric",
+        "name": "Age",
+        "lowAbsolute": 0,
+        "highAbsolute": 120
+      },
+      "mandatory": true,
+      "uuid": "correct-age-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": []
+  },
+  {
+    "test_case_name": "coded_single_select_appropriate",
+    "form_element": {
+      "name": "Gender",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Gender",
+        "answers": [
+          {
+            "name": "Male",
+            "uuid": "male-uuid"
+          },
+          {
+            "name": "Female",
+            "uuid": "female-uuid"
+          },
+          {
+            "name": "Other",
+            "uuid": "other-uuid"
+          }
+        ]
+      },
+      "mandatory": true,
+      "uuid": "gender-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": []
+  },
+  {
+    "test_case_name": "date_field_appropriate",
+    "form_element": {
+      "name": "Date of Birth",
+      "type": "Text",
+      "concept": {
+        "dataType": "Date",
+        "name": "Date of Birth",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "dob-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Patient Registration"
+    },
+    "expected_issues": []
+  }
+]

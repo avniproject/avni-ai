@@ -1,0 +1,9 @@
+test_identifier,success,timestamp,completeness,recommendation_quality,rule_coverage,validation_correctness,error_categories,error_message
+form_validation_first_name_first_name_individual_profile,False,2025-11-28T16:34:29.827654,40,50,40,40,incorrect_feedback;irrelevant_recommendation,The feedback does not address any critical Avni rules or provide a relevant recommendation.
+form_validation_age_age_text_data_type,True,2025-11-28T16:34:35.778966,90,85,90,95,,
+form_validation_weight_weight_text_data_type,True,2025-11-28T16:34:38.800440,100,100,100,100,,
+form_validation_phone_number_phone_text_no_validation,True,2025-11-28T16:34:41.715407,85,90,85,90,,
+form_validation_has_ration_card_binary_yes_no_multiselect,True,2025-11-28T16:34:44.881336,85,90,80,90,,
+form_validation_age_correct_numeric_age,False,2025-11-28T16:34:48.432858,40,40,40,40,incorrect_recommendation;incomplete_coverage,The validation feedback incorrectly suggests changing the data type to SingleSelect instead of Numeric.
+form_validation_gender_coded_single_select_appropriate,False,2025-11-28T16:34:51.364029,50.0,50.0,50.0,50.0,,
+form_validation_date_of_birth_date_field_appropriate,False,2025-11-28T16:34:54.920528,40,40,40,40,incorrect_feedback;inappropriate_recommendation,The validation feedback incorrectly suggests changing the type to SingleSelect instead of addressing the dataType mismatch.

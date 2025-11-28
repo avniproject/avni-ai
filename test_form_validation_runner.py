@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+"""
+Consolidated Form Validation Test Runner
+Supports multiple test scenarios: basic, violation_detection, comprehensive
+"""
+
+import os
+import sys
+import json
+import argparse
+from pathlib import Path
+from typing import Dict, List, Any
+
+# Add project root to Python path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from dotenv import load_dotenv
+load_dotenv()
+
+from tests.judge_framework.orchestrator import JudgeOrchestrator
+from tests.judge_framework.analytics.statistics import StatisticsCalculator
+from tests.judge_framework.analytics.reporting import ReportGenerator
+from tests.judge_framework.implementations.formElementValidation import (
+    FormElementValidationTestSubjectFactory,
+    FormElementValidationExecutorWrapper,
+    FormElementValidationJudgeStrategyWrapper
+)
+from tests.judge_framework.examples.configs.form_validation_config import create_form_validation_test_config
+
+
+def load_test_matrix(scenario: str) -> List[Dict[str, Any]]:
+    """Load test cases based on scenario"""
+    test_matrices = {
+        "basic": "/Users/himeshr/IdeaProjects/avni-ai/tests/judge_framework/test_suites/formElementValidation/comprehensive_form_validation_test_matrix.json",
+        "violation_detection": "/Users/himeshr/IdeaProjects/avni-ai/tests/judge_framework/test_suites/formElementValidation/comprehensive_form_validation_test_matrix.json",  # All in one file now
+        "comprehensive": "/Users/himeshr/IdeaProjects/avni-ai/tests/judge_framework/test_suites/formElementValidation/comprehensive_form_validation_test_matrix.json"
+    }
+    
+    if scenario not in test_matrices:
+        print(f"❌ Unknown scenario: {scenario}")
+        print(f"   Available scenarios: {list(test_matrices.keys())}")
+        return []
+    
+    matrix_file = test_matrices[scenario]
+    if not os.path.exists(matrix_file):
+        print(f"❌ Test matrix file not found: {matrix_file}")
+        print(f"   Run the appropriate analysis script first to generate test cases")
+        return []
+    
+    try:
+        with open(matrix_file, 'r') as f:
+            test_cases = json.load(f)
+        print(f"✅ Loaded {len(test_cases)} test cases for '{scenario}' scenario")
+        return test_cases
+    except Exception as e:
+        print(f"❌ Failed to load test matrix: {e}")
+        return []
+
+
+def run_test_scenario(scenario: str, fail_fast: bool = False) -> bool:
+    """Run a specific test scenario"""
+    print(f"🧪 Form Validation Test Runner - {scenario.upper()} Scenario")
+    print("=" * 60)
+    
+    # Validate environment
+    required_vars = ["OPENAI_API_KEY", "DIFY_FORM_VALIDATION_API_KEY", "DIFY_API_BASE_URL", "AVNI_AUTH_TOKEN", "AVNI_MCP_SERVER_URL"]
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    
+    if missing_vars:
+        print(f"❌ Missing environment variables: {missing_vars}")
+        return False
+    
+    print("✅ Environment validation passed")
+    
+    # Load test cases
+    test_cases = load_test_matrix(scenario)
+    if not test_cases:
+        return False
+    
+    # Filter test cases by scenario if needed
+    if scenario == "violation_detection":
+        # For violation detection, only test cases with expected issues
+        filtered_cases = [tc for tc in test_cases if tc.get("expected_issues")]
+        print(f"🎯 Filtered to {len(filtered_cases)} violation detection cases")
+        test_cases = filtered_cases
+    
+    # Set up test components
+    config = create_form_validation_test_config()
+    executor = FormElementValidationExecutorWrapper(config)
+    judge_strategy = FormElementValidationJudgeStrategyWrapper(config)
+    orchestrator = JudgeOrchestrator(executor, judge_strategy)
+    
+    print(f"\n🚀 Running {scenario} test scenario with {len(test_cases)} test cases...")
+    
+    try:
+        # Configure test execution
+        test_config = create_form_validation_test_config()
+        test_config.generation_config.static_test_cases = test_cases
+        test_config.generation_config.ai_generation_enabled = False
+        
+        # Run test suite
+        suite_result = orchestrator.run_test_suite(
+            test_subject_factory=FormElementValidationTestSubjectFactory([]),
+            config=test_config,
+            fail_fast=fail_fast
+        )
+        
+        print(f"\n📊 {scenario.title()} Test Results:")
+        print(f"   Total Tests: {suite_result.total_tests}")
+        print(f"   Successful: {suite_result.successful_tests}")
+        print(f"   Failed: {suite_result.failed_tests}")
+        print(f"   Success Rate: {suite_result.success_rate:.1f}%")
+        
+        # Generate reports
+        statistics = StatisticsCalculator.calculate_suite_statistics(suite_result)
+        console_report = ReportGenerator.generate_console_report(suite_result, statistics)
+        print(console_report)
+        
+        # Save reports
+        report_dir = "/Users/himeshr/IdeaProjects/avni-ai/tests/judge_framework/reports/formElementValidation"
+        os.makedirs(report_dir, exist_ok=True)
+        
+        # Use single consolidated report file
+        report_file = f"{report_dir}/form_validation_report.json"
+        csv_file = f"{report_dir}/form_validation_report.csv"
+        json_report = ReportGenerator.generate_json_report(suite_result, statistics)
+        ReportGenerator.save_report_to_file(json_report, report_file)
+        
+        # Success criteria based on scenario
+        success_thresholds = {
+            "basic": 60.0,
+            "violation_detection": 75.0,
+            "comprehensive": 40.0
+        }
+        
+        threshold = success_thresholds.get(scenario, 50.0)
+        success = suite_result.success_rate >= threshold
+        
+        if success:
+            print(f"\n✅ {scenario.title()} scenario PASSED: {suite_result.success_rate:.1f}% >= {threshold}%")
+        else:
+            print(f"\n❌ {scenario.title()} scenario FAILED: {suite_result.success_rate:.1f}% < {threshold}%")
+        
+        return success
+        
+    except Exception as e:
+        print(f"❌ {scenario} test execution failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def main():
+    """Main entry point for the consolidated test runner"""
+    parser = argparse.ArgumentParser(description="Form Validation Test Runner")
+    parser.add_argument(
+        "scenario",
+        choices=["basic", "violation_detection", "comprehensive"],
+        help="Test scenario to run"
+    )
+    parser.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="Stop on first failure"
+    )
+    
+    args = parser.parse_args()
+    
+    success = run_test_scenario(args.scenario, args.fail_fast)
+    
+    print(f"\n🏁 Form Validation Testing ({args.scenario}) {'✅ PASSED' if success else '❌ FAILED'}")
+    sys.exit(0 if success else 1)
+
+
+if __name__ == "__main__":
+    main()

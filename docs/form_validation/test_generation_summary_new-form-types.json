@@ -1,0 +1,19 @@
+{
+  "generation_mode": "new-form-types",
+  "total_test_cases": 7,
+  "form_types_covered": [
+    "ProgramExit",
+    "IndividualEncounterCancellation",
+    "ProgramEncounterCancellation"
+  ],
+  "concept_types_covered": [
+    "Text",
+    "Coded"
+  ],
+  "priority_distribution": {
+    "HIGH": 4,
+    "MEDIUM": 1,
+    "LOW": 1,
+    "VALID": 1
+  }
+}

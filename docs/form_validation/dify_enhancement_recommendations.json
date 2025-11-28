@@ -1,0 +1,37 @@
+[
+  {
+    "priority": "CRITICAL",
+    "area": "Core Avni Rules",
+    "issue": "Missing critical violation detection",
+    "recommendation": "Add comprehensive Avni rules for Name fields, Numeric data validation, and Phone validation",
+    "impact": "Essential for basic form validation"
+  },
+  {
+    "priority": "HIGH",
+    "area": "Comprehensive Rule Coverage",
+    "issue": "Missing medium priority rules",
+    "recommendation": "Add rules for Date/DateTime, File types, Location validation, and GroupAffiliation",
+    "impact": "Achieves comprehensive form validation coverage"
+  },
+  {
+    "priority": "MEDIUM",
+    "area": "False Positive Reduction",
+    "issue": "Incorrectly flagging valid configurations",
+    "recommendation": "Improve context awareness to distinguish between violations and valid patterns",
+    "impact": "Reduces user friction and improves trust"
+  },
+  {
+    "priority": "HIGH",
+    "area": "Output Format",
+    "issue": "Minimal JSON response limits evaluation",
+    "recommendation": "Enhance output to include detailed validation analysis with severity levels and specific rule references",
+    "impact": "Enables comprehensive evaluation and reporting"
+  },
+  {
+    "priority": "MEDIUM",
+    "area": "Form Type Context",
+    "issue": "No differentiation between form types",
+    "recommendation": "Add form type-specific validation rules (IndividualProfile vs ProgramEncounter vs Household)",
+    "impact": "Provides contextually appropriate validation"
+  }
+]

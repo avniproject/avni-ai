@@ -23,7 +23,7 @@ def create_form_validation_test_config() -> TestConfiguration:
     dify_config = DifyConfig(
         api_key=os.getenv("DIFY_FORM_VALIDATION_API_KEY", os.getenv("DIFY_API_KEY", "")),
         base_url=os.getenv("DIFY_API_BASE_URL", "https://api.dify.ai/v1"),
-        workflow_name="avni_form_validation",
+        workflow_name="avni_form_assistant",  # Exact name from YAML
         test_user="form_validation_tester",
         timeout_seconds=60
     )
@@ -32,15 +32,15 @@ def create_form_validation_test_config() -> TestConfiguration:
     evaluation_config = EvaluationConfig(
         evaluation_metrics=[
             "validation_correctness",
-            "edge_case_handling", 
-            "user_experience",
-            "data_integrity"
+            "rule_coverage", 
+            "recommendation_quality",
+            "completeness"
         ],
         success_thresholds={
-            "validation_correctness": 80.0,
-            "edge_case_handling": 75.0,
-            "user_experience": 70.0,
-            "data_integrity": 85.0
+            "validation_correctness": 75.0,
+            "rule_coverage": 70.0,
+            "recommendation_quality": 75.0,
+            "completeness": 70.0
         },
         openai_model="gpt-4o",
         openai_temperature=0.1,

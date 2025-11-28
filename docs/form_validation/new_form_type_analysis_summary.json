@@ -1,0 +1,25 @@
+{
+  "analysis_summary": {
+    "new_organizations_analyzed": 5,
+    "forms_sampled": 30,
+    "new_concept_types_found": 0,
+    "new_form_types_found": 3,
+    "test_cases_generated": 8
+  },
+  "new_form_types": [
+    "IndividualEncounterCancellation",
+    "ProgramEncounterCancellation",
+    "ProgramExit"
+  ],
+  "validation_focus_areas": [
+    "Cancellation forms should have mandatory cancellation reasons",
+    "Program exit forms should have mandatory exit reasons and dates",
+    "Date fields in new form types should use Date dataType",
+    "Reason fields should use Coded dataType with predefined options"
+  ],
+  "test_case_breakdown": {
+    "cancellation_tests": 3,
+    "program_exit_tests": 3,
+    "valid_configuration_tests": 2
+  }
+}

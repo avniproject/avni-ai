@@ -1,0 +1,864 @@
+[
+  {
+    "test_case_name": "problematic_first_name",
+    "form_element": {
+      "name": "First name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "First name",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "4ffc2c7c-080f-4425-8b17-b7a9ceb2d2ba"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_demand_name",
+    "form_element": {
+      "name": "Demand Name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Demand Name (voided~220125)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "f926902e-af1a-4aa5-811d-f3f26b6adbfb"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_demand_name",
+    "form_element": {
+      "name": "Demand Name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Demand Name (voided~220125)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "d43b9f81-3b1b-4637-9959-6d8bd92ebf38"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_account_name",
+    "form_element": {
+      "name": "Account Name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Account name (voided~220045)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "8aa3e8e8-27a1-4af1-928a-3c6b10036c7c"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_account_name",
+    "form_element": {
+      "name": "Account name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Account  name",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "5b5697fa-61a4-4d3b-b53f-b6f5afce0904"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_account_name",
+    "form_element": {
+      "name": "Account name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Account Name (voided~207308)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "26ba41f5-7b66-48f1-8ec4-5586145ee408"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_account_name",
+    "form_element": {
+      "name": "Account Name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Account Name (voided~207308)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "49644f16-59fe-4b22-9759-fbf638940a1f"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_village",
+    "form_element": {
+      "name": "Village",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Distribution Village",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "b2af2a9f-76e4-4cc7-bde6-0ce897c96e6d"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Village Form"
+    },
+    "expected_issues": [
+      "Numeric field using Text dataType"
+    ]
+  },
+  {
+    "test_case_name": "problematic_name_of_awardee_/_recognition_received",
+    "form_element": {
+      "name": "Name of Awardee / Recognition received",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Name of Awardee / Recognition received",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "657b2551-efba-499b-8b70-5ccb403b9ac8"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Recognitions/Award Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_name_of_awardee_/_recognition_received",
+    "form_element": {
+      "name": "Name of Awardee / Recognition received",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Award / Recognition",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "9b5fba57-ea64-4e80-8dec-cae7c68fd004"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Recognitions/Award Registration"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "problematic_name_of_the_aww",
+    "form_element": {
+      "name": "Name of the AWW",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Name of the AWW",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "720b683e-9eab-44ce-8d88-52c88804b6ec"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "AWC Profile"
+    },
+    "expected_issues": [
+      "Name field in IndividualProfile form"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_type_of_disaster",
+    "form_element": {
+      "name": "Type of disaster",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Type of Disaster",
+        "answers": [
+          {
+            "name": "Cyclone",
+            "uuid": "318bd723-ecb6-444b-aae3-5490db65a376",
+            "dataType": "NA",
+            "answers": [],
+            "order": 2.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Not Applicable",
+            "uuid": "ca098686-79b0-4219-8f33-479363f8a69a",
+            "dataType": "NA",
+            "answers": [],
+            "order": 13.0,
+            "active": true
+          },
+          {
+            "name": "Fire",
+            "uuid": "0ec26543-d62f-4dd9-a8f9-e2a033c1f1c4",
+            "dataType": "NA",
+            "answers": [],
+            "order": 5.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Storm",
+            "uuid": "a4b90e21-95cc-4772-a1ec-c3f474279326",
+            "dataType": "NA",
+            "answers": [],
+            "order": 10.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Winter",
+            "uuid": "a359a1d4-5a81-491d-84bd-aac0f819555f",
+            "dataType": "NA",
+            "answers": [],
+            "order": 12.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Landslides",
+            "uuid": "e037aeb5-e82c-41cb-96a8-45cb1e031126",
+            "dataType": "NA",
+            "answers": [],
+            "order": 8.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Earthquake",
+            "uuid": "b121c9c4-ca7e-4dbd-814e-f4a10be4fd79",
+            "dataType": "NA",
+            "answers": [],
+            "order": 4.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Floods",
+            "uuid": "5512bd22-4810-461b-8bc2-79e1ccfb4011",
+            "dataType": "NA",
+            "answers": [],
+            "order": 7.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Drought",
+            "uuid": "1b0285e1-0bc8-4461-b8cd-22e4b62d960f",
+            "dataType": "NA",
+            "answers": [],
+            "order": 3.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Cloudburst",
+            "uuid": "079f7101-6b67-46bf-b09e-c0aff429b943",
+            "dataType": "NA",
+            "answers": [],
+            "order": 0.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Flash Flood",
+            "uuid": "5ffe578b-9cf5-464b-aeb9-a4454e3b297d",
+            "dataType": "NA",
+            "answers": [],
+            "order": 6.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Riots",
+            "uuid": "b3dd4f42-f85f-47f3-93ba-0d818c3f7462",
+            "dataType": "NA",
+            "answers": [],
+            "order": 9.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Tsunami",
+            "uuid": "9d7d7bc1-0c39-4d2d-afaf-4f4f53f6fc8f",
+            "dataType": "NA",
+            "answers": [],
+            "order": 11.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Covid",
+            "uuid": "e3e281eb-d4eb-4c95-92a2-f72ff229884d",
+            "dataType": "NA",
+            "answers": [],
+            "order": 1.0,
+            "unique": true,
+            "active": true
+          }
+        ]
+      },
+      "mandatory": true,
+      "uuid": "3e6306bd-c528-46ed-81d7-e0b912d0aea4"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Large answer set"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_first_name",
+    "form_element": {
+      "name": "First name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "First name",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "4ffc2c7c-080f-4425-8b17-b7a9ceb2d2ba"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Voided element in form"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_target_community",
+    "form_element": {
+      "name": "Target community",
+      "type": "MultiSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Target Community",
+        "answers": [
+          {
+            "name": "Mentally Challenged",
+            "uuid": "c40880c6-cac6-4fd8-b30c-395f532d0a9c",
+            "dataType": "NA",
+            "answers": [],
+            "order": 15.0,
+            "active": true
+          },
+          {
+            "name": "Adivasis",
+            "uuid": "0211094b-254a-4120-bd3f-940731663eb4",
+            "dataType": "NA",
+            "answers": [],
+            "order": 0.0,
+            "active": true
+          },
+          {
+            "name": "Devdasi community",
+            "uuid": "1b6229ca-3360-4ba8-b858-1048f64f8d6b",
+            "dataType": "NA",
+            "answers": [],
+            "order": 7.0,
+            "active": true
+          },
+          {
+            "name": "Senior Citizens",
+            "uuid": "b4f90cb7-1cd7-4f72-aba0-49f961fc27ea",
+            "dataType": "NA",
+            "answers": [],
+            "order": 22.0,
+            "active": true
+          },
+          {
+            "name": "Tailor Cutting",
+            "uuid": "a3e19465-bebb-427a-8df2-7d58e28c5091",
+            "dataType": "NA",
+            "answers": [],
+            "order": 25.0,
+            "active": true
+          },
+          {
+            "name": "PWD",
+            "uuid": "dc6278fa-b9f5-457d-b5a4-807189ac26e6",
+            "dataType": "NA",
+            "answers": [],
+            "order": 18.0,
+            "active": true
+          },
+          {
+            "name": "HIV affected",
+            "uuid": "8df338a9-de53-4c13-8dd5-b869c3d45f2d",
+            "dataType": "NA",
+            "answers": [],
+            "order": 12.0,
+            "active": true
+          },
+          {
+            "name": "Embroidery workers",
+            "uuid": "0016afc5-47a2-46e0-867d-75ac3b0edfa0",
+            "dataType": "NA",
+            "answers": [],
+            "order": 9.0,
+            "active": true
+          },
+          {
+            "name": "Rohingya community",
+            "uuid": "508b8292-894a-4ed2-b090-96283dccaff0",
+            "dataType": "NA",
+            "answers": [],
+            "order": 21.0,
+            "active": true
+          },
+          {
+            "name": "Daily Wagers",
+            "uuid": "a45cf0ac-7200-49a2-be31-a7317aaa46b6",
+            "dataType": "NA",
+            "answers": [],
+            "order": 6.0,
+            "active": true
+          },
+          {
+            "name": "Adolescents",
+            "uuid": "7cf699d9-0a47-4111-95ce-b0c5df581762",
+            "dataType": "NA",
+            "answers": [],
+            "order": 1.0,
+            "active": true
+          },
+          {
+            "name": "Agricultural Related",
+            "uuid": "84adcd3a-c177-418e-88ea-ca3a1cdb56f5",
+            "dataType": "NA",
+            "answers": [],
+            "order": 2.0,
+            "active": true
+          },
+          {
+            "name": "Rickshaw Pullers",
+            "uuid": "43803088-d89d-425e-991f-1343ddbd66c4",
+            "dataType": "NA",
+            "answers": [],
+            "order": 20.0,
+            "active": true
+          },
+          {
+            "name": "Fisher community",
+            "uuid": "10d355b7-d81e-4937-8a5c-39e30c4e130b",
+            "dataType": "NA",
+            "answers": [],
+            "order": 10.0,
+            "active": true
+          },
+          {
+            "name": "Tribal Community",
+            "uuid": "3fdad012-1109-4684-907c-0a268e6d1e9b",
+            "dataType": "NA",
+            "answers": [],
+            "order": 29.0,
+            "active": true
+          },
+          {
+            "name": "Tea garden workers",
+            "uuid": "0640170e-b58f-4aac-a30c-01f5ad908a0a",
+            "dataType": "NA",
+            "answers": [],
+            "order": 26.0,
+            "active": true
+          },
+          {
+            "name": "Artisans",
+            "uuid": "73d1cedb-66f4-425b-9da4-7b22e87df967",
+            "dataType": "NA",
+            "answers": [],
+            "order": 3.0,
+            "active": true
+          },
+          {
+            "name": "Third Gender",
+            "uuid": "e179e806-3487-433e-ba5f-9b341db3ed20",
+            "dataType": "NA",
+            "answers": [],
+            "order": 27.0,
+            "active": true
+          },
+          {
+            "name": "Leprosy affected",
+            "uuid": "4af95ec9-9da1-4367-a2fa-2a8392822cc8",
+            "dataType": "NA",
+            "answers": [],
+            "order": 13.0,
+            "active": true
+          },
+          {
+            "name": "Children",
+            "uuid": "d46b9822-d3c3-492d-a2a3-9ab623cfd802",
+            "dataType": "NA",
+            "answers": [],
+            "order": 4.0,
+            "active": true
+          },
+          {
+            "name": "Construction workers",
+            "uuid": "bc660964-f0c1-422a-a275-c308bbc86a9e",
+            "dataType": "NA",
+            "answers": [],
+            "order": 5.0,
+            "active": true
+          },
+          {
+            "name": "Unorganized sector",
+            "uuid": "cf177b27-87c3-4dc1-8255-68ffe549b9f4",
+            "dataType": "NA",
+            "answers": [],
+            "order": 30.0,
+            "active": true
+          },
+          {
+            "name": "Transgenders",
+            "uuid": "bb9b146f-d1df-49d9-82eb-dab38c2bc8c8",
+            "dataType": "NA",
+            "answers": [],
+            "order": 28.0,
+            "active": true
+          },
+          {
+            "name": "Street Vendors",
+            "uuid": "c792d850-6ff6-46d6-b62b-1f7a91c3952f",
+            "dataType": "NA",
+            "answers": [],
+            "order": 24.0,
+            "active": true
+          },
+          {
+            "name": "Sex Workers",
+            "uuid": "c913f919-19bb-4789-948f-1ce239452da2",
+            "dataType": "NA",
+            "answers": [],
+            "order": 23.0,
+            "active": true
+          },
+          {
+            "name": "Weavers",
+            "uuid": "95867a1b-bb19-469e-b21c-313016f3725d",
+            "dataType": "NA",
+            "answers": [],
+            "order": 31.0,
+            "active": true
+          },
+          {
+            "name": "lohar",
+            "uuid": "8585d735-9b9e-4801-adc8-c9c8c0b89518",
+            "dataType": "NA",
+            "answers": [],
+            "order": 14.0,
+            "active": true
+          },
+          {
+            "name": "Migrant workers",
+            "uuid": "0ee9a1f6-c598-47ae-9c84-64aae903cc9b",
+            "dataType": "NA",
+            "answers": [],
+            "order": 16.0,
+            "active": true
+          },
+          {
+            "name": "Widows",
+            "uuid": "e0c9a937-415b-4bcc-be63-e7a41fa3c0d6",
+            "dataType": "NA",
+            "answers": [],
+            "order": 32.0,
+            "active": true
+          },
+          {
+            "name": "Differently Abled",
+            "uuid": "81f059e7-7a88-4e9e-883e-a9bfb8ef468a",
+            "dataType": "NA",
+            "answers": [],
+            "order": 8.0,
+            "active": true
+          },
+          {
+            "name": "Health workers and sweepers",
+            "uuid": "a87c0a89-9a65-43ab-8f94-daee22093c3b",
+            "dataType": "NA",
+            "answers": [],
+            "order": 11.0,
+            "active": true
+          },
+          {
+            "name": "Puppeteers",
+            "uuid": "7720a9df-4c19-437d-8c47-0b55183af349",
+            "dataType": "NA",
+            "answers": [],
+            "order": 17.0,
+            "active": true
+          },
+          {
+            "name": "None",
+            "uuid": "ba835221-04c0-4e55-a08f-e6e25bb6719c",
+            "dataType": "NA",
+            "answers": [],
+            "order": 33.0,
+            "unique": true,
+            "active": true
+          },
+          {
+            "name": "Ragpickers",
+            "uuid": "27818169-2925-4895-b4ea-6cc30cedc5b0",
+            "dataType": "NA",
+            "answers": [],
+            "order": 19.0,
+            "active": true
+          }
+        ]
+      },
+      "mandatory": false,
+      "uuid": "d557067e-add4-4cfe-858a-6d5d1aecb124"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Large answer set"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_number_of_people",
+    "form_element": {
+      "name": "Number of people",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Numeric",
+        "name": "Number of people",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "7f01c09d-9061-4455-8d47-169e637846b2"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Numeric field with non-Text type"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_demand_name",
+    "form_element": {
+      "name": "Demand Name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Demand Name (voided~220125)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "f926902e-af1a-4aa5-811d-f3f26b6adbfb"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Voided element in form"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_district",
+    "form_element": {
+      "name": "District",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Location",
+        "name": "District",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "46afcd22-6b05-4f70-a017-219234c76282"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Voided element in form"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_demand_name",
+    "form_element": {
+      "name": "Demand Name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Demand Name (voided~220125)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "d43b9f81-3b1b-4637-9959-6d8bd92ebf38"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Voided element in form"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_account_name",
+    "form_element": {
+      "name": "Account Name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Account name (voided~220045)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "8aa3e8e8-27a1-4af1-928a-3c6b10036c7c"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Voided element in form"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_account_name",
+    "form_element": {
+      "name": "Account name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Account Name (voided~207308)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "26ba41f5-7b66-48f1-8ec4-5586145ee408"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Voided element in form"
+    ]
+  },
+  {
+    "test_case_name": "edge_case_account_name",
+    "form_element": {
+      "name": "Account Name",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Text",
+        "name": "Account Name (voided~207308)",
+        "answers": []
+      },
+      "mandatory": true,
+      "uuid": "49644f16-59fe-4b22-9759-fbf638940a1f"
+    },
+    "form_context": {
+      "formType": "IndividualProfile",
+      "domain": "health",
+      "formName": "Demand Registration"
+    },
+    "expected_issues": [
+      "Edge case: Voided element in form"
+    ]
+  }
+]

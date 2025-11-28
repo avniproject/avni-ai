@@ -40,18 +40,24 @@ export AVNI_AUTH_TOKEN="your_avni_token"
 export AVNI_MCP_SERVER_URL="your_mcp_url"
 ```
 
-### 2. Run Conversation Tests
+### 2. Run Form Validation Tests
 
 ```bash
-cd tests/judge_framework/examples
-python run_conversation_tests.py --output-format all
+# Run comprehensive form validation tests
+python test_form_validation_runner.py comprehensive
+
+# Run focused violation detection tests  
+python test_form_validation_runner.py violation_detection
+
+# Run basic validation tests
+python test_form_validation_runner.py basic
 ```
 
 ### 3. View Results
 
-- Console report: Displayed in terminal
-- JSON report: `conversation_test_report.json`
-- CSV report: `conversation_test_report.csv`
+- **Form validation reports**: `tests/judge_framework/reports/formElementValidation/`
+- **Conversation reports**: `conversation_test_report.json` and `conversation_test_report.csv`
+- **Console reports**: Displayed in terminal for both use cases
 
 ## 📁 Directory Structure
 
@@ -67,13 +73,51 @@ judge_framework/
 ├── analytics/           # Statistics and reporting
 │   ├── statistics.py    # Statistical calculations
 │   └── reporting.py     # Multi-format report generation
-├── implementations/     # Concrete implementations
+├── implementations/     # Concrete implementations by use case
+│   ├── formElementValidation/  # Form validation workflow testing
+│   │   ├── form_element_validation_subject.py
+│   │   ├── form_element_validation_executor.py
+│   │   └── form_element_validation_judge.py
 │   └── conversation/    # Chat conversation testing
-└── examples/           # Usage examples and configurations
-    ├── configs/        # Configuration files
-    ├── run_conversation_tests.py
-    └── MIGRATION.md    # Migration guide from old system
+├── test_suites/         # Test data and matrices by use case
+│   ├── formElementValidation/  # Form validation test cases
+│   │   ├── curated_form_validation_test_cases.json      # 8 focused test cases
+│   │   ├── comprehensive_form_validation_test_matrix.json # 29 comprehensive test cases
+│   │   └── new_form_type_test_cases.json                # 8 new form type tests
+│   └── conversation/     # Conversation test cases (if exists)
+├── reports/             # Generated test reports by use case
+│   └── formElementValidation/  # Form validation test reports
+├── examples/           # Usage examples and analysis tools
+│   ├── configs/        # Configuration files
+│   │   ├── conversation_config.py    # Conversation testing config
+│   │   └── form_validation_config.py # Form validation testing config
+│   ├── form_validation_analysis.py       # Consolidated analysis tool
+│   ├── form_validation_test_generator.py # Consolidated test generator
+│   └── run_conversation_tests.py
+└── MIGRATION.md        # Migration guide from old system
 ```
+
+### 🎯 Use Case Separation
+
+The framework supports **independent testing use cases** with complete separation:
+
+#### FormElementValidation Use Case
+- **Purpose**: Tests the "Avni Form Assistant" Dify workflow
+- **Focus**: Form element validation, data type compliance, rule coverage
+- **Test Coverage**: 29 comprehensive test cases covering 17 concept types, 9 form types
+- **Runner**: `test_form_validation_runner.py` (project root)
+
+#### Conversation Use Case  
+- **Purpose**: Tests the "Avni Program Setup" Dify workflow
+- **Focus**: Program configuration, entity creation, conversation flow
+- **Test Coverage**: Program setup scenarios and entity management
+- **Runner**: `examples/run_conversation_tests.py`
+
+**Why Separate?**
+- **Different Dify Workflows**: Each use case tests a different workflow/API
+- **Independent Test Subjects**: Form elements vs. conversation interactions
+- **Different Evaluation Criteria**: Validation rules vs. conversation flow
+- **Scalable Organization**: Easy to add new use cases (location validation, report generation, etc.)
 
 ## 🔧 Configuration
 

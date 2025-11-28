@@ -1,0 +1,203 @@
+[
+  {
+    "test_case_name": "cancellation_form_mandatory_reason",
+    "form_element": {
+      "name": "Cancellation Reason",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Cancellation Reason",
+        "answers": [
+          {
+            "name": "User Request"
+          },
+          {
+            "name": "System Error"
+          },
+          {
+            "name": "Data Entry Error"
+          },
+          {
+            "name": "Duplicate Entry"
+          }
+        ]
+      },
+      "mandatory": false,
+      "uuid": "cancellation-reason-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualEncounterCancellation",
+      "domain": "health",
+      "formName": "Encounter Cancellation"
+    },
+    "expected_issues": [
+      "HIGH: Cancellation reason should be mandatory in cancellation forms"
+    ],
+    "test_priority": "HIGH",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "cancellation_form_text_reason_instead_of_coded",
+    "form_element": {
+      "name": "Cancellation Reason",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Cancellation Reason"
+      },
+      "mandatory": true,
+      "uuid": "cancellation-text-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramEncounterCancellation",
+      "domain": "health",
+      "formName": "Program Encounter Cancellation"
+    },
+    "expected_issues": [
+      "MEDIUM: Cancellation reason should use Coded dataType with predefined options"
+    ],
+    "test_priority": "MEDIUM",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "cancellation_form_datetime_validation",
+    "form_element": {
+      "name": "Cancellation Date",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Cancellation Date"
+      },
+      "mandatory": true,
+      "uuid": "cancellation-date-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualEncounterCancellation",
+      "domain": "health",
+      "formName": "Encounter Cancellation"
+    },
+    "expected_issues": [
+      "HIGH: Date fields should use Date dataType, not Text"
+    ],
+    "test_priority": "HIGH",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "program_exit_mandatory_exit_reason",
+    "form_element": {
+      "name": "Exit Reason",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Exit Reason",
+        "answers": [
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Transferred Out"
+          },
+          {
+            "name": "Lost to Follow-up"
+          },
+          {
+            "name": "Deceased"
+          },
+          {
+            "name": "Withdrawn Consent"
+          }
+        ]
+      },
+      "mandatory": false,
+      "uuid": "exit-reason-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramExit",
+      "domain": "health",
+      "formName": "Program Exit Form"
+    },
+    "expected_issues": [
+      "HIGH: Exit reason should be mandatory in program exit forms"
+    ],
+    "test_priority": "HIGH",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "program_exit_exit_date_validation",
+    "form_element": {
+      "name": "Exit Date",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Exit Date"
+      },
+      "mandatory": true,
+      "uuid": "exit-date-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramExit",
+      "domain": "health",
+      "formName": "Program Exit Form"
+    },
+    "expected_issues": [
+      "HIGH: Date fields should use Date dataType, not Text"
+    ],
+    "test_priority": "HIGH",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "program_exit_followup_plan_text_instead_of_notes",
+    "form_element": {
+      "name": "Follow-up Plan",
+      "type": "Text",
+      "concept": {
+        "dataType": "Text",
+        "name": "Follow-up Plan"
+      },
+      "mandatory": false,
+      "uuid": "followup-plan-uuid"
+    },
+    "form_context": {
+      "formType": "ProgramExit",
+      "domain": "health",
+      "formName": "Program Exit Form"
+    },
+    "expected_issues": [
+      "LOW: Follow-up plans should use Notes dataType for detailed text"
+    ],
+    "test_priority": "LOW",
+    "source": "new_form_type_analysis"
+  },
+  {
+    "test_case_name": "valid_cancellation_form_proper_setup",
+    "form_element": {
+      "name": "Cancellation Reason",
+      "type": "SingleSelect",
+      "concept": {
+        "dataType": "Coded",
+        "name": "Cancellation Reason",
+        "answers": [
+          {
+            "name": "User Request"
+          },
+          {
+            "name": "System Error"
+          },
+          {
+            "name": "Data Entry Error"
+          }
+        ]
+      },
+      "mandatory": true,
+      "uuid": "valid-cancellation-uuid"
+    },
+    "form_context": {
+      "formType": "IndividualEncounterCancellation",
+      "domain": "health",
+      "formName": "Encounter Cancellation"
+    },
+    "expected_issues": [],
+    "test_priority": "VALID",
+    "source": "new_form_type_analysis"
+  }
+]

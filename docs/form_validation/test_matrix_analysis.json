@@ -1,0 +1,37 @@
+{
+  "total_test_cases": 21,
+  "priority_distribution": {
+    "CRITICAL": 4,
+    "HIGH": 4,
+    "MEDIUM": 10,
+    "VALID": 3
+  },
+  "concept_types_covered": [
+    "Text",
+    "Coded",
+    "Subject",
+    "QuestionGroup",
+    "Date",
+    "DateTime",
+    "Notes",
+    "SingleSelect",
+    "MultiSelect",
+    "Image",
+    "Video",
+    "Audio",
+    "File",
+    "PhoneNumber",
+    "Numeric"
+  ],
+  "form_types_covered": [
+    "IndividualProfile",
+    "ProgramEncounter",
+    "HouseholdProfile"
+  ],
+  "avni_rules_coverage": {
+    "critical_rules": 4,
+    "high_rules": 4,
+    "medium_rules": 10,
+    "valid_configurations": 3
+  }
+}

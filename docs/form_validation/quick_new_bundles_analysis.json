@@ -1,0 +1,145 @@
+{
+  "total_forms_sampled": 30,
+  "data_types_found": [
+    "Audio",
+    "Coded",
+    "Date",
+    "DateTime",
+    "Encounter",
+    "File",
+    "Image",
+    "Location",
+    "NA",
+    "Numeric",
+    "PhoneNumber",
+    "QuestionGroup",
+    "Subject",
+    "Text",
+    "Time"
+  ],
+  "form_types_found": [
+    "Encounter",
+    "IndividualEncounterCancellation",
+    "IndividualProfile",
+    "Location",
+    "ProgramEncounter",
+    "ProgramEncounterCancellation",
+    "ProgramExit"
+  ],
+  "new_concept_types": [],
+  "domain_patterns": {
+    "logistics": [
+      "Coded",
+      "Date",
+      "DateTime",
+      "Encounter",
+      "Image",
+      "Location",
+      "NA",
+      "Numeric",
+      "QuestionGroup",
+      "Text"
+    ],
+    "administrative": [
+      "Audio",
+      "Coded",
+      "DateTime",
+      "Image",
+      "Location",
+      "NA",
+      "Numeric",
+      "PhoneNumber",
+      "QuestionGroup",
+      "Subject",
+      "Text"
+    ],
+    "education": [
+      "Coded",
+      "Date",
+      "DateTime",
+      "Encounter",
+      "File",
+      "Image",
+      "Location",
+      "NA",
+      "Numeric",
+      "QuestionGroup",
+      "Subject",
+      "Text"
+    ],
+    "monitoring": [
+      "Coded",
+      "Date",
+      "NA",
+      "Text"
+    ]
+  },
+  "sampled_forms_info": [
+    {
+      "file": "/Users/himeshr/IdeaProjects/avni-impl-bundles/reference/goonj/forms/Village Form Encounter Cancellation.json",
+      "name": "Village Form Encounter Cancellation",
+      "formType": "IndividualEncounterCancellation",
+      "dataTypes": [],
+      "file_size": 210
+    },
+    {
+      "file": "/Users/himeshr/IdeaProjects/avni-impl-bundles/reference/goonj/forms/Village Registration.js",
+      "name": "Village Registration",
+      "formType": "IndividualProfile",
+      "dataTypes": [
+        "Coded",
+        "Text"
+      ],
+      "file_size": 13590
+    },
+    {
+      "file": "/Users/himeshr/IdeaProjects/avni-impl-bundles/reference/goonj/forms/Dispatch Registration.js",
+      "name": "Dispatch Registration",
+      "formType": "IndividualProfile",
+      "dataTypes": [
+        "DateTime",
+        "Coded",
+        "Numeric",
+        "Text",
+        "NA",
+        "QuestionGroup",
+        "Image",
+        "Location"
+      ],
+      "file_size": 91137
+    },
+    {
+      "file": "/Users/himeshr/IdeaProjects/avni-impl-bundles/reference/goonj/forms/Activity Form (voided~3734).js",
+      "name": "Activity Form (voided~3734)",
+      "formType": "Encounter",
+      "dataTypes": [
+        "Date",
+        "Coded",
+        "Numeric",
+        "Text",
+        "NA",
+        "QuestionGroup",
+        "Location"
+      ],
+      "file_size": 319406
+    },
+    {
+      "file": "/Users/himeshr/IdeaProjects/avni-impl-bundles/reference/goonj/forms/Village Assessment (voided~9597).js",
+      "name": "Village Assessment (voided~9597)",
+      "formType": "IndividualProfile",
+      "dataTypes": [
+        "Date",
+        "DateTime",
+        "Coded",
+        "Encounter",
+        "Numeric",
+        "Text",
+        "NA",
+        "QuestionGroup",
+        "Image",
+        "Location"
+      ],
+      "file_size": 470866
+    }
+  ]
+}
