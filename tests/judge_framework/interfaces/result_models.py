@@ -106,7 +106,7 @@ class EvaluationResult:
     test_identifier: str
     test_type: str
     success: bool
-    timestamp: str
+    timestamp: str = field(default_factory=lambda: datetime.datetime.now().isoformat())
     
     # Scoring (configurable metrics)
     scores: Dict[str, float] = field(default_factory=dict)
