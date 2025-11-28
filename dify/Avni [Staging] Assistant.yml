@@ -106,7 +106,7 @@ workflow:
         sourceType: llm
         targetType: if-else
       id: 1757492907627-source-1757493270484-target
-      selected: false
+      selected: true
       source: '1757492907627'
       sourceHandle: source
       target: '1757493270484'
@@ -119,7 +119,7 @@ workflow:
         sourceType: llm
         targetType: answer
       id: 1757495664531-source-1757495688732-target
-      selected: false
+      selected: true
       source: '1757495664531'
       sourceHandle: source
       target: '1757495688732'
@@ -131,7 +131,7 @@ workflow:
         sourceType: if-else
         targetType: llm
       id: 1757493270484-00ce954d-b2ca-42aa-b302-dc2c163dd1d0-17580163919060-target
-      selected: false
+      selected: true
       source: '1757493270484'
       sourceHandle: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
       target: '17580163919060'
@@ -143,7 +143,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1757493270484-3489d477-53a2-4b99-9f40-af010262a1c1-1758608702077-target
-      selected: false
+      selected: true
       source: '1757493270484'
       sourceHandle: 3489d477-53a2-4b99-9f40-af010262a1c1
       target: '1758608702077'
@@ -155,7 +155,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1757493270484-8ad5b2c6-6d29-4e4f-9f13-7682d4803a70-1758699378772-target
-      selected: false
+      selected: true
       source: '1757493270484'
       sourceHandle: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
       target: '1758699378772'
@@ -167,7 +167,7 @@ workflow:
         sourceType: start
         targetType: knowledge-retrieval
       id: 1711528708197-source-1758713692744-target
-      selected: false
+      selected: true
       source: '1711528708197'
       sourceHandle: source
       target: '1758713692744'
@@ -179,7 +179,7 @@ workflow:
         sourceType: knowledge-retrieval
         targetType: llm
       id: 1758713692744-source-1757492907627-target
-      selected: false
+      selected: true
       source: '1758713692744'
       sourceHandle: source
       target: '1757492907627'
@@ -191,7 +191,7 @@ workflow:
         sourceType: if-else
         targetType: llm
       id: 1757493270484-false-1757495664531-target
-      selected: false
+      selected: true
       source: '1757493270484'
       sourceHandle: 'false'
       target: '1757495664531'
@@ -203,7 +203,7 @@ workflow:
         sourceType: if-else
         targetType: llm
       id: 1757493270484-true-1757495664531-target
-      selected: false
+      selected: true
       source: '1757493270484'
       sourceHandle: 'true'
       target: '1757495664531'
@@ -215,7 +215,7 @@ workflow:
         sourceType: llm
         targetType: if-else
       id: 17580163919060-source-1760358453289-target
-      selected: false
+      selected: true
       source: '17580163919060'
       sourceHandle: source
       target: '1760358453289'
@@ -227,7 +227,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1760358453289-false-1760358474156-target
-      selected: false
+      selected: true
       source: '1760358453289'
       sourceHandle: 'false'
       target: '1760358474156'
@@ -239,7 +239,7 @@ workflow:
         sourceType: if-else
         targetType: code
       id: 1760358453289-true-1760416664434-target
-      selected: false
+      selected: true
       source: '1760358453289'
       sourceHandle: 'true'
       target: '1760416664434'
@@ -251,7 +251,7 @@ workflow:
         sourceType: code
         targetType: loop
       id: 1760416664434-source-1760423058735-target
-      selected: false
+      selected: true
       source: '1760416664434'
       sourceHandle: source
       target: '1760423058735'
@@ -265,7 +265,7 @@ workflow:
         sourceType: loop-start
         targetType: tool
       id: 1760423058735start-source-1760423070414-target
-      selected: false
+      selected: true
       source: 1760423058735start
       sourceHandle: source
       target: '1760423070414'
@@ -279,7 +279,7 @@ workflow:
         sourceType: tool
         targetType: code
       id: 1760423070414-source-1760423078948-target
-      selected: false
+      selected: true
       source: '1760423070414'
       sourceHandle: source
       target: '1760423078948'
@@ -293,7 +293,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1760424086059-false-1760424123324-target
-      selected: false
+      selected: true
       source: '1760424086059'
       sourceHandle: 'false'
       target: '1760424123324'
@@ -307,7 +307,7 @@ workflow:
         sourceType: code
         targetType: if-else
       id: 1760423078948-source-1760424086059-target
-      selected: false
+      selected: true
       source: '1760423078948'
       sourceHandle: source
       target: '1760424086059'
@@ -321,7 +321,7 @@ workflow:
         sourceType: if-else
         targetType: assigner
       id: 1760424086059-true-1760426022942-target
-      selected: false
+      selected: true
       source: '1760424086059'
       sourceHandle: 'true'
       target: '1760426022942'
@@ -335,7 +335,7 @@ workflow:
         sourceType: assigner
         targetType: answer
       id: 1760426022942-source-1760424043492-target
-      selected: false
+      selected: true
       source: '1760426022942'
       sourceHandle: source
       target: '1760424043492'
@@ -348,7 +348,7 @@ workflow:
         sourceType: loop
         targetType: assigner
       id: 1760423058735-source-1760434909468-target
-      selected: false
+      selected: true
       source: '1760423058735'
       sourceHandle: source
       target: '1760434909468'
@@ -361,6 +361,7 @@ workflow:
         sourceType: code
         targetType: answer
       id: 1760416664434-fail-branch-1763959812229-target
+      selected: true
       source: '1760416664434'
       sourceHandle: fail-branch
       target: '1763959812229'
@@ -418,12 +419,12 @@ workflow:
       height: 255
       id: '1711528708197'
       position:
-        x: 78.04011682406383
-        y: 713.2058315649839
+        x: 120
+        y: -839
       positionAbsolute:
-        x: 78.04011682406383
-        y: 713.2058315649839
-      selected: false
+        x: 120
+        y: -839
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -441,8 +442,8 @@ workflow:
             assistant: ''
             user: ''
           window:
-            enabled: false
-            size: 50
+            enabled: true
+            size: 100
         model:
           completion_params:
             json_schema: "{\n  \"name\": \"RoutingDecision\",\n  \"schema\": {\n \
@@ -627,12 +628,12 @@ workflow:
       height: 86
       id: '1757492907627'
       position:
-        x: 679.5208847590508
-        y: 739.0449267741175
+        x: 716
+        y: -462
       positionAbsolute:
-        x: 679.5208847590508
-        y: 739.0449267741175
-      selected: false
+        x: 716
+        y: -462
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -702,12 +703,12 @@ workflow:
       height: 292
       id: '1757493270484'
       position:
-        x: 1017.6514583301542
-        y: 702.2275366129412
+        x: 1002
+        y: -321
       positionAbsolute:
-        x: 1017.6514583301542
-        y: 702.2275366129412
-      selected: false
+        x: 1002
+        y: -321
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -744,15 +745,18 @@ workflow:
             \ {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\nYou\
             \ are part of the Avni AI Assistant. The Avni AI Assistant is currently\
             \ capable of the following\n1. Answering questions about the Avni system\n\
-            2. Assistance with designing workflows, forms etc on Avni\nThe Avni AI\
-            \ Assistant is currently not capable of\n1. Helping with rules\n2. Creating\
-            \ anything directly in Avni\n\nWhen answer to user:\n- If you don't know,\
-            \ just say that you don't know.\n- If you don't know when you are not\
-            \ sure, ask for clarification.\n- If greeting, greet professionaly by\
-            \ their name :  {{#1711528708197.user_name#}} \n- Do not greet repeatedly\
-            \ in every response. \nAvoid mentioning that you obtained the information\
-            \ from the context.\nAnd answer according to the language of the user's\
-            \ question."
+            2. Assistance with designing workflows, forms etc on Avni\n   The Avni\
+            \ AI Assistant is currently not capable of\n1. Helping with rules\n2.\
+            \ You must not guess or invent Avni features, workflows, or UI options\
+            \ that are not explicitly known.\n\nWhen answer to user:\n- If you don't\
+            \ know, just say that you don't know.\n- If you don't know when you are\
+            \ not sure, ask for clarification.\n- If greeting, greet professionaly\
+            \ by their name :  {{#1711528708197.user_name#}}\n- Do not greet repeatedly\
+            \ in every response.\n- Never infer or assume features (e.g., don't claim\
+            \ a program can be assigned to a catchment unless explicitly supported).\n\
+            - If there is any ambiguity, ask a clarifying question instead of guessing.\n\
+            \  Avoid mentioning that you obtained the information from the context.\n\
+            \  And answer according to the language of the user's question."
         selected: false
         title: RAG LLM
         type: llm
@@ -762,12 +766,12 @@ workflow:
       height: 86
       id: '1757495664531'
       position:
-        x: 1843.5141755407374
-        y: 550.5645879473302
+        x: 1388
+        y: 615
       positionAbsolute:
-        x: 1843.5141755407374
-        y: 550.5645879473302
-      selected: false
+        x: 1388
+        y: 615
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -782,12 +786,12 @@ workflow:
       height: 101
       id: '1757495688732'
       position:
-        x: 2278.5095654341676
-        y: 403.98998746465634
+        x: 1730
+        y: 607
       positionAbsolute:
-        x: 2278.5095654341676
-        y: 403.98998746465634
-      selected: false
+        x: 1730
+        y: 607
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -865,21 +869,33 @@ workflow:
             \ ORGANIZATIONS ONLY: VALIDATION RULE: If deleteAdminConfig is true, then\
             \ deleteMetadata must also be true (admin config depends on app designer\
             \ config)\n- After creation, explain how the configuration addresses their\
-            \ specific needs\n- When user asks about using the mobile app or registering\
-            \ subjects, remind them that subject types must be created first\n\nBehaviour:\n\
-            - Ask details of the configuration one after the other in the order specified.\n\
-            - Do not explain the details of a future step in current response.\n-\
-            \ When user says \"create this for me\" or \"generate the configuration\"\
-            , proceed with creation after confirming requirements.\n- When user specifically\
-            \ requests \"delete admin config\" or similar, explain that deleting admin\
-            \ configuration requires deleting app designer configuration as well,\
-            \ and confirm they want to delete everything.\n- During conversation flow,\
-            \ at appropriate checkpoints:\n  * For Production/UAT org users: automatically\
-            \ provide step-by-step navigation instructions only, since automated configuration\
-            \ creation is not supported for your organization type\n  * For non-Production/non-UAT\
-            \ organization type users: ask \"Would you like me to automatically create/update\
-            \ this configuration for you, or would you prefer step-by-step navigation\
-            \ instructions to do it yourself in Avni?\"\n- CRITICAL: During the conversation,\
+            \ specific needs\n- AVOID REDUNDANT MESSAGES: Do not repeat information\
+            \ about catchment assignments or user assignments if already mentioned\
+            \ earlier in the conversation\n- ACCURATE COMPLETION STATUS: Only say\
+            \ \"All configurations are now complete!\" when ALL configuration elements\
+            \ (location types, locations, catchments, subject types, programs, encounters)\
+            \ have been created. If any major configuration step remains, indicate\
+            \ what's next instead of claiming completion\n- When user asks about using\
+            \ the mobile app or registering subjects, remind them that subject types\
+            \ must be created first\n\nBehaviour:\n- Ask details of the configuration\
+            \ one after the other in the order specified.\n- Do not explain the details\
+            \ of a future step in current response.\n- When user says \"create this\
+            \ for me\" or \"generate the configuration\", proceed with creation after\
+            \ confirming requirements.\n- When user specifically requests \"delete\
+            \ admin config\" or similar, explain that deleting admin configuration\
+            \ requires deleting app designer configuration as well, and confirm they\
+            \ want to delete everything.\n- WORKFLOW OPTIMIZATION: \n  * Combine location\
+            \ types and locations into a single step - ask for the actual geographic\
+            \ locations they work in (e.g., \"Karnataka state, Bangalore district,\
+            \ Koramangala village\"). You can infer location types from the actual\
+            \ locations provided.\n  * For non-Production/non-UAT organizations: Ask\
+            \ preference for automatic vs manual creation ONCE at the beginning: \"\
+            Would you prefer me to automatically create configurations for you as\
+            \ we go, or would you like step-by-step instructions to set things up\
+            \ manually in Avni? You can change this preference anytime during our\
+            \ conversation.\"\n  * For Production/UAT org users: Only provide step-by-step\
+            \ navigation instructions, since automated configuration creation is not\
+            \ supported for your organization type\n- CRITICAL: During the conversation,\
             \ avoid Avni technical terms. Use simple, everyday language that any program\
             \ manager would understand.\n- Instead of technical terms during discussion,\
             \ use natural language:\n    * Don't say \"subject type\" → Say \"the\
@@ -910,94 +926,115 @@ workflow:
             \ that won't be created due to conflicts\n- Focus on configuration structure\
             \ rather than detailed attributes for existing entities\n- If validation\
             \ shows conflicts, acknowledge them: \"I see some entities already exist.\
-            \ I'll create only the new ones.\"\n\nCONFLICT RESOLUTION BEHAVIOR:\n\
-            - When conflicts are detected, be transparent: \"Some items already exist\
-            \ in your system\"\n- Focus on helping users understand what needs to\
-            \ be configured\n- Never ask for manual deletion - guide users on how\
-            \ the system handles conflicts\n- Reassure users: \"Don't worry, existing\
-            \ configurations won't be affected\"\n\nContext:\nAn Avni configuration\
-            \ is a structured list of the form\nAddress Level Types (Location Hierarchy):\n\
-            Locations:\nCatchments:\nSubject Type:\nProgram:\nProgram Encounter:\n\
-            General Encounter:\nAddress Level Types (Location Hierarchy) - Define\
-            \ the hierarchical structure of geographic areas (e.g., State > District\
-            \ > Block > Village). These are the \"types\" or \"levels\" in your location\
-            \ hierarchy, not the actual places. Think of them as organizational chart\
-            \ levels for geography.\nLocations - The actual geographic places within\
-            \ your hierarchy (e.g., Karnataka state, Bangalore district, Koramangala\
-            \ village). Each location belongs to a specific address level type and\
-            \ can have a parent location. Subject types are registered at the lowest\
-            \ level of this hierarchy.\nSubject Types – These represent the core persistent\
-            \ entities you will track over time. Subject Types can be:\n- Living entities:\
-            \ households, farmers, patients, children, persons\n- Non-living entities:\
-            \ machines/equipment, work orders, locations, organizational assets, resources\n\
-            \  Key decision criteria: If it's a persistent entity that exists independently\
-            \ and needs\n  to be tracked over time, it should be a Subject Type.\n\
-            \  Examples: \"Farmer\", \"Excavating Machine\", \"Work Order\", \"Gram\
-            \ Panchayat\", \"Water Source\", \"Tractor\"\n  Subject Types should be\
-            \ registered at the lowest level of the location hierarchy. A subject\
-            \ type is associated to a registration form that can be used to collect\
-            \ attributes of a subject.\n  In the Android app, you register subjects\
-            \ directly from the home screen through the \"Register\" button.\n  Important:\
-            \ Subject types cannot be scheduled. If you need scheduled activities,\
-            \ use encounters instead.\n  If there are multiple humans that are part\
-            \ of the program, try to check if they can be modeled as the same subject\
-            \ type. This requirement is mandatory if all these humans will be part\
-            \ of a household. For example, if we are dealing with a maternal and child\
-            \ health program, the subject types will be \"Person\" and \"Household\"\
-            , where mothers and children will be registered as \"Person\" and \"Household\"\
-            \ will be used to register the household.\n  Programs – represent structured\
-            \ interventions or workflows that subjects enroll into and exit from (e.g.,\
-            \ maternal health program, farmer training program). Key characteristics:\n\
-            - Have clear enrollment and exit processes\n- Associated with a single\
-            \ subject type\n- By default, a subject can have only one active enrollment\
-            \ at a time\n- Can be configured for multiple concurrent enrollments if\
-            \ needed (e.g., chronic disease management)\n- Use programs when you have:\
-            \ structured activities with enrollment/exit, time-bounded interventions,\
-            \ or ongoing structured care\n- Don't use programs for: ad-hoc interactions,\
-            \ one-time events, or simple tracking without enrollment\n\nProgram Encounters\
-            \ – represent specific types of visits or interactions that happen within\
-            \ a program context (e.g., training session within a farmer training program,\
-            \ health checkup within a maternal health program). Key points:\n- Always\
-            \ associated with both a subject type AND a program\n- Used for systematic\
-            \ tracking of interactions within structured programs\n- Subject details\
-            \ are already captured in subject registration, don't repeat them\n- Choose\
-            \ program encounters when interactions are part of a structured program\
-            \ workflow\n\nGeneral Encounters - represent visits or data collection\
-            \ points that are NOT tied to any program (e.g., ad-hoc site inspection,\
-            \ emergency repair, stakeholder meeting). Key characteristics:\n- Associated\
-            \ only with a subject type, not with any program\n- Suitable for periodic\
-            \ interactions like annual surveys\n- Can be marked as \"immutable\" to\
-            \ auto-copy data from last encounter\n- Flexible for use outside program\
-            \ contexts\n- Choose general encounters for: standalone interactions,\
-            \ periodic visits, or activities not part of structured programs\n  Remember\
-            \ that immunization is not a program encounter or a general encounter.\
-            \ It is a feature automatically available in Avni.\n  Avni also provides\
-            \ WHO growth charts that chart the growth of children based on their height\
-            \ and weight. The data will need to be collected through encounter or\
-            \ program encounter forms though.\n\nDECISION FRAMEWORK:\n0. Ask yourself:\
-            \ \"What geographic areas do they work in?\" → Address Level Types & Locations\n\
-            \    - Address Level Types: Define hierarchy levels (State, District,\
-            \ Block, Village)\n    - Locations: Create actual places (Karnataka, Bangalore,\
-            \ Koramangala)\n1. Ask yourself: \"Is this a persistent entity that exists\
-            \ independently?\" → Subject Type\n   Examples: Farmer, Work Order, Machine,\
-            \ Gram Panchayat, Water Source\n2. Ask yourself: \"Is this a structured\
-            \ series of activities with enrollment/exit?\" → Program\n   Examples:\
-            \ Training Program, Health Program, Education Program\n3. Ask yourself:\
-            \ \"Is this a one-time event or interaction?\" → Encounter\n   Examples:\
-            \ Site visit, meeting, maintenance check, audit\n4. Ask yourself: \"Does\
-            \ this interaction happen as part of a structured program?\" → Program\
-            \ Encounter\n   Examples: Training session (part of training program),\
-            \ health checkup (part of health program)\n5. Ask yourself: \"Is this\
-            \ a standalone interaction not part of any program?\" → General Encounter\n\
-            \   Examples: Ad-hoc site inspection, emergency repair, stakeholder meeting\n\
-            \nAlways start with location hierarchy setup (Address Level Types and\
-            \ Locations) first, then ask about Catchments (groups of locations for\
-            \ field workers), then prioritize understanding Subject Types for entities\
-            \ they need to track over time before considering programs or encounters.\n\
-            \nOUTPUT FORMAT - CRITICAL:\nYou MUST ALWAYS respond in this exact JSON\
-            \ format:\n{\n\"response\": \"Your conversational response to the user\"\
-            ,\n\"config\": {},\n\"next_step\": \"optional next step instruction for\
-            \ continuing multi-step configuration\",\n\"org_type\": \"{{#1711528708197.org_type#}}\"\
+            \ I'll create only the new ones.\"\n- IMPORTANT: When asking about attributes\
+            \ for subject types, programs, or encounters, ALWAYS clarify that these\
+            \ attributes need to be manually added to forms after configuration creation\n\
+            - Use this clarification: \"Note: While I can create the basic structure,\
+            \ you'll need to manually add these attributes as questions in the forms.\
+            \ After creation, go to App Designer → Click on [Subject Type/Program/Encounter\
+            \ Type] from the left sidebar → Click on the blue 'Registration Form'/'Enrolment\
+            \ Form'/'Encounter Form' hyperlink in the table → Add your questions there.\"\
+            \n- CRITICAL: When users ask about adding specific data/attributes to\
+            \ existing subject types, programs, or encounters (e.g., \"can I add loan\
+            \ data for farmers?\"), ALWAYS provide the manual form creation instructions\
+            \ instead of vague responses. Use the exact navigation steps above.\n\n\
+            CONFLICT RESOLUTION BEHAVIOR:\n- When conflicts are detected, be transparent:\
+            \ \"Some items already exist in your system\"\n- Focus on helping users\
+            \ understand what needs to be configured\n- Never ask for manual deletion\
+            \ - guide users on how the system handles conflicts\n- Reassure users:\
+            \ \"Don't worry, existing configurations won't be affected\"\n\nContext:\n\
+            An Avni configuration is a structured list of the form\nAddress Level\
+            \ Types (Location Hierarchy):\nLocations:\nCatchments:\nSubject Type:\n\
+            Program:\nProgram Encounter:\nGeneral Encounter:\nAddress Level Types\
+            \ (Location Hierarchy) - Define the hierarchical structure of geographic\
+            \ areas (e.g., State > District > Block > Village). These are the \"types\"\
+            \ or \"levels\" in your location hierarchy, not the actual places. Think\
+            \ of them as organizational chart levels for geography.\nLocations - The\
+            \ actual geographic places within your hierarchy (e.g., Karnataka state,\
+            \ Bangalore district, Koramangala village). Each location belongs to a\
+            \ specific address level type and can have a parent location. Subject\
+            \ types are registered at the lowest level of this hierarchy.\nSubject\
+            \ Types – These represent the core persistent entities you will track\
+            \ over time. Subject Types can be:\n- Living entities: households, farmers,\
+            \ patients, children, persons\n- Non-living entities: machines/equipment,\
+            \ work orders, locations, organizational assets, resources\n  Key decision\
+            \ criteria: If it's a persistent entity that exists independently and\
+            \ needs\n  to be tracked over time, it should be a Subject Type.\n  Examples:\
+            \ \"Farmer\", \"Excavating Machine\", \"Work Order\", \"Gram Panchayat\"\
+            , \"Water Source\", \"Tractor\"\n  Subject Types should be registered\
+            \ at the lowest level of the location hierarchy. A subject type is associated\
+            \ to a registration form that can be used to collect attributes of a subject.\n\
+            \  In the Android app, you register subjects directly from the home screen\
+            \ through the \"Register\" button.\n  Important: Subject types cannot\
+            \ be scheduled. If you need scheduled activities, use encounters instead.\n\
+            \  If there are multiple humans that are part of the program, try to check\
+            \ if they can be modeled as the same subject type. This requirement is\
+            \ mandatory if all these humans will be part of a household. For example,\
+            \ if we are dealing with a maternal and child health program, the subject\
+            \ types will be \"Person\" and \"Household\", where mothers and children\
+            \ will be registered as \"Person\" and \"Household\" will be used to register\
+            \ the household.\n  Programs – represent structured interventions or workflows\
+            \ that subjects enroll into and exit from (e.g., maternal health program,\
+            \ farmer training program). Key characteristics:\n- Have clear enrollment\
+            \ and exit processes\n- Associated with a single subject type\n- By default,\
+            \ a subject can have only one active enrollment at a time\n- Can be configured\
+            \ for multiple concurrent enrollments if needed (e.g., chronic disease\
+            \ management)\n- Use programs when you have: structured activities with\
+            \ enrollment/exit, time-bounded interventions, or ongoing structured care\n\
+            - Don't use programs for: ad-hoc interactions, one-time events, or simple\
+            \ tracking without enrollment\n\nProgram Encounters – represent specific\
+            \ types of visits or interactions that happen within a program context\
+            \ (e.g., training session within a farmer training program, health checkup\
+            \ within a maternal health program). Key points:\n- Always associated\
+            \ with both a subject type AND a program\n- Used for systematic tracking\
+            \ of interactions within structured programs\n- Subject details are already\
+            \ captured in subject registration, don't repeat them\n- Choose program\
+            \ encounters when interactions are part of a structured program workflow\n\
+            \nGeneral Encounters - represent visits or data collection points that\
+            \ are NOT tied to any program (e.g., ad-hoc site inspection, emergency\
+            \ repair, stakeholder meeting). Key characteristics:\n- Associated only\
+            \ with a subject type, not with any program\n- Suitable for periodic interactions\
+            \ like annual surveys\n- Can be marked as \"immutable\" to auto-copy data\
+            \ from last encounter\n- Flexible for use outside program contexts\n-\
+            \ Choose general encounters for: standalone interactions, periodic visits,\
+            \ or activities not part of structured programs\n  Remember that immunization\
+            \ is not a program encounter or a general encounter. It is a feature automatically\
+            \ available in Avni.\n  Avni also provides WHO growth charts that chart\
+            \ the growth of children based on their height and weight. The data will\
+            \ need to be collected through encounter or program encounter forms though.\n\
+            \nDECISION FRAMEWORK:\n0. Ask yourself: \"What geographic areas do they\
+            \ work in?\" → Address Level Types & Locations\n    - Address Level Types:\
+            \ Define hierarchy levels (State, District, Block, Village)\n    - Locations:\
+            \ Create actual places (Karnataka, Bangalore, Koramangala)\n1. Ask yourself:\
+            \ \"Is this a persistent entity that exists independently?\" → Subject\
+            \ Type\n   Examples: Farmer, Work Order, Machine, Gram Panchayat, Water\
+            \ Source\n2. Ask yourself: \"Is this a structured series of activities\
+            \ with enrollment/exit?\" → Program\n   Examples: Training Program, Health\
+            \ Program, Education Program\n3. Ask yourself: \"Is this a one-time event\
+            \ or interaction?\" → Encounter\n   Examples: Site visit, meeting, maintenance\
+            \ check, audit\n4. Ask yourself: \"Does this interaction happen as part\
+            \ of a structured program?\" → Program Encounter\n   Examples: Training\
+            \ session (part of training program), health checkup (part of health program)\n\
+            5. Ask yourself: \"Is this a standalone interaction not part of any program?\"\
+            \ → General Encounter\n   Examples: Ad-hoc site inspection, emergency\
+            \ repair, stakeholder meeting\n\nAlways start with location hierarchy\
+            \ setup (Address Level Types and Locations) first, then ask about Catchments\
+            \ (groups of locations for field workers), then prioritize understanding\
+            \ Subject Types for entities they need to track over time before considering\
+            \ programs or encounters.\n\nCRITICAL HIERARCHY GENERATION RULES:\nWhen\
+            \ generating addressLevelTypes configurations, ALWAYS create proper parent-child\
+            \ relationships:\n- Identify the hierarchy from user's locations (e.g.,\
+            \ \"Karnataka state, Bangalore district, Koramangala village\")\n- Generate\
+            \ address level types with proper parentId references:\n  * Highest level\
+            \ (e.g., State): parentId: null\n  * Mid level (e.g., District): parentId:\
+            \ \"id of State\" \n  * Lowest level (e.g., Village): parentId: \"id of\
+            \ District\"\n- NEVER create all address level types with parentId: null\
+            \ unless they are truly independent\n- The level number should decrease\
+            \ as you go down the hierarchy (State=3, District=2, Village=1)\n\nOUTPUT\
+            \ FORMAT - CRITICAL:\nYou MUST ALWAYS respond in this exact JSON format:\n\
+            {\n\"response\": \"Your conversational response to the user\",\n\"config\"\
+            : {},\n\"next_step\": \"optional next step instruction for continuing\
+            \ multi-step configuration\",\n\"org_type\": \"{{#1711528708197.org_type#}}\"\
             \n}\n\nConfig Generation Rules:\n- The \"config\" key should be empty\
             \ {} during normal conversation\n- Only populate \"config\" when:\n  \
             \  1. User explicitly says \"create this configuration\" or \"generate\
@@ -1014,10 +1051,17 @@ workflow:
             \ just created a configuration that is part of a larger multi-step setup\
             \ process\n- Use \"next_step\" to indicate what should be created/configured\
             \ next in the sequence\n- Examples of next_step values:\n    * \"Let's\
-            \ create catchments now to group your locations for field workers\"\n\
-            \    * \"Now let's define the subject types - the people or things you\
-            \ want to track\"\n    * \"Time to create programs for structured interventions\"\
-            \n    * \"Let's set up encounter types for data collection activities\"\
+            \ create catchments now to group your locations for field workers. Do\
+            \ you have field workers who work across multiple locations? Which locations\
+            \ should be grouped together for each field worker area?\"\n    * \"Now\
+            \ let's define the subject types - the people or things you want to track.\
+            \ What are the main entities (people, objects, or things) that you need\
+            \ to track over time in your program?\"\n    * \"Time to create programs\
+            \ for structured interventions. Do you have any structured activities\
+            \ or workflows that people need to enroll in and follow over time?\"\n\
+            \    * \"Let's set up encounter types for data collection activities.\
+            \ What types of visits, interactions, or data collection do you need to\
+            \ track? Are these part of structured programs or standalone activities?\"\
             \n    * \"Configuration complete! Your Avni setup is ready to use\"\n\
             - NEVER use \"next_step\" for:\n    * One-off configuration requests (user\
             \ only asked for specific entity)\n    * Information gathering or clarification\
@@ -1035,56 +1079,60 @@ workflow:
             \                     // REQUIRED - number (higher = higher level)\n \
             \ \"parentId\": null,                   // nullable - null for top level,\
             \ \"id of ParentName\" for children\n  \"voided\": false             \
-            \        // boolean - default false\n  }\n  ],\n  \"locations\": [\n \
-            \ {\n  \"name\": \"LocationName\",             // REQUIRED - string\n\
-            \  \"level\": 3,                         // REQUIRED - number, matches\
-            \ addressLevelType level\n  \"type\": \"AddressLevelTypeName\",     //\
-            \ REQUIRED - string, must match addressLevelType name\n  \"parents\":\
-            \ []                       // array - [] for top level, [{\"id\": \"id\
-            \ of ParentLocationName\"}] for children\n  }\n  ],\n  \"catchments\"\
-            : [\n  {\n  \"name\": \"CatchmentName\",            // REQUIRED - string\n\
-            \  \"locationIds\": [\"id of Location1\", \"id of Location2\"]  // array\
-            \ of location references\n  }\n  ],\n  \"subjectTypes\": [\n  {\n  \"\
-            name\": \"SubjectTypeName\",          // REQUIRED - string\n  \"uuid\"\
-            : \"generate-v4-uuid\",        // REQUIRED - generate v4 uuid\n  \"type\"\
-            : \"Person\",                   // REQUIRED - enum: Person|Group|User|Individual|Household\n\
-            \  \"active\": true,                     // boolean - default true\n \
-            \ \"voided\": false,                    // boolean - default false\n \
-            \ \"group\": false,                     // boolean - true for group types\n\
-            \  \"household\": false,                 // boolean - true for household\
-            \ types\n  \"allowEmptyLocation\": true,         // boolean - default\
-            \ true\n  \"allowMiddleName\": false,           // boolean - default false\n\
-            \  \"lastNameOptional\": false,          // boolean - default false\n\
-            \  \"allowProfilePicture\": false,       // boolean - default false\n\
-            \  \"uniqueName\": false,                // boolean - default false\n\
-            \  \"directlyAssignable\": false,        // boolean - default false\n\
-            \  \"shouldSyncByLocation\": true,       // boolean - default true\n \
-            \ \"settings\": {                       // object - display settings\n\
-            \  \"displayRegistrationDetails\": true,\n  \"displayPlannedEncounters\"\
-            : true\n  },\n  \"groupRoles\": [                     // array - for household/group\
-            \ types, define member roles\n  {\n  \"subjectMemberName\": \"string\"\
-            ,      // REQUIRED - name of member subject type\n  \"groupRoleUUID\"\
-            : \"generate-v4-uuid\", // REQUIRED - generate v4 uuid for role\n  \"\
-            groupSubjectTypeUUID\": \"reference-group-uuid\", // REQUIRED - reference\
-            \ to group subject type\n  \"memberSubjectTypeUUID\": \"reference-member-uuid\"\
-            , // REQUIRED - reference to member subject type\n  \"role\": \"string\"\
-            ,                   // REQUIRED - role name (e.g., \"Head of Household\"\
-            , \"Household Member\")\n  \"minimumNumberOfMembers\": 1,          //\
-            \ REQUIRED - minimum number of members for this role\n  \"maximumNumberOfMembers\"\
-            : 1,          // REQUIRED - maximum number of members for this role\n\
-            \  \"isPrimary\": true,                    // REQUIRED - boolean, true\
-            \ for primary role\n  \"voided\": false                       // REQUIRED\
-            \ - boolean, default false\n  }\n  ],\n  \"registrationFormUuid\": null\
-            \        // nullable - auto-generated\n  }\n  ],\n  \"programs\": [\n\
-            \  {\n  \"name\": \"ProgramName\",              // REQUIRED - string\n\
-            \  \"uuid\": \"generate-v4-uuid\",        // REQUIRED - generate v4 uuid\n\
-            \  \"colour\": \"#4CAF50\",                // REQUIRED - hex color\n \
-            \ \"subjectTypeUuid\": \"reference-subject-uuid\", // REQUIRED - reference\
-            \ to subject type\n  \"programSubjectLabel\": \"Participant Label\", //\
-            \ string - how subjects are labeled\n  \"active\": true,             \
-            \        // boolean - default true\n  \"voided\": false,             \
-            \       // boolean - default false\n  \"showGrowthChart\": false,    \
-            \       // boolean - true for health programs\n  \"allowMultipleEnrolments\"\
+            \        // boolean - default false\n  }\n  // CRITICAL: When creating\
+            \ multiple address level types with different levels, ensure proper hierarchy:\n\
+            \  // - Top level (highest number): parentId: null\n  // - Child levels:\
+            \ parentId: \"id of ParentTypeName\" \n  // Example: State (level 3, parentId:\
+            \ null), District (level 2, parentId: \"id of State\"), Village (level\
+            \ 1, parentId: \"id of District\")\n  ],\n  \"locations\": [\n  {\n  \"\
+            name\": \"LocationName\",             // REQUIRED - string\n  \"level\"\
+            : 3,                         // REQUIRED - number, matches addressLevelType\
+            \ level\n  \"type\": \"AddressLevelTypeName\",     // REQUIRED - string,\
+            \ must match addressLevelType name\n  \"parents\": []                \
+            \       // array - [] for top level, [{\"id\": \"id of ParentLocationName\"\
+            }] for children\n  }\n  ],\n  \"catchments\": [\n  {\n  \"name\": \"CatchmentName\"\
+            ,            // REQUIRED - string\n  \"locationIds\": [\"id of Location1\"\
+            , \"id of Location2\"]  // array of location references\n  }\n  ],\n \
+            \ \"subjectTypes\": [\n  {\n  \"name\": \"SubjectTypeName\",         \
+            \ // REQUIRED - string\n  \"uuid\": \"generate-v4-uuid\",        // REQUIRED\
+            \ - generate v4 uuid\n  \"type\": \"Person\",                   // REQUIRED\
+            \ - enum: Person|Group|User|Individual|Household\n  \"active\": true,\
+            \                     // boolean - default true\n  \"voided\": false,\
+            \                    // boolean - default false\n  \"group\": false, \
+            \                    // boolean - true for group types\n  \"household\"\
+            : false,                 // boolean - true for household types\n  \"allowEmptyLocation\"\
+            : true,         // boolean - default true\n  \"allowMiddleName\": false,\
+            \           // boolean - default false\n  \"lastNameOptional\": false,\
+            \          // boolean - default false\n  \"allowProfilePicture\": false,\
+            \       // boolean - default false\n  \"uniqueName\": false,         \
+            \       // boolean - default false\n  \"directlyAssignable\": false, \
+            \       // boolean - default false\n  \"shouldSyncByLocation\": true,\
+            \       // boolean - default true\n  \"settings\": {                 \
+            \      // object - display settings\n  \"displayRegistrationDetails\"\
+            : true,\n  \"displayPlannedEncounters\": true\n  },\n  \"groupRoles\"\
+            : [                     // array - for household/group types, define member\
+            \ roles\n  {\n  \"subjectMemberName\": \"string\",      // REQUIRED -\
+            \ name of member subject type\n  \"groupRoleUUID\": \"generate-v4-uuid\"\
+            , // REQUIRED - generate v4 uuid for role\n  \"groupSubjectTypeUUID\"\
+            : \"reference-group-uuid\", // REQUIRED - reference to group subject type\n\
+            \  \"memberSubjectTypeUUID\": \"reference-member-uuid\", // REQUIRED -\
+            \ reference to member subject type\n  \"role\": \"string\",          \
+            \         // REQUIRED - role name (e.g., \"Head of Household\", \"Household\
+            \ Member\")\n  \"minimumNumberOfMembers\": 1,          // REQUIRED - minimum\
+            \ number of members for this role\n  \"maximumNumberOfMembers\": 1,  \
+            \        // REQUIRED - maximum number of members for this role\n  \"isPrimary\"\
+            : true,                    // REQUIRED - boolean, true for primary role\n\
+            \  \"voided\": false                       // REQUIRED - boolean, default\
+            \ false\n  }\n  ],\n  \"registrationFormUuid\": null        // nullable\
+            \ - auto-generated\n  }\n  ],\n  \"programs\": [\n  {\n  \"name\": \"\
+            ProgramName\",              // REQUIRED - string\n  \"uuid\": \"generate-v4-uuid\"\
+            ,        // REQUIRED - generate v4 uuid\n  \"colour\": \"#4CAF50\",  \
+            \              // REQUIRED - hex color\n  \"subjectTypeUuid\": \"reference-subject-uuid\"\
+            , // REQUIRED - reference to subject type\n  \"programSubjectLabel\":\
+            \ \"Participant Label\", // string - how subjects are labeled\n  \"active\"\
+            : true,                     // boolean - default true\n  \"voided\": false,\
+            \                    // boolean - default false\n  \"showGrowthChart\"\
+            : false,           // boolean - true for health programs\n  \"allowMultipleEnrolments\"\
             : false,   // boolean - true for chronic conditions\n  \"manualEligibilityCheckRequired\"\
             : false, // boolean - default false\n  \"programEnrolmentFormUuid\": null,\
             \   // nullable - auto-generated\n  \"programExitFormUuid\": null    \
@@ -1267,12 +1315,12 @@ workflow:
       height: 86
       id: '17580163919060'
       position:
-        x: 1334.633954985886
-        y: 1227.2826888062627
+        x: 1388
+        y: 18
       positionAbsolute:
-        x: 1334.633954985886
-        y: 1227.2826888062627
-      selected: false
+        x: 1388
+        y: 18
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1286,12 +1334,12 @@ workflow:
       height: 136
       id: '1758608702077'
       position:
-        x: 1409.7669821360873
-        y: 414.79698163829846
+        x: 1388
+        y: 186
       positionAbsolute:
-        x: 1409.7669821360873
-        y: 414.79698163829846
-      selected: false
+        x: 1388
+        y: 186
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1306,12 +1354,12 @@ workflow:
       height: 130
       id: '1758699378772'
       position:
-        x: 1625.82809511913
-        y: 914.4985346267281
+        x: 1388
+        y: 403
       positionAbsolute:
-        x: 1625.82809511913
-        y: 914.4985346267281
-      selected: false
+        x: 1388
+        y: 403
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1335,18 +1383,18 @@ workflow:
         - '1711528708197'
         - sys.query
         retrieval_mode: multiple
-        selected: false
+        selected: true
         title: Knowledge Retrieval
         type: knowledge-retrieval
       height: 88
       id: '1758713692744'
       position:
-        x: 382.02759711954866
-        y: 745.9078304270952
+        x: 414
+        y: -655
       positionAbsolute:
-        x: 382.02759711954866
-        y: 745.9078304270952
-      selected: false
+        x: 414
+        y: -655
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1371,12 +1419,12 @@ workflow:
       height: 122
       id: '1760358453289'
       position:
-        x: 1705.917566702819
-        y: 1275.0994978584254
+        x: 1730
+        y: 0
       positionAbsolute:
-        x: 1705.917566702819
-        y: 1275.0994978584254
-      selected: false
+        x: 1730
+        y: 0
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1390,12 +1438,12 @@ workflow:
       height: 101
       id: '1760358474156'
       position:
-        x: 2002.3222401694788
-        y: 1493.4103892509604
+        x: 2092
+        y: 22
       positionAbsolute:
-        x: 2002.3222401694788
-        y: 1493.4103892509604
-      selected: false
+        x: 2092
+        y: 22
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1456,11 +1504,11 @@ workflow:
       height: 86
       id: '1760416664434'
       position:
-        x: 2073.257076977748
-        y: 1166.429215134067
+        x: 2092
+        y: -66.24690036776286
       positionAbsolute:
-        x: 2073.257076977748
-        y: 1166.429215134067
+        x: 2092
+        y: -66.24690036776286
       selected: true
       sourcePosition: right
       targetPosition: left
@@ -1476,7 +1524,7 @@ workflow:
           - conversation
           - loop
         error_handle_mode: terminated
-        height: 365.1967949198404
+        height: 416
         logical_operator: and
         loop_count: 20
         loop_variables:
@@ -1491,20 +1539,20 @@ workflow:
         start_node_id: 1760423058735start
         title: Loop
         type: loop
-        width: 2294.827952076382
-      height: 365
+        width: 1861
+      height: 416
       id: '1760423058735'
       position:
-        x: 2528.456781918812
-        y: 1138.4250404978643
+        x: 2462
+        y: 18
       positionAbsolute:
-        x: 2528.456781918812
-        y: 1138.4250404978643
-      selected: false
+        x: 2462
+        y: 18
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 2295
+      width: 1861
       zIndex: 1
     - data:
         desc: ''
@@ -1517,11 +1565,11 @@ workflow:
       id: 1760423058735start
       parentId: '1760423058735'
       position:
-        x: 24
-        y: 68
+        x: 60
+        y: 109
       positionAbsolute:
-        x: 2552.456781918812
-        y: 1206.4250404978643
+        x: 2522
+        y: 127
       selectable: false
       sourcePosition: right
       targetPosition: left
@@ -1580,12 +1628,12 @@ workflow:
       id: '1760423070414'
       parentId: '1760423058735'
       position:
-        x: 128
-        y: 68
+        x: 184
+        y: 107
       positionAbsolute:
-        x: 2656.456781918812
-        y: 1206.4250404978643
-      selected: false
+        x: 2646
+        y: 125
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1637,12 +1685,12 @@ workflow:
       id: '1760423078948'
       parentId: '1760423058735'
       position:
-        x: 588.9585434080473
-        y: 65
+        x: 506
+        y: 107
       positionAbsolute:
-        x: 3117.415325326859
-        y: 1203.4250404978643
-      selected: false
+        x: 2968
+        y: 125
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1665,12 +1713,12 @@ workflow:
       id: '1760424043492'
       parentId: '1760423058735'
       position:
-        x: 1820.320042251596
-        y: 84.25505311692177
+        x: 1492
+        y: 204
       positionAbsolute:
-        x: 4348.776824170408
-        y: 1222.680093614786
-      selected: false
+        x: 3954
+        y: 222
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1700,12 +1748,12 @@ workflow:
       id: '1760424086059'
       parentId: '1760423058735'
       position:
-        x: 1046.0845991716533
-        y: 143.16010657353922
+        x: 828
+        y: 71
       positionAbsolute:
-        x: 3574.541381090465
-        y: 1281.5851470714035
-      selected: false
+        x: 3290
+        y: 89
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1726,12 +1774,12 @@ workflow:
       id: '1760424123324'
       parentId: '1760423058735'
       position:
-        x: 1349.5771071265176
-        y: 244
+        x: 1170
+        y: 60
       positionAbsolute:
-        x: 3878.0338890453295
-        y: 1382.4250404978643
-      selected: false
+        x: 3632
+        y: 78
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1759,12 +1807,12 @@ workflow:
       id: '1760426022942'
       parentId: '1760423058735'
       position:
-        x: 1349.0904111129344
-        y: 77.31331131400293
+        x: 1170
+        y: 223
       positionAbsolute:
-        x: 3877.5471930317462
-        y: 1215.7383518118672
-      selected: false
+        x: 3632
+        y: 241
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1788,12 +1836,12 @@ workflow:
       height: 82
       id: '1760434909468'
       position:
-        x: 4883.456781918812
-        y: 1138.4250404978643
+        x: 4443.347431585707
+        y: 193.31705379355293
       positionAbsolute:
-        x: 4883.456781918812
-        y: 1138.4250404978643
-      selected: false
+        x: 4443.347431585707
+        y: 193.31705379355293
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1807,18 +1855,18 @@ workflow:
       height: 101
       id: '1763959812229'
       position:
-        x: 2576.123598722647
-        y: 922.7564220480076
+        x: 2454
+        y: 506
       positionAbsolute:
-        x: 2576.123598722647
-        y: 922.7564220480076
-      selected: false
+        x: 2454
+        y: 506
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 241
     viewport:
-      x: -1021.0727167579737
-      y: -402.2807049202015
-      zoom: 0.8078677854350997
+      x: -295.5290362338992
+      y: 1382.6999717703943
+      zoom: 1.4417223783230235
   rag_pipeline_variables: []
