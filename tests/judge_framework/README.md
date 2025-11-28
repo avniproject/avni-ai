@@ -40,24 +40,10 @@ export AVNI_AUTH_TOKEN="your_avni_token"
 export AVNI_MCP_SERVER_URL="your_mcp_url"
 ```
 
-### 2. Run Form Validation Tests
-
-```bash
-# Run comprehensive form validation tests
-python test_form_validation_runner.py comprehensive
-
-# Run focused violation detection tests  
-python test_form_validation_runner.py violation_detection
-
-# Run basic validation tests
-python test_form_validation_runner.py basic
-```
-
-### 3. View Results
-
-- **Form validation reports**: `tests/judge_framework/reports/formElementValidation/`
-- **Conversation reports**: `conversation_test_report.json` and `conversation_test_report.csv`
-- **Console reports**: Displayed in terminal for both use cases
+3. **Run with Fail-Fast** (optional):
+   ```bash
+   python test_form_validation_runner.py --fail-fast
+   ```
 
 ## 📁 Directory Structure
 

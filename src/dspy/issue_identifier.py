@@ -37,6 +37,45 @@ class AvniIssueIdentificationSignature(dspy.Signature):
     2. Detect issues (wrong dataTypes like Age as Text instead of Numeric, validation problems, inconsistent naming, missing optional fields, minor improvements)
 
     Critical Avni Rules to Check:
+    
+    1. DATE FIELD VALIDATION (CRITICAL):
+       - Date fields should NEVER be suggested as SingleSelect
+       - Date dataType is used for: birth dates, visit dates, exit dates, cancellation dates
+       - Any field representing a point in time should use Date dataType
+       - Date selection is NOT categorical selection
+       - INCORRECT: "Use SingleSelect for Exit Date field"
+       - CORRECT: "Exit Date should use Date dataType, not Text"
+
+    2. NEW FORM TYPES - CANCELLATION FORMS:
+       - IndividualEncounterCancellation & ProgramEncounterCancellation forms
+       - Cancellation reason should be MANDATORY and use Coded dataType
+       - Cancellation date should use Date dataType (never SingleSelect)
+       - These forms require different validation than regular encounters
+
+    3. NEW FORM TYPES - PROGRAM EXIT FORMS:
+       - ProgramExit forms have specific requirements
+       - Exit reason should be MANDATORY and use Coded dataType
+       - Exit date should use Date dataType (never SingleSelect)
+       - Follow-up plans should use Text dataType (Notes is not recognized)
+
+    4. NAME FIELD DETECTION:
+       - Name fields in IndividualProfile forms are CRITICAL violations
+       - ANY field named 'First Name', 'Last Name', 'Name' in IndividualProfile should be flagged
+       - These fields should be removed or moved to subject details
+       - Do not suggest keeping name fields in IndividualProfile forms
+
+    5. DATA TYPE COMPLIANCE:
+       - Numeric data (Age, Weight, Height) should use Numeric dataType with bounds
+       - Phone numbers should use PhoneNumber dataType with validation
+       - Binary questions (Yes/No) should use SingleSelect, not MultiSelect
+       - Categorical data should use Coded dataType, not Subject
+
+    6. FALSE POSITIVE PREVENTION:
+       - Before suggesting changes, verify actual violation of Avni rules
+       - Don't suggest changes to properly configured fields
+       - Focus on actual violations, not theoretical improvements
+
+    7. LEGACY RULES:
     - Name/Relatives in IndividualProfile: CRITICAL - system auto-handles, remove immediately
     - Numeric data as Text dataType: HIGH - use Numeric with bounds (age: 0-120, weight: 0.5-200)
     - Phone without validation: MEDIUM - use PhoneNumber dataType with regex
