@@ -35,7 +35,6 @@
     },
     "form_context": {
       "formType": "Location",
-      "domain": "health",
       "formName": "Location Attribute Form"
     },
     "expected_issues": [],
@@ -64,7 +63,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [
@@ -95,7 +93,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [
@@ -128,7 +125,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [],
@@ -157,7 +153,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [
@@ -188,7 +183,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [],
@@ -234,7 +228,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [
@@ -282,7 +275,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [],
@@ -311,7 +303,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [
@@ -367,7 +358,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [],
@@ -396,7 +386,6 @@
     },
     "form_context": {
       "formType": "IndividualProfile",
-      "domain": "health",
       "formName": "Patient Registration"
     },
     "expected_issues": [],
@@ -425,7 +414,6 @@
     },
     "form_context": {
       "formType": "ProgramExit",
-      "domain": "health",
       "formName": "Program Exit Form"
     },
     "expected_issues": [],
@@ -454,7 +442,6 @@
     },
     "form_context": {
       "formType": "IndividualEncounterCancellation",
-      "domain": "health",
       "formName": "Encounter Cancellation Form"
     },
     "expected_issues": [],
@@ -508,7 +495,6 @@
     },
     "form_context": {
       "formType": "IndividualEncounterCancellation",
-      "domain": "health",
       "formName": "Encounter Cancellation Form"
     },
     "expected_issues": [],
@@ -562,7 +548,6 @@
     },
     "form_context": {
       "formType": "ProgramExit",
-      "domain": "health",
       "formName": "Program Exit Form"
     },
     "expected_issues": [],
@@ -591,7 +576,6 @@
     },
     "form_context": {
       "formType": "ProgramExit",
-      "domain": "health",
       "formName": "Program Exit Form"
     },
     "expected_issues": [],
@@ -620,7 +604,6 @@
     },
     "form_context": {
       "formType": "ProgramEncounter",
-      "domain": "health",
       "formName": "Growth Monitoring"
     },
     "expected_issues": [
@@ -654,7 +637,6 @@
     },
     "form_context": {
       "formType": "ProgramEncounter",
-      "domain": "health",
       "formName": "Growth Monitoring"
     },
     "expected_issues": [],
