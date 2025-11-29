@@ -98,6 +98,7 @@ workflow:
         sourceType: llm
         targetType: answer
       id: 1762509929006-source-1762500391975-target
+      selected: false
       source: '1762509929006'
       sourceHandle: source
       target: '1762500391975'
@@ -107,10 +108,69 @@ workflow:
     - data:
         isInLoop: false
         sourceType: start
-        targetType: llm
-      id: 1711528708197-source-1762509929006-target
+        targetType: if-else
+      id: 1711528708197-source-1732870000001-target
+      selected: false
       source: '1711528708197'
       sourceHandle: source
+      target: '1732870000001'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1732870000001-true-1762509929006-target
+      selected: false
+      source: '1732870000001'
+      sourceHandle: 'true'
+      target: '1762509929006'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1732870000002-source-1732870000003-target
+      selected: false
+      source: '1732870000002'
+      sourceHandle: source
+      target: '1732870000003'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1732870000003-source-1732870000004-target
+      selected: false
+      source: '1732870000003'
+      sourceHandle: source
+      target: '1732870000004'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: knowledge-retrieval
+      id: 1732870000001-7a557c49-05d9-4157-8b6b-ce31b2ed7d6a-1732870000002-target
+      source: '1732870000001'
+      sourceHandle: 7a557c49-05d9-4157-8b6b-ce31b2ed7d6a
+      target: '1732870000002'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1732870000001-false-1762509929006-target
+      source: '1732870000001'
+      sourceHandle: 'false'
       target: '1762509929006'
       targetHandle: target
       type: custom
@@ -163,7 +223,19 @@ workflow:
           required: false
           type: text-input
           variable: avni_mcp_server_url
-      height: 257
+        - default: FormValidation
+          hide: true
+          hint: ''
+          label: requestType
+          max_length: 48
+          options:
+          - FormValidation
+          - VisitSchedule
+          placeholder: ''
+          required: false
+          type: select
+          variable: requestType
+      height: 283
       id: '1711528708197'
       position:
         x: 352.0294910460403
@@ -269,18 +341,209 @@ workflow:
       height: 88
       id: '1762509929006'
       position:
-        x: 788.9539393413614
-        y: 773.9301370756358
+        x: 942.0309443515424
+        y: 598.0544291915982
       positionAbsolute:
-        x: 788.9539393413614
-        y: 773.9301370756358
+        x: 942.0309443515424
+        y: 598.0544291915982
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: empty
+            id: cond1
+            value: ''
+            variable_selector:
+            - '1711528708197'
+            - requestType
+          - comparison_operator: contains
+            id: 17398e4a-6c23-439c-bcf6-dc68c0821d86
+            value: FormValidation
+            varType: string
+            variable_selector:
+            - '1711528708197'
+            - requestType
+          id: 'true'
+          logical_operator: and
+        - case_id: 7a557c49-05d9-4157-8b6b-ce31b2ed7d6a
+          conditions:
+          - comparison_operator: contains
+            id: 5616159f-cdde-4331-abd4-65c4caf180c6
+            value: VisitSchedule
+            varType: string
+            variable_selector:
+            - '1711528708197'
+            - requestType
+          id: 7a557c49-05d9-4157-8b6b-ce31b2ed7d6a
+          logical_operator: and
+        logical_operator: and
+        selected: false
+        title: Route by Request Type
+        type: if-else
+      height: 198
+      id: '1732870000001'
+      position:
+        x: 650
+        y: 750
+      positionAbsolute:
+        x: 650
+        y: 750
       selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
+    - data:
+        dataset_ids:
+        - PbU6BVReZ2F8Rm8JIn99UcGfvldJo3V6x0FYp4TfMA3owZBXaUbASK7kegUbSk8S
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: weighted_score
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: text-embedding-3-large
+              embedding_provider_name: langgenius/openai/openai
+              vector_weight: 0.7
+            weight_type: customized
+        query_variable_selector:
+        - '1711528708197'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: Knowledge Retrieval - Visit Schedule
+        type: knowledge-retrieval
+      height: 90
+      id: '1732870000002'
+      position:
+        x: 950
+        y: 900
+      positionAbsolute:
+        x: 950
+        y: 900
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1732870000002'
+          - result
+        memory:
+          query_prompt_template: '{{#sys.query#}}\n\n\n            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 100
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: vs-prompt-1
+          role: system
+          text: "# Avni Visit Scheduling Rule Generator — Final Production Prompt\n\
+            \nYou are the world's best Avni (OpenCHS) rules engineer.\n\nYou are always\
+            \ given two things:\n1. A clear user request (e.g. \"Schedule ANC follow-up\
+            \ 28 days after current ANC visit\")\n2. Complete technical context as\
+            \ JSON (encounter types, program, concepts, etc.)\n\nThis context is 100%\
+            \ authoritative and always present.\n\n## Your Golden Rule\nOnly ask questions\
+            \ if something is genuinely missing or ambiguous.  \nOtherwise: understand\
+            \ silently and move fast.\n\n## Default Assumptions (unless contradicted)\n\
+            \ - Trigger = completion of current encounter\n- Reference date = encounterDateTime\
+            \ of current encounter\n- Flexibility window = ±7 days (e.g., 28 days\
+            \ → 21–35 days window)\n- Next visit name = exactly as listed in context\n\
+            \ - Stop scheduling after \"Delivery\" (pregnancy programs) or last visit\
+            \ in sequence\n- Program name = \"Maternal Health\" or as specified in\
+            \ context\n\n## Step-by-Step Behavior\n\n### 1. Understand (Silent)\n\
+            \ Read the user request + full context JSON.\n\nIf everything is clear\
+            \ (95% of cases):\n→ Do NOT ask any questions\n→ Do NOT say \"I understand\"\
+            \ or mention phases\n→ Go straight to step 2\n\nOnly ask if:\n- Next visit\
+            \ name is not in context\n- Timing is completely missing (e.g. \"schedule\
+            \ follow-up\" with no days/weeks)\n- Trigger is unclear (enrollment vs\
+            \ encounter)\n- Conflicting info between request and context\n\n### 2.\
+            \ Validate (Always Do This)\nPresent a clean table with 3–4 real-world\
+            \ scenarios showing exactly when the rule will trigger.\n\nExample:\n\
+            \ | Case                  | Trigger            | Reference Date     |\
+            \ Next Visit         | Earliest   | Latest     | Will Schedule? |\n|-----------------------|--------------------|--------------------|--------------------|------------|------------|----------------|\n\
+            \ | Standard ANC visit    | ANC completed      | 2025-04-01         |\
+            \ ANC - Follow Up    | 2025-04-22 | 2025-05-06 | Yes            |\n| Early\
+            \ completion      | ANC on day 20      | 2025-03-20         | ANC - Follow\
+            \ Up        | Today      | +14 days   | Yes            |\n| After Delivery\
+            \ | Delivery recorded  | 2025-06-15         | (none)           | —   \
+            \       | —          | No             |\n\nThen ask:\nDo these scenarios\
+            \ match exactly what you want?  \nReply **YES** to get the final rule\
+            \ code, or tell me what to change.\n\n### 3. Generate Code (Only After\
+            \ User Says \"YES\")\nDeliver:\n1. Complete, clean, production-ready JavaScript\
+            \ rule\n2. One-line plain English summary\n3. No extra chatter\n Use this\
+            \ exact code format:\n```javascript\n\"use strict\";\n({params, imports})\
+            \ => {\n    const { entity, today } = params;\n    const builder = new\
+            \ imports.rulesConfig.VisitScheduleBuilder({entity});\n\n    // Example:\
+            \ ANC to ANC Follow Up (28 days ±7)\n    if (entity.encounter?.encounterType?.name\
+            \ === \"ANC\") {\n        if (entity.individual.hasEncounterOfType(\"\
+            \ Delivery\")) return builder.getAll();\n\n        const baseDate = entity.encounterDateTime;\n\
+            \ builder.scheduleNext({\n            visitType: \"ANC - Follow Up\",\n\
+            \            earliestDate: baseDate.addDays(21),\n            dueDate:\
+            \ baseDate.addDays(28),\n            maxDate: baseDate.addDays(35)\n });\
+            \ }\n\n    return builder.getAll();\n};\n\n## Context and Technical Details\n\
+            \nUse this context for technical implementation: {{#context#}}"
+        - id: vs-prompt-2
+          role: user
+          text: '{{#sys.query#}} {{#sys.files#}}'
+        reasoning_format: tagged
+        selected: false
+        title: LLM - Visit Schedule
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '1732870000003'
+      position:
+        x: 1250
+        y: 900
+      positionAbsolute:
+        x: 1250
+        y: 900
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1732870000003.text#}}'
+        selected: false
+        title: Answer - Visit Schedule
+        type: answer
+        variables: []
+      height: 103
+      id: '1732870000004'
+      position:
+        x: 1550
+        y: 900
+      positionAbsolute:
+        x: 1550
+        y: 900
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
     viewport:
-      x: -838.2087947286182
-      y: -1321.6719624790758
-      zoom: 1.8248882878024235
+      x: -360.1692307147818
+      y: -109.80109595294499
+      zoom: 0.7
   rag_pipeline_variables: []
