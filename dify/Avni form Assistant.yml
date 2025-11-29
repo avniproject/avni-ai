@@ -166,11 +166,11 @@ workflow:
       height: 257
       id: '1711528708197'
       position:
-        x: 78.04011682406383
-        y: 713.2058315649839
+        x: 352.0294910460403
+        y: 721.9734915400871
       positionAbsolute:
-        x: 78.04011682406383
-        y: 713.2058315649839
+        x: 352.0294910460403
+        y: 721.9734915400871
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -204,179 +204,59 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: gpt-4-turbo
+          name: gpt-5.1
           provider: langgenius/openai/openai
         prompt_template:
         - id: bcaaf498-89b5-4273-bc8c-5a28f60018e1
           role: system
-          text: "�\x05�&/}�(�\x19question_analyzer.predict�}�(�\x06traces�]��\x05\
-            train�]��\x05demos�]�(�\x17dspy.primitives.example��\aExample���)��}�(�\x06\
-            _store�}�(�  augmented���\nquestion_text��\x0EAge of patient��\aoptions����\a\
-            context��}AVNI RULES: Text dataType for numeric fields like Age should\
-            \ be Numeric dataType. Current: dataType: Text, type: SingleSelect�� reasoning���The\
-            \ current dataType for the age field is set to Text, which is inappropriate\
-            \ for a numeric value like age. Age should be represented as a Numeric\
-            \ dataType to allow for proper data entry, validation, and calculations.��\b\
-            dataType��\aNumeric��\x04type��\fSingleSelect��\vavni_issues��BHIGH: Age\
-            \ field incorrectly using Text dataType instead of Numeric��\x0Erecommendation��WChange\
-            \ the dataType from Text to Numeric to accurately reflect the nature of\
-            \ the field.�u�\x06_demos�]��\v_input_keys�Nubh\v)��}�(h\x0E}�(h\x10�h\x11\
-            �\nChild details�h\x13h\x14h\x15�~AVNI RULES: Children as repeatable groups\
-            \ should be separate subject types. Current: dataType: QuestionGroup,\
-            \ repeatable: true��  reasoning�X\f\x01The current configuration treats\
-            \ child details as a QuestionGroup, but according to AVNI rules, children\
-            \ should be represented as separate subject types rather than grouped\
-            \ as a QuestionGroup. This ensures that each child can be managed individually\
-            \ within the system.��\bdataType��\aSubject��\x04type��\nQuestionGroup��\v\
-            avni_issues��jHIGH: Children should be represented as separate subject\
-            \ types instead of being grouped in a QuestionGroup��\x0Erecommendation��sChange\
-            \ the dataType from QuestionGroup to separate household subject types\
-            \ for each child to comply with AVNI rules�uh!]�h#Nubh\v)��}�(h\x0E}�(h\x11\
-            �\x12Preferred Language�h\x13�\x1DEnglish, Hindi, Telugu, Tamil�h\x15\
-            �nAVNI RULES: Subject dataType should only be for relationships. Current:\
-            \ dataType: Subject for categorical data��\bdataType��\x05Coded��\x04\
-            type��\fSingleSelect��\vavni_issues��WMEDIUM: Subject dataType inappropriate\
-            \ for categorical data - should use Coded dataType��\x0Erecommendation��oChange\
-            \ dataType from Subject to Coded with SingleSelect type and proper answer\
-            \ options for language preferences�uh!]�h#Nubh\v)��}�(h\x0E}�(�\x0Eform_structure���{\"\
-            name\": \"Patient Registration\", \"formType\": \"IndividualProfile\"\
-            , \"formElementGroups\": [{\"formElements\": [{\"name\": \"Age\", \"concept\"\
-            : {\"dataType\": \"Text\"}}, {\"name\": \"Phone\", \"concept\": {\"dataType\"\
-            : \"Text\"}}]}]}��\x06domain��\x06health��\x10analysis_options��K{\"include_suggestions\"\
-            : true, \"focus_areas\": [\"validation\", \"field_types\"]}��\x06issues�XI\x01\
-            [{\"category\": \"logic\", \"message\": \"Age field using Text dataType\
-            \ should use Numeric\", \"severity\": \"high\", \"suggest_fix\": \"Change\
-            \ to Numeric dataType with bounds 0-120\"}, {\"category\": \"validation\"\
-            , \"message\": \"Phone field missing validation pattern\", \"severity\"\
-            : \"medium\", \"suggest_fix\": \"Add regex validation for phone numbers\"\
-            }]��\vsuggestions�XT\x01[{\"type\": \"field_optimization\", \"title\"\
-            : \"Add emergency contact field\", \"description\": \"Health forms should\
-            \ include emergency contact\", \"priority\": \"high\", \"implementation\"\
-            : {\"dataType\": \"Text\", \"required\": true}}, {\"type\": \"validation\"\
-            , \"title\": \"Add phone number validation\", \"description\": \"Validate\
-            \ phone format\", \"priority\": \"medium\"}]��\x16ranked_recommendations�X\n\
-            \x01[{\"rank\": 1, \"type\": \"field_optimization\", \"title\": \"Fix\
-            \ age dataType\", \"priority\": \"high\"}, {\"rank\": 2, \"type\": \"\
-            new_field\", \"title\": \"Add emergency contact\", \"priority\": \"high\"\
-            }, {\"rank\": 3, \"type\": \"validation\", \"title\": \"Phone validation\"\
-            , \"priority\": \"medium\"}]��\x11executive_summary�X+\x01{\"overview\"\
-            : \"Form needs critical dataType fixes and validation improvements\",\
-            \ \"key_metrics\": {\"total_issues\": 2, \"total_suggestions\": 2, \"\
-            high_priority\": 3}, \"top_actions\": [\"Fix age field dataType\", \"\
-            Add emergency contact\", \"Implement phone validation\"], \"overall_assessment\"\
-            : \"needs_improvement\"}�uh!]�h#Nubh\v)��}�(h\x0E}�(hFX\x16\x01{\"name\"\
-            : \"Health Assessment\", \"formElementGroups\": [{\"formElements\": [{\"\
-            name\": \"Weight\", \"concept\": {\"dataType\": \"Numeric\", \"lowAbsolute\"\
-            : 1, \"highAbsolute\": 200, \"unit\": \"kg\"}}, {\"name\": \"Blood Group\"\
-            , \"concept\": {\"dataType\": \"Coded\", \"answers\": [\"A+\", \"B+\"\
-            , \"O+\", \"AB+\"]}}]}]}�hHhIhL�\x02[]��\asummary��O{\"total_issues\"\
-            : 0, \"by_severity\": {}, \"overall_assessment\": \"well_structured\"\
-            }��\x0Frecommendations��J[\"Consider adding emergency contact field for\
-            \ health domain completeness\"]��\x12severity_breakdown��1{\"critical\"\
-            : 0, \"high\": 0, \"medium\": 0, \"low\": 0}�uh!]�h#Nubh\v)��}�(h\x0E\
-            }�(h\x11�\x04Name�h\x13h\x14h\x15��AVNI RULES: Name fields in registration\
-            \ forms are CRITICAL issues - system auto-handles name collection. formType:\
-            \ IndividualProfile, dataType: Text�h:�\x02NA�h<h\x14h>�nCRITICAL: Name\
-            \ fields should not be manually added to registration forms - system auto-handles\
-            \ name collection�h@�cRemove manual name field as Avni system automatically\
-            \ handles name collection in registration forms�uh!]�h#Nubh\v)��}�(h\x0E\
-            }�(h\x11�\x1ADo you have a ration card?�h\x13�\ayes, no�h\x15�pAVNI RULES:\
-            \ MultiSelect for Yes/No questions should be SingleSelect. Current: type:\
-            \ MultiSelect, dataType: Coded�h:h;h<h=h>�NMEDIUM: Binary question using\
-            \ MultiSelect should use SingleSelect type instead�h@�HChange type from\
-            \ MultiSelect to SingleSelect for binary Yes/No questions�uh!]�h#Nubh\v\
-            )��}�(h\x0E}�(h\x11� Relatives�h\x13h\x14h\x15��AVNI RULES: Relatives\
-            \ in individual registration should use household subject types. Current:\
-            \ dataType: Subject, formType: IndividualProfile�h:hfh<h\x14h>�oHIGH:\
-            \ Relatives field in individual registration should use household subject\
-            \ types instead of Subject dataType�h@�wRemove relatives field from individual\
-            \ forms and use proper household subject type relationships for family\
-            \ connections�uh!]�h#Nube�    signature�}�(�\finstructions�X`\x01Using\
-            \ the provided question text, options, and context, predict the corresponding\
-            \ data type and field type for the form field. Ensure to identify any\
-            \ critical or high Avni rule violations and provide actionable recommendations\
-            \ for compliance. Think critically about the relationship between the\
-            \ question content and the expected handling of data types.��\x06fields�]�(}�(�\x06\
-            prefix��\x0EQuestion Text:��\vdescription��\x1DThe text of the form question�u}�(h��\b\
-            Options:�h��)Available answer options, comma-separated�u}�(h��\bContext:�h��FAvni\
-            \ form rules and domain context including current dataType and type�u}�(h��/Reasoning:\
-            \ Let's think step by step in order to�h��\f${reasoning}�u}�(h��\nData\
-            \ Type:�h���Avni dataType - one of: Numeric, Text, Notes, Coded, NA, Date,\
-            \ DateTime, Time, Duration, Image, ImageV2, Id, Video, Subject, Location,\
-            \ PhoneNumber, GroupAffiliation, Audio, File, QuestionGroup, Encounter�u}�(h��\x05\
-            Type:�h��-Avni type - one of: SingleSelect, MultiSelect�u}�(h��\fAvni\
-            \ Issues:�h��?CRITICAL/HIGH/MEDIUM/NONE - specific Avni rule violations\
-            \ found�u}�(h��\x0FRecommendation:�h��%Specific action to take to fix\
-            \ issues�ueu�\x02lm�Nu�\x16form_validator.predict�}�(h\x03]�h\x05]�h\a\
-            ]�(h\v)��}�(h\x0E}�(hFhXhHhIhLhYhZh[h\\h]h^h_uh!]�h#Nubh\v)��}�(h\x0E\
-            }�(hFhGhHhIhJhKhLhMhNhOhPhQhRhSuh!]�h#Nubh\v)��}�(h\x0E}�(h\x11hmh\x13\
-            hnh\x15hoh:h;h<h=h>hph@hquh!]�h#Nubeh{}�(h}X;\x04You are an expert form\
-            \ validation consultant specialized in healthcare form analysis. Your\
-            \ task is to analyze the provided `form_structure` JSON according to the\
-            \ domain specified (healthcare, education, etc.) and validate it against\
-            \ critical Avni rules. Please articulate your reasoning in a step-by-step\
-            \ manner. Identify and categorize any issues found in the form, provide\
-            \ a summary of your findings, and suggest actionable recommendations along\
-            \ with a breakdown of issues by severity. \n\nOutput format\nThe output\
-            \ should be a JSON object with the following fields: uuid, message. Do\
-            \ not include any other fields. Message should be max 20 words. Pick the\
-            \ first error that you see and nothing else for the message\n\nEnsure\
-            \ that all feedback is clear and actionable for users to enhance the form\
-            \ design and maintain data integrity.�h\x7F]�(}�(h��\x0FForm Structure:�h��OComplete\
-            \ Avni form JSON with critical rules context and validation requirements�u}�(h��\a\
-            Domain:�h��EDomain context (health, education, survey) for specialized\
-            \ validation�u}�(h�h�h�h�u}�(h��\aIssues:�h��SComplete list of issues\
-            \ found with category, message, severity, and suggested fixes�u}�(h��\b\
-            Summary:�h��XSummary statistics: total issues, breakdown by category and\
-            \ severity, overall assessment�u}�(h��\x10Recommendations:�h��CPrioritized\
-            \ list of actionable recommendations for form improvement�u}�(h��\x13\
-            Severity Breakdown:�h��8Count of issues by severity: critical, high, medium,\
-            \ low�ueuh�Nu�\x19complete_analyzer.predict�}�(h\x03]�h\x05]�h\a]�(h\v\
-            )��}�(h\x0E}�(h\x11hvh\x13h\x14h\x15hwh:hfh<h\x14h>hxh@hyuh!]�h#Nubh\v\
-            )��}�(h\x0E}�(h\x11hdh\x13h\x14h\x15heh:hfh<h\x14h>hgh@hhuh!]�h#Nubh\v\
-            )��}�(h\x0E}�(hFhXhHhIhLhYhZh[h\\h]h^h_uh!]�h#Nubh\v)��}�(h\x0E}�(hFhGhHhIhJhKhLhMhNhOhPhQhRhSuh!]�h#Nubh\v\
-            )��}�(h\x0E}�(h\x11h7h\x13h8h\x15h9h:h;h<h=h>h?h@hAuh!]�h#Nubh\v)��}�(h\x0E\
-            }�(h\x11hmh\x13hnh\x15hoh:h;h<h=h>hph@hquh!]�h#Nubeh{}�(h}XK\x06You are\
-            \ an expert Avni form improvement consultant specializing in healthcare\
-            \ form analysis.\n\nYour task is to analyze Avni form JSON structures\
-            \ and provide comprehensive, actionable recommendations.\n\nCritical Avni\
-            \ Rules:\n- Name/Relatives in IndividualProfile: CRITICAL - system auto-handles,\
-            \ remove immediately\n- Numeric data as Text dataType: HIGH - use Numeric\
-            \ with bounds (age: 0-120, weight: 0.5-200)\n- Phone without validation:\
-            \ MEDIUM - use PhoneNumber dataType with regex\n- Voided fields present:\
-            \ MEDIUM - remove completely from active forms\n- Subject dataType for\
-            \ categories: MEDIUM - use Coded dataType instead\n\nOutput Format Requirements:\n\
-            1. Issues: JSON array with category, message, severity, formElementUuid,\
-            \ formElementName, suggestedFix\n2. Suggestions: JSON array with type,\
-            \ title, description, priority, formElementUuid, currentValue, suggestedValue,\
-            \ rationale\n3. Ranked Recommendations: JSON array with priority, title,\
-            \ description, affectedElements array with uuid/name/action\n4. Executive\
-            \ Summary: JSON object with totalIssues, criticalIssues, affectedElements\
-            \ count, topPriority action, overallScore\n\nAlways reference specific\
-            \ form element UUIDs so the UI can highlight exact fields needing changes.\n\
-            Provide exact Avni dataTypes and implementation details.�h\x7F]�(}�(h��\x0F\
-            Form Structure:�h��`Complete Avni form JSON with formElementGroups, field\
-            \ configurations, and UUIDs for all elements�u}�(h��\x11Analysis Options:�h��9Analysis\
-            \ configuration options (focus areas, depth, etc.)�u}�(h�h�h�h�u}�(h��\a\
-            Issues:�h�X\x11\x01JSON array of issues: [{\"category\": \"Data Integrity\"\
-            , \"message\": \"Field has wrong type\", \"severity\": \"High\", \"formElementUuid\"\
-            : \"4e2a73f4-f498-4a9a-ae51-84434e6d2cca\", \"formElementName\": \"What\
-            \ is the body temp?\", \"suggestedFix\": \"Change type from SingleSelect\
-            \ to Numeric\"}]�u}�(h��\fSuggestions:�h�XF\x01JSON array of suggestions:\
-            \ [{\"type\": \"Field Type Fix\", \"title\": \"Fix Temperature Field\"\
-            , \"description\": \"Change to proper data type\", \"priority\": \"High\"\
-            , \"formElementUuid\": \"4e2a73f4-f498-4a9a-ae51-84434e6d2cca\", \"currentValue\"\
-            : \"SingleSelect\", \"suggestedValue\": \"Numeric\", \"rationale\": \"\
-            Temperature should be numeric input\"}]�u}�(h��\x17Ranked Recommendations:�h�X&\x01\
-            JSON array of prioritized recommendations: [{\"priority\": \"High\", \"\
-            title\": \"Fix Critical Field Types\", \"description\": \"Update field\
-            \ types for accuracy\", \"affectedElements\": [{\"uuid\": \"4e2a73f4-f498-4a9a-ae51-84434e6d2cca\"\
-            , \"name\": \"What is the body temp?\", \"action\": \"Change type to Numeric\"\
-            }]}]�u}�(h��\x12Executive Summary:�h���JSON object with summary: {\"totalIssues\"\
-            : 3, \"criticalIssues\": 1, \"affectedElements\": 4, \"topPriority\":\
-            \ \"Fix field types for accuracy\", \"overallScore\": 75}�ueuh�Nu�\bmetadata�}��\x13\
-            dependency_versions�}�(�\x06python��\x043.13��\x04dspy��\x053.0.3��\v\
-            cloudpickle��\x033.1�usu."
+          text: "You are an expert Avni form element validator specializing in identifying\
+            \ form issues and rule violations.\n\n\n    Your task is to analyze Avni\
+            \ form element JSON structures and identify all problems, violations,\
+            \ and issues.\n\n\n    Key Responsibilities:\n    1. Identify violations\
+            \ (Name fields in registration - system auto-handles these)\n    2. Detect\
+            \ issues (wrong dataTypes like Age as Text instead of Numeric, validation\
+            \ problems, inconsistent naming, missing optional fields, minor improvements)\n\
+            \n\n    Critical Avni Rules to Check:\n    \n    1. DATE FIELD VALIDATION\
+            \ (CRITICAL):\n       - Date fields should NEVER be suggested as SingleSelect\n\
+            \       - Date dataType is used for: birth dates, visit dates, exit dates,\
+            \ cancellation dates\n       - Any field representing a point in time\
+            \ should use Date dataType\n       - Date selection is NOT categorical\
+            \ selection\n       - INCORRECT: \"Use SingleSelect for Exit Date field\"\
+            \n       - CORRECT: \"Exit Date should use Date dataType, not Text\"\n\
+            \n\n    2. NEW FORM TYPES - CANCELLATION FORMS:\n       - IndividualEncounterCancellation\
+            \ & ProgramEncounterCancellation forms\n       - Cancellation reason should\
+            \ be MANDATORY and use Coded dataType\n       - Cancellation date should\
+            \ use Date dataType (never SingleSelect)\n       - These forms require\
+            \ different validation than regular encounters\n\n\n    3. NEW FORM TYPES\
+            \ - PROGRAM EXIT FORMS:\n       - ProgramExit forms have specific requirements\n\
+            \       - Exit reason should be MANDATORY and use Coded dataType\n   \
+            \    - Exit date should use Date dataType (never SingleSelect)\n     \
+            \  - Follow-up plans should use Text dataType (Notes is not recognized)\n\
+            \n\n    4. NAME FIELD DETECTION:\n       - Name fields in IndividualProfile\
+            \ forms are CRITICAL violations\n       - ANY field named 'First Name',\
+            \ 'Last Name', 'Name' in IndividualProfile should be flagged\n       -\
+            \ These fields should be removed or moved to subject details\n       -\
+            \ Do not suggest keeping name fields in IndividualProfile forms\n\n\n\
+            \    5. DATA TYPE COMPLIANCE:\n       - Numeric data (Age, Weight, Height)\
+            \ should use Numeric dataType with bounds\n       - Phone numbers should\
+            \ use PhoneNumber dataType with validation\n       - Binary questions\
+            \ (Yes/No) should use SingleSelect, not MultiSelect\n       - Categorical\
+            \ data should use Coded dataType, not Subject\n\n\n    6. FALSE POSITIVE\
+            \ PREVENTION:\n       - Before suggesting changes, verify actual violation\
+            \ of Avni rules\n       - Don't suggest changes to properly configured\
+            \ fields\n       - Focus on actual violations, not theoretical improvements\n\
+            \n\n    7. LEGACY RULES:\n    - Name/Relatives in IndividualProfile: CRITICAL\
+            \ - system auto-handles, remove immediately\n    - Numeric data as Text\
+            \ dataType: HIGH - use Numeric with bounds (age: 0-120, weight: 0.5-200)\n\
+            \    - Phone without validation: MEDIUM - use PhoneNumber dataType with\
+            \ regex\n    - Voided fields present: MEDIUM - remove completely from\
+            \ active forms\n    - Subject dataType for categories: MEDIUM - use Coded\
+            \ dataType instead\n    - MultiSelect for Yes/No questions: MEDIUM - should\
+            \ be SingleSelect\n    - Missing mandatory field declarations: LOW - ensure\
+            \ important fields are marked mandatory\n\n\n    Output Format Requirements:\n\
+            \    - Issues: JSON array with formElementUuid, formElementName, message\n\
+            \    \n    Always reference specific form element UUIDs when available\
+            \ so the UI can highlight exact fields needing changes."
         - id: 609d0c40-8344-4127-b72e-a368586e079d
           role: user
           text: '{{#sys.files#}} {{#sys.query#}}'
@@ -400,7 +280,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: 22.57280131784546
-      y: -119.41799061976894
-      zoom: 0.4562220719506059
+      x: -838.2087947286182
+      y: -1321.6719624790758
+      zoom: 1.8248882878024235
   rag_pipeline_variables: []
