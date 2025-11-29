@@ -1,8 +1,8 @@
 {
   "metadata": {
     "test_type": "formelementvalidationtestsubject",
-    "generated_at": "2025-11-28T19:16:03.023987",
-    "configuration_hash": "b9ced3f7"
+    "generated_at": "2025-11-29T12:25:52.836371",
+    "configuration_hash": "201e05cb"
   },
   "summary": {
     "total_tests": 18,
@@ -12,11 +12,11 @@
   },
   "scores": {
     "average_scores": {
-      "validation_correctness": 95.83333333333333,
-      "rule_coverage": 95.27777777777777,
-      "recommendation_quality": 95.83333333333333,
-      "completeness": 95.55555555555556,
-      "performance_score": 98.767525
+      "validation_correctness": 94.72222222222223,
+      "rule_coverage": 93.61111111111111,
+      "recommendation_quality": 95.55555555555556,
+      "completeness": 94.16666666666667,
+      "performance_score": 99.9857138888889
     },
     "score_distributions": []
   },
@@ -25,8 +25,8 @@
     "common_errors": []
   },
   "execution": {
-    "start_time": "2025-11-28T19:13:55.433455",
-    "end_time": "2025-11-28T19:16:03.020572"
+    "start_time": "2025-11-29T12:24:03.798913",
+    "end_time": "2025-11-29T12:25:52.834423"
   },
   "individual_results": [
     {
@@ -37,11 +37,11 @@
         "rule_coverage": 100,
         "recommendation_quality": 100,
         "completeness": 100,
-        "performance_score": 100.0
+        "performance_score": 99.74285
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:14:00.540421"
+      "timestamp": "2025-11-29T12:24:09.803488"
     },
     {
       "test_identifier": "form_validation_first_name_violation_name_field_individual_profile",
@@ -55,35 +55,35 @@
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:14:04.485967"
+      "timestamp": "2025-11-29T12:24:13.502406"
     },
     {
       "test_identifier": "form_validation_age_violation_age_as_text_instead_of_numeric",
       "success": true,
       "scores": {
-        "validation_correctness": 95,
-        "rule_coverage": 95,
-        "recommendation_quality": 95,
-        "completeness": 95,
+        "validation_correctness": 100,
+        "rule_coverage": 100,
+        "recommendation_quality": 100,
+        "completeness": 100,
         "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:14:12.267725"
+      "timestamp": "2025-11-29T12:24:17.145391"
     },
     {
       "test_identifier": "form_validation_age_valid_age_as_numeric",
       "success": true,
       "scores": {
         "validation_correctness": 85,
-        "rule_coverage": 90,
-        "recommendation_quality": 85,
-        "completeness": 90,
+        "rule_coverage": 80,
+        "recommendation_quality": 90,
+        "completeness": 85,
         "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:14:22.360357"
+      "timestamp": "2025-11-29T12:24:24.471927"
     },
     {
       "test_identifier": "form_validation_phone_number_violation_phone_as_text",
@@ -97,35 +97,35 @@
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:14:29.735698"
+      "timestamp": "2025-11-29T12:24:32.963878"
     },
     {
       "test_identifier": "form_validation_phone_number_valid_phone_as_phonenumber",
       "success": true,
       "scores": {
-        "validation_correctness": 95,
-        "rule_coverage": 90,
-        "recommendation_quality": 95,
-        "completeness": 95,
-        "performance_score": 77.81545
+        "validation_correctness": 85,
+        "rule_coverage": 80,
+        "recommendation_quality": 90,
+        "completeness": 85,
+        "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:14:44.275383"
+      "timestamp": "2025-11-29T12:24:41.698941"
     },
     {
       "test_identifier": "form_validation_has_ration_card_violation_binary_question_multiselect",
       "success": true,
       "scores": {
-        "validation_correctness": 95,
-        "rule_coverage": 90,
-        "recommendation_quality": 95,
-        "completeness": 90,
+        "validation_correctness": 100,
+        "rule_coverage": 100,
+        "recommendation_quality": 100,
+        "completeness": 100,
         "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:14:53.412738"
+      "timestamp": "2025-11-29T12:24:45.889174"
     },
     {
       "test_identifier": "form_validation_has_ration_card_valid_binary_question_singleselect",
@@ -139,21 +139,21 @@
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:14:57.672129"
+      "timestamp": "2025-11-29T12:24:49.079766"
     },
     {
       "test_identifier": "form_validation_education_level_violation_subject_for_categorical_data",
       "success": true,
       "scores": {
         "validation_correctness": 95,
-        "rule_coverage": 90,
+        "rule_coverage": 95,
         "recommendation_quality": 95,
-        "completeness": 90,
+        "completeness": 95,
         "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:15:06.270072"
+      "timestamp": "2025-11-29T12:24:56.422939"
     },
     {
       "test_identifier": "form_validation_education_level_valid_coded_for_categorical_data",
@@ -167,10 +167,24 @@
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:15:11.006094"
+      "timestamp": "2025-11-29T12:24:59.070188"
     },
     {
       "test_identifier": "form_validation_date_of_birth_valid_date_field",
+      "success": true,
+      "scores": {
+        "validation_correctness": 90,
+        "rule_coverage": 90,
+        "recommendation_quality": 85,
+        "completeness": 90,
+        "performance_score": 100.0
+      },
+      "error_categories": [],
+      "error_message": "",
+      "timestamp": "2025-11-29T12:25:06.138995"
+    },
+    {
+      "test_identifier": "form_validation_exit_date_valid_exit_date_program_exit",
       "success": true,
       "scores": {
         "validation_correctness": 95,
@@ -181,35 +195,21 @@
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:15:15.826213"
-    },
-    {
-      "test_identifier": "form_validation_exit_date_valid_exit_date_program_exit",
-      "success": true,
-      "scores": {
-        "validation_correctness": 95,
-        "rule_coverage": 100,
-        "recommendation_quality": 95,
-        "completeness": 100,
-        "performance_score": 100.0
-      },
-      "error_categories": [],
-      "error_message": "",
-      "timestamp": "2025-11-28T19:15:24.006302"
+      "timestamp": "2025-11-29T12:25:13.536491"
     },
     {
       "test_identifier": "form_validation_cancellation_date_valid_cancellation_date",
       "success": true,
       "scores": {
         "validation_correctness": 95,
-        "rule_coverage": 100,
+        "rule_coverage": 90,
         "recommendation_quality": 95,
-        "completeness": 100,
+        "completeness": 90,
         "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:15:33.627707"
+      "timestamp": "2025-11-29T12:25:19.760278"
     },
     {
       "test_identifier": "form_validation_cancellation_reason_valid_cancellation_reason_coded",
@@ -217,13 +217,13 @@
       "scores": {
         "validation_correctness": 95,
         "rule_coverage": 95,
-        "recommendation_quality": 90,
+        "recommendation_quality": 95,
         "completeness": 95,
         "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:15:37.866179"
+      "timestamp": "2025-11-29T12:25:27.276609"
     },
     {
       "test_identifier": "form_validation_exit_reason_valid_exit_reason_coded",
@@ -237,7 +237,7 @@
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:15:47.162912"
+      "timestamp": "2025-11-29T12:25:36.249229"
     },
     {
       "test_identifier": "form_validation_follow-up_plan_valid_followup_plan_text",
@@ -251,35 +251,35 @@
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:15:50.605288"
+      "timestamp": "2025-11-29T12:25:39.724570"
     },
     {
       "test_identifier": "form_validation_weight_violation_weight_as_text",
       "success": true,
       "scores": {
-        "validation_correctness": 100,
+        "validation_correctness": 95,
         "rule_coverage": 100,
-        "recommendation_quality": 100,
-        "completeness": 100,
+        "recommendation_quality": 95,
+        "completeness": 95,
         "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:15:54.521264"
+      "timestamp": "2025-11-29T12:25:46.291777"
     },
     {
       "test_identifier": "form_validation_weight_valid_weight_as_numeric",
       "success": true,
       "scores": {
-        "validation_correctness": 95,
-        "rule_coverage": 90,
-        "recommendation_quality": 95,
-        "completeness": 90,
+        "validation_correctness": 85,
+        "rule_coverage": 80,
+        "recommendation_quality": 90,
+        "completeness": 85,
         "performance_score": 100.0
       },
       "error_categories": [],
       "error_message": "",
-      "timestamp": "2025-11-28T19:16:03.020483"
+      "timestamp": "2025-11-29T12:25:52.834323"
     }
   ],
   "statistics": {
@@ -291,47 +291,47 @@
     },
     "score_statistics": {
       "validation_correctness": {
-        "mean": 95.83333333333333,
+        "mean": 94.72222222222223,
         "median": 95.0,
         "min": 85,
         "max": 100,
-        "std_dev": 3.929526239966879,
+        "std_dev": 5.549833654693737,
         "count": 18,
         "pass_rate": 100.0
       },
       "rule_coverage": {
-        "mean": 95.27777777777777,
+        "mean": 93.61111111111111,
         "median": 95.0,
-        "min": 90,
+        "min": 80,
         "max": 100,
-        "std_dev": 4.687976555296169,
+        "std_dev": 7.4371000743797895,
         "count": 18,
         "pass_rate": 100.0
       },
       "recommendation_quality": {
-        "mean": 95.83333333333333,
-        "median": 95.0,
-        "min": 85,
-        "max": 100,
-        "std_dev": 3.929526239966879,
-        "count": 18,
-        "pass_rate": 100.0
-      },
-      "completeness": {
         "mean": 95.55555555555556,
         "median": 95.0,
-        "min": 90,
+        "min": 85,
         "max": 100,
         "std_dev": 4.501270699313332,
         "count": 18,
         "pass_rate": 100.0
       },
+      "completeness": {
+        "mean": 94.16666666666667,
+        "median": 95.0,
+        "min": 85,
+        "max": 100,
+        "std_dev": 5.752237416355278,
+        "count": 18,
+        "pass_rate": 100.0
+      },
       "performance_score": {
-        "mean": 98.767525,
+        "mean": 99.9857138888889,
         "median": 100.0,
-        "min": 77.81545,
+        "min": 99.74285,
         "max": 100.0,
-        "std_dev": 5.228948580857342,
+        "std_dev": 0.0606108362607059,
         "count": 18,
         "pass_rate": 100.0
       }
@@ -342,24 +342,24 @@
       "common_failure_patterns": [],
       "test_consistency": {
         "validation_correctness": {
-          "variance": 15.441176470588236,
-          "coefficient_of_variation": 0.04100375206921961
+          "variance": 30.80065359477124,
+          "coefficient_of_variation": 0.05859061922843828
         },
         "rule_coverage": {
-          "variance": 21.977124183006534,
-          "coefficient_of_variation": 0.04920325247541169
+          "variance": 55.310457516339866,
+          "coefficient_of_variation": 0.07944676637319656
         },
         "recommendation_quality": {
-          "variance": 15.441176470588236,
-          "coefficient_of_variation": 0.04100375206921961
-        },
-        "completeness": {
           "variance": 20.26143790849673,
           "coefficient_of_variation": 0.0471063212718837
         },
+        "completeness": {
+          "variance": 33.088235294117645,
+          "coefficient_of_variation": 0.061085707076339237
+        },
         "performance_score": {
-          "variance": 27.341903261250003,
-          "coefficient_of_variation": 0.052941982507482506
+          "variance": 0.0036736734722221014,
+          "coefficient_of_variation": 0.0006061949642932079
         }
       }
     }
