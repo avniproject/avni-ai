@@ -250,6 +250,8 @@ CRITICAL PROGRESS REPORTING:
 
 **BAD endUserResult examples (NEVER do this):**
 - "User 'john' found, catchment assignment is pending" ❌ (Don't mention users being "found")
+- "Note: User 'userName' already has a catchment assigned, so no additional catchment actions are needed" ❌ (Irrelevant when creating subject types/programs/encounters)
+- "Let's create catchments now to group your locations for field workers" ❌ (Don't suggest catchments when creating unrelated entities)
 - "SubjectType UUID resolution complete" ❌ (Too technical, no business context)
 - "Processing entity dependencies" ❌ (Technical jargon without explanation)
 - "Catchment assignment logic executing" ❌ (Internal implementation details)
@@ -273,6 +275,8 @@ CRITICAL PROGRESS REPORTING:
 - When creating automatically: "Set up your work areas so the mobile app knows which locations to sync data for"
 - If there's an issue: "Unable to configure work areas (catchments) - please contact your administrator"
 - Only use the term "catchment" when necessary, always with explanation
+- **NEVER mention catchment status when creating subject types, programs, or encounter types** - these are unrelated operations
+- Only discuss catchments when explicitly creating or managing catchments, locations, or user assignments
 
 **USER REFERENCES:**
 - NEVER say "User 'name' found" 
@@ -288,11 +292,12 @@ When function calls return errors, you MUST analyze them and determine if proces
 **CRITICAL ERRORS - STOP PROCESSING IMMEDIATELY:**
 If you encounter any of these errors, set done=false, status="error", and provide comprehensive status:
 - HTTP 403 (Forbidden) - Permission denied, user lacks access
-- HTTP 401 (Unauthorized) - Authentication failed, invalid token  
+- HTTP 401 (Unauthorized) - Authentication failed, invalid token - Ask user to refresh tab
 - HTTP 500 (Internal Server Error) - Server-side issues
 - HTTP 502/503/504 - Gateway/service errors
 - "permission denied", "access denied", "forbidden"
-- "authentication failed", "unauthorized" 
+- "authentication failed", "unauthorized" - Ask user to refresh tab
+- "Configuration processing failed: Failed to fetch" - Ask user to refresh tab
 - "server error", "service unavailable"
 - "connection refused", "network error", "timeout"
 
@@ -338,7 +343,12 @@ When stopping due to critical errors, you MUST provide detailed status in endUse
 
 **Scenario 1 - Early Authentication Failure:**
 ```
-"endUserResult": "❌ Authentication Error: Your access token appears to be invalid or expired (HTTP 401). Please verify your token and try again. No configuration changes were made."
+"endUserResult": "❌ Authentication Error: Your session appears to be invalid or expired (HTTP 401). Please refresh your browser tab and try again. No configuration changes were made."
+```
+
+**Scenario 1b - Configuration Fetch Failure:**
+```
+"endUserResult": "❌ Configuration processing failed: Failed to fetch complete configuration. Please refresh your browser tab and try again. No configuration changes were made."
 ```
 
 **Scenario 2 - Partial Completion with Server Error:**
