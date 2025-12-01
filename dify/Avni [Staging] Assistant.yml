@@ -106,7 +106,7 @@ workflow:
         sourceType: llm
         targetType: if-else
       id: 1757492907627-source-1757493270484-target
-      selected: true
+      selected: false
       source: '1757492907627'
       sourceHandle: source
       target: '1757493270484'
@@ -119,7 +119,7 @@ workflow:
         sourceType: llm
         targetType: answer
       id: 1757495664531-source-1757495688732-target
-      selected: true
+      selected: false
       source: '1757495664531'
       sourceHandle: source
       target: '1757495688732'
@@ -131,7 +131,7 @@ workflow:
         sourceType: if-else
         targetType: llm
       id: 1757493270484-00ce954d-b2ca-42aa-b302-dc2c163dd1d0-17580163919060-target
-      selected: true
+      selected: false
       source: '1757493270484'
       sourceHandle: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
       target: '17580163919060'
@@ -143,7 +143,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1757493270484-3489d477-53a2-4b99-9f40-af010262a1c1-1758608702077-target
-      selected: true
+      selected: false
       source: '1757493270484'
       sourceHandle: 3489d477-53a2-4b99-9f40-af010262a1c1
       target: '1758608702077'
@@ -155,7 +155,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1757493270484-8ad5b2c6-6d29-4e4f-9f13-7682d4803a70-1758699378772-target
-      selected: true
+      selected: false
       source: '1757493270484'
       sourceHandle: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
       target: '1758699378772'
@@ -167,7 +167,7 @@ workflow:
         sourceType: start
         targetType: knowledge-retrieval
       id: 1711528708197-source-1758713692744-target
-      selected: true
+      selected: false
       source: '1711528708197'
       sourceHandle: source
       target: '1758713692744'
@@ -179,7 +179,7 @@ workflow:
         sourceType: knowledge-retrieval
         targetType: llm
       id: 1758713692744-source-1757492907627-target
-      selected: true
+      selected: false
       source: '1758713692744'
       sourceHandle: source
       target: '1757492907627'
@@ -191,7 +191,7 @@ workflow:
         sourceType: if-else
         targetType: llm
       id: 1757493270484-false-1757495664531-target
-      selected: true
+      selected: false
       source: '1757493270484'
       sourceHandle: 'false'
       target: '1757495664531'
@@ -203,7 +203,7 @@ workflow:
         sourceType: if-else
         targetType: llm
       id: 1757493270484-true-1757495664531-target
-      selected: true
+      selected: false
       source: '1757493270484'
       sourceHandle: 'true'
       target: '1757495664531'
@@ -215,7 +215,7 @@ workflow:
         sourceType: llm
         targetType: if-else
       id: 17580163919060-source-1760358453289-target
-      selected: true
+      selected: false
       source: '17580163919060'
       sourceHandle: source
       target: '1760358453289'
@@ -227,7 +227,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1760358453289-false-1760358474156-target
-      selected: true
+      selected: false
       source: '1760358453289'
       sourceHandle: 'false'
       target: '1760358474156'
@@ -239,7 +239,7 @@ workflow:
         sourceType: if-else
         targetType: code
       id: 1760358453289-true-1760416664434-target
-      selected: true
+      selected: false
       source: '1760358453289'
       sourceHandle: 'true'
       target: '1760416664434'
@@ -251,7 +251,7 @@ workflow:
         sourceType: code
         targetType: loop
       id: 1760416664434-source-1760423058735-target
-      selected: true
+      selected: false
       source: '1760416664434'
       sourceHandle: source
       target: '1760423058735'
@@ -265,7 +265,7 @@ workflow:
         sourceType: loop-start
         targetType: tool
       id: 1760423058735start-source-1760423070414-target
-      selected: true
+      selected: false
       source: 1760423058735start
       sourceHandle: source
       target: '1760423070414'
@@ -279,7 +279,7 @@ workflow:
         sourceType: tool
         targetType: code
       id: 1760423070414-source-1760423078948-target
-      selected: true
+      selected: false
       source: '1760423070414'
       sourceHandle: source
       target: '1760423078948'
@@ -293,7 +293,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1760424086059-false-1760424123324-target
-      selected: true
+      selected: false
       source: '1760424086059'
       sourceHandle: 'false'
       target: '1760424123324'
@@ -307,7 +307,7 @@ workflow:
         sourceType: code
         targetType: if-else
       id: 1760423078948-source-1760424086059-target
-      selected: true
+      selected: false
       source: '1760423078948'
       sourceHandle: source
       target: '1760424086059'
@@ -321,7 +321,7 @@ workflow:
         sourceType: if-else
         targetType: assigner
       id: 1760424086059-true-1760426022942-target
-      selected: true
+      selected: false
       source: '1760424086059'
       sourceHandle: 'true'
       target: '1760426022942'
@@ -335,7 +335,7 @@ workflow:
         sourceType: assigner
         targetType: answer
       id: 1760426022942-source-1760424043492-target
-      selected: true
+      selected: false
       source: '1760426022942'
       sourceHandle: source
       target: '1760424043492'
@@ -348,7 +348,7 @@ workflow:
         sourceType: loop
         targetType: assigner
       id: 1760423058735-source-1760434909468-target
-      selected: true
+      selected: false
       source: '1760423058735'
       sourceHandle: source
       target: '1760434909468'
@@ -361,7 +361,7 @@ workflow:
         sourceType: code
         targetType: answer
       id: 1760416664434-fail-branch-1763959812229-target
-      selected: true
+      selected: false
       source: '1760416664434'
       sourceHandle: fail-branch
       target: '1763959812229'
@@ -920,25 +920,20 @@ workflow:
             \ rules, clearly respond: \"I can't help you with writing Avni rules right\
             \ now. For creating or implementing rules in Avni, please consult the\
             \ Avni documentation or reach out to the Avni support team.\"\n\nCRITICAL\
-            \ ATTRIBUTE HANDLING RULES:\n- If a subject type already exists (from\
-            \ validation), do NOT ask for attributes\n- Only ask for attributes when\
-            \ creating NEW subject types\n- Skip attribute questions for entities\
-            \ that won't be created due to conflicts\n- Focus on configuration structure\
-            \ rather than detailed attributes for existing entities\n- If validation\
-            \ shows conflicts, acknowledge them: \"I see some entities already exist.\
-            \ I'll create only the new ones.\"\n- IMPORTANT: When asking about attributes\
-            \ for subject types, programs, or encounters, ALWAYS clarify that these\
-            \ attributes need to be manually added to forms after configuration creation\n\
-            - Use this clarification: \"Note: While I can create the basic structure,\
-            \ you'll need to manually add these attributes as questions in the forms.\
+            \ ATTRIBUTE HANDLING RULES:\n- DO NOT ask for attributes when creating\
+            \ subject types, programs, or encounters - attribute collection is not\
+            \ currently supported\n- Focus only on the basic structure and names of\
+            \ entities\n- If validation shows conflicts, acknowledge them: \"I see\
+            \ some entities already exist. I'll create only the new ones.\"\n- CRITICAL:\
+            \ When users ask about adding specific data/attributes to existing subject\
+            \ types, programs, or encounters (e.g., \"can I add loan data for farmers?\"\
+            ), ALWAYS provide the manual form creation instructions instead of vague\
+            \ responses\n- Use this clarification: \"You'll need to manually add these\
+            \ attributes as questions in the forms after the basic structure is created.\
             \ After creation, go to App Designer → Click on [Subject Type/Program/Encounter\
             \ Type] from the left sidebar → Click on the blue 'Registration Form'/'Enrolment\
             \ Form'/'Encounter Form' hyperlink in the table → Add your questions there.\"\
-            \n- CRITICAL: When users ask about adding specific data/attributes to\
-            \ existing subject types, programs, or encounters (e.g., \"can I add loan\
-            \ data for farmers?\"), ALWAYS provide the manual form creation instructions\
-            \ instead of vague responses. Use the exact navigation steps above.\n\n\
-            CONFLICT RESOLUTION BEHAVIOR:\n- When conflicts are detected, be transparent:\
+            \n\nCONFLICT RESOLUTION BEHAVIOR:\n- When conflicts are detected, be transparent:\
             \ \"Some items already exist in your system\"\n- Focus on helping users\
             \ understand what needs to be configured\n- Never ask for manual deletion\
             \ - guide users on how the system handles conflicts\n- Reassure users:\
@@ -1383,7 +1378,7 @@ workflow:
         - '1711528708197'
         - sys.query
         retrieval_mode: multiple
-        selected: true
+        selected: false
         title: Knowledge Retrieval
         type: knowledge-retrieval
       height: 88
@@ -1866,7 +1861,7 @@ workflow:
       type: custom
       width: 241
     viewport:
-      x: -295.5290362338992
-      y: 1382.6999717703943
-      zoom: 1.4417223783230235
+      x: -722.8958764223673
+      y: 350.55384444626384
+      zoom: 1.024060516860587
   rag_pipeline_variables: []

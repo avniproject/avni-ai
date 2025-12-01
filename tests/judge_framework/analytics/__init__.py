@@ -3,4 +3,4 @@
 from .statistics import StatisticsCalculator
 from .reporting import ReportGenerator
 
-__all__ = ['StatisticsCalculator', 'ReportGenerator']
+__all__ = ["StatisticsCalculator", "ReportGenerator"]

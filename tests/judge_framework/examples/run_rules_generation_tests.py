@@ -1,75 +1,56 @@
 #!/usr/bin/env python3
-"""
-Example script demonstrating conversation testing using the Judge Framework
-
-This script shows how to:
-1. Configure the framework for conversation testing
-2. Load existing conversation prompts and scenarios
-3. Run tests using the new orchestrator
-4. Generate comprehensive reports
-
-Usage:
-    python run_conversation_tests.py [--output-format console|json|csv|all] [--fail-fast]
-"""
-
 import argparse
-import os
 import sys
-from pathlib import Path
 
-# Add the project root to Python path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
-
-from dotenv import load_dotenv
+from src.utils.env import OPENAI_API_KEY, DIFY_API_KEY
 from tests.judge_framework.orchestrator import (
     JudgeOrchestrator,
     ConsoleProgressReporter,
 )
 from tests.judge_framework.analytics.statistics import StatisticsCalculator
 from tests.judge_framework.analytics.reporting import ReportGenerator
+from tests.judge_framework.implementations.rulesGeneration import (
+    RulesGenerationExecutorWrapper,
+    RulesGenerationJudgeWrapper,
+)
 from tests.judge_framework.implementations.conversation import (
     ConversationTestSubjectFactory,
-    ConversationExecutorWrapper,
-    ConversationJudgeStrategyWrapper,
 )
-from tests.judge_framework.examples.configs.conversation_config import (
-    create_conversation_test_config,
-    load_conversation_prompts,
+from tests.judge_framework.examples.configs.rules_generation_config import (
+    create_rules_generation_test_config,
+    create_rules_generation_prompts,
 )
-
-# Load environment variables
-load_dotenv()
 
 
 def validate_environment():
-    """Validate required environment variables"""
-    required_vars = ["OPENAI_API_KEY", "DIFY_API_KEY"]
-    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    missing_vars = []
+
+    if not OPENAI_API_KEY:
+        missing_vars.append("OPENAI_API_KEY")
+
+    if not DIFY_API_KEY:
+        missing_vars.append("DIFY_API_KEY")
 
     if missing_vars:
         print(f"❌ Missing required environment variables: {', '.join(missing_vars)}")
-        print("Please set these variables in your .env file or environment.")
         return False
 
     return True
 
 
-def setup_conversation_test_components(config):
-    """Set up all components needed for conversation testing"""
-
-    # Load conversation prompts
-    scenario_names, tester_prompts = load_conversation_prompts()
+def setup_rules_test_components(config):
+    tester_prompts = create_rules_generation_prompts()
 
     # Create test subject factory
     test_subject_factory = ConversationTestSubjectFactory(tester_prompts)
 
-    # Create conversation executor with AI strategy
-    executor = ConversationExecutorWrapper(
+    # Create rules generation executor
+    executor = RulesGenerationExecutorWrapper(
         config=config, scenario_prompts=tester_prompts
     )
 
     # Create judge strategy
-    judge_strategy = ConversationJudgeStrategyWrapper(config)
+    judge_strategy = RulesGenerationJudgeWrapper(config)
 
     # Create orchestrator
     orchestrator = JudgeOrchestrator(
@@ -81,10 +62,10 @@ def setup_conversation_test_components(config):
     return orchestrator, test_subject_factory
 
 
-def run_conversation_tests(args):
-    """Run conversation tests with the specified configuration"""
+def run_rules_generation_tests(args):
+    """Run rules generation tests"""
 
-    print("🚀 Starting Conversation Testing with Judge Framework")
+    print("🚀 Starting Rules Generation Testing with Judge Framework")
     print("=" * 60)
 
     # Validate environment
@@ -92,17 +73,19 @@ def run_conversation_tests(args):
         sys.exit(1)
 
     # Create test configuration
-    config = create_conversation_test_config()
-    print(f"📋 Configuration loaded for workflow: {config.workflow_name}")
-    print(f"   Static test cases: {len(config.static_test_cases)}")
+    config = create_rules_generation_test_config()
+    print(f"📋 Configuration loaded for workflow: {config.dify_config.workflow_name}")
+    print(f"   Static test cases: {len(config.generation_config.static_test_cases)}")
     print(f"   AI-generated cases: {config.generation_config.num_ai_cases}")
-    print(f"   Evaluation metrics: {', '.join(config.evaluation_metrics)}")
+    print(
+        f"   Evaluation metrics: {', '.join(config.evaluation_config.evaluation_metrics)}"
+    )
 
     # Set up test components
-    orchestrator, test_subject_factory = setup_conversation_test_components(config)
+    orchestrator, test_subject_factory = setup_rules_test_components(config)
 
     # Run test suite
-    print(f"\n🧪 Running conversation tests...")
+    print(f"\n🧪 Running rules generation tests...")
     suite_result = orchestrator.run_test_suite(
         test_subject_factory=test_subject_factory,
         config=config,
@@ -124,12 +107,14 @@ def run_conversation_tests(args):
     if args.output_format in ["json", "all"]:
         json_report = ReportGenerator.generate_json_report(suite_result, statistics)
         ReportGenerator.save_report_to_file(
-            json_report, "conversation_test_report.json"
+            json_report, "rules_generation_test_report.json"
         )
 
     if args.output_format in ["csv", "all"]:
         csv_report = ReportGenerator.generate_csv_report(suite_result)
-        ReportGenerator.save_report_to_file(csv_report, "conversation_test_report.csv")
+        ReportGenerator.save_report_to_file(
+            csv_report, "rules_generation_test_report.csv"
+        )
 
     # Print summary
     print(f"\n✅ Test execution completed!")
@@ -144,13 +129,13 @@ def run_conversation_tests(args):
 def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(
-        description="Run conversation tests using the Judge Framework",
+        description="Run rules generation tests using the Judge Framework",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python run_conversation_tests.py
-  python run_conversation_tests.py --output-format json
-  python run_conversation_tests.py --fail-fast --output-format all
+  python run_rules_generation_tests.py
+  python run_rules_generation_tests.py --output-format json
+  python run_rules_generation_tests.py --fail-fast --output-format all
         """,
     )
 
@@ -167,8 +152,11 @@ Examples:
 
     args = parser.parse_args()
 
+    print("🧪 Rules Generation Testing Tool")
+    print("=" * 50)
+
     try:
-        success = run_conversation_tests(args)
+        success = run_rules_generation_tests(args)
         sys.exit(0 if success else 1)
     except KeyboardInterrupt:
         print("\n⚠️  Test execution interrupted by user")

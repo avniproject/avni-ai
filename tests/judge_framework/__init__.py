@@ -16,12 +16,12 @@ from .analytics.statistics import StatisticsCalculator
 from .analytics.reporting import ReportGenerator
 
 __all__ = [
-    'TestSubject',
-    'TestExecutor', 
-    'JudgeStrategy',
-    'EvaluationResult',
-    'TestConfiguration',
-    'JudgeOrchestrator',
-    'StatisticsCalculator',
-    'ReportGenerator'
+    "TestSubject",
+    "TestExecutor",
+    "JudgeStrategy",
+    "EvaluationResult",
+    "TestConfiguration",
+    "JudgeOrchestrator",
+    "StatisticsCalculator",
+    "ReportGenerator",
 ]

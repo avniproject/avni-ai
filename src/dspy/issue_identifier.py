@@ -36,7 +36,7 @@ class AvniIssueIdentificationSignature(dspy.Signature):
     2. Detect issues (wrong dataTypes like Age as Text instead of Numeric, validation problems, inconsistent naming, missing optional fields, minor improvements)
 
     Critical Avni Rules to Check:
-    
+
     1. DATE FIELD VALIDATION (CRITICAL):
        - Date fields should NEVER be suggested as SingleSelect
        - Date dataType is used for: birth dates, visit dates, exit dates, cancellation dates
@@ -85,7 +85,7 @@ class AvniIssueIdentificationSignature(dspy.Signature):
 
     Output Format Requirements:
     - Issues: JSON array with formElementUuid, formElementName, message
-    
+
     Always reference specific form element UUIDs when available so the UI can highlight exact fields needing changes."""
 
     form_structure = dspy.InputField(
