@@ -16,7 +16,6 @@ class IssueIdentifier(dspy.Module):
 
         except Exception as e:
             logger.error(f"Issue identification failed: {e}")
-            error_msg = str(e)
 
             # Return a simple object with the expected attributes
             class ErrorResult:

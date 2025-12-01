@@ -3,6 +3,7 @@ deps:
 
 lint:
 	uv run ruff format
+	uv run ruff check --fix
 
 start:
 	uv run avni-mcp-server

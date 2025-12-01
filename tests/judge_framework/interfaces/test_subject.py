@@ -3,7 +3,7 @@ Test Subject interface for the Judge Framework
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from .result_models import TestConfiguration
 
 

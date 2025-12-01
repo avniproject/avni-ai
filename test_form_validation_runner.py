@@ -1,23 +1,12 @@
 #!/usr/bin/env python3
-"""
-Simplified Form Validation Test Runner
-Uses the consolidated comprehensive test matrix
-"""
 
 import os
 import sys
 import json
 import argparse
-from pathlib import Path
 from typing import Dict, List, Any
 
-# Add project root to Python path
-sys.path.insert(0, str(Path(__file__).parent))
-
 from dotenv import load_dotenv
-
-load_dotenv()
-
 from tests.judge_framework.orchestrator import JudgeOrchestrator
 from tests.judge_framework.analytics.statistics import StatisticsCalculator
 from tests.judge_framework.analytics.reporting import ReportGenerator
@@ -30,23 +19,25 @@ from tests.judge_framework.examples.configs.form_validation_config import (
     create_form_validation_test_config,
 )
 
+load_dotenv()
+
 
 def load_test_matrix() -> List[Dict[str, Any]]:
     """Load the consolidated comprehensive test matrix"""
     matrix_file = "/Users/himeshr/IdeaProjects/avni-ai/tests/judge_framework/test_suites/formElementValidation/comprehensive_form_validation_test_matrix.json"
 
     if not os.path.exists(matrix_file):
-        print(f"❌ Test matrix file not found: {matrix_file}")
-        print(f"   Run the test generation script first to create test cases")
+        print(f" Test matrix file not found: {matrix_file}")
+        print("   Run the test generation script first to create test cases")
         return []
 
     try:
         with open(matrix_file, "r") as f:
             test_cases = json.load(f)
-        print(f"✅ Loaded {len(test_cases)} test cases from comprehensive test matrix")
+        print(f" Loaded {len(test_cases)} test cases from comprehensive test matrix")
         return test_cases
     except Exception as e:
-        print(f"❌ Failed to load test matrix: {e}")
+        print(f" Failed to load test matrix: {e}")
         return []
 
 
@@ -66,10 +57,10 @@ def run_form_validation_tests(fail_fast: bool = False) -> bool:
     missing_vars = [var for var in required_vars if not os.getenv(var)]
 
     if missing_vars:
-        print(f"❌ Missing environment variables: {missing_vars}")
+        print(f" Missing environment variables: {missing_vars}")
         return False
 
-    print("✅ Environment validation passed")
+    print(" Environment validation passed")
 
     # Load test cases
     test_cases = load_test_matrix()
@@ -82,7 +73,7 @@ def run_form_validation_tests(fail_fast: bool = False) -> bool:
     judge_strategy = FormElementValidationJudgeStrategyWrapper(config)
     orchestrator = JudgeOrchestrator(executor, judge_strategy)
 
-    print(f"\n🚀 Running comprehensive test suite with {len(test_cases)} test cases...")
+    print(f"\n Running comprehensive test suite with {len(test_cases)} test cases...")
 
     try:
         # Configure test execution
@@ -97,7 +88,7 @@ def run_form_validation_tests(fail_fast: bool = False) -> bool:
             fail_fast=fail_fast,
         )
 
-        print(f"\n📊 Comprehensive Test Results:")
+        print("\n Comprehensive Test Results:")
         print(f"   Total Tests: {suite_result.total_tests}")
         print(f"   Successful: {suite_result.successful_tests}")
         print(f"   Failed: {suite_result.failed_tests}")
@@ -116,7 +107,6 @@ def run_form_validation_tests(fail_fast: bool = False) -> bool:
 
         # Use single consolidated report file
         report_file = f"{report_dir}/form_validation_report.json"
-        csv_file = f"{report_dir}/form_validation_report.csv"
         json_report = ReportGenerator.generate_json_report(suite_result, statistics)
         ReportGenerator.save_report_to_file(json_report, report_file)
 
@@ -126,17 +116,17 @@ def run_form_validation_tests(fail_fast: bool = False) -> bool:
 
         if success:
             print(
-                f"\n✅ Comprehensive test suite PASSED: {suite_result.success_rate:.1f}% >= {threshold}%"
+                f"\n Comprehensive test suite PASSED: {suite_result.success_rate:.1f}% >= {threshold}%"
             )
         else:
             print(
-                f"\n❌ Comprehensive test suite FAILED: {suite_result.success_rate:.1f}% < {threshold}%"
+                f"\n Comprehensive test suite FAILED: {suite_result.success_rate:.1f}% < {threshold}%"
             )
 
         return success
 
     except Exception as e:
-        print(f"❌ Test execution failed: {e}")
+        print(f" Test execution failed: {e}")
         import traceback
 
         traceback.print_exc()
@@ -144,7 +134,6 @@ def run_form_validation_tests(fail_fast: bool = False) -> bool:
 
 
 def main():
-    """Main entry point for the simplified test runner"""
     parser = argparse.ArgumentParser(description="Form Validation Test Runner")
     parser.add_argument(
         "--fail-fast", action="store_true", help="Stop on first failure"
@@ -154,7 +143,7 @@ def main():
 
     success = run_form_validation_tests(args.fail_fast)
 
-    print(f"\n🏁 Form Validation Testing {'✅ PASSED' if success else '❌ FAILED'}")
+    print(f"\n🏁 Form Validation Testing {' PASSED' if success else ' FAILED'}")
     sys.exit(0 if success else 1)
 
 

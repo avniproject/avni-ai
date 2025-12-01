@@ -2,7 +2,7 @@
 Judge Orchestrator - Template Method pattern coordinator
 """
 
-from typing import List, Dict, Any, Optional, Protocol
+from typing import List, Optional, Protocol
 from datetime import datetime
 import hashlib
 
@@ -129,7 +129,7 @@ class JudgeOrchestrator:
             else:
                 suite_result.failed_tests += 1
                 if fail_fast:
-                    print(f"\n🛑 Stopping early due to failure (fail_fast=True)")
+                    print("\n🛑 Stopping early due to failure (fail_fast=True)")
                     break
 
             # Store result
@@ -203,7 +203,6 @@ class JudgeOrchestrator:
             return
 
         # Calculate average scores
-        all_scores = {}
         score_sums = {}
         score_counts = {}
 

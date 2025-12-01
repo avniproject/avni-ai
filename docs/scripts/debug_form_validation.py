@@ -75,7 +75,7 @@ Please validate this form element according to Avni rules and provide recommenda
                 timeout=30,
             )
 
-            print(f"✅ Response received")
+            print("✅ Response received")
             print(f"   Success: {response.get('success', False)}")
             print(f"   Conversation ID: {response.get('conversation_id', 'N/A')}")
             print(f"   Message ID: {response.get('message_id', 'N/A')}")

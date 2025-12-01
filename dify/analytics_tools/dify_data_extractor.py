@@ -10,6 +10,14 @@ Usage:
 2. Run: python3 dify_data_extractor.py
 """
 
+import requests
+import csv
+import json
+from datetime import datetime
+import argparse
+from typing import List, Dict, Any
+import time
+
 # =============================================================================
 # CONFIGURATION - UPDATE THESE VALUES
 # =============================================================================
@@ -36,14 +44,6 @@ DELAY_BETWEEN_REQUESTS = 0.5  # Seconds to wait between requests
 # =============================================================================
 # END CONFIGURATION
 # =============================================================================
-
-import requests
-import csv
-import json
-from datetime import datetime
-import argparse
-from typing import List, Dict, Any
-import time
 
 
 class DifyDataExtractor:
@@ -248,7 +248,7 @@ class DifyDataExtractor:
             if delay > 0 and i < len(conversations) - 1:
                 time.sleep(delay)
 
-        print(f"\nExtraction completed!")
+        print("\nExtraction completed!")
         print(f"Total conversations: {len(conversations)}")
         print(f"Total messages: {len(all_messages)}")
 
@@ -339,7 +339,7 @@ def main():
     )
 
     # Save data as CSV only
-    print(f"\nSaving data as CSV files...")
+    print("\nSaving data as CSV files...")
 
     extractor.save_to_csv(data, OUTPUT_DIR, ADD_TIMESTAMP)
 

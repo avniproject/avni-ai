@@ -2,7 +2,7 @@
 Correct Form Element Validation executor that matches the actual Dify workflow
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import sys
 from pathlib import Path
 

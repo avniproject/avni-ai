@@ -80,7 +80,7 @@ def main():
             "source": "VISIT_SCHEDULE_RULE_EXAMPLES",
         }
 
-        print(f"📋 Summary:")
+        print("📋 Summary:")
         print(f"   Total test cases: {summary['total_test_cases']}")
         print(f"   Form types: {len(summary['form_types_covered'])}")
         print(f"   Encounter types: {len(summary['encounter_types_covered'])}")

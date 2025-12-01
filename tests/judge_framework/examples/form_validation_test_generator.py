@@ -4,7 +4,6 @@ Consolidated Form Validation Test Generator
 Combines test matrix generation and new form type test case generation
 """
 
-import os
 import json
 import argparse
 from pathlib import Path
@@ -675,7 +674,7 @@ def generate_new_form_type_tests() -> List[Dict[str, Any]]:
 
     all_new_tests = cancellation_tests + program_exit_tests + valid_tests
 
-    print(f"📊 Test Cases Generated:")
+    print("📊 Test Cases Generated:")
     print(f"   Cancellation Form Tests: {len(cancellation_tests)}")
     print(f"   Program Exit Form Tests: {len(program_exit_tests)}")
     print(f"   Valid Form Type Tests: {len(valid_tests)}")
@@ -739,7 +738,7 @@ def update_comprehensive_matrix(new_test_cases: List[Dict[str, Any]]) -> bool:
         with open(comprehensive_matrix_file, "w") as f:
             json.dump(existing_matrix, f, indent=2)
 
-        print(f"✅ Enhanced comprehensive test matrix:")
+        print("✅ Enhanced comprehensive test matrix:")
         print(f"   Original test cases: {original_count}")
         print(f"   Added new test cases: {len(new_test_cases)}")
         print(f"   Total test cases: {len(existing_matrix)}")

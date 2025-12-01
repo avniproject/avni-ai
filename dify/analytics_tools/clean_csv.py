@@ -54,7 +54,7 @@ def clean_csv(input_file, output_file):
                 writer.writerow(row)
                 rows_kept += 1
 
-    print(f"\nCleaning completed!")
+    print("\nCleaning completed!")
     print(f"Rows kept: {rows_kept}")
     print(f"Rows removed: {rows_removed}")
     print(f"Output saved to: {output_file}")

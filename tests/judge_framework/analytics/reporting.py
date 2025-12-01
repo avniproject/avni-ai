@@ -5,7 +5,7 @@ Report generation for test results
 from typing import Dict, List, Any
 from datetime import datetime
 import json
-from ..interfaces.result_models import TestSuiteResult, EvaluationResult
+from ..interfaces.result_models import TestSuiteResult
 
 
 class ReportGenerator:
@@ -20,7 +20,7 @@ class ReportGenerator:
 
         # Header
         report.append("\n" + "=" * 80)
-        report.append(f"🧪 JUDGE FRAMEWORK TEST REPORT")
+        report.append("🧪 JUDGE FRAMEWORK TEST REPORT")
         report.append(f"Test Type: {suite_result.test_type.upper()}")
         report.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         report.append("=" * 80)
@@ -185,7 +185,7 @@ class ReportGenerator:
 
         # Header
         report.append("\n" + "=" * 80)
-        report.append(f"🔄 TEST SUITE COMPARISON REPORT")
+        report.append("🔄 TEST SUITE COMPARISON REPORT")
         report.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         report.append("=" * 80)
 

@@ -3,7 +3,7 @@ Form Validation Executor interface for the Judge Framework
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import time
 from .result_models import TestConfiguration
 

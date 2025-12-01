@@ -13,7 +13,7 @@ import re
 import random
 import argparse
 from pathlib import Path
-from typing import Dict, List, Set, Any, Tuple
+from typing import Dict, List, Any
 from collections import defaultdict
 
 
@@ -333,7 +333,7 @@ def run_full_analysis():
 
     analysis = analyze_form_elements(all_elements)
 
-    print(f"\n📊 Full Analysis Results:")
+    print("\n📊 Full Analysis Results:")
     print(f"   Total forms processed: {len(all_elements)}")
     print(f"   Concept types found: {len(analysis['concept_types_found'])}")
     print(f"   Form types found: {len(analysis['form_types_found'])}")
@@ -373,7 +373,7 @@ def run_quick_analysis():
 
     analysis = analyze_sampled_forms(all_sampled_forms)
 
-    print(f"\n📊 Quick Analysis Results:")
+    print("\n📊 Quick Analysis Results:")
     print(f"   Total forms sampled: {len(all_sampled_forms)}")
     print(f"   Concept types found: {len(analysis['data_types_found'])}")
     print(f"   New concept types: {len(analysis['new_concept_types'])}")
@@ -418,7 +418,7 @@ def run_new_only_analysis():
 
     analysis = analyze_sampled_forms(all_sampled_forms)
 
-    print(f"\n📊 New Organizations Analysis Results:")
+    print("\n📊 New Organizations Analysis Results:")
     print(f"   Organizations analyzed: {len(organizations)}")
     print(f"   Total forms sampled: {len(all_sampled_forms)}")
     print(f"   Concept types found: {len(analysis['data_types_found'])}")
@@ -428,7 +428,7 @@ def run_new_only_analysis():
     if analysis["new_concept_types"]:
         print(f"   🔍 NEW TYPES: {', '.join(analysis['new_concept_types'])}")
 
-    print(f"\n📋 Domain Patterns:")
+    print("\n📋 Domain Patterns:")
     for domain, patterns in analysis["domain_patterns"].items():
         if patterns:
             print(f"   {domain.title()}: {len(patterns)} patterns")

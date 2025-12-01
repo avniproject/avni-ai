@@ -102,7 +102,7 @@ def run_conversation_tests(args):
     orchestrator, test_subject_factory = setup_conversation_test_components(config)
 
     # Run test suite
-    print(f"\n🧪 Running conversation tests...")
+    print("\n🧪 Running conversation tests...")
     suite_result = orchestrator.run_test_suite(
         test_subject_factory=test_subject_factory,
         config=config,
@@ -113,7 +113,7 @@ def run_conversation_tests(args):
     statistics = StatisticsCalculator.calculate_suite_statistics(suite_result)
 
     # Generate reports
-    print(f"\n📊 Generating reports...")
+    print("\n📊 Generating reports...")
 
     if args.output_format in ["console", "all"]:
         console_report = ReportGenerator.generate_console_report(
@@ -132,7 +132,7 @@ def run_conversation_tests(args):
         ReportGenerator.save_report_to_file(csv_report, "conversation_test_report.csv")
 
     # Print summary
-    print(f"\n✅ Test execution completed!")
+    print("\n✅ Test execution completed!")
     print(f"   Success Rate: {suite_result.success_rate:.1f}%")
     print(f"   Total Tests: {suite_result.total_tests}")
     print(f"   Successful: {suite_result.successful_tests}")
