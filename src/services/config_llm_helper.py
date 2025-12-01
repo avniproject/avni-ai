@@ -1,8 +1,29 @@
 import json
 import logging
+import uuid
+import copy
 from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
+
+
+def preprocess_config_uuids(config: Dict[str, Any]) -> Dict[str, Any]:
+    processed_config = copy.deepcopy(config)
+
+    def replace_uuids(obj):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if value == "generate-v4-uuid":
+                    obj[key] = str(uuid.uuid4())
+                    logger.info(f"Generated UUID for {key}: {obj[key]}")
+                else:
+                    replace_uuids(value)
+        elif isinstance(obj, list):
+            for item in obj:
+                replace_uuids(item)
+
+    replace_uuids(processed_config)
+    return processed_config
 
 
 def build_system_instructions() -> str:
@@ -95,13 +116,10 @@ OTHER CONVERSION RULES:
 - For general encounters:DO NOT include program_uuid parameter in function calls payload at all (do not send "program_uuid": "" ,program_uuid should be completely neglected), otherwise it will fail to create encounter type
 - For program-specific encounters: include program_uuid parameter with actual program UUID
 
-UUID GENERATION AND REFERENCE RULES:
-- When config contains "uuid": "generate-v4-uuid" or "subjectTypeUuid": "generate-v4-uuid" → Generate a new UUID version 4 and use that value
+UUID REFERENCE RULES:
 - When config contains "subjectTypeUuid": "reference-subject-uuid-for-individuals" → Find the existing "Individual" subject type UUID from operational context and use that value
 - When config contains "subjectTypeUuid": "reference-subject-uuid-for-household" → Find the existing "Household" subject type UUID from operational context and use that value
-- When config contains any field with "generate-v4-uuid" → Generate a new UUID v4 for that field
 - When config contains any field with "reference-subject-uuid-for-X" → Find the existing subject type with name X and use its UUID
-- Generated UUIDs must be in standard format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
 - Always use the EXACT UUID from operational context when referencing existing items
 
 **COMPREHENSIVE STEP-BY-STEP CREATION EXAMPLE:**

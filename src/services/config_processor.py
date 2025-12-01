@@ -14,6 +14,7 @@ from .config_llm_helper import (
     extract_text_content,
     log_input_list,
     log_openai_response_summary,
+    preprocess_config_uuids,
 )
 
 logger = logging.getLogger(__name__)
@@ -184,7 +185,15 @@ class ConfigProcessor:
         session_logger.info("=" * 80)
 
         try:
-            session_logger.info("STEP 1: Fetching complete existing configuration")
+            session_logger.info(
+                "STEP 1: Preprocessing config to replace UUID placeholders"
+            )
+            processed_config = preprocess_config_uuids(config)
+            session_logger.info(
+                f"Processed config: {json.dumps(processed_config, indent=2)}"
+            )
+
+            session_logger.info("STEP 2: Fetching complete existing configuration")
             avni_client = AvniClient()
             complete_existing_config = await avni_client.fetch_complete_config(
                 auth_token
@@ -201,19 +210,21 @@ class ConfigProcessor:
             session_logger.info("Successfully fetched complete existing config")
 
             system_instructions = build_system_instructions()
-            session_logger.info("STEP 2: Built system instructions")
-            config_input = build_initial_input(config, complete_existing_config)
-            session_logger.info("STEP 3: Built initial input for LLM")
+            session_logger.info("STEP 3: Built system instructions")
+            config_input = build_initial_input(
+                processed_config, complete_existing_config
+            )
+            session_logger.info("STEP 4: Built initial input for LLM")
 
             available_tools = tool_registry.get_openai_tools()
-            session_logger.info(f"STEP 4: Got {len(available_tools)} available tools")
+            session_logger.info(f"STEP 5: Got {len(available_tools)} available tools")
             for i, tool in enumerate(available_tools, 1):
                 tool_name = tool.get("function", {}).get("name", "unknown")
                 session_logger.info(f"  Tool {i}: {tool_name}")
 
             max_iterations = 30  # Prevent infinite loops
             session_logger.info(
-                f"STEP 5: Starting LLM iteration loop (max {max_iterations} iterations)"
+                f"STEP 6: Starting LLM iteration loop (max {max_iterations} iterations)"
             )
 
             async with OpenAIResponsesClient(OPENAI_API_KEY, 120.0) as client:
