@@ -267,7 +267,7 @@ Next Step Rules:
   {
   "name": "EncounterTypeName",        // REQUIRED - string
   "uuid": "generate-v4-uuid",        // REQUIRED - generate v4 uuid
-  "subjectTypeUuid": "reference-subject-uuid", // REQUIRED - reference to subject type
+  "subjectTypeUuid": "reference-subject-uuid", // REQUIRED - reference to subject type can not be NULL
   "programUuid": null,                // nullable - null for general encounters, program uuid for program encounters
   "active": true,                     // boolean - default true
   "voided": false,                    // boolean - default false
