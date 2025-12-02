@@ -97,7 +97,7 @@ def create_error_result(
 
     return ConfigProcessResult(
         done=False,
-        status="error",
+        status="completed",
         results={
             "deleted_implementation": [],
             "deleted_address_level_types": [],
@@ -136,7 +136,7 @@ def create_max_iterations_result(max_iterations: int) -> ConfigProcessResult:
 
     return ConfigProcessResult(
         done=False,
-        status="error",
+        status="completed",
         results={
             "deleted_implementation": [],
             "deleted_address_level_types": [],
@@ -201,13 +201,19 @@ class ConfigProcessor:
                 auth_token
             )
             if "error" in complete_existing_config:
+                error_msg = complete_existing_config["error"]
                 session_logger.error(
-                    f"Failed to fetch complete configuration: {complete_existing_config['error']}"
+                    f"Failed to fetch complete configuration: {error_msg}"
                 )
-                return create_error_result(
-                    "Failed to fetch complete configuration",
-                    [complete_existing_config["error"]],
-                )
+
+                if "HTTP 401" in error_msg or "401" in error_msg:
+                    user_friendly_msg = " Authentication Error: Please refresh your browser tab and try again. No configuration changes were made."
+                    return create_error_result(user_friendly_msg, [error_msg])
+                else:
+                    return create_error_result(
+                        "Failed to fetch complete configuration",
+                        [error_msg],
+                    )
 
             session_logger.info("Successfully fetched complete existing config")
 

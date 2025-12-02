@@ -213,7 +213,7 @@ WRONG WORKFLOW:
 IMPORTANT: You must respond in JSON format with these fields:
 {
   "done": boolean,  // true only when ALL CRUD operations are successfully processed
-  "status": "processing|completed|error",
+  "status": "processing|completed",
   "results": {
     "deleted_implementation": [...],
     "deleted_address_level_types": [...],
@@ -308,7 +308,7 @@ CRITICAL ERROR HANDLING:
 When function calls return errors, you MUST analyze them and determine if processing should continue:
 
 **CRITICAL ERRORS - STOP PROCESSING IMMEDIATELY:**
-If you encounter any of these errors, set done=false, status="error", and provide comprehensive status:
+If you encounter any of these errors, set done=false, status="completed", and provide comprehensive status in endUserResult:
 - HTTP 403 (Forbidden) - Permission denied, user lacks access
 - HTTP 401 (Unauthorized) - Authentication failed, invalid token - Ask user to refresh tab
 - HTTP 500 (Internal Server Error) - Server-side issues
@@ -345,7 +345,7 @@ When stopping due to critical errors, you MUST provide detailed status in endUse
 ```json
 {
   "done": false,
-  "status": "error",
+  "status": "completed",
   "results": {
     // Include all successful operations in appropriate arrays
     "created_address_level_types": [...],
