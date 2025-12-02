@@ -4,7 +4,7 @@ import os
 from typing import Dict, Any, Callable, Optional
 from dataclasses import dataclass
 
-from ..clients import AvniClient, OpenAIResponsesClient
+from ..clients import OpenAIResponsesClient
 from .tool_registry import tool_registry
 from ..utils.env import OPENAI_API_KEY
 from .config_llm_helper import (
@@ -16,6 +16,8 @@ from .config_llm_helper import (
     log_openai_response_summary,
     preprocess_config_uuids,
 )
+from .avni.config_fetcher import ConfigFetcher
+from .avni.form_mapping_processor import FormMappingProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -194,8 +196,8 @@ class ConfigProcessor:
             )
 
             session_logger.info("STEP 2: Fetching complete existing configuration")
-            avni_client = AvniClient()
-            complete_existing_config = await avni_client.fetch_complete_config(
+            config_fetcher = ConfigFetcher()
+            complete_existing_config = await config_fetcher.fetch_complete_config(
                 auth_token
             )
             if "error" in complete_existing_config:
@@ -208,6 +210,13 @@ class ConfigProcessor:
                 )
 
             session_logger.info("Successfully fetched complete existing config")
+
+            session_logger.info("STEP 2.5: Enriching config with form mappings")
+            complete_existing_config = (
+                await FormMappingProcessor.enrich_config_with_form_mappings(
+                    complete_existing_config, auth_token, session_logger
+                )
+            )
 
             system_instructions = build_system_instructions()
             session_logger.info("STEP 3: Built system instructions")
@@ -222,7 +231,7 @@ class ConfigProcessor:
                 tool_name = tool.get("function", {}).get("name", "unknown")
                 session_logger.info(f"  Tool {i}: {tool_name}")
 
-            max_iterations = 30  # Prevent infinite loops
+            max_iterations = 15  # Prevent infinite loops
             session_logger.info(
                 f"STEP 6: Starting LLM iteration loop (max {max_iterations} iterations)"
             )
