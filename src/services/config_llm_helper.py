@@ -361,7 +361,7 @@ When stopping due to critical errors, you MUST provide detailed status in endUse
 
 **Scenario 1 - Early Authentication Failure:**
 ```
-"endUserResult": "❌ Authentication Error: Your session appears to be invalid or expired (HTTP 401). Please refresh your browser tab and try again. No configuration changes were made."
+"endUserResult": "Looks like your token is expired! Please refresh your browser tab and try again. No configuration changes were made."
 ```
 
 **Scenario 1b - Configuration Fetch Failure:**
