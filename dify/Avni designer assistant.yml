@@ -275,13 +275,12 @@ workflow:
           - org_name
         model:
           completion_params:
-            frequency_penalty: 0.5
-            max_tokens: 500
-            presence_penalty: 0.5
-            temperature: 0.2
-            top_p: 0.75
+            max_tokens: 100
+            reasoning_effort: minimal
+            response_format: text
+            verbosity: low
           mode: chat
-          name: gpt-4.1-nano
+          name: gpt-5-nano
           provider: langgenius/openai/openai
         prompt_template:
         - id: bcaaf498-89b5-4273-bc8c-5a28f60018e1
@@ -291,8 +290,10 @@ workflow:
             \ form element JSON structures and identify all problems, violations,\
             \ and issues.\n\n## Critical Avni Rules to Check:\n    \n    1. DATE FIELD\
             \ VALIDATION (CRITICAL):\n       - Date fields should NEVER be suggested\
-            \ as SingleSelect\n       - Date dataType is used for: birth dates, visit\
-            \ dates, exit dates, cancellation dates\n       - Any field representing\
+            \ as SingleSelect\n       - Date dataType is used for capturing dates\
+            \ other than when the current action is performed\n       - Any field\
+            \ named case-insensitively 'Registration date', 'Enrolment date', 'Visit\
+            \ date', 'Exit date', 'Cancellation date'\n      - Any field representing\
             \ a point in time should use Date dataType\n       - Date selection is\
             \ NOT categorical selection\n\n\n    2. NEW FORM TYPES - CANCELLATION\
             \ FORMS:\n       - IndividualEncounterCancellation & ProgramEncounterCancellation\
@@ -471,24 +472,25 @@ workflow:
             - Trigger is unclear (enrolment vs encounter)\n- Timing is completely\
             \ missing (e.g. \"schedule follow-up\" with no days/weeks)\n- Next visit\
             \ name is not in context\n- Conflicting info between request and context\n\
-            \n### 2. Validate (Always Do This)\nPresent a clean table with 3–4 real-world\
-            \ scenarios showing exactly when the rule will trigger.\n\nExample:\n\
-            | Case                  | Trigger            | Reference Date     | Next\
-            \ Visit         | Earliest   | Latest     | Will Schedule? |\n|-----------------------|--------------------|--------------------|--------------------|------------|------------|----------------|\n\
+            \n### 2. Validate (Always Do This)\n\nPresent a clean MarkDown table with\
+            \ 3–4 real-world scenarios showing exactly when the rule will trigger.\n\
+            Then ask:\nDo these scenarios match exactly what you want?  \nReply **YES**\
+            \ to get the final rule code, or tell me what to change.\n\nExample:\n\
+            ```\n| Case                  | Trigger            | Reference Date   \
+            \  | Next Visit         | Earliest   | Latest     | Will Schedule? |\n\
+            |-----------------------|--------------------|--------------------|--------------------|------------|------------|----------------|\n\
             | Standard ANC visit    | ANC completed      | 2025-04-01         | ANC\
             \ - Follow Up    | 2025-04-22 | 2025-05-06 | Yes            |\n| Early\
             \ completion      | ANC on day 20      | 2025-03-20         | ANC - Follow\
             \ Up        | Today      | +14 days   | Yes            |\n| After Delivery\
             \ | Delivery recorded  | 2025-06-15         | (none)           | —   \
-            \       | —          | No             |\n\nThen ask:\nDo these scenarios\
-            \ match exactly what you want?  \nReply **YES** to get the final rule\
-            \ code, or tell me what to change.\n\n### 3. Generate Code (Only After\
-            \ User Says \"YES\")\nDeliver:\n1. Complete, clean, production-ready JavaScript\
-            \ rule\n2. One-line plain English summary\n3. No extra chatter\n Use this\
-            \ exact code format:\n```javascript\n\"use strict\";\n({params, imports})\
-            \ => {\n    const { entity, today } = params;\n    const builder = new\
-            \ imports.rulesConfig.VisitScheduleBuilder({entity});\n\n    // Example:\
-            \ ANC to ANC Follow Up (28 days ±7)\n    if (entity.encounterType.name\
+            \       | —          | No             |\n```\n\n\n### 3. Generate Code\
+            \ (Only After User Says \"YES\")\nDeliver:\n1. Complete, clean, production-ready\
+            \ JavaScript rule\n2. One-line plain English summary\n3. No extra chatter\n\
+            \ Use this exact code format:\n```javascript\n\"use strict\";\n({params,\
+            \ imports}) => {\n    const { entity, today } = params;\n    const builder\
+            \ = new imports.rulesConfig.VisitScheduleBuilder({entity});\n\n    //\
+            \ Example: ANC to ANC Follow Up (28 days ±7)\n    if (entity.encounterType.name\
             \ === \"ANC\") {\n        if (entity.individual.hasEncounterOfType(\"\
             \ Delivery\")) return builder.getAll();\n\n        const baseDate = entity.encounterDateTime;\n\
             \ builder.add({\n            name: \"ANC - Follow Up\",, \n          \
@@ -1067,24 +1069,24 @@ workflow:
             \n  console.log('encounter-->',encounter);\n  \n  const baseDate = encounter.cancelDateTime;\n\
             \  console.log(\"\"baseDate -->\"\", baseDate);\n\n  function isAlreadyScheduled(nextVisitName,\
             \ earliestDate) {\n    const nextVisitDate = moment(earliestDate).startOf(\"\
-            \"day\"\");\n    const existingEncounters = encounter.individual?.encounters\
+            \"day\"\");\n    const existingEncounters = encounter.individual.encounters\
             \ || [];\n\n    console.log(`Checking for ${nextVisitName} on ${nextVisitDate.format(\"\
             \"YYYY-MM-DD\"\")}`);\n\n    existingEncounters.forEach((enc) => {\n \
-            \     const name = enc.name?.trim();\n      const date = enc.earliestVisitDateTime\n\
+            \     const name = enc.name.trim();\n      const date = enc.earliestVisitDateTime\n\
             \        ? moment(enc.earliestVisitDateTime).format(\"\"YYYY-MM-DD\"\"\
             )\n        : \"\"N/A\"\";\n      console.log(`  Encounter: ${name}, Date:\
             \ ${date}, Voided: ${enc.voided}`);\n    });\n\n    return existingEncounters.some((enc)\
-            \ => {\n      const encounterName = enc.name?.trim();\n      const scheduledDate\
+            \ => {\n      const encounterName = enc.name.trim();\n      const scheduledDate\
             \ = enc.earliestVisitDateTime\n        ? moment(enc.earliestVisitDateTime).startOf(\"\
             \"day\"\")\n        : null;\n\n      return (\n        enc.voided ===\
             \ false &&\n        (\n          encounterName === nextVisitName ||\n\
             \          (scheduledDate && scheduledDate.isSame(nextVisitDate, \"\"\
             day\"\"))\n        )\n      );\n    });\n  }\n\n  function getNextVisitName(currentVisitName)\
-            \ {\n    const match = currentVisitName?.match(/^School Health - Screening\
+            \ {\n    const match = currentVisitName.match(/^School Health - Screening\
             \ Follow up (\\d+)$/);\n    if (match) {\n      const nextNumber = parseInt(match[1],\
             \ 10) + 1;\n      return `School Health - Screening Follow up ${nextNumber}`;\n\
             \    }\n    return \"\"School Health - Screening Follow up 2\"\";\n  }\n\
-            \n  const dob = encounter.individual?.dateOfBirth;\n  const today = moment();\n\
+            \n  const dob = encounter.individual.dateOfBirth;\n  const today = moment();\n\
             \  const ageInYears = moment(today).diff(moment(dob), \"\"years\"\", true);\n\
             \  const isAgeEligible = ageInYears >= 5 && ageInYears <= 19;\n\n  console.log(\"\
             \"isAgeEligible--->\"\", isAgeEligible);\n\n  const nextVisitName = getNextVisitName(encounter.name);\n\
@@ -2815,11 +2817,11 @@ workflow:
             \  \n  const encounterType = encounter.encounterType.name;\n\n  const\
             \ baseDate = encounter.encounterDateTime;\n\n  function isAlreadyScheduled(nextVisitName,\
             \ earliestDate) {\n    const nextVisitDate = moment(earliestDate).startOf('day');\n\
-            \    const existingEncounters = encounter.individual?.encounters || [];\n\
-            \    existingEncounters.forEach(enc => {\n      const name = enc.name?.trim();\n\
+            \    const existingEncounters = encounter.individual.encounters || [];\n\
+            \    existingEncounters.forEach(enc => {\n      const name = enc.name.trim();\n\
             \      const date = enc.earliestVisitDateTime ? moment(enc.earliestVisitDateTime).format('YYYY-MM-DD')\
             \ : 'N/A';\n    });\n\n    return existingEncounters.some((enc) => {\n\
-            \      const encounterName = enc.name?.trim();\n      const scheduledDate\
+            \      const encounterName = enc.name.trim();\n      const scheduledDate\
             \ = enc.earliestVisitDateTime\n        ? moment(enc.earliestVisitDateTime).startOf('day')\n\
             \        : null;\n\n      return (\n        enc.voided === false &&\n\
             \        (\n          encounterName === nextVisitName ||\n          (scheduledDate\
@@ -3110,7 +3112,7 @@ workflow:
           role: user
           text: '{{#sys.query#}} {{#sys.files#}}'
         reasoning_format: tagged
-        selected: false
+        selected: true
         title: LLM - Visit Schedule
         type: llm
         vision:
