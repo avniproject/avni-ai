@@ -4,7 +4,7 @@ import os
 from typing import Dict, Any, Callable, Optional
 from dataclasses import dataclass
 
-from ..clients import AvniClient, OpenAIResponsesClient
+from ..clients import OpenAIResponsesClient
 from .tool_registry import tool_registry
 from ..utils.env import OPENAI_API_KEY
 from .config_llm_helper import (
@@ -16,6 +16,8 @@ from .config_llm_helper import (
     log_openai_response_summary,
     preprocess_config_uuids,
 )
+from .avni.config_fetcher import ConfigFetcher
+from .avni.form_mapping_processor import FormMappingProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +97,7 @@ def create_error_result(
 
     return ConfigProcessResult(
         done=False,
-        status="error",
+        status="completed",
         results={
             "deleted_implementation": [],
             "deleted_address_level_types": [],
@@ -134,7 +136,7 @@ def create_max_iterations_result(max_iterations: int) -> ConfigProcessResult:
 
     return ConfigProcessResult(
         done=False,
-        status="error",
+        status="completed",
         results={
             "deleted_implementation": [],
             "deleted_address_level_types": [],
@@ -194,20 +196,33 @@ class ConfigProcessor:
             )
 
             session_logger.info("STEP 2: Fetching complete existing configuration")
-            avni_client = AvniClient()
-            complete_existing_config = await avni_client.fetch_complete_config(
+            config_fetcher = ConfigFetcher()
+            complete_existing_config = await config_fetcher.fetch_complete_config(
                 auth_token
             )
             if "error" in complete_existing_config:
+                error_msg = complete_existing_config["error"]
                 session_logger.error(
-                    f"Failed to fetch complete configuration: {complete_existing_config['error']}"
-                )
-                return create_error_result(
-                    "Failed to fetch complete configuration",
-                    [complete_existing_config["error"]],
+                    f"Failed to fetch complete configuration: {error_msg}"
                 )
 
+                if "HTTP 401" in error_msg or "401" in error_msg:
+                    user_friendly_msg = " Authentication Error: Please refresh your browser tab and try again. No configuration changes were made."
+                    return create_error_result(user_friendly_msg, [error_msg])
+                else:
+                    return create_error_result(
+                        "Failed to fetch complete configuration",
+                        [error_msg],
+                    )
+
             session_logger.info("Successfully fetched complete existing config")
+
+            session_logger.info("STEP 2.5: Enriching config with form mappings")
+            complete_existing_config = (
+                await FormMappingProcessor.enrich_config_with_form_mappings(
+                    complete_existing_config, auth_token, session_logger
+                )
+            )
 
             system_instructions = build_system_instructions()
             session_logger.info("STEP 3: Built system instructions")
@@ -222,7 +237,7 @@ class ConfigProcessor:
                 tool_name = tool.get("function", {}).get("name", "unknown")
                 session_logger.info(f"  Tool {i}: {tool_name}")
 
-            max_iterations = 30  # Prevent infinite loops
+            max_iterations = 15  # Prevent infinite loops
             session_logger.info(
                 f"STEP 6: Starting LLM iteration loop (max {max_iterations} iterations)"
             )
