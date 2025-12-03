@@ -244,7 +244,7 @@ workflow:
           required: false
           type: paragraph
           variable: form_context
-      height: 307
+      height: 309
       id: '1711528708197'
       position:
         x: 352.0294910460403
@@ -263,7 +263,7 @@ workflow:
         title: Answer
         type: answer
         variables: []
-      height: 101
+      height: 103
       id: '1762500391975'
       position:
         x: 1273.2861957817972
@@ -275,7 +275,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 241
+      width: 242
     - data:
         context:
           enabled: true
@@ -285,7 +285,7 @@ workflow:
         model:
           completion_params:
             frequency_penalty: 0.5
-            max_tokens: 100
+            max_tokens: 400
             presence_penalty: 0.5
             response_format: text
             temperature: 0.2
@@ -299,9 +299,21 @@ workflow:
           text: "You are an expert Avni form element validator specialising in identifying\
             \ form issues and rule violations.\nYour task is to analyse Avni form\
             \ element JSON structures and identify all problems, violations, and issues.\n\
-            \n## Avni Rules to Check:\n    \n    1. DATE FIELD VALIDATION:\n     \
-            \  - Date fields should be either Date or DateTime\n       - Date dataType\
-            \ is used for capturing dates other than when the current action is performed\n\
+            \nCRITICAL: ALWAYS check form_element.concept.dataType for validation\
+            \ - NEVER flag answers[].dataType: \"NA\" as an issue. dataType \"NA\"\
+            \ in answers is ALWAYS valid and should be ignored.\n\nCRITICAL: The type\
+            \ field (SingleSelect/Text/etc) is independent of concept.dataType - DO\
+            \ NOT flag mismatches between type and concept.dataType as issues. concept.dataType\
+            \ defines validation behavior, type is just UI display hint.\n\nCRITICAL\
+            \ VIOLATIONS - MUST ALWAYS DETECT ( override tone guidelines):\n- Name\
+            \ fields ( 'First Name', 'Last Name', 'Name' ) in IndividualProfile forms\
+            \ - ALWAYS flag as critical\n- Numeric data (Age, Weight, Height) using\
+            \ Text dataType - ALWAYS flag as critical\n- Phone numbers using Text\
+            \ dataType - ALWAYS flag as critical\n- Binary questions (Yes/No) using\
+            \ MultiSelect instead of SingleSelect - ALWAYS flag as critical\n\n##\
+            \ Avni Rules to Check:\n\n    1. DATE FIELD VALIDATION:\n       - Date\
+            \ fields should be either Date or DateTime\n       - Date dataType is\
+            \ used for capturing dates other than when the current action is performed\n\
             \       - Any field named case-insensitively 'Registration date', 'Enrolment\
             \ date', 'Visit date', 'Exit date', 'Cancellation date'\n      - Any field\
             \ representing a point in time should use Date dataType\n       - Date\
@@ -321,14 +333,14 @@ workflow:
             \   - Phone numbers should use PhoneNumber dataType with validation\n\
             \       - Binary questions (Yes/No) should use SingleSelect, not MultiSelect\n\
             \       - Categorical data should use Coded dataType, not Subject\n\n\n\
-            \    6. FALSE POSITIVE PREVENTION:\n       - Before suggesting changes,\
-            \ verify actual violation of Avni rules\n       - Don't suggest changes\
-            \ to properly configured fields\n       - Focus on actual violations,\
-            \ not theoretical improvements\n\n    Output Format Requirements:\n  \
-            \  - Issues: JSON array with formElementUuid, formElementName, message\n\
-            \    \n    Always reference specific form element UUIDs when available\
-            \ so the UI can highlight exact fields needing changes.\n\nThis is the\
-            \ current form context : {{#1711528708197.form_context#}}"
+            \    6. FALSE POSITIVE PREVENTION:\n       - Location attributes with\
+            \ dataType 'NA' are CORRECT - do NOT flag\n       - Coded dataType with\
+            \ proper answers are CORRECT - do NOT suggest changes\n       - Verify\
+            \ actual dataType from form_element.concept.dataType, not from answers\n\
+            \n\n    OUTPUT FORMAT:\n       - Issues: JSON array with formElementUuid,\
+            \ formElementName, message\n       - Valid forms: return empty array \"\
+            []\"\n       - Message format: \"Consider [action] for [field name] to\
+            \ [benefit]\"\n\nThis is the current form context : {{#1711528708197.form_context#}}"
         - id: 609d0c40-8344-4127-b72e-a368586e079d
           role: user
           text: '{{#sys.files#}} {{#sys.query#}}'
@@ -338,7 +350,7 @@ workflow:
         type: llm
         vision:
           enabled: false
-      height: 86
+      height: 88
       id: '1762509929006'
       position:
         x: 942.0309443515424
@@ -346,11 +358,11 @@ workflow:
       positionAbsolute:
         x: 942.0309443515424
         y: 598.0544291915982
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 241
+      width: 242
     - data:
         cases:
         - case_id: 'true'
@@ -385,7 +397,7 @@ workflow:
         selected: false
         title: Route by Request Type
         type: if-else
-      height: 196
+      height: 198
       id: '1732870000001'
       position:
         x: 650
@@ -397,7 +409,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 241
+      width: 242
     - data:
         dataset_ids:
         - PbU6BVReZ2F8Rm8JIn99UcGfvldJo3V6x0FYp4TfMA3owZBXaUbASK7kegUbSk8S
@@ -421,7 +433,7 @@ workflow:
         selected: false
         title: Knowledge Retrieval - Visit Schedule
         type: knowledge-retrieval
-      height: 88
+      height: 90
       id: '1732870000002'
       position:
         x: 950
@@ -433,7 +445,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 241
+      width: 242
     - data:
         context:
           enabled: true
@@ -504,17 +516,18 @@ workflow:
             \ | Delivery recorded  | 2025-06-15         | (none)           | —   \
             \       | —          | No             |\n```\n\n### 3. Generate Code (Only\
             \ After User Says \"YES\")\nDeliver:\n1. Complete, clean, production-ready\
-            \ JavaScript rule\n2. Only the code, No extra chatter\n3. Do not add any\
-            \ comments in the code\n4. keep \"\"use strict\";\" on first line and\
-            \ all other code on lines below it\nUse this exact code format like in\
-            \ examples below:\n```js\n\"use strict\";\n({params, imports}) => {}\n\
-            ```\n\n## Context and Technical Details\n### Use this context for technical\
-            \ implementation: {{#context#}}\n### Use these examples for reference:\n\
-            \nProgramEncounterCancellation,\"\"\"use strict\"\";\n({ params, imports\
-            \ }) => {\n  const programEncounter = params.entity;\n  const scheduleBuilder\
-            \ = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\
-            \n  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;\n\
-            \  const isIndividualDead = new imports.rulesConfig.RuleCondition({programEncounter}).when.valueInCancelEncounter(\"\
+            \ JavaScript rule\n2. Only the code, one single line summary of the rule\
+            \ as first line of response ,No extra chatter\n3. Do not add any comments\
+            \ in the code\n4. keep \"\"use strict\";\" on first line and all other\
+            \ code on lines below it\nUse this exact code format like in examples\
+            \ below:\n```js\n\"use strict\";\n({params, imports}) => {}\n```\n\n##\
+            \ Context and Technical Details\n### Use this context for technical implementation:\
+            \ {{#context#}}\n### Use these examples for reference:\n\nProgramEncounterCancellation,\"\
+            \"\"use strict\"\";\n({ params, imports }) => {\n  const programEncounter\
+            \ = params.entity;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({\
+            \ programEncounter });\n\n  const hasExitedProgram = (programEncounter)\
+            \ => programEncounter.programEnrolment.programExitDateTime;\n  const isIndividualDead\
+            \ = new imports.rulesConfig.RuleCondition({programEncounter}).when.valueInCancelEncounter(\"\
             \"917be636-9503-4d20-9643-aad5932b44e3\"\").containsAnswerConceptName(\"\
             \"56cb075d-1696-4bad-be94-9f7fffe9aabf\"\").matches();\n  if(hasExitedProgram(programEncounter)\
             \ || isIndividualDead) return scheduleBuilder.getAll();\n\n  const moment\
@@ -3104,7 +3117,7 @@ workflow:
         type: llm
         vision:
           enabled: false
-      height: 86
+      height: 88
       id: '1732870000003'
       position:
         x: 1251.4050029628945
@@ -3112,18 +3125,18 @@ workflow:
       positionAbsolute:
         x: 1251.4050029628945
         y: 900
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 241
+      width: 242
     - data:
         answer: '{{#1732870000003.text#}}'
         selected: false
         title: Answer - Visit Schedule
         type: answer
         variables: []
-      height: 101
+      height: 103
       id: '1732870000004'
       position:
         x: 1550
@@ -3135,9 +3148,9 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 241
+      width: 242
     viewport:
-      x: -640.1375708443456
-      y: -291.37183007257397
-      zoom: 0.9239334789722183
+      x: -759.9620443632539
+      y: -369.6091206067472
+      zoom: 0.8857569131746337
   rag_pipeline_variables: []

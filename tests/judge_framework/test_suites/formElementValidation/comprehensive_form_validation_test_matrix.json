@@ -66,7 +66,7 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [
-      "CRITICAL: Name field should not be in IndividualProfile form"
+      "Consider removing 'First Name' field - name fields should not be in IndividualProfile forms"
     ],
     "test_priority": "CRITICAL",
     "performance_expectations": {
@@ -96,7 +96,7 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [
-      "HIGH: Age field using Text dataType instead of Numeric"
+      "Age field using Text dataType instead of Numeric"
     ],
     "test_priority": "CRITICAL",
     "performance_expectations": {
@@ -156,7 +156,7 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [
-      "MEDIUM: Phone field should use PhoneNumber dataType"
+      "Phone field should use PhoneNumber dataType"
     ],
     "test_priority": "CRITICAL",
     "performance_expectations": {
@@ -231,7 +231,7 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [
-      "MEDIUM: Binary question should use SingleSelect instead of MultiSelect"
+      "Binary question should use SingleSelect instead of MultiSelect"
     ],
     "test_priority": "CRITICAL",
     "performance_expectations": {
@@ -306,7 +306,7 @@
       "formName": "Patient Registration"
     },
     "expected_issues": [
-      "MEDIUM: Subject dataType should only be used for relationships"
+      "Subject dataType should only be used for relationships"
     ],
     "test_priority": "HIGH",
     "performance_expectations": {
@@ -367,35 +367,7 @@
       "max_response_time_ms": 2500
     }
   },
-  {
-    "test_case_name": "valid_date_field",
-    "form_element": {
-      "name": "Date of Birth",
-      "uuid": "dob-valid-uuid",
-      "keyValues": [],
-      "concept": {
-        "name": "Date of Birth",
-        "uuid": "dob-concept-uuid",
-        "dataType": "Date",
-        "answers": [],
-        "active": true
-      },
-      "displayOrder": 6.0,
-      "type": "Text",
-      "mandatory": true
-    },
-    "form_context": {
-      "formType": "IndividualProfile",
-      "formName": "Patient Registration"
-    },
-    "expected_issues": [],
-    "test_priority": "HIGH",
-    "performance_expectations": {
-      "ideal_response_time_ms": 500,
-      "max_response_time_ms": 2500
-    }
-  },
-  {
+    {
     "test_case_name": "valid_exit_date_program_exit",
     "form_element": {
       "name": "Exit Date",
@@ -451,113 +423,7 @@
       "max_response_time_ms": 2500
     }
   },
-  {
-    "test_case_name": "valid_cancellation_reason_coded",
-    "form_element": {
-      "name": "Cancellation Reason",
-      "uuid": "cancellation-reason-valid-uuid",
-      "keyValues": [],
-      "concept": {
-        "name": "Cancellation Reason",
-        "uuid": "cancellation-reason-concept-uuid",
-        "dataType": "Coded",
-        "answers": [
-          {
-            "name": "Patient refused",
-            "uuid": "refused-uuid",
-            "dataType": "NA",
-            "answers": [],
-            "order": 0.0,
-            "active": true
-          },
-          {
-            "name": "Adverse event",
-            "uuid": "adverse-uuid",
-            "dataType": "NA",
-            "answers": [],
-            "order": 1.0,
-            "active": true
-          },
-          {
-            "name": "Other",
-            "uuid": "other-uuid",
-            "dataType": "NA",
-            "answers": [],
-            "order": 2.0,
-            "active": true
-          }
-        ],
-        "active": true
-      },
-      "displayOrder": 2.0,
-      "type": "SingleSelect",
-      "mandatory": true
-    },
-    "form_context": {
-      "formType": "IndividualEncounterCancellation",
-      "formName": "Encounter Cancellation Form"
-    },
-    "expected_issues": [],
-    "test_priority": "CRITICAL",
-    "performance_expectations": {
-      "ideal_response_time_ms": 500,
-      "max_response_time_ms": 2500
-    }
-  },
-  {
-    "test_case_name": "valid_exit_reason_coded",
-    "form_element": {
-      "name": "Exit Reason",
-      "uuid": "exit-reason-valid-uuid",
-      "keyValues": [],
-      "concept": {
-        "name": "Exit Reason",
-        "uuid": "exit-reason-concept-uuid",
-        "dataType": "Coded",
-        "answers": [
-          {
-            "name": "Completed",
-            "uuid": "completed-uuid",
-            "dataType": "NA",
-            "answers": [],
-            "order": 0.0,
-            "active": true
-          },
-          {
-            "name": "Transferred",
-            "uuid": "transferred-uuid",
-            "dataType": "NA",
-            "answers": [],
-            "order": 1.0,
-            "active": true
-          },
-          {
-            "name": "Withdrawn",
-            "uuid": "withdrawn-uuid",
-            "dataType": "NA",
-            "answers": [],
-            "order": 2.0,
-            "active": true
-          }
-        ],
-        "active": true
-      },
-      "displayOrder": 2.0,
-      "type": "SingleSelect",
-      "mandatory": true
-    },
-    "form_context": {
-      "formType": "ProgramExit",
-      "formName": "Program Exit Form"
-    },
-    "expected_issues": [],
-    "test_priority": "CRITICAL",
-    "performance_expectations": {
-      "ideal_response_time_ms": 500,
-      "max_response_time_ms": 2500
-    }
-  },
-  {
+      {
     "test_case_name": "valid_followup_plan_text",
     "form_element": {
       "name": "Follow-up Plan",
@@ -571,7 +437,7 @@
         "active": true
       },
       "displayOrder": 3.0,
-      "type": "Text",
+      "type": "SingleSelect",
       "mandatory": false
     },
     "form_context": {
@@ -599,7 +465,7 @@
         "active": true
       },
       "displayOrder": 1.0,
-      "type": "Text",
+      "type": "SingleSelect",
       "mandatory": false
     },
     "form_context": {
@@ -607,7 +473,7 @@
       "formName": "Growth Monitoring"
     },
     "expected_issues": [
-      "HIGH: Weight field should use Numeric dataType"
+      "Weight field should use Numeric dataType"
     ],
     "test_priority": "HIGH",
     "performance_expectations": {

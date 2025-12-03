@@ -345,7 +345,7 @@ Evaluate this form validation based on the criteria provided in the prompt.
                 else:
                     return {
                         "uuid": "",
-                        "message": "No issues found",
+                        "message": "[]",
                         "is_valid": True,
                         "issues_count": 0,
                         "response_format": "raw_array_empty",
@@ -408,7 +408,7 @@ Evaluate this form validation based on the criteria provided in the prompt.
                     else:
                         return {
                             "uuid": "",
-                            "message": "No issues found",
+                            "message": "[]",
                             "is_valid": True,
                             "issues_count": 0,
                             "response_format": "enhanced_json",
