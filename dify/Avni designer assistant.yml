@@ -235,7 +235,16 @@ workflow:
           required: false
           type: select
           variable: requestType
-      height: 283
+        - default: ''
+          hint: ''
+          label: form_context
+          max_length: 9999
+          options: []
+          placeholder: ''
+          required: false
+          type: paragraph
+          variable: form_context
+      height: 307
       id: '1711528708197'
       position:
         x: 352.0294910460403
@@ -254,7 +263,7 @@ workflow:
         title: Answer
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1762500391975'
       position:
         x: 1273.2861957817972
@@ -266,7 +275,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -275,50 +284,51 @@ workflow:
           - org_name
         model:
           completion_params:
+            frequency_penalty: 0.5
             max_tokens: 100
-            reasoning_effort: minimal
+            presence_penalty: 0.5
             response_format: text
-            verbosity: low
+            temperature: 0.2
+            top_p: 0.75
           mode: chat
-          name: gpt-5-nano
+          name: gpt-4.1-nano
           provider: langgenius/openai/openai
         prompt_template:
         - id: bcaaf498-89b5-4273-bc8c-5a28f60018e1
           role: system
-          text: "You are an expert Avni form element validator specializing in identifying\
-            \ form issues and rule violations.\n\n\n    Your task is to analyze Avni\
-            \ form element JSON structures and identify all problems, violations,\
-            \ and issues.\n\n## Critical Avni Rules to Check:\n    \n    1. DATE FIELD\
-            \ VALIDATION (CRITICAL):\n       - Date fields should NEVER be suggested\
-            \ as SingleSelect\n       - Date dataType is used for capturing dates\
-            \ other than when the current action is performed\n       - Any field\
-            \ named case-insensitively 'Registration date', 'Enrolment date', 'Visit\
-            \ date', 'Exit date', 'Cancellation date'\n      - Any field representing\
-            \ a point in time should use Date dataType\n       - Date selection is\
-            \ NOT categorical selection\n\n\n    2. NEW FORM TYPES - CANCELLATION\
-            \ FORMS:\n       - IndividualEncounterCancellation & ProgramEncounterCancellation\
+          text: "You are an expert Avni form element validator specialising in identifying\
+            \ form issues and rule violations.\nYour task is to analyse Avni form\
+            \ element JSON structures and identify all problems, violations, and issues.\n\
+            \n## Avni Rules to Check:\n    \n    1. DATE FIELD VALIDATION:\n     \
+            \  - Date fields should be either Date or DateTime\n       - Date dataType\
+            \ is used for capturing dates other than when the current action is performed\n\
+            \       - Any field named case-insensitively 'Registration date', 'Enrolment\
+            \ date', 'Visit date', 'Exit date', 'Cancellation date'\n      - Any field\
+            \ representing a point in time should use Date dataType\n       - Date\
+            \ selection is NOT categorical selection\n\n\n    2. NEW FORM TYPES -\
+            \ CANCELLATION FORMS:\n       - IndividualEncounterCancellation & ProgramEncounterCancellation\
             \ forms\n       - Cancellation reason should be MANDATORY and use Coded\
             \ dataType\n       - These forms require different validation than regular\
             \ encounters\n\n\n    3. NEW FORM TYPES - PROGRAM EXIT FORMS:\n      \
             \ - ProgramExit forms have specific requirements\n       - Exit reason\
             \ should be MANDATORY and use Coded dataType\n       - Follow-up plans\
-            \ should use Text dataType (Notes is not recognized)\n\n\n    4. NAME\
+            \ should use Text dataType (Notes is not recognised)\n\n\n    4. NAME\
             \ FIELD DETECTION:\n       - Name fields in IndividualProfile forms are\
-            \ CRITICAL violations\n       - ANY field named 'First Name', 'Last Name',\
-            \ 'Name' in IndividualProfile should be flagged\n       - These fields\
-            \ should be removed\n       - Do not suggest keeping name fields in IndividualProfile\
-            \ forms\n\n\n    5. DATA TYPE COMPLIANCE:\n       - Numeric data (Age,\
-            \ Weight, Height) should use Numeric dataType with bounds\n       - Phone\
-            \ numbers should use PhoneNumber dataType with validation\n       - Binary\
-            \ questions (Yes/No) should use SingleSelect, not MultiSelect\n      \
-            \ - Categorical data should use Coded dataType, not Subject\n\n\n    6.\
-            \ FALSE POSITIVE PREVENTION:\n       - Before suggesting changes, verify\
-            \ actual violation of Avni rules\n       - Don't suggest changes to properly\
-            \ configured fields\n       - Focus on actual violations, not theoretical\
-            \ improvements\n\n    Output Format Requirements:\n    - Issues: JSON\
-            \ array with formElementUuid, formElementName, message\n    \n    Always\
-            \ reference specific form element UUIDs when available so the UI can highlight\
-            \ exact fields needing changes."
+            \ violations\n       - ANY field named 'First Name', 'Last Name', 'Name'\
+            \ in IndividualProfile should be flagged\n       - These fields should\
+            \ be removed\n\n\n    5. DATA TYPE COMPLIANCE:\n       - Numeric data\
+            \ (Age, Weight, Height) should use Numeric dataType with bounds\n    \
+            \   - Phone numbers should use PhoneNumber dataType with validation\n\
+            \       - Binary questions (Yes/No) should use SingleSelect, not MultiSelect\n\
+            \       - Categorical data should use Coded dataType, not Subject\n\n\n\
+            \    6. FALSE POSITIVE PREVENTION:\n       - Before suggesting changes,\
+            \ verify actual violation of Avni rules\n       - Don't suggest changes\
+            \ to properly configured fields\n       - Focus on actual violations,\
+            \ not theoretical improvements\n\n    Output Format Requirements:\n  \
+            \  - Issues: JSON array with formElementUuid, formElementName, message\n\
+            \    \n    Always reference specific form element UUIDs when available\
+            \ so the UI can highlight exact fields needing changes.\n\nThis is the\
+            \ current form context : {{#1711528708197.form_context#}}"
         - id: 609d0c40-8344-4127-b72e-a368586e079d
           role: user
           text: '{{#sys.files#}} {{#sys.query#}}'
@@ -328,7 +338,7 @@ workflow:
         type: llm
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1762509929006'
       position:
         x: 942.0309443515424
@@ -340,7 +350,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 'true'
@@ -375,7 +385,7 @@ workflow:
         selected: false
         title: Route by Request Type
         type: if-else
-      height: 198
+      height: 196
       id: '1732870000001'
       position:
         x: 650
@@ -387,7 +397,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         dataset_ids:
         - PbU6BVReZ2F8Rm8JIn99UcGfvldJo3V6x0FYp4TfMA3owZBXaUbASK7kegUbSk8S
@@ -411,7 +421,7 @@ workflow:
         selected: false
         title: Knowledge Retrieval - Visit Schedule
         type: knowledge-retrieval
-      height: 90
+      height: 88
       id: '1732870000002'
       position:
         x: 950
@@ -419,11 +429,11 @@ workflow:
       positionAbsolute:
         x: 950
         y: 900
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -440,14 +450,12 @@ workflow:
             size: 100
         model:
           completion_params:
-            frequency_penalty: 0.5
-            max_tokens: 2000
-            presence_penalty: 0.5
+            max_tokens: 1000
+            reasoning_effort: low
             response_format: text
-            temperature: 0.2
-            top_p: 0.75
+            verbosity: low
           mode: chat
-          name: gpt-4.1-nano
+          name: gpt-5-nano
           provider: langgenius/openai/openai
         prompt_template:
         - id: vs-prompt-1
@@ -497,12 +505,14 @@ workflow:
             \  encounterType: \"ANC - Follow Up\",\n            earliestDate: baseDate.addDays(21),\n\
             \            maxDate: baseDate.addDays(35)\n }); }\n\n    return builder.getAll();\n\
             };\n\n## Context and Technical Details\n### Use this context for technical\
-            \ implementation: {{#context#}}\n### Use these examples for reference:\n\
-            \nProgramEncounterCancellation,\"\"\"use strict\"\";\n({ params, imports\
-            \ }) => {\n  const programEncounter = params.entity;\n  const scheduleBuilder\
-            \ = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\
-            \n  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;\n\
-            \  const isIndividualDead = new imports.rulesConfig.RuleCondition({programEncounter}).when.valueInCancelEncounter(\"\
+            \ implementation: {{#context#}}\n### This is the current context of the\
+            \ form : {{#1711528708197.form_context#}}\n### Use these examples for\
+            \ reference:\n\nProgramEncounterCancellation,\"\"\"use strict\"\";\n({\
+            \ params, imports }) => {\n  const programEncounter = params.entity;\n\
+            \  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({\
+            \ programEncounter });\n\n  const hasExitedProgram = (programEncounter)\
+            \ => programEncounter.programEnrolment.programExitDateTime;\n  const isIndividualDead\
+            \ = new imports.rulesConfig.RuleCondition({programEncounter}).when.valueInCancelEncounter(\"\
             \"917be636-9503-4d20-9643-aad5932b44e3\"\").containsAnswerConceptName(\"\
             \"56cb075d-1696-4bad-be94-9f7fffe9aabf\"\").matches();\n  if(hasExitedProgram(programEncounter)\
             \ || isIndividualDead) return scheduleBuilder.getAll();\n\n  const moment\
@@ -3112,12 +3122,12 @@ workflow:
           role: user
           text: '{{#sys.query#}} {{#sys.files#}}'
         reasoning_format: tagged
-        selected: true
+        selected: false
         title: LLM - Visit Schedule
         type: llm
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1732870000003'
       position:
         x: 1251.4050029628945
@@ -3125,18 +3135,18 @@ workflow:
       positionAbsolute:
         x: 1251.4050029628945
         y: 900
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#1732870000003.text#}}'
         selected: false
         title: Answer - Visit Schedule
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1732870000004'
       position:
         x: 1550
@@ -3148,9 +3158,9 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     viewport:
-      x: -186.21310908018813
-      y: -44.06016172227646
-      zoom: 0.7012021083308355
+      x: 131.70090220745374
+      y: -90.58280630261243
+      zoom: 0.6331972201915773
   rag_pipeline_variables: []
