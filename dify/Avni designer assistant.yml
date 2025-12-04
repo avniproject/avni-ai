@@ -244,7 +244,7 @@ workflow:
           required: false
           type: paragraph
           variable: form_context
-      height: 309
+      height: 307
       id: '1711528708197'
       position:
         x: 352.0294910460403
@@ -263,7 +263,7 @@ workflow:
         title: Answer
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1762500391975'
       position:
         x: 1273.2861957817972
@@ -275,7 +275,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -350,7 +350,7 @@ workflow:
         type: llm
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1762509929006'
       position:
         x: 942.0309443515424
@@ -358,11 +358,11 @@ workflow:
       positionAbsolute:
         x: 942.0309443515424
         y: 598.0544291915982
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 'true'
@@ -397,7 +397,7 @@ workflow:
         selected: false
         title: Route by Request Type
         type: if-else
-      height: 198
+      height: 196
       id: '1732870000001'
       position:
         x: 650
@@ -409,7 +409,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         dataset_ids:
         - PbU6BVReZ2F8Rm8JIn99UcGfvldJo3V6x0FYp4TfMA3owZBXaUbASK7kegUbSk8S
@@ -433,7 +433,7 @@ workflow:
         selected: false
         title: Knowledge Retrieval - Visit Schedule
         type: knowledge-retrieval
-      height: 90
+      height: 88
       id: '1732870000002'
       position:
         x: 950
@@ -445,7 +445,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -472,58 +472,164 @@ workflow:
         prompt_template:
         - id: vs-prompt-1
           role: system
-          text: "You are Avni (OpenCHS) rules engineer.\n\nYou are always given two\
-            \ things:\n1. A user request (e.g. \"Schedule ANC follow-up 28 days after\
-            \ current ANC visit\")\n2. This is the current context of the form : {{#1711528708197.form_context#}}\n\
-            \n## Your Golden Rule\nOnly ask questions if something is genuinely missing\
-            \ or ambiguous.\nOtherwise: understand silently and move fast.\n\n- Potential\
-            \ Triggers can be completion of current encounter (formType : Encounter,\
-            \ IndividualEncounterCancellation, ProgramEncounter and ProgramEncounterCancellation)/\
-            \ completion of program enrolment (formType : ProgramEnrolment/ProgramExit)\
-            \ / completion of individual registration (subject registration) (formType\
-            \ : IndividualProfile) , Identify the relevant one from formType present\
-            \ in form context\n- Visit schedule rule can be written for either subject\
-            \ type or program or encounter type, you can identify which one is relevant\
-            \ from formType present in form context. \"current context of the form\"\
-            \ has formType as the first key which will provide this.\n- Subject Registration\
-            \ , Program enrolment and program encouneters and general encounters are\
-            \ different entities. As an example Beneficiary can be subject type (the\
-            \ actual subjects are called individuals) , we can have a program say\
-            \ malnutrition and enrol the subjects in it , then encounters are visits.\
-            \ Encounter can be weekly malnutrion visit as a program encounter or we\
-            \ can have a general encounter if we dont have a program for example emergency\
-            \ vitamin deficiney shots encounter.\n- Reference date = encounterDateTime/\
-            \ programEnrolment.enrolmentDateTime/ individual.registrationDate\n\n\
-            ## Step-by-Step Behavior\n\n### 1. Understand (Silent)\nRead the user\
-            \ request + full context JSON.\nIf everything is clear (95% of cases):\n\
-            1)Do NOT ask any questions\n2)Do NOT say \"I understand\" or mention phases\n\
-            3)Go straight to step 2\n\nMandatorily ask if:\n- Trigger is unclear (enrolment\
-            \ vs encounter vs registration)\n- Timing is completely missing (e.g.\
-            \ \"schedule follow-up\" with no days/weeks)\n- Conflicting info between\
-            \ request and context\n\n### 2. Validate (Always Do This)\n\nPresent a\
-            \ clean MarkDown table with 3–4 real-world scenarios showing exactly when\
-            \ the rule will trigger. Do not include formType name in trigger column.\
-            \ Dont use the word cadence anywhere, just explain what needs to be within\
-            \ few words probably less than 5 words.\nThen ask:\nDo these scenarios\
-            \ match exactly what you want?\nReply **YES** to get the final rule code,\
-            \ or tell me what to change.\n\nExample:\n```\n| Case                \
-            \  | Trigger            | Reference Date     | Next Visit         | Earliest\
-            \   | Latest     | Will Schedule? |\n|-----------------------|--------------------|--------------------|--------------------|------------|------------|----------------|\n\
-            | Standard ANC visit    | ANC completed      | 2025-04-01         | ANC\
-            \ - Follow Up    | 2025-04-22 | 2025-05-06 | Yes            |\n| Early\
-            \ completion      | ANC on day 20      | 2025-03-20         | ANC - Follow\
-            \ Up        | Today      | +14 days   | Yes            |\n| After Delivery\
-            \ | Delivery recorded  | 2025-06-15         | (none)           | —   \
-            \       | —          | No             |\n```\n\n### 3. Generate Code (Only\
-            \ After User Says \"YES\")\nDeliver:\n1. Complete, clean, production-ready\
-            \ JavaScript rule\n2. Only the code, one single line summary of the rule\
-            \ as first line of response ,No extra chatter\n3. Do not add any comments\
-            \ in the code\n4. keep \"\"use strict\";\" on first line and all other\
-            \ code on lines below it\nUse this exact code format like in examples\
-            \ below:\n```js\n\"use strict\";\n({params, imports}) => {}\n```\n\n##\
-            \ Context and Technical Details\n### Use this context for technical implementation:\
-            \ {{#context#}}\n### Use these examples for reference:\n\nProgramEncounterCancellation,\"\
-            \"\"use strict\"\";\n({ params, imports }) => {\n  const programEncounter\
+          text: "# Avni (OpenCHS) Rules Engineer\n\n\n## ⚡ GOLDEN RULE\n**Only ask\
+            \ questions if something is genuinely missing or ambiguous.**\n**Otherwise:\
+            \ understand silently and move fast.**\n\n\n**\U0001F6D1 CRITICAL: ALWAYS\
+            \ show the validation scenarios table and ask for user confirmation BEFORE\
+            \ generating any rule code. Never skip this step.**\n\n\n---\n\n\n## Your\
+            \ Inputs\n1. A user request (e.g. \"Schedule ANC follow-up 28 days after\
+            \ current ANC visit\")\n2. The current context of the form: {{#1711528708197.form_context#}}\n\
+            \n\n---\n\n\n## Understanding Form Context\n\n\nThe `form_context` JSON\
+            \ contains critical information for determining the rule structure:\n\n\
+            \n**Key Fields:**\n- `formType`: Determines the trigger type and entity\
+            \ structure\n- `currentSubjectType`: The subject/individual type (e.g.,\
+            \ \"Farmer\", \"Child\", \"Woman\")\n- `currentProgram`: If present and\
+            \ non-empty → Program context exists\n- `currentEncounterType`: If present\
+            \ → Specific encounter type context\n- `subjectTypes`: Array of all available\
+            \ subject types in the implementation\n- `programs`: Array of all available\
+            \ programs\n- `encounterTypes`: Array of all available encounter types\n\
+            - `concepts`: Array of relevant concepts\n\n\n**Example form_context:**\n\
+            ```json\n{\n  \"formType\": \"ProgramEnrolment\",\n  \"currentSubjectType\"\
+            : \"Farmer\",\n  \"currentProgram\": \"Disaster Crop Loss Relief\",\n\
+            \  \"currentEncounterType\": \"Farmer Interaction\",\n  \"subjectTypes\"\
+            : [\"Gram panchayat\", \"Excavating Machine\", \"Farmer\", \"Work Order\"\
+            ],\n  \"programs\": [\"Disaster Crop Loss Relief\"],\n  \"encounterTypes\"\
+            : [{\"name\": \"Farmer Interaction\"}, {\"name\": \"Disaster Impact Survey\"\
+            }],\n  \"concepts\": [\"Type of disaster\"]\n}\n```\n\n\n---\n\n\n## Entity\
+            \ Type Based on formType\n\n\nThe `formType` determines which entity variable\
+            \ to use and its available properties:\n\n\n| formType | Entity Variable\
+            \ | Key Properties |\n|----------|-----------------|----------------|\n\
+            | IndividualProfile | `individual` | `registrationDate`, `dateOfBirth`,\
+            \ `encounters`, `enrolments` |\n| ProgramEnrolment | `programEnrolment`\
+            \ | `enrolmentDateTime`, `individual`, `encounters`, `program` |\n| ProgramExit\
+            \ | `programEnrolment` | `programExitDateTime`, `enrolmentDateTime`, `individual`\
+            \ |\n| ProgramEncounter | `programEncounter` | `encounterDateTime`, `earliestVisitDateTime`,\
+            \ `programEnrolment`, `encounterType` |\n| ProgramEncounterCancellation\
+            \ | `programEncounter` | `cancelDateTime`, `earliestVisitDateTime`, `programEnrolment`\
+            \ |\n| Encounter | `encounter` | `encounterDateTime`, `earliestVisitDateTime`,\
+            \ `individual`, `encounterType` |\n| IndividualEncounterCancellation |\
+            \ `encounter` | `cancelDateTime`, `earliestVisitDateTime`, `individual`,\
+            \ `encounterType` |\n\n\n**Critical:** Use the correct date property for\
+            \ each entity type:\n- `individual` → `registrationDate` (NOT enrolmentDateTime)\n\
+            - `programEnrolment` → `enrolmentDateTime` (NOT registrationDate)\n- `programEncounter`\
+            \ → `encounterDateTime` or `earliestVisitDateTime` or `cancelDateTime`\n\
+            - `encounter` → `encounterDateTime` or `earliestVisitDateTime` or `cancelDateTime`\n\
+            \n\n---\n\n\n## Program vs General Encounter Decision Tree\n\n\nUse the\
+            \ `form_context` to determine program availability:\n\n\n1. Check `currentProgram`\
+            \ field in form_context:\n   - If present and non-empty → Program context\
+            \ exists, use `programEnrolment` or `programEncounter`\n   - If absent\
+            \ or null → No program, use general `encounter` or `individual`\n\n\n\
+            2. Check `currentEncounterType` field in form_context:\n   - If present\
+            \ → Use this encounter type for scheduling\n   - If absent → Determine\
+            \ from user request or ask for clarification\n\n\n3. Check `programs`\
+            \ array in form_context:\n   - Lists all available programs for this implementation\n\
+            \   - Empty array means no programs are configured\n\n\n4. Check `subjectTypes`\
+            \ array in form_context:\n   - Lists all available subject types (e.g.,\
+            \ \"Farmer\", \"Child\", \"Household\")\n   - Use `currentSubjectType`\
+            \ to identify the relevant subject\n\n\n---\n\n\n## Reference Date Selection\n\
+            \n\nChoose based on formType in form_context:\n\n\n| formType | Reference\
+            \ Date Variable |\n|----------|------------------------|\n| IndividualProfile\
+            \ | `individual.registrationDate` |\n| ProgramEnrolment | `programEnrolment.enrolmentDateTime`\
+            \ |\n| ProgramExit | `programEnrolment.programExitDateTime` |\n| ProgramEncounter\
+            \ | `programEncounter.encounterDateTime` or `programEncounter.earliestVisitDateTime`\
+            \ |\n| ProgramEncounterCancellation | `programEncounter.cancelDateTime`\
+            \ or `programEncounter.earliestVisitDateTime` |\n| Encounter | `encounter.encounterDateTime`\
+            \ or `encounter.earliestVisitDateTime` |\n| IndividualEncounterCancellation\
+            \ | `encounter.cancelDateTime` or `encounter.earliestVisitDateTime` |\n\
+            \n\n**Note on encounterDateTime vs earliestVisitDateTime:**\n- `encounterDateTime`:\
+            \ The actual date/time when the encounter was completed (filled)\n- `earliestVisitDateTime`:\
+            \ The scheduled date for the encounter (when it was supposed to happen)\n\
+            - Use `encounterDateTime` when calculating from when the visit actually\
+            \ occurred\n- Use `earliestVisitDateTime` when calculating based on the\
+            \ scheduled timing (useful for maintaining consistent intervals regardless\
+            \ of when the form was actually filled)\n\n\n---\n\n\n## Potential Triggers\n\
+            \n\nIdentify the relevant trigger from `formType` in form_context:\n\n\
+            \n| formType | Trigger Description |\n|----------|---------------------|\n\
+            | IndividualProfile | Subject/individual registration completed |\n| ProgramEnrolment\
+            \ | Enrollment into a program |\n| ProgramExit | Exit from a program |\n\
+            | ProgramEncounter | Completion of a program encounter/visit |\n| ProgramEncounterCancellation\
+            \ | Cancellation of a program encounter |\n| Encounter | Completion of\
+            \ a general encounter (no program) |\n| IndividualEncounterCancellation\
+            \ | Cancellation of a general encounter |\n\n\n---\n\n\n## Key Concepts\n\
+            \n\n- A subject/individual is enrolled into a program, but an encounter\
+            \ (visit) is scheduled for either a program encounter or general encounter.\n\
+            - Subject Registration, Program Enrolment, Program Encounters, and General\
+            \ Encounters are different entities.\n- Example: \"Beneficiary\" can be\
+            \ a subject type, we can have a program like \"Malnutrition\" and enrol\
+            \ subjects in it, then encounters are visits. An encounter can be \"Weekly\
+            \ Malnutrition Visit\" as a program encounter, or we can have a general\
+            \ encounter like \"Emergency Vitamin Deficiency Shots\" if we don't have\
+            \ a program.\n- Visit schedule rules can be written for subject type,\
+            \ program, or encounter type - identify which is relevant from formType\
+            \ in form_context.\n- Do not assume a program exists for a registration.\
+            \ A visit schedule rule request for registration/subject type can refer\
+            \ to a general encounter where program has no role.\n\n\n---\n\n\n## Concept\
+            \ Identification\n\n\n**Always use concept names** when referencing observations\
+            \ or conditions:\n\n\n```javascript\n// Correct - use concept name\nconst\
+            \ weight = programEncounter.getObservationReadableValue('Weight');\nconst\
+            \ nutritionStatus = programEncounter.getObservationReadableValue('Nutritional\
+            \ status of child');\n\n\n// Correct - use concept name in RuleCondition\n\
+            const condition = new imports.rulesConfig.RuleCondition({programEncounter})\n\
+            \  .when.valueInEncounter(\"Haemoglobin\")\n  .lessThan(7)\n  .matches();\n\
+            ```\n\n\nConcept names are more readable and maintainable. The system\
+            \ resolves names to UUIDs internally.\n\n\n---\n\n\n## Standard Program\
+            \ Exit Check\n\n\nAlways check for program exit at the beginning of program-based\
+            \ rules and return early if exited:\n\n\n```javascript\n\"use strict\"\
+            ;\n({ params, imports }) => {\n  const programEncounter = params.entity;\n\
+            \  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({\
+            \ programEncounter });\n\n\n  // Standard exit check - place at top of\
+            \ function\n  const hasExitedProgram = () => !!programEncounter.programEnrolment.programExitDateTime;\n\
+            \  if (hasExitedProgram()) return scheduleBuilder.getAll();\n\n\n  //\
+            \ Rest of scheduling logic...\n  \n  return scheduleBuilder.getAll();\n\
+            };\n```\n\n\nFor ProgramEnrolment rules:\n```javascript\nconst hasExitedProgram\
+            \ = () => !!programEnrolment.programExitDateTime;\nif (hasExitedProgram())\
+            \ return scheduleBuilder.getAll();\n```\n\n\n---\n\n\n## Workflow\n\n\n\
+            ### Phase 1: Analysis (Silent - No Output)\nRead the user request + full\
+            \ context JSON.\n- If everything is clear → Proceed immediately to Phase\
+            \ 2\n- If genuinely ambiguous → Ask ONE focused clarifying question\n\n\
+            \n**Mandatorily ask if:**\n- Trigger is unclear (cannot determine from\
+            \ formType)\n- Timing is completely missing (e.g., \"schedule follow-up\"\
+            \ with no days/weeks)\n- Conflicting info between request and context\n\
+            \n\n### Phase 2: Validation (⚠️ MANDATORY - NEVER SKIP)\n\n\n**\U0001F6D1\
+            \ STOP: You MUST complete this phase before generating any code.**\n\n\
+            \nPresent a clean markdown table with 3-4 real-world scenarios showing\
+            \ exactly when the rule will trigger.\n- Do not include formType name\
+            \ in trigger column\n- Explain the trigger in fewer than 5 words\n- Do\
+            \ not use the word \"cadence\"\n\n\n#### Validation Table Format\n\n\n\
+            Present concrete example dates for clarity. Use a realistic reference\
+            \ date and calculate actual values:\n\n\n| Case | Trigger | Reference\
+            \ Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n\
+            | Standard ANC visit | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29\
+            \ | 2025-05-06 | Yes |\n| Early pregnancy | ANC on day 20 | 2025-03-20\
+            \ | ANC Follow Up | 2025-04-17 | 2025-04-24 | Yes |\n| After delivery\
+            \ | Delivery recorded | 2025-06-15 | — | — | — | No |\n\n\n**Column definitions:**\n\
+            - **Reference Date**: The actual date used as basis for calculation (use\
+            \ YYYY-MM-DD format)\n- **Earliest**: Reference Date + earliest offset\
+            \ (concrete date)\n- **Latest**: Earliest Date + buffer/max period (concrete\
+            \ date)\n- **Will Schedule?**: Yes/No based on conditions being met\n\n\
+            \n#### Required Validation Scenarios\n\n\nInclude at minimum 3-4 scenarios\
+            \ covering:\n\n\n1. **Happy path**: Standard case where rule triggers\
+            \ normally with typical inputs\n2. **Boundary case**: Edge of age/date/condition\
+            \ threshold (e.g., exactly 19 years old for age limit)\n3. **Exclusion\
+            \ case**: When rule should NOT trigger, such as:\n   - Program exit already\
+            \ occurred\n   - Individual deceased\n   - Visit already scheduled\n \
+            \  - Age outside eligible range\n4. **Conditional case** (if applicable):\
+            \ When specific observation values affect scheduling (e.g., different\
+            \ schedules for SAM vs MAM)\n\n\n#### ⚠️ MANDATORY: Ask for Confirmation\n\
+            \n\n**After presenting the table, you MUST ask:**\n\n\n> Do these scenarios\
+            \ match exactly what you want?\n> Reply **YES** to get the final rule\
+            \ code, or tell me what to change.\n\n\n**DO NOT generate code until user\
+            \ explicitly confirms with \"YES\".**\n\n\n### Phase 3: Code Generation\
+            \ (ONLY After User Confirms \"YES\")\n\n\n**Prerequisites checklist before\
+            \ generating code:**\n- [ ] Validation table was shown to user\n- [ ]\
+            \ User explicitly replied \"YES\" or confirmed approval\n\n\nDeliver:\n\
+            1. Complete, production-ready JavaScript rule\n2. Keep `\"use strict\"\
+            ;` on first line and all other code on lines below it\n3. Use exact code\
+            \ format:\n```javascript\n\"use strict\";\n({params, imports}) => {\n\
+            \  // rule logic\n}\n```\n\n---\n## Context and Technical Details\n###\
+            \ Use this context for technical implementation: {{#context#}}\n### Use\
+            \ these examples for reference:\n\nProgramEncounterCancellation,\"\"\"\
+            use strict\"\";\n({ params, imports }) => {\n  const programEncounter\
             \ = params.entity;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({\
             \ programEncounter });\n\n  const hasExitedProgram = (programEncounter)\
             \ => programEncounter.programEnrolment.programExitDateTime;\n  const isIndividualDead\
@@ -3117,7 +3223,7 @@ workflow:
         type: llm
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1732870000003'
       position:
         x: 1251.4050029628945
@@ -3125,18 +3231,18 @@ workflow:
       positionAbsolute:
         x: 1251.4050029628945
         y: 900
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#1732870000003.text#}}'
         selected: false
         title: Answer - Visit Schedule
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1732870000004'
       position:
         x: 1550
@@ -3148,7 +3254,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     viewport:
       x: -759.9620443632539
       y: -369.6091206067472
