@@ -43,18 +43,11 @@ def create_rules_generation_test_config() -> TestConfiguration:
 
     static_test_cases = []
     for i, example in enumerate(_ALL_EXAMPLES):
-        context_json = json.dumps(example["context"], indent=2)
-
-        scenario_description = f"{example['scenario']}\n\nContext:\n{context_json}"
-
-        context_message = f"Here is the exact technical context for this scheduling rule:\n\n```json\n{context_json}\n```"
-
         static_test_cases.append(
             {
                 "scenario": example["scenario"],
                 "scenario_index": i,
-                "initial_query": scenario_description,
-                "context_message": context_message,
+                "initial_query": example["rule_request"],
                 "reference_rule": example["expected_generated_rule"].strip(),
                 "reference_context": example["context"],
                 "rule_request": example["rule_request"],

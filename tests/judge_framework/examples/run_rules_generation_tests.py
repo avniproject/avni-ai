@@ -12,9 +12,7 @@ from tests.judge_framework.analytics.reporting import ReportGenerator
 from tests.judge_framework.implementations.rulesGeneration import (
     RulesGenerationExecutorWrapper,
     RulesGenerationJudgeWrapper,
-)
-from tests.judge_framework.implementations.conversation import (
-    ConversationTestSubjectFactory,
+    RulesGenerationTestSubjectFactory,
 )
 from tests.judge_framework.examples.configs.rules_generation_config import (
     create_rules_generation_test_config,
@@ -42,7 +40,7 @@ def setup_rules_test_components(config):
     tester_prompts = create_rules_generation_prompts()
 
     # Create test subject factory
-    test_subject_factory = ConversationTestSubjectFactory(tester_prompts)
+    test_subject_factory = RulesGenerationTestSubjectFactory(tester_prompts)
 
     # Create rules generation executor
     executor = RulesGenerationExecutorWrapper(

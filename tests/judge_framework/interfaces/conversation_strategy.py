@@ -100,7 +100,7 @@ class AIConversationStrategy(ConversationGenerationStrategy):
         """
         Determine if conversation should continue based on length and content
         """
-        max_iterations = context.get("max_iterations", 8)
+        max_iterations = context.get("max_iterations", 4)
         current_length = len(conversation_history)
 
         # Continue if we haven't reached max iterations

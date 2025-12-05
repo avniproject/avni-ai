@@ -4,11 +4,14 @@ from tests.judge_framework.implementations.conversation.conversation_executor im
     ConversationExecutorWrapper,
 )
 from tests.judge_framework.interfaces.result_models import TestConfiguration
+from .rules_generation_conversation_strategy import RulesGenerationConversationStrategy
 
 
 class RulesGenerationExecutorWrapper(ConversationExecutorWrapper):
     def __init__(self, config: TestConfiguration, scenario_prompts: list[str]):
-        super().__init__(config, scenario_prompts)
+        # Use rules-specific conversation strategy
+        rules_strategy = RulesGenerationConversationStrategy()
+        super().__init__(config, scenario_prompts, rules_strategy)
 
     def execute(self, test_input: Dict[str, Any]) -> Dict[str, Any]:
         return super().execute(test_input)
