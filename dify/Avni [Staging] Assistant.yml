@@ -416,7 +416,7 @@ workflow:
           required: false
           type: text-input
           variable: avni_mcp_server_url
-      height: 257
+      height: 255
       id: '1711528708197'
       position:
         x: 120
@@ -625,7 +625,7 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1757492907627'
       position:
         x: 716
@@ -637,7 +637,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
@@ -700,7 +700,7 @@ workflow:
         selected: false
         title: IF/ELSE
         type: if-else
-      height: 294
+      height: 292
       id: '1757493270484'
       position:
         x: 1002
@@ -712,7 +712,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -763,7 +763,7 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1757495664531'
       position:
         x: 1388
@@ -775,7 +775,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#1757495664531.text#}}'
         desc: ''
@@ -783,7 +783,7 @@ workflow:
         title: RAG Answer
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1757495688732'
       position:
         x: 1730
@@ -795,7 +795,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -1307,7 +1307,7 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '17580163919060'
       position:
         x: 1388
@@ -1319,14 +1319,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
         selected: false
         title: Clarify the question
         type: answer
         variables: []
-      height: 137
+      height: 136
       id: '1758608702077'
       position:
         x: 1388
@@ -1338,7 +1338,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: This assistant can help you with any questions related to Avni. This
           does not seem relevant to Avni.
@@ -1346,7 +1346,7 @@ workflow:
         title: Unrelated Question
         type: answer
         variables: []
-      height: 132
+      height: 130
       id: '1758699378772'
       position:
         x: 1388
@@ -1358,7 +1358,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         dataset_ids:
         - dJYQVwzGfiPU2dwuy9dYaLBiSwQozqKNeZCTZoym65ylPOGG17+hJvZrSrVhIw9q
@@ -1381,7 +1381,7 @@ workflow:
         selected: false
         title: Knowledge Retrieval
         type: knowledge-retrieval
-      height: 90
+      height: 88
       id: '1758713692744'
       position:
         x: 414
@@ -1393,7 +1393,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 'true'
@@ -1411,7 +1411,7 @@ workflow:
         selected: false
         title: IF/ELSE 2
         type: if-else
-      height: 124
+      height: 122
       id: '1760358453289'
       position:
         x: 1730
@@ -1423,14 +1423,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#17580163919060.structured_output.response#}}'
         selected: false
         title: Assistant LLM Response
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1760358474156'
       position:
         x: 2092
@@ -1442,7 +1442,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
           \ submit_async_config(\n    configuration: Dict[str, Any],\n    avni_auth_token:\
@@ -1496,7 +1496,7 @@ workflow:
           - avni_mcp_server_url
           value_type: string
           variable: avni_mcp_server_url
-      height: 88
+      height: 86
       id: '1760416664434'
       position:
         x: 2092
@@ -1508,7 +1508,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         break_conditions:
         - comparison_operator: is
@@ -1619,7 +1619,7 @@ workflow:
             type: constant
             value: 5
         type: tool
-      height: 52
+      height: 50
       id: '1760423070414'
       parentId: '1760423058735'
       position:
@@ -1632,7 +1632,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
@@ -1676,7 +1676,7 @@ workflow:
           - avni_mcp_server_url
           value_type: string
           variable: avni_mcp_server_url
-      height: 52
+      height: 50
       id: '1760423078948'
       parentId: '1760423058735'
       position:
@@ -1689,7 +1689,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         answer: '
@@ -1704,7 +1704,7 @@ workflow:
         title: End User Result
         type: answer
         variables: []
-      height: 121
+      height: 120
       id: '1760424043492'
       parentId: '1760423058735'
       position:
@@ -1717,7 +1717,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         cases:
@@ -1739,7 +1739,7 @@ workflow:
         selected: false
         title: 'Processing Status '
         type: if-else
-      height: 124
+      height: 122
       id: '1760424086059'
       parentId: '1760423058735'
       position:
@@ -1752,7 +1752,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         answer: '
@@ -1765,7 +1765,7 @@ workflow:
         title: Config under process
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1760424123324'
       parentId: '1760423058735'
       position:
@@ -1778,7 +1778,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         isInIteration: false
@@ -1798,7 +1798,7 @@ workflow:
         title: Break Loop
         type: assigner
         version: '2'
-      height: 84
+      height: 82
       id: '1760426022942'
       parentId: '1760423058735'
       position:
@@ -1811,7 +1811,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         items:
@@ -1828,7 +1828,7 @@ workflow:
         title: Update Loop Boolean
         type: assigner
         version: '2'
-      height: 84
+      height: 82
       id: '1760434909468'
       position:
         x: 4443.347431585707
@@ -1840,14 +1840,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#1760416664434.error_message#}}'
         selected: false
         title: Answer 7
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1763959812229'
       position:
         x: 2454
@@ -1859,9 +1859,9 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     viewport:
-      x: 36.65886201509602
-      y: 560.486750683639
-      zoom: 0.25
+      x: -1216.8836141397749
+      y: 209.36348745031864
+      zoom: 0.557350840358613
   rag_pipeline_variables: []
