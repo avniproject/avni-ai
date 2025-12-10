@@ -66,6 +66,7 @@ class ConversationTestSubject(TestSubject):
             "org_type": "trial",
             "user_name": "Arjun",
             "avni_mcp_server_url": os.getenv("AVNI_MCP_SERVER_URL"),
+            "requestType": "VisitSchedule",
         }
 
 
