@@ -37,6 +37,7 @@ cd dify/analytics_tools
 # - COOKIES  
 # - BAGGAGE
 # - START_DATE / END_DATE
+# Go to Logs and annotations on the Dify UI and look for chat-conversations network request to find the values for these variables.
 
 uv run python dify_data_extractor.py
 ```
