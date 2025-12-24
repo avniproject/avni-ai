@@ -6,11 +6,13 @@ import json
 import os
 from typing import Dict, Any
 
-from tests.judge_framework.implementations.conversation.conversation_subject import ConversationTestSubject
+from tests.judge_framework.implementations.conversation.conversation_subject import (
+    ConversationTestSubject,
+)
 from tests.judge_framework.interfaces.result_models import TestConfiguration
-from tests.judge_framework.interfaces.test_subject import TestSubjectFactory, TestSubject
-from tests.judge_framework.test_suites.rulesGeneration.visit_schedule_rule_examples import (
-    VISIT_SCHEDULE_RULE_EXAMPLES,
+from tests.judge_framework.interfaces.test_subject import (
+    TestSubjectFactory,
+    TestSubject,
 )
 
 
@@ -25,22 +27,24 @@ class RulesGenerationTestSubject(ConversationTestSubject):
     def get_test_input(self) -> Dict[str, Any]:
         """Get input data for rules generation execution with form_context in inputs"""
         base_input = super().get_test_input()
-        
+
         # Get the specific context for this test case
         test_case_context = self.test_data.get("reference_context", {})
-        
+
         # Add form_context to inputs
         inputs = base_input.get("inputs", {})
-        inputs.update({
-            "auth_token": os.getenv("AVNI_AUTH_TOKEN"),
-            "org_name": "Social Welfare Foundation Trust", 
-            "org_type": "trial",
-            "user_name": "xxx",
-            "requestType": "VisitSchedule",
-            "avni_mcp_server_url": os.getenv("AVNI_MCP_SERVER_URL"),
-            "form_context": json.dumps(test_case_context)
-        })
-        
+        inputs.update(
+            {
+                "auth_token": os.getenv("AVNI_AUTH_TOKEN"),
+                "org_name": "Social Welfare Foundation Trust",
+                "org_type": "trial",
+                "user_name": "xxx",
+                "requestType": "VisitSchedule",
+                "avni_mcp_server_url": os.getenv("AVNI_MCP_SERVER_URL"),
+                "form_context": json.dumps(test_case_context),
+            }
+        )
+
         base_input["inputs"] = inputs
         return base_input
 
@@ -51,16 +55,16 @@ class RulesGenerationTestSubject(ConversationTestSubject):
     def get_expected_outputs(self) -> Dict[str, Any]:
         """Get expected outputs for rules generation evaluation"""
         expected = super().get_expected_outputs()
-        
+
         # Add rules-specific expected outputs if available in scenario data
-        if hasattr(self, '_scenario_data'):
+        if hasattr(self, "_scenario_data"):
             if "reference_rule" in self._scenario_data:
                 expected["reference_rule"] = self._scenario_data["reference_rule"]
             if "reference_context" in self._scenario_data:
                 expected["reference_context"] = self._scenario_data["reference_context"]
             if "rule_request" in self._scenario_data:
                 expected["rule_request"] = self._scenario_data["rule_request"]
-                
+
         return expected
 
 
@@ -117,9 +121,9 @@ Generate a similar but different rule request:"""
     ) -> list[RulesGenerationTestSubject]:
         """Create test subjects from configuration static test cases"""
         test_subjects = []
-        
+
         for test_case in config.generation_config.static_test_cases:
             test_subject = self.create_test_subject(test_case, config)
             test_subjects.append(test_subject)
-            
+
         return test_subjects
