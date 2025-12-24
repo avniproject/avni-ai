@@ -6,81 +6,83 @@ app:
   name: Avni [Staging] Assistant
   use_icon_as_answer_icon: false
 dependencies:
-- current_identifier: null
-  type: marketplace
-  value:
-    marketplace_plugin_unique_identifier: langgenius/openai:0.2.7@9031bbf9b37d9f6341a20c78a8bd18d686afd3ff627545496c3557705419d084
-    version: null
-- current_identifier: null
-  type: marketplace
-  value:
-    marketplace_plugin_unique_identifier: agimaster/justwait:0.0.2@1cc2d5e7fbd6a829396c8a51947924f799f9566071bf8499c4e2a9f75ad3330f
-    version: null
+  - current_identifier: null
+    type: marketplace
+    value:
+      marketplace_plugin_unique_identifier: agimaster/justwait:0.0.2@1cc2d5e7fbd6a829396c8a51947924f799f9566071bf8499c4e2a9f75ad3330f
+      version: null
+  - current_identifier: null
+    type: marketplace
+    value:
+      marketplace_plugin_unique_identifier: langgenius/openai:0.2.8@aae2be0913b8c6f0b80cff58e08d7a8b4c214569b41778413fcaea204561ff16
+      version: null
 kind: app
 version: 0.5.0
 workflow:
   conversation_variables:
-  - description: ''
-    id: 80e10fd7-a4a9-4300-ad77-fd31a27bb86b
-    name: 'True'
-    selector:
-    - conversation
-    - 'True'
-    value: true
-    value_type: boolean
-  - description: ''
-    id: 0873be68-c224-4e79-8cf8-ce2f583d6509
-    name: 'False'
-    selector:
-    - conversation
-    - 'False'
-    value: false
-    value_type: boolean
-  - description: ''
-    id: ebacfa4e-342c-455e-a4ba-b70851015711
-    name: loop
-    selector:
-    - conversation
-    - loop
-    value: true
-    value_type: boolean
+    - description: ''
+      id: 80e10fd7-a4a9-4300-ad77-fd31a27bb86b
+      name: 'True'
+      selector:
+        - conversation
+        - 'True'
+      value: true
+      value_type: boolean
+    - description: ''
+      id: 0873be68-c224-4e79-8cf8-ce2f583d6509
+      name: 'False'
+      selector:
+        - conversation
+        - 'False'
+      value: false
+      value_type: boolean
+    - description: ''
+      id: ebacfa4e-342c-455e-a4ba-b70851015711
+      name: loop
+      selector:
+        - conversation
+        - loop
+      value: true
+      value_type: boolean
   environment_variables:
-  - description: ''
-    id: 16bf6bae-2ad7-483e-a226-add93e02d738
-    name: CODE_MAX_DEPTH
-    selector:
-    - env
-    - CODE_MAX_DEPTH
-    value: '100'
-    value_type: string
+    - description: ''
+      id: 16bf6bae-2ad7-483e-a226-add93e02d738
+      name: CODE_MAX_DEPTH
+      selector:
+        - env
+        - CODE_MAX_DEPTH
+      value: '100'
+      value_type: string
   features:
     file_upload:
       allowed_file_extensions:
-      - .JPG
-      - .JPEG
-      - .PNG
-      - .GIF
-      - .WEBP
-      - .SVG
+        - .JPG
+        - .JPEG
+        - .PNG
+        - .GIF
+        - .WEBP
+        - .SVG
       allowed_file_types:
-      - image
+        - image
       allowed_file_upload_methods:
-      - local_file
-      - remote_url
+        - local_file
+        - remote_url
       enabled: false
       fileUploadConfig:
         audio_file_size_limit: 50
         batch_count_limit: 5
         file_size_limit: 15
+        image_file_batch_limit: 10
         image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
         video_file_size_limit: 100
         workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
         transfer_methods:
-        - local_file
-        - remote_url
+          - local_file
+          - remote_url
       number_limits: 3
     opening_statement: Hey {{user_name}} ! I’m your AI assistant . I can help you
       with any questions about Avni — from creating new forms automatically to guiding
@@ -100,353 +102,353 @@ workflow:
       voice: ''
   graph:
     edges:
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: llm
-        targetType: if-else
-      id: 1757492907627-source-1757493270484-target
-      selected: false
-      source: '1757492907627'
-      sourceHandle: source
-      target: '1757493270484'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: llm
-        targetType: answer
-      id: 1757495664531-source-1757495688732-target
-      selected: false
-      source: '1757495664531'
-      sourceHandle: source
-      target: '1757495688732'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: llm
-      id: 1757493270484-00ce954d-b2ca-42aa-b302-dc2c163dd1d0-17580163919060-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
-      target: '17580163919060'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1757493270484-3489d477-53a2-4b99-9f40-af010262a1c1-1758608702077-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 3489d477-53a2-4b99-9f40-af010262a1c1
-      target: '1758608702077'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1757493270484-8ad5b2c6-6d29-4e4f-9f13-7682d4803a70-1758699378772-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
-      target: '1758699378772'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: start
-        targetType: knowledge-retrieval
-      id: 1711528708197-source-1758713692744-target
-      selected: false
-      source: '1711528708197'
-      sourceHandle: source
-      target: '1758713692744'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: knowledge-retrieval
-        targetType: llm
-      id: 1758713692744-source-1757492907627-target
-      selected: false
-      source: '1758713692744'
-      sourceHandle: source
-      target: '1757492907627'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: llm
-      id: 1757493270484-false-1757495664531-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 'false'
-      target: '1757495664531'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: llm
-      id: 1757493270484-true-1757495664531-target
-      selected: false
-      source: '1757493270484'
-      sourceHandle: 'true'
-      target: '1757495664531'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: if-else
-      id: 17580163919060-source-1760358453289-target
-      selected: false
-      source: '17580163919060'
-      sourceHandle: source
-      target: '1760358453289'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1760358453289-false-1760358474156-target
-      selected: false
-      source: '1760358453289'
-      sourceHandle: 'false'
-      target: '1760358474156'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: 1760358453289-true-1760416664434-target
-      selected: false
-      source: '1760358453289'
-      sourceHandle: 'true'
-      target: '1760416664434'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: loop
-      id: 1760416664434-source-1760423058735-target
-      selected: false
-      source: '1760416664434'
-      sourceHandle: source
-      target: '1760423058735'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        sourceType: loop-start
-        targetType: tool
-      id: 1760423058735start-source-1760423070414-target
-      selected: false
-      source: 1760423058735start
-      sourceHandle: source
-      target: '1760423070414'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        sourceType: tool
-        targetType: code
-      id: 1760423070414-source-1760423078948-target
-      selected: false
-      source: '1760423070414'
-      sourceHandle: source
-      target: '1760423078948'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        sourceType: if-else
-        targetType: answer
-      id: 1760424086059-false-1760424123324-target
-      selected: false
-      source: '1760424086059'
-      sourceHandle: 'false'
-      target: '1760424123324'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        sourceType: code
-        targetType: if-else
-      id: 1760423078948-source-1760424086059-target
-      selected: false
-      source: '1760423078948'
-      sourceHandle: source
-      target: '1760424086059'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        sourceType: if-else
-        targetType: assigner
-      id: 1760424086059-true-1760426022942-target
-      selected: false
-      source: '1760424086059'
-      sourceHandle: 'true'
-      target: '1760426022942'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        sourceType: assigner
-        targetType: answer
-      id: 1760426022942-source-1760424043492-target
-      selected: false
-      source: '1760426022942'
-      sourceHandle: source
-      target: '1760424043492'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: loop
-        targetType: assigner
-      id: 1760423058735-source-1760434909468-target
-      selected: false
-      source: '1760423058735'
-      sourceHandle: source
-      target: '1760434909468'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: code
-        targetType: answer
-      id: 1760416664434-fail-branch-1763959812229-target
-      selected: false
-      source: '1760416664434'
-      sourceHandle: fail-branch
-      target: '1763959812229'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    nodes:
-    - data:
-        desc: Define the initial parameters for launching a workflow
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: llm
+          targetType: if-else
+        id: 1757492907627-source-1757493270484-target
         selected: false
-        title: Start
-        type: start
-        variables:
-        - hide: true
-          label: auth_token
-          max_length: 2000
-          options: []
-          required: false
-          type: paragraph
-          variable: auth_token
-        - hide: true
-          label: org_name
-          max_length: 200
-          options: []
-          required: false
-          type: text-input
-          variable: org_name
-        - default: trial
-          hide: true
-          label: org_type
-          max_length: 48
-          options: []
-          required: false
-          type: text-input
-          variable: org_type
-        - hide: true
-          hint: ''
-          label: user_name
-          max_length: 48
-          options: []
-          placeholder: ''
-          required: false
-          type: text-input
-          variable: user_name
-        - default: https://staging-mcp.avniproject.org
-          hide: true
-          hint: ''
-          label: avni_mcp_server_url
-          max_length: 48
-          options: []
-          placeholder: ''
-          required: false
-          type: text-input
-          variable: avni_mcp_server_url
-      height: 255
-      id: '1711528708197'
-      position:
-        x: 120
-        y: -839
-      positionAbsolute:
-        x: 120
-        y: -839
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        context:
-          enabled: true
-          variable_selector:
-          - '1758713692744'
-          - result
-        desc: ''
-        memory:
-          query_prompt_template: '{{#sys.files#}} {{#sys.query#}}'
-          role_prefix:
-            assistant: ''
-            user: ''
-          window:
+        source: '1757492907627'
+        sourceHandle: source
+        target: '1757493270484'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: llm
+          targetType: answer
+        id: 1757495664531-source-1757495688732-target
+        selected: false
+        source: '1757495664531'
+        sourceHandle: source
+        target: '1757495688732'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: llm
+        id: 1757493270484-00ce954d-b2ca-42aa-b302-dc2c163dd1d0-17580163919060-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+        target: '17580163919060'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1757493270484-3489d477-53a2-4b99-9f40-af010262a1c1-1758608702077-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 3489d477-53a2-4b99-9f40-af010262a1c1
+        target: '1758608702077'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1757493270484-8ad5b2c6-6d29-4e4f-9f13-7682d4803a70-1758699378772-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+        target: '1758699378772'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: start
+          targetType: knowledge-retrieval
+        id: 1711528708197-source-1758713692744-target
+        selected: false
+        source: '1711528708197'
+        sourceHandle: source
+        target: '1758713692744'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: knowledge-retrieval
+          targetType: llm
+        id: 1758713692744-source-1757492907627-target
+        selected: false
+        source: '1758713692744'
+        sourceHandle: source
+        target: '1757492907627'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: llm
+        id: 1757493270484-false-1757495664531-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 'false'
+        target: '1757495664531'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: llm
+        id: 1757493270484-true-1757495664531-target
+        selected: false
+        source: '1757493270484'
+        sourceHandle: 'true'
+        target: '1757495664531'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: llm
+          targetType: if-else
+        id: 17580163919060-source-1760358453289-target
+        selected: false
+        source: '17580163919060'
+        sourceHandle: source
+        target: '1760358453289'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: answer
+        id: 1760358453289-false-1760358474156-target
+        selected: false
+        source: '1760358453289'
+        sourceHandle: 'false'
+        target: '1760358474156'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: if-else
+          targetType: code
+        id: 1760358453289-true-1760416664434-target
+        selected: false
+        source: '1760358453289'
+        sourceHandle: 'true'
+        target: '1760416664434'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInLoop: false
+          sourceType: code
+          targetType: loop
+        id: 1760416664434-source-1760423058735-target
+        selected: false
+        source: '1760416664434'
+        sourceHandle: source
+        target: '1760423058735'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          sourceType: loop-start
+          targetType: tool
+        id: 1760423058735start-source-1760423070414-target
+        selected: false
+        source: 1760423058735start
+        sourceHandle: source
+        target: '1760423070414'
+        targetHandle: target
+        type: custom
+        zIndex: 1002
+      - data:
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          sourceType: tool
+          targetType: code
+        id: 1760423070414-source-1760423078948-target
+        selected: false
+        source: '1760423070414'
+        sourceHandle: source
+        target: '1760423078948'
+        targetHandle: target
+        type: custom
+        zIndex: 1002
+      - data:
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          sourceType: if-else
+          targetType: answer
+        id: 1760424086059-false-1760424123324-target
+        selected: false
+        source: '1760424086059'
+        sourceHandle: 'false'
+        target: '1760424123324'
+        targetHandle: target
+        type: custom
+        zIndex: 1002
+      - data:
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          sourceType: code
+          targetType: if-else
+        id: 1760423078948-source-1760424086059-target
+        selected: false
+        source: '1760423078948'
+        sourceHandle: source
+        target: '1760424086059'
+        targetHandle: target
+        type: custom
+        zIndex: 1002
+      - data:
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          sourceType: if-else
+          targetType: assigner
+        id: 1760424086059-true-1760426022942-target
+        selected: false
+        source: '1760424086059'
+        sourceHandle: 'true'
+        target: '1760426022942'
+        targetHandle: target
+        type: custom
+        zIndex: 1002
+      - data:
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          sourceType: assigner
+          targetType: answer
+        id: 1760426022942-source-1760424043492-target
+        selected: false
+        source: '1760426022942'
+        sourceHandle: source
+        target: '1760424043492'
+        targetHandle: target
+        type: custom
+        zIndex: 1002
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: loop
+          targetType: assigner
+        id: 1760423058735-source-1760434909468-target
+        selected: false
+        source: '1760423058735'
+        sourceHandle: source
+        target: '1760434909468'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: code
+          targetType: answer
+        id: 1760416664434-fail-branch-1763959812229-target
+        selected: false
+        source: '1760416664434'
+        sourceHandle: fail-branch
+        target: '1763959812229'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+    nodes:
+      - data:
+          desc: Define the initial parameters for launching a workflow
+          selected: false
+          title: Start
+          type: start
+          variables:
+            - hide: true
+              label: auth_token
+              max_length: 2000
+              options: []
+              required: false
+              type: paragraph
+              variable: auth_token
+            - hide: true
+              label: org_name
+              max_length: 200
+              options: []
+              required: false
+              type: text-input
+              variable: org_name
+            - default: trial
+              hide: true
+              label: org_type
+              max_length: 48
+              options: []
+              required: false
+              type: text-input
+              variable: org_type
+            - hide: true
+              hint: ''
+              label: user_name
+              max_length: 48
+              options: []
+              placeholder: ''
+              required: false
+              type: text-input
+              variable: user_name
+            - default: https://staging-mcp.avniproject.org
+              hide: true
+              hint: ''
+              label: avni_mcp_server_url
+              max_length: 48
+              options: []
+              placeholder: ''
+              required: false
+              type: text-input
+              variable: avni_mcp_server_url
+        height: 255
+        id: '1711528708197'
+        position:
+          x: 120
+          y: -839
+        positionAbsolute:
+          x: 120
+          y: -839
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 242
+      - data:
+          context:
             enabled: true
-            size: 100
-        model:
-          completion_params:
-            json_schema: "{\n  \"name\": \"RoutingDecision\",\n  \"schema\": {\n \
+            variable_selector:
+              - '1758713692744'
+              - result
+          desc: ''
+          memory:
+            query_prompt_template: '{{#sys.files#}} {{#sys.query#}}'
+            role_prefix:
+              assistant: ''
+              user: ''
+            window:
+              enabled: true
+              size: 100
+          model:
+            completion_params:
+              json_schema: "{\n  \"name\": \"RoutingDecision\",\n  \"schema\": {\n \
               \   \"type\": \"object\",\n    \"properties\": {\n      \"service\"\
               : {\n        \"type\": \"string\",\n        \"enum\": [\"RAG\", \"ASSISTANT\"\
               , \"TEMPLATE\"],\n        \"description\": \"Service to which the request\
@@ -469,15 +471,15 @@ workflow:
               \  \"confidence\",\n      \"question_type\",\n      \"routing_reason\"\
               ,\n      \"clarification_needed\"\n    ],\n    \"additionalProperties\"\
               : false\n  }\n}"
-            response_format: json_schema
-            temperature: 0.1
-          mode: chat
-          name: gpt-4o-mini
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: b14eb575-d615-41dd-aac1-00663db3a6eb
-          role: system
-          text: "You are the Avni Platform Orchestrator of the Avni AI Assistant.\
+              response_format: json_schema
+              temperature: 0.1
+            mode: chat
+            name: gpt-4o-mini
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: b14eb575-d615-41dd-aac1-00663db3a6eb
+              role: system
+              text: "You are the Avni Platform Orchestrator of the Avni AI Assistant.\
             \ Route user messages based on their PRIMARY INTENT, not the complexity\
             \ or specificity of their\nquestion.\n\n<context>\n{{#context#}}\n</context>\n\
             \n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
@@ -589,158 +591,158 @@ workflow:
             \       requests (\"Delete everything...\", \"Clean slate...\", \"Remove\
             \ all...\")?\n        │   └── YES → ASSISTANT\n        │\n        └──\
             \ UNCLEAR → Default to RAG (safer for capability questions)"
-        - id: 36b2faa1-0e45-4962-8107-74a07045af09
-          role: user
-          text: ''
-        selected: false
-        structured_output:
-          schema:
-            additionalProperties: false
-            properties:
-              clarification_needed:
-                type: boolean
-              clarifying_questions:
-                items:
+            - id: 36b2faa1-0e45-4962-8107-74a07045af09
+              role: user
+              text: ''
+          selected: false
+          structured_output:
+            schema:
+              additionalProperties: false
+              properties:
+                clarification_needed:
+                  type: boolean
+                clarifying_questions:
+                  items:
+                    type: string
+                  type: array
+                confidence:
+                  type: number
+                question_type:
                   type: string
-                type: array
-              confidence:
-                type: number
-              question_type:
-                type: string
-              routing_reason:
-                type: string
-              service:
-                type: string
-            required:
-            - service
-            - confidence
-            - question_type
-            - routing_reason
-            - clarification_needed
-            - clarifying_questions
-            type: object
-        structured_output_enabled: true
-        title: Orchestrator
-        type: llm
-        variables: []
-        vision:
-          enabled: false
-      height: 86
-      id: '1757492907627'
-      position:
-        x: 716
-        y: -462
-      positionAbsolute:
-        x: 716
-        y: -462
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        cases:
-        - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
-          conditions:
-          - comparison_operator: is
-            id: 93fbecf3-5468-4878-84ce-37c7cfa15625
-            value: 'true'
-            varType: object
+                routing_reason:
+                  type: string
+                service:
+                  type: string
+              required:
+                - service
+                - confidence
+                - question_type
+                - routing_reason
+                - clarification_needed
+                - clarifying_questions
+              type: object
+          structured_output_enabled: true
+          title: Orchestrator
+          type: llm
+          variables: []
+          vision:
+            enabled: false
+        height: 86
+        id: '1757492907627'
+        position:
+          x: 716
+          y: -462
+        positionAbsolute:
+          x: 716
+          y: -462
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          cases:
+            - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
+              conditions:
+                - comparison_operator: is
+                  id: 93fbecf3-5468-4878-84ce-37c7cfa15625
+                  value: 'true'
+                  varType: object
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - clarification_needed
+                - comparison_operator: <
+                  id: 964871af-0fc9-45e9-a795-d2fda4b4ad34
+                  value: '0.8'
+                  varType: number
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - confidence
+              id: 3489d477-53a2-4b99-9f40-af010262a1c1
+              logical_operator: and
+            - case_id: 'true'
+              conditions:
+                - comparison_operator: is
+                  id: fb0a1b2b-46e8-4a67-8b98-b44ea87869db
+                  value: RAG
+                  varType: string
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - service
+              id: 'true'
+              logical_operator: and
+            - case_id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+              conditions:
+                - comparison_operator: is
+                  id: 1931b24c-c74e-4a09-b0c1-afeb220851bd
+                  value: ASSISTANT
+                  varType: string
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - service
+              id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
+              logical_operator: and
+            - case_id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+              conditions:
+                - comparison_operator: is
+                  id: beb8a551-f66d-4add-9480-bb9c185119f4
+                  value: OUT_OF_SCOPE
+                  varType: string
+                  variable_selector:
+                    - '1757492907627'
+                    - structured_output
+                    - service
+              id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
+              logical_operator: and
+          desc: ''
+          selected: false
+          title: IF/ELSE
+          type: if-else
+        height: 292
+        id: '1757493270484'
+        position:
+          x: 1002
+          y: -321
+        positionAbsolute:
+          x: 1002
+          y: -321
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          context:
+            enabled: true
             variable_selector:
-            - '1757492907627'
-            - structured_output
-            - clarification_needed
-          - comparison_operator: <
-            id: 964871af-0fc9-45e9-a795-d2fda4b4ad34
-            value: '0.8'
-            varType: number
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - confidence
-          id: 3489d477-53a2-4b99-9f40-af010262a1c1
-          logical_operator: and
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: is
-            id: fb0a1b2b-46e8-4a67-8b98-b44ea87869db
-            value: RAG
-            varType: string
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - service
-          id: 'true'
-          logical_operator: and
-        - case_id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
-          conditions:
-          - comparison_operator: is
-            id: 1931b24c-c74e-4a09-b0c1-afeb220851bd
-            value: ASSISTANT
-            varType: string
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - service
-          id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
-          logical_operator: and
-        - case_id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
-          conditions:
-          - comparison_operator: is
-            id: beb8a551-f66d-4add-9480-bb9c185119f4
-            value: OUT_OF_SCOPE
-            varType: string
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - service
-          id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
-          logical_operator: and
-        desc: ''
-        selected: false
-        title: IF/ELSE
-        type: if-else
-      height: 292
-      id: '1757493270484'
-      position:
-        x: 1002
-        y: -321
-      positionAbsolute:
-        x: 1002
-        y: -321
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        context:
-          enabled: true
-          variable_selector:
-          - '1758713692744'
-          - result
-        desc: ''
-        memory:
-          query_prompt_template: '{{#sys.query#}}
+              - '1758713692744'
+              - result
+          desc: ''
+          memory:
+            query_prompt_template: '{{#sys.query#}}
 
 
             {{#sys.files#}}'
-          role_prefix:
-            assistant: ''
-            user: ''
-          window:
-            enabled: false
-            size: 50
-        model:
-          completion_params:
-            temperature: 0.1
-          mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
-          role: system
-          text: "Use the following context as your learned knowledge, inside <context></context>\
+            role_prefix:
+              assistant: ''
+              user: ''
+            window:
+              enabled: false
+              size: 50
+          model:
+            completion_params:
+              temperature: 0.1
+            mode: chat
+            name: gpt-4o
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
+              role: system
+              text: "Use the following context as your learned knowledge, inside <context></context>\
             \ XML tags.\n<context>\n{{#context#}}\n</context>\nYou are talking to\
             \ {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\nYou\
             \ are part of the Avni AI Assistant. The Avni AI Assistant is currently\
@@ -757,73 +759,73 @@ workflow:
             - If there is any ambiguity, ask a clarifying question instead of guessing.\n\
             \  Avoid mentioning that you obtained the information from the context.\n\
             \  And answer according to the language of the user's question."
-        selected: false
-        title: RAG LLM
-        type: llm
-        variables: []
-        vision:
-          enabled: false
-      height: 86
-      id: '1757495664531'
-      position:
-        x: 1388
-        y: 615
-      positionAbsolute:
-        x: 1388
-        y: 615
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        answer: '{{#1757495664531.text#}}'
-        desc: ''
-        selected: false
-        title: RAG Answer
-        type: answer
-        variables: []
-      height: 101
-      id: '1757495688732'
-      position:
-        x: 1730
-        y: 607
-      positionAbsolute:
-        x: 1730
-        y: 607
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        context:
-          enabled: true
-          variable_selector:
-          - '1757492907627'
-          - text
-        desc: ''
-        memory:
-          query_prompt_template: 'Previous conversation context for {{#1711528708197.user_name#}}:
+          selected: false
+          title: RAG LLM
+          type: llm
+          variables: []
+          vision:
+            enabled: false
+        height: 86
+        id: '1757495664531'
+        position:
+          x: 1388
+          y: 615
+        positionAbsolute:
+          x: 1388
+          y: 615
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: '{{#1757495664531.text#}}'
+          desc: ''
+          selected: false
+          title: RAG Answer
+          type: answer
+          variables: []
+        height: 101
+        id: '1757495688732'
+        position:
+          x: 1730
+          y: 607
+        positionAbsolute:
+          x: 1730
+          y: 607
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          context:
+            enabled: true
+            variable_selector:
+              - '1757492907627'
+              - text
+          desc: ''
+          memory:
+            query_prompt_template: 'Previous conversation context for {{#1711528708197.user_name#}}:
             {{#conversation_history#}}
 
             Current query: {{#sys.query#}} {{#sys.files#}}'
-          role_prefix:
-            assistant: 'Assistant: '
-            user: '{{#1711528708197.user_name#}}: '
-          window:
-            enabled: true
-            size: 20
-        model:
-          completion_params:
-            temperature: 0.1
-          mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
-          role: system
-          text: "Instructions:\nYou are Avni Copilot, an expert assistant for the\
+            role_prefix:
+              assistant: 'Assistant: '
+              user: '{{#1711528708197.user_name#}}: '
+            window:
+              enabled: true
+              size: 20
+          model:
+            completion_params:
+              temperature: 0.1
+            mode: chat
+            name: gpt-4o
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
+              role: system
+              text: "Instructions:\nYou are Avni Copilot, an expert assistant for the\
             \ Avni data collection platform.\nYour primary role is to guide NGOs,\
             \ program managers, and implementers in designing their Avni configuration\
             \ and confirm that the configuration matches their requirements.\n- Arrive\
@@ -1283,168 +1285,168 @@ workflow:
             \     {\n          \"name\": \"{{#1711528708197.user_name#}}\"\n     \
             \   }\n      ]\n    }\n  }\n  ```\n- Only include this user update when\
             \ there are entities being created (not for pure update/delete operations)]()"
-        selected: false
-        structured_output:
-          schema:
-            additionalProperties: false
-            properties:
-              config:
-                type: object
-              next_step:
-                type: string
-              org_type:
-                type: string
-              response:
-                type: string
-            required:
-            - response
-            - config
-            - org_type
-            type: object
-        structured_output_enabled: true
-        title: Assistant LLM
-        type: llm
-        variables: []
-        vision:
-          enabled: false
-      height: 86
-      id: '17580163919060'
-      position:
-        x: 1388
-        y: 18
-      positionAbsolute:
-        x: 1388
-        y: 18
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
-        selected: false
-        title: Clarify the question
-        type: answer
-        variables: []
-      height: 136
-      id: '1758608702077'
-      position:
-        x: 1388
-        y: 186
-      positionAbsolute:
-        x: 1388
-        y: 186
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        answer: This assistant can help you with any questions related to Avni. This
-          does not seem relevant to Avni.
-        selected: false
-        title: Unrelated Question
-        type: answer
-        variables: []
-      height: 130
-      id: '1758699378772'
-      position:
-        x: 1388
-        y: 403
-      positionAbsolute:
-        x: 1388
-        y: 403
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        dataset_ids:
-        - dJYQVwzGfiPU2dwuy9dYaLBiSwQozqKNeZCTZoym65ylPOGG17+hJvZrSrVhIw9q
-        multiple_retrieval_config:
-          reranking_enable: false
-          reranking_mode: weighted_score
-          top_k: 4
-          weights:
-            keyword_setting:
-              keyword_weight: 0.3
-            vector_setting:
-              embedding_model_name: text-embedding-3-large
-              embedding_provider_name: langgenius/openai/openai
-              vector_weight: 0.7
-            weight_type: customized
-        query_variable_selector:
-        - '1711528708197'
-        - sys.query
-        retrieval_mode: multiple
-        selected: false
-        title: Knowledge Retrieval
-        type: knowledge-retrieval
-      height: 88
-      id: '1758713692744'
-      position:
-        x: 414
-        y: -655
-      positionAbsolute:
-        x: 414
-        y: -655
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        cases:
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: not empty
-            id: cde18111-1f71-439c-bb76-ca3994fd38d9
-            value: ''
-            varType: object
-            variable_selector:
-            - '17580163919060'
-            - structured_output
-            - config
-          id: 'true'
-          logical_operator: and
-        selected: false
-        title: IF/ELSE 2
-        type: if-else
-      height: 122
-      id: '1760358453289'
-      position:
-        x: 1730
-        y: 0
-      positionAbsolute:
-        x: 1730
-        y: 0
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        answer: '{{#17580163919060.structured_output.response#}}'
-        selected: false
-        title: Assistant LLM Response
-        type: answer
-        variables: []
-      height: 101
-      id: '1760358474156'
-      position:
-        x: 2092
-        y: 22
-      positionAbsolute:
-        x: 2092
-        y: 22
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
+          selected: false
+          structured_output:
+            schema:
+              additionalProperties: false
+              properties:
+                config:
+                  type: object
+                next_step:
+                  type: string
+                org_type:
+                  type: string
+                response:
+                  type: string
+              required:
+                - response
+                - config
+                - org_type
+              type: object
+          structured_output_enabled: true
+          title: Assistant LLM
+          type: llm
+          variables: []
+          vision:
+            enabled: false
+        height: 86
+        id: '17580163919060'
+        position:
+          x: 1388
+          y: 18
+        positionAbsolute:
+          x: 1388
+          y: 18
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
+          selected: false
+          title: Clarify the question
+          type: answer
+          variables: []
+        height: 136
+        id: '1758608702077'
+        position:
+          x: 1388
+          y: 186
+        positionAbsolute:
+          x: 1388
+          y: 186
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: This assistant can help you with any questions related to Avni. This
+            does not seem relevant to Avni.
+          selected: false
+          title: Unrelated Question
+          type: answer
+          variables: []
+        height: 130
+        id: '1758699378772'
+        position:
+          x: 1388
+          y: 403
+        positionAbsolute:
+          x: 1388
+          y: 403
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          dataset_ids:
+            - dJYQVwzGfiPU2dwuy9dYaLBiSwQozqKNeZCTZoym65ylPOGG17+hJvZrSrVhIw9q
+          multiple_retrieval_config:
+            reranking_enable: false
+            reranking_mode: weighted_score
+            top_k: 4
+            weights:
+              keyword_setting:
+                keyword_weight: 0.3
+              vector_setting:
+                embedding_model_name: text-embedding-3-large
+                embedding_provider_name: langgenius/openai/openai
+                vector_weight: 0.7
+              weight_type: customized
+          query_variable_selector:
+            - '1711528708197'
+            - sys.query
+          retrieval_mode: multiple
+          selected: false
+          title: Knowledge Retrieval
+          type: knowledge-retrieval
+        height: 88
+        id: '1758713692744'
+        position:
+          x: 414
+          y: -655
+        positionAbsolute:
+          x: 414
+          y: -655
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          cases:
+            - case_id: 'true'
+              conditions:
+                - comparison_operator: not empty
+                  id: cde18111-1f71-439c-bb76-ca3994fd38d9
+                  value: ''
+                  varType: object
+                  variable_selector:
+                    - '17580163919060'
+                    - structured_output
+                    - config
+              id: 'true'
+              logical_operator: and
+          selected: false
+          title: IF/ELSE 2
+          type: if-else
+        height: 122
+        id: '1760358453289'
+        position:
+          x: 1730
+          y: 0
+        positionAbsolute:
+          x: 1730
+          y: 0
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: '{{#17580163919060.structured_output.response#}}'
+          selected: false
+          title: Assistant LLM Response
+          type: answer
+          variables: []
+        height: 101
+        id: '1760358474156'
+        position:
+          x: 2092
+          y: 142.0508392628631
+        positionAbsolute:
+          x: 2092
+          y: 142.0508392628631
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
           \ submit_async_config(\n    configuration: Dict[str, Any],\n    avni_auth_token:\
           \ str,\n    avni_mcp_server_url: str,\n) -> Dict[str, Any]:\n    session\
           \ = requests.Session()\n\n    submit_url = f\"{avni_mcp_server_url}/process-config-async\"\
@@ -1471,171 +1473,171 @@ workflow:
           \        avni_mcp_server_url=avni_mcp_server_url,\n    )\n\n    print(\"\
           \\n\" + \"=\" * 40)\n    print(\"\U0001F3C1 SUBMISSION RESULT:\")\n    print(json.dumps(result,\
           \ indent=2))\n\n    return {\"output\": result}\n"
-        code_language: python3
-        error_strategy: fail-branch
-        outputs:
-          output:
-            children: null
-            type: object
-        selected: false
-        title: Process Config Request
-        type: code
-        variables:
-        - value_selector:
-          - '1711528708197'
-          - auth_token
-          value_type: string
-          variable: avni_auth_token
-        - value_selector:
-          - '17580163919060'
-          - structured_output
-          value_type: object
-          variable: configuration
-        - value_selector:
-          - '1711528708197'
-          - avni_mcp_server_url
-          value_type: string
-          variable: avni_mcp_server_url
-      height: 86
-      id: '1760416664434'
-      position:
-        x: 2092
-        y: -66.24690036776286
-      positionAbsolute:
-        x: 2092
-        y: -66.24690036776286
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        break_conditions:
-        - comparison_operator: is
-          id: 5f6ef1d9-afed-455c-b3f1-be97a76ec289
-          value: false
-          varType: boolean
-          variable_selector:
-          - conversation
-          - loop
-        error_handle_mode: terminated
+          code_language: python3
+          error_strategy: fail-branch
+          outputs:
+            output:
+              children: null
+              type: object
+          selected: false
+          title: Process Config Request
+          type: code
+          variables:
+            - value_selector:
+                - '1711528708197'
+                - auth_token
+              value_type: string
+              variable: avni_auth_token
+            - value_selector:
+                - '17580163919060'
+                - structured_output
+              value_type: object
+              variable: configuration
+            - value_selector:
+                - '1711528708197'
+                - avni_mcp_server_url
+              value_type: string
+              variable: avni_mcp_server_url
+        height: 86
+        id: '1760416664434'
+        position:
+          x: 2092
+          y: -66.24690036776286
+        positionAbsolute:
+          x: 2092
+          y: -66.24690036776286
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          break_conditions:
+            - comparison_operator: is
+              id: 5f6ef1d9-afed-455c-b3f1-be97a76ec289
+              value: false
+              varType: boolean
+              variable_selector:
+                - conversation
+                - loop
+          error_handle_mode: terminated
+          height: 416
+          logical_operator: and
+          loop_count: 20
+          loop_variables:
+            - id: 12574170-70f7-49d0-bfe4-7fbf8fb885a0
+              label: loop
+              value:
+                - conversation
+                - loop
+              value_type: variable
+              var_type: boolean
+          selected: false
+          start_node_id: 1760423058735start
+          title: Loop
+          type: loop
+          width: 1861
         height: 416
-        logical_operator: and
-        loop_count: 20
-        loop_variables:
-        - id: 12574170-70f7-49d0-bfe4-7fbf8fb885a0
-          label: loop
-          value:
-          - conversation
-          - loop
-          value_type: variable
-          var_type: boolean
-        selected: false
-        start_node_id: 1760423058735start
-        title: Loop
-        type: loop
+        id: '1760423058735'
+        position:
+          x: 2445.308378071105
+          y: 9.184497627950861
+        positionAbsolute:
+          x: 2445.308378071105
+          y: 9.184497627950861
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
         width: 1861
-      height: 416
-      id: '1760423058735'
-      position:
-        x: 2445.308378071105
-        y: 9.184497627950861
-      positionAbsolute:
-        x: 2445.308378071105
-        y: 9.184497627950861
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 1861
-      zIndex: 1
-    - data:
-        desc: ''
-        isInLoop: true
-        selected: false
-        title: ''
-        type: loop-start
-      draggable: false
-      height: 48
-      id: 1760423058735start
-      parentId: '1760423058735'
-      position:
-        x: 60
-        y: 109
-      positionAbsolute:
-        x: 2505.308378071105
-        y: 118.18449762795086
-      selectable: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom-loop-start
-      width: 44
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        is_team_authorization: true
-        loop_id: '1760423058735'
-        paramSchemas:
-        - auto_generate: null
-          default: null
-          form: llm
-          human_description:
-            en_US: The number of seconds to wait
-            ja_JP: The number of seconds to wait
-            pt_BR: The number of seconds to wait
-            zh_Hans: 等待的秒数
-          label:
-            en_US: Seconds
-            ja_JP: Seconds
-            pt_BR: Seconds
-            zh_Hans: 秒数
-          llm_description: The number of seconds to pause execution
-          max: null
-          min: null
-          name: seconds
-          options: []
-          placeholder: null
-          precision: null
-          required: true
-          scope: null
-          template: null
-          type: number
-        params:
-          seconds: ''
-        provider_id: agimaster/justwait/justwait
-        provider_name: agimaster/justwait/justwait
-        provider_type: builtin
-        selected: false
-        title: Wait
-        tool_configurations: {}
-        tool_description: Wait for a specified number of seconds, similar to Python's
-          time.sleep() function
-        tool_label: Wait
-        tool_name: wait
-        tool_node_version: '2'
-        tool_parameters:
-          seconds:
-            type: constant
-            value: 5
-        type: tool
-      height: 50
-      id: '1760423070414'
-      parentId: '1760423058735'
-      position:
-        x: 184
-        y: 107
-      positionAbsolute:
-        x: 2629.308378071105
-        y: 116.18449762795086
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
+        zIndex: 1
+      - data:
+          desc: ''
+          isInLoop: true
+          selected: false
+          title: ''
+          type: loop-start
+        draggable: false
+        height: 48
+        id: 1760423058735start
+        parentId: '1760423058735'
+        position:
+          x: 60
+          y: 109
+        positionAbsolute:
+          x: 2505.308378071105
+          y: 118.18449762795086
+        selectable: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom-loop-start
+        width: 44
+        zIndex: 1002
+      - data:
+          isInIteration: false
+          isInLoop: true
+          is_team_authorization: true
+          loop_id: '1760423058735'
+          paramSchemas:
+            - auto_generate: null
+              default: null
+              form: llm
+              human_description:
+                en_US: The number of seconds to wait
+                ja_JP: The number of seconds to wait
+                pt_BR: The number of seconds to wait
+                zh_Hans: 等待的秒数
+              label:
+                en_US: Seconds
+                ja_JP: Seconds
+                pt_BR: Seconds
+                zh_Hans: 秒数
+              llm_description: The number of seconds to pause execution
+              max: null
+              min: null
+              name: seconds
+              options: []
+              placeholder: null
+              precision: null
+              required: true
+              scope: null
+              template: null
+              type: number
+          params:
+            seconds: ''
+          provider_id: agimaster/justwait/justwait
+          provider_name: agimaster/justwait/justwait
+          provider_type: builtin
+          selected: false
+          title: Wait
+          tool_configurations: {}
+          tool_description: Wait for a specified number of seconds, similar to Python's
+            time.sleep() function
+          tool_label: Wait
+          tool_name: wait
+          tool_node_version: '2'
+          tool_parameters:
+            seconds:
+              type: constant
+              value: 5
+          type: tool
+        height: 50
+        id: '1760423070414'
+        parentId: '1760423058735'
+        position:
+          x: 184
+          y: 107
+        positionAbsolute:
+          x: 2629.308378071105
+          y: 116.18449762795086
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+        zIndex: 1002
+      - data:
+          code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
           \ check_task_status(task_id: str, avni_mcp_server_url: str) -> Dict[str,\
           \ Any]:\n    session = requests.Session()\n\n    status_url = f\"{avni_mcp_server_url}/process-config-status/{task_id}\"\
           \n\n    print(f\"\U0001F50D Checking task status: {task_id}\")\n\n    try:\n\
@@ -1654,214 +1656,214 @@ workflow:
           \ status reached: {status}\")\n\n    print(\"\\n\" + \"=\" * 40)\n    print(\"\
           \U0001F3C1 FINAL RESULT:\")\n    print(json.dumps(result, indent=2))\n\n\
           \    return {\"output\": result}\n"
-        code_language: python3
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        outputs:
-          output:
-            children: null
-            type: object
-        selected: false
-        title: Check processing status
-        type: code
-        variables:
-        - value_selector:
-          - '1760416664434'
-          - output
-          value_type: object
-          variable: output
-        - value_selector:
-          - '1711528708197'
-          - avni_mcp_server_url
-          value_type: string
-          variable: avni_mcp_server_url
-      height: 50
-      id: '1760423078948'
-      parentId: '1760423058735'
-      position:
-        x: 506
-        y: 107
-      positionAbsolute:
-        x: 2951.308378071105
-        y: 116.18449762795086
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        answer: '
+          code_language: python3
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          outputs:
+            output:
+              children: null
+              type: object
+          selected: false
+          title: Check processing status
+          type: code
+          variables:
+            - value_selector:
+                - '1760416664434'
+                - output
+              value_type: object
+              variable: output
+            - value_selector:
+                - '1711528708197'
+                - avni_mcp_server_url
+              value_type: string
+              variable: avni_mcp_server_url
+        height: 50
+        id: '1760423078948'
+        parentId: '1760423058735'
+        position:
+          x: 506
+          y: 107
+        positionAbsolute:
+          x: 2951.308378071105
+          y: 116.18449762795086
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+        zIndex: 1002
+      - data:
+          answer: '
 
           {{#1760423078948.output.result.endUserResult#}}
 
           {{#17580163919060.structured_output.next_step#}}'
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        selected: false
-        title: End User Result
-        type: answer
-        variables: []
-      height: 120
-      id: '1760424043492'
-      parentId: '1760423058735'
-      position:
-        x: 1492
-        y: 204
-      positionAbsolute:
-        x: 3937.308378071105
-        y: 213.18449762795086
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        cases:
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: contains
-            id: 1955a1ea-5359-4626-9f5c-edc1dec536d8
-            value: completed
-            varType: string
-            variable_selector:
-            - '1760423078948'
-            - output
-            - status
-          id: 'true'
-          logical_operator: and
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        selected: false
-        title: 'Processing Status '
-        type: if-else
-      height: 122
-      id: '1760424086059'
-      parentId: '1760423058735'
-      position:
-        x: 828
-        y: 70.1865858522658
-      positionAbsolute:
-        x: 3273.308378071105
-        y: 79.37108348021665
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        answer: '
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          selected: false
+          title: End User Result
+          type: answer
+          variables: []
+        height: 120
+        id: '1760424043492'
+        parentId: '1760423058735'
+        position:
+          x: 1492
+          y: 204
+        positionAbsolute:
+          x: 3937.308378071105
+          y: 213.18449762795086
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+        zIndex: 1002
+      - data:
+          cases:
+            - case_id: 'true'
+              conditions:
+                - comparison_operator: contains
+                  id: 1955a1ea-5359-4626-9f5c-edc1dec536d8
+                  value: completed
+                  varType: string
+                  variable_selector:
+                    - '1760423078948'
+                    - output
+                    - status
+              id: 'true'
+              logical_operator: and
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          selected: false
+          title: 'Processing Status '
+          type: if-else
+        height: 122
+        id: '1760424086059'
+        parentId: '1760423058735'
+        position:
+          x: 828
+          y: 70.1865858522658
+        positionAbsolute:
+          x: 3273.308378071105
+          y: 79.37108348021665
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+        zIndex: 1002
+      - data:
+          answer: '
 
           {{#1760423078948.output.progress#}}'
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1760423058735'
-        selected: false
-        title: Config under process
-        type: answer
-        variables: []
-      height: 101
-      id: '1760424123324'
-      parentId: '1760423058735'
-      position:
-        x: 1170
-        y: 60
-      positionAbsolute:
-        x: 3615.308378071105
-        y: 69.18449762795086
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        items:
-        - input_type: variable
-          operation: over-write
-          value:
-          - conversation
-          - 'False'
-          variable_selector:
-          - conversation
-          - loop
-          write_mode: over-write
-        loop_id: '1760423058735'
-        selected: false
-        title: Break Loop
-        type: assigner
-        version: '2'
-      height: 82
-      id: '1760426022942'
-      parentId: '1760423058735'
-      position:
-        x: 1170
-        y: 223
-      positionAbsolute:
-        x: 3615.308378071105
-        y: 232.18449762795086
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        items:
-        - input_type: variable
-          operation: over-write
-          value:
-          - conversation
-          - 'True'
-          variable_selector:
-          - conversation
-          - loop
-          write_mode: over-write
-        selected: false
-        title: Update Loop Boolean
-        type: assigner
-        version: '2'
-      height: 82
-      id: '1760434909468'
-      position:
-        x: 4443.347431585707
-        y: 193.31705379355293
-      positionAbsolute:
-        x: 4443.347431585707
-        y: 193.31705379355293
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-    - data:
-        answer: '{{#1760416664434.error_message#}}'
-        selected: false
-        title: Answer 7
-        type: answer
-        variables: []
-      height: 101
-      id: '1763959812229'
-      position:
-        x: 2454
-        y: 506
-      positionAbsolute:
-        x: 2454
-        y: 506
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
+          isInIteration: false
+          isInLoop: true
+          loop_id: '1760423058735'
+          selected: false
+          title: Config under process
+          type: answer
+          variables: []
+        height: 101
+        id: '1760424123324'
+        parentId: '1760423058735'
+        position:
+          x: 1170
+          y: 60
+        positionAbsolute:
+          x: 3615.308378071105
+          y: 69.18449762795086
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+        zIndex: 1002
+      - data:
+          isInIteration: false
+          isInLoop: true
+          items:
+            - input_type: variable
+              operation: over-write
+              value:
+                - conversation
+                - 'False'
+              variable_selector:
+                - conversation
+                - loop
+              write_mode: over-write
+          loop_id: '1760423058735'
+          selected: false
+          title: Break Loop
+          type: assigner
+          version: '2'
+        height: 82
+        id: '1760426022942'
+        parentId: '1760423058735'
+        position:
+          x: 1170
+          y: 223
+        positionAbsolute:
+          x: 3615.308378071105
+          y: 232.18449762795086
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+        zIndex: 1002
+      - data:
+          items:
+            - input_type: variable
+              operation: over-write
+              value:
+                - conversation
+                - 'True'
+              variable_selector:
+                - conversation
+                - loop
+              write_mode: over-write
+          selected: false
+          title: Update Loop Boolean
+          type: assigner
+          version: '2'
+        height: 82
+        id: '1760434909468'
+        position:
+          x: 4443.347431585707
+          y: 193.31705379355293
+        positionAbsolute:
+          x: 4443.347431585707
+          y: 193.31705379355293
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
+      - data:
+          answer: '{{#1760416664434.error_message#}}'
+          selected: false
+          title: Answer 7
+          type: answer
+          variables: []
+        height: 101
+        id: '1763959812229'
+        position:
+          x: 2454
+          y: 506
+        positionAbsolute:
+          x: 2454
+          y: 506
+        selected: true
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 241
     viewport:
-      x: -1216.8836141397749
-      y: 209.36348745031864
-      zoom: 0.557350840358613
+      x: 106.07212911801844
+      y: 342.87236181509604
+      zoom: 0.6846159287271028
   rag_pipeline_variables: []
