@@ -1,1 +1,1 @@
-"""Test suite for Avni MCP Server."""
+"""Test suite for Avni AI Server."""

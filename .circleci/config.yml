@@ -30,7 +30,7 @@ commands:
       - run: |
           pwd
           cd ~/avni-infra/configure
-          VAULT_PASSWORD_FILE=~/.vault-pass.txt mcp_zip_path=~/artifacts make deploy-avni-ai-<< parameters.env >>
+          VAULT_PASSWORD_FILE=~/.vault-pass.txt ai_zip_path=~/artifacts make deploy-avni-ai-<< parameters.env >>
 
       - run: rm ~/.vault-pass.txt
 
@@ -172,6 +172,36 @@ jobs:
       - deploy_as_service:
           env: "staging"
 
+  prerelease_deploy:
+    docker:
+      - image: cimg/deploy:2025.01
+    steps:
+      - attach_workspace:
+          at: /tmp/artifacts
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::118388513628:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-0cdce9ae698eb3462"
+          availability-zone: "ap-south-1b"
+      - deploy_as_service:
+          env: "prerelease"
+
+  prod_deploy:
+    docker:
+      - image: cimg/deploy:2025.01
+    steps:
+      - attach_workspace:
+          at: /tmp/artifacts
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::118388513628:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-07df2679f68762a68"
+          availability-zone: "ap-south-1a"
+      - deploy_as_service:
+          env: "prod"
+
 workflows:
   version: 2
   build-test-deploy:
@@ -189,3 +219,29 @@ workflows:
             - staging_approve
           context:
             - non-prod-deploy
+      - prerelease_approve:
+          type: approval
+          requires:
+            - test
+          filters:
+            branches:
+              ignore:
+                - master
+      - prerelease_deploy:
+          requires:
+            - prerelease_approve
+          context:
+            - non-prod-deploy
+      - prod_approve:
+          type: approval
+          requires:
+            - test
+          filters:
+            branches:
+              ignore:
+                - master
+      - prod_deploy:
+          requires:
+            - prod_approve
+          context:
+            - prod-deploy
