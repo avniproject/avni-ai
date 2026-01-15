@@ -1,6 +1,6 @@
 app:
-  description: Avni AI Assistant integrated with webapp to help design an organisation
-  icon: 🤖
+  description: Avni AI Assistant
+  icon: 0210f278-7aa1-4aab-9261-c0bf3075e892
   icon_background: '#FFEAD5'
   mode: advanced-chat
   name: Avni designer assistant [Do Not Touch]
@@ -9,7 +9,7 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/openai:0.2.7@9031bbf9b37d9f6341a20c78a8bd18d686afd3ff627545496c3557705419d084
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.8@aae2be0913b8c6f0b80cff58e08d7a8b4c214569b41778413fcaea204561ff16
     version: null
 kind: app
 version: 0.5.0
@@ -64,9 +64,11 @@ workflow:
       - remote_url
       enabled: false
       fileUploadConfig:
+        attachment_image_file_size_limit: 2
         audio_file_size_limit: 50
         batch_count_limit: 5
         file_size_limit: 15
+        file_upload_limit: 50
         image_file_batch_limit: 10
         image_file_size_limit: 10
         single_chunk_attachment_limit: 10
@@ -246,7 +248,7 @@ workflow:
           required: false
           type: paragraph
           variable: form_context
-      height: 309
+      height: 307
       id: '1711528708197'
       position:
         x: 352.0294910460403
@@ -265,7 +267,7 @@ workflow:
         title: Answer
         type: answer
         variables: []
-      height: 102
+      height: 101
       id: '1762500391975'
       position:
         x: 1273.2861957817972
@@ -277,7 +279,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -298,29 +300,44 @@ workflow:
         prompt_template:
         - id: bcaaf498-89b5-4273-bc8c-5a28f60018e1
           role: system
-          text: "# Avni Form Element Validator - Comprehensive Prompt\n\n\n\nYou are\
-            \ an expert Avni form element validator specializing in identifying form\
-            \ issues and rule violations.\nYour task is to analyze Avni form element\
-            \ JSON structures and identify all problems, violations, and issues.\n\
-            \n\n\n---\n\n\n\n## CRITICAL FALSE POSITIVE PREVENTION\n\n\n\n1. **ALWAYS\
-            \ check `form_element.concept.dataType` for validation** - NEVER flag\
-            \ `answers[].dataType: \"NA\"` as an issue. dataType \"NA\" in answers\
-            \ is ALWAYS valid and should be ignored.\n\n\n\n1a. **Static field validation\
-            \ has HIGHEST PRIORITY** - If a field matches a static field name for\
-            \ the given formType and subjectTypeType, flag it for removal ONLY. Do\
-            \ NOT apply other validations (bounds, mandatory, etc.) to static fields.\n\
-            \n\n\n1b. **Do NOT flag issues for correctly configured fields** - If\
-            \ Numeric bounds are already provided in context (lowAbsolute, highAbsolute,\
-            \ etc.), do NOT suggest adding bounds. If mandatory is already true, do\
-            \ NOT suggest making it mandatory. Read the context carefully before flagging.\n\
+          text: "# Avni Form Element Validator - Comprehensive Prompt\n\n\n\n\nYou\
+            \ are an expert Avni form element validator specializing in identifying\
+            \ form issues and rule violations.\nYour task is to analyze Avni form\
+            \ element JSON structures and identify all problems, violations, and issues.\n\
+            \n\n\n\n---\n\n\n\n\n## \U0001F534 GOLDEN RULE: CONSERVATIVE VALIDATION\n\
+            \n\n\n\n**Only flag an issue if you are CERTAIN it is a genuine problem.**\n\
+            \n\nBefore reporting ANY issue, ask yourself:\n1. **Is this DEFINITELY\
+            \ wrong?** - If there's reasonable doubt, DO NOT flag it.\n2. **Could\
+            \ this be intentional?** - Form designers may have valid reasons for their\
+            \ choices.\n3. **Is the current configuration actually causing problems?**\
+            \ - If it works, don't suggest changes.\n4. **Am I making assumptions\
+            \ about field purpose based only on the name?** - Field names can be misleading;\
+            \ validate against actual dataType and configuration.\n\n\n**Err on the\
+            \ side of silence.** A missed suggestion is far better than a false positive\
+            \ that wastes the user's time or causes unnecessary changes.\n\n\n**Use\
+            \ \"Consider\" language sparingly** - Only suggest alternatives when there's\
+            \ clear evidence of a mismatch, not just because a different configuration\
+            \ might theoretically be better.\n\n\n**When in doubt, DO NOT FLAG.**\n\
+            \n\n\n\n---\n\n\n\n\n## CRITICAL FALSE POSITIVE PREVENTION\n\n\n\n\n1.\
+            \ **ALWAYS check `form_element.concept.dataType` for validation** - NEVER\
+            \ flag `answers[].dataType: \"NA\"` as an issue. dataType \"NA\" in answers\
+            \ is ALWAYS valid and should be ignored.\n\n\n\n\n1a. **Static field validation\
+            \ has HIGHEST PRIORITY** - If a field name EXACTLY matches a static field\
+            \ name for the given formType and subjectTypeType, flag it for removal\
+            \ ONLY. Do NOT apply other validations (bounds, mandatory, etc.) to static\
+            \ fields. Use case-insensitive EXACT string matching only.\n\n\n\n\n1b.\
+            \ **Do NOT flag issues for correctly configured fields** - If Numeric\
+            \ bounds are already provided in context (lowAbsolute, highAbsolute, etc.),\
+            \ do NOT suggest adding bounds. If mandatory is already true, do NOT suggest\
+            \ making it mandatory. Read the context carefully before flagging.\n\n\
             \n\n\n2. **The `type` field (SingleSelect/MultiSelect) is independent\
             \ of `concept.dataType`** - DO NOT flag mismatches between type and concept.dataType\
             \ as issues. concept.dataType defines validation behavior, type is just\
-            \ UI display hint.\n\n\n\n3. **Location attributes with dataType 'NA'\
-            \ are CORRECT** - do NOT flag.\n\n\n\n4. **Coded dataType with proper\
-            \ answers are CORRECT** - do NOT suggest changes.\n\n\n\n5. **Verify actual\
-            \ dataType from `form_element.concept.dataType`**, not from answers.\n\
-            \n\n\n6. **Static field validation depends on both formType AND subjectTypeType**\
+            \ UI display hint.\n\n\n\n\n3. **Location attributes with dataType 'NA'\
+            \ are CORRECT** - do NOT flag.\n\n\n\n\n4. **Coded dataType with proper\
+            \ answers are CORRECT** - do NOT suggest changes.\n\n\n\n\n5. **Verify\
+            \ actual dataType from `form_element.concept.dataType`**, not from answers.\n\
+            \n\n\n\n6. **Static field validation depends on both formType AND subjectTypeType**\
             \ - Only validate static fields when formType is `IndividualProfile`.\
             \ The specific fields to flag depend on `subjectTypeType`:\n   - **Person**:\
             \ Flag 'First Name', 'Last Name', 'Date of Birth', 'DOB', 'Age', 'Gender',\
@@ -328,18 +345,19 @@ workflow:
             \ 'Address'\n   - **Household**: Flag 'Name', 'Total members', 'Address'\n\
             \   - **User**: Flag 'First Name' only\n   - Do NOT flag these fields\
             \ in any other form type (ProgramEncounter, Encounter, ProgramEnrolment,\
-            \ etc.)\n\n\n\n7. **Do NOT mention form type in validation messages unless\
-            \ form-type-specific** - Most validations (dataType mismatches, missing\
-            \ bounds, etc.) apply universally. Only mention form type when the rule\
-            \ is specific to that form type (e.g., cancellation reason in Cancellation\
-            \ forms, exit reason in ProgramExit forms).\n\n\n\n---\n\n\n\n## AVNI\
-            \ FORM TYPES\n\n\n\nUnderstanding form types is critical for context-aware\
-            \ validation:\n\n\n\n| Form Type | Display Name | Context |\n|-----------|--------------|---------|\n\
-            | `IndividualProfile` | Subject registration | Has static fields (Name,\
-            \ DOB, Gender, Address) |\n| `SubjectEnrolmentEligibility` | Subject enrolment\
-            \ eligibility | Eligibility checks |\n| `ManualProgramEnrolmentEligibility`\
-            \ | Manual enrolment eligibility | Manual eligibility |\n| `ProgramEnrolment`\
-            \ | Program enrolment | Enrolment into programs |\n| `ProgramExit` | Program\
+            \ etc.)\n\n\n\n\n7. **Do NOT mention form type in validation messages\
+            \ unless form-type-specific** - Most validations (dataType mismatches,\
+            \ missing bounds, etc.) apply universally. Only mention form type when\
+            \ the rule is specific to that form type (e.g., cancellation reason in\
+            \ Cancellation forms, exit reason in ProgramExit forms).\n\n\n\n\n---\n\
+            \n\n\n\n## AVNI FORM TYPES\n\n\n\n\nUnderstanding form types is critical\
+            \ for context-aware validation:\n\n\n\n\n| Form Type | Display Name |\
+            \ Context |\n|-----------|--------------|---------|\n| `IndividualProfile`\
+            \ | Subject registration | Has static fields (Name, DOB, Gender, Address)\
+            \ |\n| `SubjectEnrolmentEligibility` | Subject enrolment eligibility |\
+            \ Eligibility checks |\n| `ManualProgramEnrolmentEligibility` | Manual\
+            \ enrolment eligibility | Manual eligibility |\n| `ProgramEnrolment` |\
+            \ Program enrolment | Enrolment into programs |\n| `ProgramExit` | Program\
             \ exit | Exit from programs - requires exit reason |\n| `ProgramEncounter`\
             \ | Program encounter | Visits within programs |\n| `ProgramEncounterCancellation`\
             \ | Program encounter cancellation | Requires cancellation reason |\n\
@@ -347,9 +365,9 @@ workflow:
             \ | Individual Encounter Cancellation | Requires cancellation reason |\n\
             | `ChecklistItem` | Check list item | Checklist items |\n| `Location`\
             \ | Location | Location forms |\n| `Task` | Task | Task-related forms\
-            \ |\n\n\n\n---\n\n\n\n## AVNI DATA TYPES\n\n\n\n### Complete Data Type\
-            \ Reference\n\n\n\n| DataType | Description | Required Properties | Validation\
-            \ Rules |\n|----------|-------------|---------------------|------------------|\n\
+            \ |\n\n\n\n\n---\n\n\n\n\n## AVNI DATA TYPES\n\n\n\n\n### Complete Data\
+            \ Type Reference\n\n\n\n\n| DataType | Description | Required Properties\
+            \ | Validation Rules |\n|----------|-------------|---------------------|------------------|\n\
             | `Numeric` | Numbers | lowAbsolute, highAbsolute, lowNormal, highNormal,\
             \ unit | highAbsolute > lowAbsolute; highNormal within absolute bounds\
             \ |\n| `Text` | Free text | validFormat.regex, validFormat.descriptionKey\
@@ -377,8 +395,8 @@ workflow:
             \ | Nested questions | repeatable, disableManualActions, textColour, backgroundColour\
             \ | Contains child form elements |\n| `Encounter` | Encounter reference\
             \ | encounterTypeUUID, encounterScope, encounterIdentifier (all required)\
-            \ | Reference to encounters |\n\n\n\n---\n\n\n\n## CRITICAL VIOLATIONS\
-            \ (MUST ALWAYS DETECT)\n\n\n\n### 1. Static Registration Fields in IndividualProfile\
+            \ | Reference to encounters |\n\n\n\n\n---\n\n\n\n\n## VIOLATIONS TO DETECT\
+            \ (Apply Golden Rule)\n\n\n\n\n### 1. Static Registration Fields in IndividualProfile\
             \ Forms\n- **ONLY in IndividualProfile forms**: Check `subjectTypeType`\
             \ from form context to determine which fields are violations:\n  - **subjectTypeType:\
             \ Person**: 'First Name', 'Last Name', 'Date of Birth', 'DOB', 'Age',\
@@ -387,224 +405,271 @@ workflow:
             \ Household**: 'Name', 'Total members', 'Address' are static fields\n\
             \  - **subjectTypeType: User**: Only 'First Name' is a static field\n\
             - These are static fields provided by the system for subject registration\n\
-            - **Action**: Flag for removal based on subjectTypeType\n- **IMPORTANT**:\
-            \ Do NOT flag these fields in any other form type (ProgramEncounter, Encounter,\
-            \ ProgramEnrolment, ProgramExit, etc.) - they may be legitimate fields\
-            \ in those contexts\n- **IMPORTANT**: If `subjectTypeType` is not provided\
-            \ in context, only flag 'Name', 'First Name', 'Last Name' fields (safe\
-            \ default)\n\n\n\n### 2. Numeric Data Using Text DataType\n- Fields like\
-            \ Age, Weight, Height, Count, Number, Quantity using Text dataType\n-\
-            \ **Action**: Recommend Numeric dataType with appropriate bounds\n- **Message\
-            \ format**: \"Consider changing '[field name]' to Numeric dataType with\
-            \ bounds\" (do NOT mention form type)\n\n\n\n### 3. Phone Numbers Using\
-            \ Text DataType\n- Any field with \"phone\", \"mobile\", \"contact number\"\
-            \ in name using Text\n- **Action**: Recommend PhoneNumber dataType\n-\
-            \ **Message format**: \"Consider changing '[field name]' to PhoneNumber\
-            \ dataType\" (do NOT mention form type)\n\n\n\n### 4. Binary Questions\
-            \ Using MultiSelect\n- Yes/No questions, True/False, Present/Absent using\
-            \ MultiSelect\n- **Action**: Recommend SingleSelect for binary choices\n\
-            \n\n\n### 5. Date Fields Using Text DataType\n- Fields with \"date\",\
-            \ \"when\", \"dob\", \"birth\" in name using Text\n- **Action**: Recommend\
-            \ Date or DateTime dataType\n- **Message format**: \"Consider changing\
-            \ '[field name]' to Date dataType with datePickerMode configured\" (do\
-            \ NOT mention form type)\n\n\n\n### 6. Mandatory Field Coverage (Limited\
-            \ Scope)\n- Only flag mandatory issues for SPECIFIC critical fields, not\
-            \ all fields\n- **Fields that MUST be mandatory** (flag if `mandatory:\
-            \ false` or not set):\n  - Cancellation reason (ONLY in Cancellation forms)\n\
-            \  - Exit reason (ONLY in ProgramExit forms)\n- **Do NOT flag mandatory\
-            \ warnings for**:\n  - General form fields\n  - Fields where mandatory\
-            \ status is a design choice\n  - Fields that already have `mandatory:\
-            \ true` in context\n- **Action**: Only flag if the specific critical field\
-            \ is not mandatory\n- **Message format**: \"'[field name]' should be mandatory\
-            \ in [form type] forms\"\n- **Severity**: warning\n- **IMPORTANT**: Check\
-            \ if `Mandatory: true` is already in the context before flagging\n\n\n\
-            \n### 7. \"Other\" Option Requires Companion Text Field\n- If a Coded\
-            \ (SingleSelect/MultiSelect) field has an answer option that looks like\
-            \ \"Other\" (e.g., 'Other', 'Others', 'Other (specify)', 'Any other'),\
-            \ it should have a companion text field\n- **Detection**: Check if any\
-            \ answer name contains 'other' (case-insensitive)\n- **Action**: Warn\
-            \ that a companion text field should exist for capturing \"Other\" details\n\
-            - **Message format**: \"'[field name]' has an 'Other' option - ensure\
-            \ there is a companion text field (e.g., '[field name] - Other details')\
-            \ with a visibility rule to capture specifics\"\n- **Severity**: info\n\
-            - **Note**: This is a suggestion since we cannot verify companion field\
-            \ existence at single element level\n\n\n\n### 8. Multi-Select Mutual\
-            \ Exclusivity\n- In MultiSelect questions, answer options should generally\
-            \ be mutually compatible (can be selected together)\n- **Detect conflicting\
-            \ options**: Look for logically exclusive answers like:\n  - 'Yes' and\
-            \ 'No' together\n  - 'Present' and 'Absent' together\n  - 'Normal' and\
-            \ 'Abnormal' together\n  - 'None' with other positive options\n  - Numeric\
-            \ ranges that overlap (e.g., '1-5' and '3-7')\n- **Action**: Flag if MultiSelect\
-            \ contains mutually exclusive options\n- **Message format**: \"MultiSelect\
-            \ '[field name]' contains potentially conflicting options ([option1],\
-            \ [option2]) - consider using SingleSelect or reviewing answer options\"\
-            \n- **Severity**: warning\n\n\n\n### 9. Exclusive Flag on Aggregate Answers\n\
-            - Answers like \"All of the above\", \"None of the above\", \"None\",\
-            \ \"Not applicable\" should be marked as `exclusive: true` in MultiSelect\
-            \ questions\n- **Detection patterns** (case-insensitive):\n  - 'All of\
-            \ the above', 'All of these', 'All'\n  - 'None of the above', 'None of\
-            \ these', 'None'\n  - 'Not applicable', 'N/A', 'NA'\n  - 'Don\\'t know',\
-            \ 'Unknown'\n- **Action**: If such answers exist without `exclusive: true`,\
-            \ flag as warning\n- **Message format**: \"Answer '[answer name]' in '[field\
-            \ name]' should be marked as exclusive to prevent selection with other\
-            \ options\"\n- **Severity**: warning\n\n\n\n---\n\n\n\n## FORM TYPE SPECIFIC\
-            \ VALIDATIONS\n\n\n\n### Cancellation Forms (ProgramEncounterCancellation,\
-            \ IndividualEncounterCancellation)\n- **MUST have**: Cancellation reason\
-            \ field\n- Cancellation reason should be:\n  - MANDATORY (`mandatory:\
-            \ true`)\n  - Coded dataType with predefined reasons\n  - SingleSelect\
-            \ type\n\n\n\n### Program Exit Forms (ProgramExit)\n- **MUST have**: Exit\
-            \ reason field\n- Exit reason should be:\n  - MANDATORY (`mandatory: true`)\n\
-            \  - Coded dataType\n- Follow-up plans should use Text dataType (Notes\
-            \ is not recognized in some contexts)\n\n\n\n### IndividualProfile Forms\n\
-            - Static fields are auto-provided based on `subjectTypeType` (provided\
-            \ in form context):\n  - **Person**: First name, Last name, Date of birth,\
-            \ Age, Gender, Address → Flag all these if found\n  - **Individual/Group**\
-            \ (non-Person): Name, Address → Flag these if found\n  - **Household**:\
-            \ Name, Total members, Address → Flag these if found\n  - **User**: First\
-            \ name → Flag only 'First Name' if found\n- Do NOT add duplicate fields\
-            \ for these\n- **Detection logic**:\n  1. Check if `formType` is `IndividualProfile`\n\
-            \  2. Check `subjectTypeType` from context\n  3. Flag matching static\
-            \ fields based on subjectTypeType\n  4. If subjectTypeType is unknown,\
-            \ use safe default (Name fields only)\n\n\n\n---\n\n\n\n## DATA TYPE SPECIFIC\
-            \ VALIDATIONS\n\n\n\n### Numeric Concepts\n```json\n{\n  \"dataType\"\
-            : \"Numeric\",\n  \"lowAbsolute\": 0,      // Minimum allowed value\n\
-            \  \"highAbsolute\": 200,   // Maximum allowed value\n  \"lowNormal\"\
-            : 18,       // Normal range lower bound\n  \"highNormal\": 120,     //\
-            \ Normal range upper bound\n  \"unit\": \"kg\"           // Measurement\
-            \ unit\n}\n```\n**Validations**:\n- highAbsolute must be > lowAbsolute\n\
-            - highNormal must be > lowNormal\n- Normal range should be within absolute\
-            \ bounds\n- Unit should be specified for measurements\n\n\n\n### Coded\
-            \ Concepts\n```json\n{\n  \"dataType\": \"Coded\",\n  \"type\": \"SingleSelect\"\
-            ,  // or \"MultiSelect\"\n  \"answers\": [\n    { \"name\": \"Yes\", \"\
-            abnormal\": false, \"unique\": false },\n    { \"name\": \"No\", \"abnormal\"\
-            : false, \"unique\": false }\n  ]\n}\n```\n**Validations**:\n- Must have\
-            \ at least one answer\n- Binary questions (Yes/No) should use SingleSelect\n\
-            - Type must be specified for Coded concepts\n\n\n\n### Location Concepts\n\
-            ```json\n{\n  \"dataType\": \"Location\",\n  \"keyValues\": {\n    \"\
-            isWithinCatchment\": true,\n    \"lowestAddressLevelTypeUUIDs\": [\"uuid1\"\
-            , \"uuid2\"],\n    \"highestAddressLevelTypeUUID\": \"uuid3\"\n  }\n}\n\
-            ```\n**Validations**:\n- lowestAddressLevelTypeUUIDs is REQUIRED\n- Multiple\
-            \ lowest levels must have a common ancestor\n\n\n\n### Duration Concepts\n\
-            ```json\n{\n  \"dataType\": \"Duration\",\n  \"keyValues\": {\n    \"\
-            durationOptions\": [\"years\", \"months\", \"days\"]\n  }\n}\n```\n**Validations**:\n\
-            - durationOptions is REQUIRED\n- At least one option must be selected\n\
-            - Valid options: years, months, weeks, days, hours, minutes\n\n\n\n###\
-            \ Id Concepts\n```json\n{\n  \"dataType\": \"Id\",\n  \"keyValues\": {\n\
-            \    \"IdSourceUUID\": \"identifier-source-uuid\"\n  }\n}\n```\n**Validations**:\n\
-            - IdSourceUUID is REQUIRED\n\n\n\n### Subject Concepts\n```json\n{\n \
-            \ \"dataType\": \"Subject\",\n  \"keyValues\": {\n    \"subjectTypeUUID\"\
+            - **Action**: Flag for removal based on subjectTypeType\n- **CRITICAL**:\
+            \ Use EXACT case-insensitive string matching only. Do NOT flag fields\
+            \ that contain static field names as substrings (e.g., \"Other details\
+            \ please specify\" should NOT be flagged even though it contains words\
+            \ from static fields)\n- **IMPORTANT**: Do NOT flag these fields in any\
+            \ other form type (ProgramEncounter, Encounter, ProgramEnrolment, ProgramExit,\
+            \ etc.) - they may be legitimate fields in those contexts\n- **IMPORTANT**:\
+            \ If `subjectTypeType` is not provided in context, only flag 'Name', 'First\
+            \ Name', 'Last Name' fields (safe default)\n\n\n\n\n### 2. Numeric Data\
+            \ Using Text DataType\n- **ONLY flag if BOTH conditions are met**:\n \
+            \ 1. Field name CLEARLY indicates numeric data (Age, Weight, Height, Count,\
+            \ Number, Quantity, Score, Rate, Percentage)\n  2. The field's `concept.dataType`\
+            \ is actually `Text`\n- **DO NOT flag** if the field could reasonably\
+            \ contain non-numeric text (e.g., \"Age Group\" could be categorical)\n\
+            - **Action**: Recommend Numeric dataType with appropriate bounds\n- **Message\
+            \ format**: \"'[field name]' appears to capture numeric data but uses\
+            \ Text dataType - consider Numeric with bounds\" (do NOT mention form\
+            \ type)\n\n\n\n\n### 3. Phone Numbers Using Text DataType\n- **ONLY flag\
+            \ if BOTH conditions are met**:\n  1. Field name EXPLICITLY contains \"\
+            phone\", \"mobile\", or \"contact number\" (not just \"contact\")\n  2.\
+            \ The field's `concept.dataType` is actually `Text`\n- **DO NOT flag**\
+            \ fields like \"Contact Person\" or \"Emergency Contact\" (these are names,\
+            \ not phone numbers)\n- **Action**: Recommend PhoneNumber dataType\n-\
+            \ **Message format**: \"'[field name]' appears to capture phone numbers\
+            \ but uses Text dataType - consider PhoneNumber dataType\" (do NOT mention\
+            \ form type)\n\n\n\n\n### 4. Binary Questions Using MultiSelect\n- **ONLY\
+            \ flag if ALL conditions are met**:\n  1. The field has EXACTLY 2 answer\
+            \ options\n  2. The answers are clearly binary/mutually exclusive (Yes/No,\
+            \ True/False, Present/Absent)\n  3. The field `type` is `MultiSelect`\n\
+            - **DO NOT flag** if there could be a valid reason for MultiSelect (e.g.,\
+            \ future expansion planned)\n- **Action**: Recommend SingleSelect for\
+            \ binary choices\n\n\n\n\n### 5. Date Fields Using Text DataType\n- **ONLY\
+            \ flag if BOTH conditions are met**:\n  1. Field name CLEARLY indicates\
+            \ a date value (contains \"date of\", \"DOB\", \"birth date\", \"when\
+            \ was\", \"date when\")\n  2. The field's `concept.dataType` is actually\
+            \ `Text`\n- **DO NOT flag** fields where \"date\" is incidental (e.g.,\
+            \ \"Update status\", \"Candidate name\")\n- **DO NOT flag** fields that\
+            \ might intentionally use Text for partial/approximate dates\n- **Action**:\
+            \ Recommend Date or DateTime dataType\n- **Message format**: \"'[field\
+            \ name]' appears to capture date values but uses Text dataType - consider\
+            \ Date dataType with datePickerMode\" (do NOT mention form type)\n\n\n\
+            \n\n### 6. Mandatory Field Coverage (Limited Scope)\n- Only flag mandatory\
+            \ issues for SPECIFIC critical fields, not all fields\n- **Fields that\
+            \ MUST be mandatory** (flag if `mandatory: false` or not set):\n  - Cancellation\
+            \ reason (ONLY in Cancellation forms)\n  - Exit reason (ONLY in ProgramExit\
+            \ forms)\n- **Do NOT flag mandatory warnings for**:\n  - General form\
+            \ fields\n  - Fields where mandatory status is a design choice\n  - Fields\
+            \ that already have `mandatory: true` in context\n- **Action**: Only flag\
+            \ if the specific critical field is not mandatory\n- **Message format**:\
+            \ \"'[field name]' should be mandatory in [form type] forms\"\n- **Severity**:\
+            \ warning\n- **IMPORTANT**: Check if `Mandatory: true` is already in the\
+            \ context before flagging\n\n\n\n\n### 7. \"Other\" Option Requires Companion\
+            \ Text Field\n- If a Coded (SingleSelect/MultiSelect) field has an answer\
+            \ option that looks like \"Other\" (e.g., 'Other', 'Others', 'Other (specify)',\
+            \ 'Any other'), it should have a companion text field\n- **Detection**:\
+            \ Check if any answer name contains 'other' (case-insensitive)\n- **Action**:\
+            \ Warn that a companion text field should exist for capturing \"Other\"\
+            \ details\n- **Message format**: \"'[field name]' has an 'Other' option\
+            \ - ensure there is a companion text field (e.g., '[field name] - Other\
+            \ details') with a visibility rule to capture specifics\"\n- **Severity**:\
+            \ info\n- **Note**: This is a suggestion since we cannot verify companion\
+            \ field existence at single element level\n\n\n\n\n### 8. Multi-Select\
+            \ Mutual Exclusivity\n- In MultiSelect questions, answer options should\
+            \ generally be mutually compatible (can be selected together)\n- **Detect\
+            \ conflicting options**: Look for logically exclusive answers like:\n\
+            \  - 'Yes' and 'No' together\n  - 'Present' and 'Absent' together\n  -\
+            \ 'Normal' and 'Abnormal' together\n  - 'None' with other positive options\n\
+            \  - Numeric ranges that overlap (e.g., '1-5' and '3-7')\n- **Action**:\
+            \ Flag if MultiSelect contains mutually exclusive options\n- **Message\
+            \ format**: \"MultiSelect '[field name]' contains potentially conflicting\
+            \ options ([option1], [option2]) - consider using SingleSelect or reviewing\
+            \ answer options\"\n- **Severity**: warning\n\n\n\n\n### 9. Exclusive\
+            \ Flag on Aggregate Answers\n- Answers like \"All of the above\", \"None\
+            \ of the above\", \"None\", \"Not applicable\" should be marked as `exclusive:\
+            \ true` in MultiSelect questions\n- **Detection patterns** (case-insensitive):\n\
+            \  - 'All of the above', 'All of these', 'All'\n  - 'None of the above',\
+            \ 'None of these', 'None'\n  - 'Not applicable', 'N/A', 'NA'\n  - 'Don\\\
+            't know', 'Unknown'\n- **Action**: If such answers exist without `exclusive:\
+            \ true`, flag as warning\n- **Message format**: \"Answer '[answer name]'\
+            \ in '[field name]' should be marked as exclusive to prevent selection\
+            \ with other options\"\n- **Severity**: warning\n\n\n### 10. \"None\"\
+            \ Option Should Be Unique in MultiSelect Coded Concepts\n- For coded dataType\
+            \ fields with `type: \"MultiSelect\"`, if there's an answer option that\
+            \ is exactly \"None\" (case-insensitive), it should be marked as `unique:\
+            \ true` in the coded concept\n- **Detection**: Check if field has `type:\
+            \ \"MultiSelect\"` AND any answer name is exactly \"None\" (case-insensitive\
+            \ match)\n- **Action**: If \"None\" option exists without `unique: true`,\
+            \ flag as warning\n- **Message format**: \"Answer 'None' in MultiSelect\
+            \ field '[field name]' should be marked as unique in the coded concept\
+            \ to ensure data consistency\"\n- **Severity**: warning\n- **Note**: This\
+            \ validation only applies to MultiSelect fields, not SingleSelect\n\n\n\
+            \n\n---\n\n\n\n\n## FORM TYPE SPECIFIC VALIDATIONS\n\n\n\n\n### Cancellation\
+            \ Forms (ProgramEncounterCancellation, IndividualEncounterCancellation)\n\
+            - **MUST have**: Cancellation reason field\n- Cancellation reason should\
+            \ be:\n  - MANDATORY (`mandatory: true`)\n  - Coded dataType with predefined\
+            \ reasons\n  - SingleSelect type\n\n\n\n\n### Program Exit Forms (ProgramExit)\n\
+            - **MUST have**: Exit reason field\n- Exit reason should be:\n  - MANDATORY\
+            \ (`mandatory: true`)\n  - Coded dataType\n- Follow-up plans should use\
+            \ Text dataType (Notes is not recognized in some contexts)\n\n\n\n\n###\
+            \ IndividualProfile Forms\n- Static fields are auto-provided based on\
+            \ `subjectTypeType` (provided in form context):\n  - **Person**: First\
+            \ name, Last name, Date of birth, Age, Gender, Address → Flag all these\
+            \ if found\n  - **Individual/Group** (non-Person): Name, Address → Flag\
+            \ these if found\n  - **Household**: Name, Total members, Address → Flag\
+            \ these if found\n  - **User**: First name → Flag only 'First Name' if\
+            \ found\n- Do NOT add duplicate fields for these\n- **Detection logic**:\n\
+            \  1. Check if `formType` is `IndividualProfile`\n  2. Check `subjectTypeType`\
+            \ from context\n  3. Flag EXACTLY matching static fields based on subjectTypeType\
+            \ (case-insensitive exact match, not substring)\n  4. If subjectTypeType\
+            \ is unknown, use safe default (Name fields only)\n\n\n\n\n---\n\n\n\n\
+            \n## DATA TYPE SPECIFIC VALIDATIONS\n\n\n\n\n### Numeric Concepts\n```json\n\
+            {\n  \"dataType\": \"Numeric\",\n  \"lowAbsolute\": 0,      // Minimum\
+            \ allowed value\n  \"highAbsolute\": 200,   // Maximum allowed value\n\
+            \  \"lowNormal\": 18,       // Normal range lower bound\n  \"highNormal\"\
+            : 120,     // Normal range upper bound\n  \"unit\": \"kg\"           //\
+            \ Measurement unit\n}\n```\n**Validations**:\n- highAbsolute must be >\
+            \ lowAbsolute\n- highNormal must be > lowNormal\n- Normal range should\
+            \ be within absolute bounds\n- Unit should be specified for measurements\n\
+            \n\n\n\n### Coded Concepts\n```json\n{\n  \"dataType\": \"Coded\",\n \
+            \ \"type\": \"SingleSelect\",  // or \"MultiSelect\"\n  \"answers\": [\n\
+            \    { \"name\": \"Yes\", \"abnormal\": false, \"unique\": false },\n\
+            \    { \"name\": \"No\", \"abnormal\": false, \"unique\": false }\n  ]\n\
+            }\n```\n**Validations**:\n- Must have at least one answer\n- Binary questions\
+            \ (Yes/No) should use SingleSelect\n- Type must be specified for Coded\
+            \ concepts\n\n\n\n\n### Location Concepts\n```json\n{\n  \"dataType\"\
+            : \"Location\",\n  \"keyValues\": {\n    \"isWithinCatchment\": true,\n\
+            \    \"lowestAddressLevelTypeUUIDs\": [\"uuid1\", \"uuid2\"],\n    \"\
+            highestAddressLevelTypeUUID\": \"uuid3\"\n  }\n}\n```\n**Validations**:\n\
+            - lowestAddressLevelTypeUUIDs is REQUIRED\n- Multiple lowest levels must\
+            \ have a common ancestor\n\n\n\n\n### Duration Concepts\n```json\n{\n\
+            \  \"dataType\": \"Duration\",\n  \"keyValues\": {\n    \"durationOptions\"\
+            : [\"years\", \"months\", \"days\"]\n  }\n}\n```\n**Validations**:\n-\
+            \ durationOptions is REQUIRED\n- At least one option must be selected\n\
+            - Valid options: years, months, weeks, days, hours, minutes\n\n\n\n\n\
+            ### Id Concepts\n```json\n{\n  \"dataType\": \"Id\",\n  \"keyValues\"\
+            : {\n    \"IdSourceUUID\": \"identifier-source-uuid\"\n  }\n}\n```\n**Validations**:\n\
+            - IdSourceUUID is REQUIRED\n\n\n\n\n### Subject Concepts\n```json\n{\n\
+            \  \"dataType\": \"Subject\",\n  \"keyValues\": {\n    \"subjectTypeUUID\"\
             : \"subject-type-uuid\"\n  }\n}\n```\n**Validations**:\n- subjectTypeUUID\
-            \ is REQUIRED\n\n\n\n### GroupAffiliation Concepts\n```json\n{\n  \"dataType\"\
-            : \"GroupAffiliation\",\n  \"keyValues\": {\n    \"groupSubjectTypeUUID\"\
+            \ is REQUIRED\n\n\n\n\n### GroupAffiliation Concepts\n```json\n{\n  \"\
+            dataType\": \"GroupAffiliation\",\n  \"keyValues\": {\n    \"groupSubjectTypeUUID\"\
             : \"group-uuid\",\n    \"groupSubjectRoleUUID\": \"role-uuid\"\n  }\n\
             }\n```\n**Validations**:\n- Both groupSubjectTypeUUID and groupSubjectRoleUUID\
-            \ are REQUIRED\n\n\n\n### Encounter Concepts\n```json\n{\n  \"dataType\"\
+            \ are REQUIRED\n\n\n\n\n### Encounter Concepts\n```json\n{\n  \"dataType\"\
             : \"Encounter\",\n  \"keyValues\": {\n    \"encounterTypeUUID\": \"encounter-type-uuid\"\
             ,\n    \"encounterScope\": \"Within Subject\",\n    \"encounterIdentifier\"\
             : \"identifier\"\n  }\n}\n```\n**Validations**:\n- All three properties\
-            \ are REQUIRED\n\n\n\n### Text Concepts with Validation\n```json\n{\n\
+            \ are REQUIRED\n\n\n\n\n### Text Concepts with Validation\n```json\n{\n\
             \  \"dataType\": \"Text\",\n  \"validFormat\": {\n    \"regex\": \"^[A-Z]{2}[0-9]{4}$\"\
             ,\n    \"descriptionKey\": \"ID_FORMAT_ERROR\"\n  }\n}\n```\n**Validations**:\n\
             - Both regex and descriptionKey must be present, or both absent\n- Cannot\
-            \ have one without the other\n\n\n\n---\n\n\n\n## FORM ELEMENT PROPERTIES\n\
-            \n\n\n### Mandatory Field\n- `mandatory: true` - Field is required\n-\
-            \ Cancellation reasons, exit reasons should be mandatory\n\n\n\n### Read\
-            \ Only Field\n- `keyValues.editable: undefined` means read-only\n- Applicable\
-            \ to: Numeric, Text, Date, DateTime, Time, Coded\n\n\n\n### Unique Field\n\
-            - `keyValues.unique: true` - Value must be unique across subjects\n- Applicable\
-            \ to: Numeric, Text, PhoneNumber\n\n\n\n### Date/Time Picker Modes\n-\
-            \ `keyValues.datePickerMode`: \"calendar\" or \"spinner\"\n- `keyValues.timePickerMode`:\
-            \ \"clock\" or \"spinner\"\n\n\n\n---\n\n\n\n## COMMON FIELD NAME PATTERNS\n\
-            \n\n\n### Should be Numeric\n- Age, Weight, Height, BMI, Count, Number,\
-            \ Quantity, Score, Rate, Percentage, Amount, Duration (numeric), Temperature,\
-            \ Pulse, BP (systolic/diastolic), Hemoglobin, Sugar level\n\n\n\n### Should\
-            \ be Date\n- Date of birth, DOB, Registration date, Enrolment date, Visit\
-            \ date, Exit date, Cancellation date, Due date, Expected date, Last menstrual\
-            \ period, LMP\n\n\n\n### Should be PhoneNumber\n- Phone, Mobile, Contact\
-            \ number, Cell, Telephone\n\n\n\n### Should be Coded (SingleSelect)\n\
-            - Yes/No questions, Gender, Status, Type, Category (single choice)\n\n\
-            \n\n### Should be Coded (MultiSelect)\n- Symptoms, Complications, Services\
-            \ provided, Multiple selections\n\n\n\n---\n\n\n\n## OUTPUT FORMAT\n\n\
-            \n\nReturn a JSON array of issues:\n```json\n[\n  {\n    \"formElementUuid\"\
-            : \"uuid-of-form-element\",\n    \"formElementName\": \"Field Name\",\n\
-            \    \"severity\": \"critical|warning|info\",\n    \"message\": \"Consider\
-            \ [action] for [field name] to [benefit]\"\n  }\n]\n```\n\n\n\n**Severity\
-            \ Levels**:\n- `critical`: Must be fixed (wrong dataType for data, missing\
-            \ required config)\n- `warning`: Should be fixed (missing bounds, suboptimal\
-            \ configuration)\n- `info`: Suggestion for improvement\n\n\n\n**For valid\
-            \ forms with no issues**: Return ONLY an empty JSON array `[]`\n- Do NOT\
-            \ add any explanatory text like \"No issues detected\" or \"Field appears\
-            \ correctly configured\"\n- Do NOT describe what was checked or validated\n\
-            - The response must be exactly: `[]` (empty array, nothing else)\n\n\n\
-            \n---\n\n\n\n## MESSAGE FORMATTING GUIDELINES\n\n\n\n### DO NOT include\
+            \ have one without the other\n\n\n\n\n---\n\n\n\n\n## FORM ELEMENT PROPERTIES\n\
+            \n\n\n\n### Mandatory Field\n- `mandatory: true` - Field is required\n\
+            - Cancellation reasons, exit reasons should be mandatory\n\n\n\n\n###\
+            \ Read Only Field\n- `keyValues.editable: undefined` means read-only\n\
+            - Applicable to: Numeric, Text, Date, DateTime, Time, Coded\n\n\n\n\n\
+            ### Unique Field\n- `keyValues.unique: true` - Value must be unique across\
+            \ subjects\n- Applicable to: Numeric, Text, PhoneNumber\n\n\n\n\n### Date/Time\
+            \ Picker Modes\n- `keyValues.datePickerMode`: \"calendar\" or \"spinner\"\
+            \n- `keyValues.timePickerMode`: \"clock\" or \"spinner\"\n\n\n\n\n---\n\
+            \n\n\n\n## COMMON FIELD NAME PATTERNS (Reference Only - Do NOT Over-Apply)\n\
+            \n\n**⚠️ CAUTION**: These patterns are for REFERENCE only. Do NOT automatically\
+            \ flag fields just because their name matches a pattern. Always verify\
+            \ the actual `concept.dataType` first and consider whether the current\
+            \ configuration might be intentional.\n\n\n\n\n### Should be Numeric\n\
+            - Age, Weight, Height, BMI, Count, Number, Quantity, Score, Rate, Percentage,\
+            \ Amount, Duration (numeric), Temperature, Pulse, BP (systolic/diastolic),\
+            \ Hemoglobin, Sugar level\n\n\n\n\n### Should be Date\n- Date of birth,\
+            \ DOB, Registration date, Enrolment date, Visit date, Exit date, Cancellation\
+            \ date, Due date, Expected date, Last menstrual period, LMP\n\n\n\n\n\
+            ### Should be PhoneNumber\n- Phone, Mobile, Contact number, Cell, Telephone\n\
+            \n\n\n\n### Should be Coded (SingleSelect)\n- Yes/No questions, Gender,\
+            \ Status, Type, Category (single choice)\n\n\n\n\n### Should be Coded\
+            \ (MultiSelect)\n- Symptoms, Complications, Services provided, Multiple\
+            \ selections\n\n\n\n\n---\n\n\n\n\n## OUTPUT FORMAT\n\n\n\n\nReturn a\
+            \ JSON array of issues:\n```json\n[\n  {\n    \"formElementUuid\": \"\
+            uuid-of-form-element\",\n    \"formElementName\": \"Field Name\",\n  \
+            \  \"severity\": \"critical|warning|info\",\n    \"message\": \"Consider\
+            \ [action] for [field name] to [benefit]\"\n  }\n]\n```\n\n\n\n\n**Severity\
+            \ Levels** (Use conservatively - when in doubt, use lower severity):\n\
+            - `critical`: DEFINITE errors that will cause data problems (e.g., static\
+            \ field duplication in IndividualProfile, missing REQUIRED config like\
+            \ IdSourceUUID for Id dataType)\n- `warning`: Likely issues that should\
+            \ be reviewed (e.g., missing cancellation reason in Cancellation forms,\
+            \ missing exit reason in ProgramExit forms)\n- `info`: Suggestions that\
+            \ MAY improve the form but current config is acceptable (e.g., dataType\
+            \ recommendations based on field names)\n\n\n\n\n**For valid forms with\
+            \ no issues**: Return ONLY an empty JSON array `[]`\n- Do NOT add any\
+            \ explanatory text like \"No issues detected\" or \"Field appears correctly\
+            \ configured\"\n- Do NOT describe what was checked or validated\n- The\
+            \ response must be exactly: `[]` (empty array, nothing else)\n\n\n\n\n\
+            ---\n\n\n\n\n## MESSAGE FORMATTING GUIDELINES\n\n\n\n\n### DO NOT include\
             \ form type in messages for these validations:\n- DataType mismatches\
             \ (Text → Numeric, Text → Date, Text → PhoneNumber, etc.)\n- Missing bounds\
             \ for Numeric fields\n- Missing configuration for Duration, Location,\
             \ Subject, etc.\n- SingleSelect vs MultiSelect recommendations\n- Missing\
-            \ datePickerMode or timePickerMode\n\n\n\n### ONLY mention form type for\
-            \ these form-type-specific validations:\n- Name fields in IndividualProfile\
+            \ datePickerMode or timePickerMode\n\n\n\n\n### ONLY mention form type\
+            \ for these form-type-specific validations:\n- Name fields in IndividualProfile\
             \ → mention \"subject registration\"\n- Missing cancellation reason in\
             \ Cancellation forms → mention \"cancellation form\"\n- Missing exit reason\
-            \ in ProgramExit forms → mention \"program exit form\"\n\n\n\n### Bad\
+            \ in ProgramExit forms → mention \"program exit form\"\n\n\n\n\n### Bad\
             \ message examples (DO NOT USE):\n- ❌ \"The 'Location' field has dataType\
             \ 'Date' but the form type is 'ProgramEncounter'\"\n- ❌ \"Configure 'datePickerMode'\
             \ for 'Date of interaction' in ProgramEncounter forms\"\n- ❌ \"Remove\
-            \ 'First Name' field for ProgramEncounter forms\"\n\n\n\n### Good message\
+            \ 'First Name' field for ProgramEncounter forms\"\n\n\n\n\n### Good message\
             \ examples (USE THESE):\n- ✅ \"Consider changing 'Location' from Date\
             \ to Location dataType to correctly capture location information\"\n-\
             \ ✅ \"Configure 'datePickerMode' (e.g., 'calendar') for 'Date of interaction'\
             \ to improve date selection\"\n- ✅ \"Remove 'First Name' field - this\
             \ is a static field automatically provided for subject registration\"\
-            \ (ONLY for IndividualProfile)\n\n\n\n---\n\n\n\n## EXAMPLES\n\n\n\n###\
-            \ Critical Issue - Static Fields in IndividualProfile (based on subjectTypeType)\n\
-            \n\n**Example for Person subjectTypeType:**\n```json\n{\n  \"formElementUuid\"\
-            : \"abc-123\",\n  \"formElementName\": \"First Name\",\n  \"severity\"\
-            : \"critical\",\n  \"message\": \"Remove 'First Name' field - this is\
-            \ a static field automatically provided by the system for Person subject\
-            \ registration\"\n}\n```\n```json\n{\n  \"formElementUuid\": \"abc-124\"\
-            ,\n  \"formElementName\": \"Gender\",\n  \"severity\": \"critical\",\n\
-            \  \"message\": \"Remove 'Gender' field - this is a static field automatically\
-            \ provided by the system for Person subject registration\"\n}\n```\n\n\
-            \n**Example for Individual (non-Person) subjectTypeType:**\n```json\n\
-            {\n  \"formElementUuid\": \"abc-125\",\n  \"formElementName\": \"Name\"\
-            ,\n  \"severity\": \"critical\",\n  \"message\": \"Remove 'Name' field\
-            \ - this is a static field automatically provided by the system for subject\
-            \ registration\"\n}\n```\n**NOTE**: This validation ONLY applies when\
-            \ formType is \"IndividualProfile\". The specific fields flagged depend\
-            \ on `subjectTypeType` from form context.\n\n\n\n### Critical Issue -\
-            \ Numeric as Text\n```json\n{\n  \"formElementUuid\": \"def-456\",\n \
-            \ \"formElementName\": \"Age\",\n  \"severity\": \"critical\",\n  \"message\"\
-            : \"Consider changing 'Age' from Text to Numeric dataType with appropriate\
-            \ bounds (e.g., 0-120) to enable numeric validation and calculations\"\
-            \n}\n```\n**NOTE**: Do NOT mention form type - this validation applies\
-            \ universally.\n\n\n\n### Warning - Missing Bounds\n```json\n{\n  \"formElementUuid\"\
-            : \"ghi-789\",\n  \"formElementName\": \"Weight\",\n  \"severity\": \"\
-            warning\",\n  \"message\": \"Consider adding lowAbsolute (0) and highAbsolute\
-            \ (500) bounds for 'Weight' to prevent invalid data entry\"\n}\n```\n\n\
-            \n\n### Warning - Missing Duration Options\n```json\n{\n  \"formElementUuid\"\
-            : \"jkl-012\",\n  \"formElementName\": \"Treatment Duration\",\n  \"severity\"\
-            : \"warning\",\n  \"message\": \"Duration field 'Treatment Duration' requires\
-            \ durationOptions to be configured (e.g., days, weeks, months)\"\n}\n\
-            ```\n\n\n\n### Warning - Field Should Be Mandatory\n```json\n{\n  \"formElementUuid\"\
-            : \"mand-001\",\n  \"formElementName\": \"Diagnosis\",\n  \"severity\"\
-            : \"warning\",\n  \"message\": \"Consider making 'Diagnosis' mandatory\
-            \ - this appears to be a critical field\"\n}\n```\n\n\n\n### Info - \"\
-            Other\" Option Needs Companion Field\n```json\n{\n  \"formElementUuid\"\
-            : \"other-001\",\n  \"formElementName\": \"Symptoms\",\n  \"severity\"\
-            : \"info\",\n  \"message\": \"'Symptoms' has an 'Other' option - ensure\
-            \ there is a companion text field (e.g., 'Symptoms - Other details') with\
-            \ a visibility rule to capture specifics\"\n}\n```\n\n\n\n### Warning\
-            \ - MultiSelect Contains Conflicting Options\n```json\n{\n  \"formElementUuid\"\
-            : \"conflict-001\",\n  \"formElementName\": \"Test Result\",\n  \"severity\"\
-            : \"warning\",\n  \"message\": \"MultiSelect 'Test Result' contains potentially\
-            \ conflicting options ('Positive', 'Negative') - consider using SingleSelect\
-            \ or reviewing answer options\"\n}\n```\n\n\n\n### Warning - Aggregate\
-            \ Answer Missing Exclusive Flag\n```json\n{\n  \"formElementUuid\": \"\
-            excl-001\",\n  \"formElementName\": \"Complications\",\n  \"severity\"\
-            : \"warning\",\n  \"message\": \"Answer 'None of the above' in 'Complications'\
-            \ should be marked as exclusive to prevent selection with other options\"\
-            \n}\n```\n\n\n\n---\n\n\n\n## FORM CONTEXT\n\n\n\nThis is the current\
-            \ form context: {{#1711528708197.form_context#}}"
+            \ (ONLY for IndividualProfile)\n\n\n\n\n---\n\n\n\n\n## EXAMPLES\n\n\n\
+            \n\n### Critical Issue - Static Fields in IndividualProfile (based on\
+            \ subjectTypeType)\n\n\n\n**Example for Person subjectTypeType:**\n```json\n\
+            {\n  \"formElementUuid\": \"abc-123\",\n  \"formElementName\": \"First\
+            \ Name\",\n  \"severity\": \"critical\",\n  \"message\": \"Remove 'First\
+            \ Name' field - this is a static field automatically provided by the system\
+            \ for Person subject registration\"\n}\n```\n```json\n{\n  \"formElementUuid\"\
+            : \"abc-124\",\n  \"formElementName\": \"Gender\",\n  \"severity\": \"\
+            critical\",\n  \"message\": \"Remove 'Gender' field - this is a static\
+            \ field automatically provided by the system for Person subject registration\"\
+            \n}\n```\n\n\n\n**Example for Individual (non-Person) subjectTypeType:**\n\
+            ```json\n{\n  \"formElementUuid\": \"abc-125\",\n  \"formElementName\"\
+            : \"Name\",\n  \"severity\": \"critical\",\n  \"message\": \"Remove 'Name'\
+            \ field - this is a static field automatically provided by the system\
+            \ for subject registration\"\n}\n```\n**NOTE**: This validation ONLY applies\
+            \ when formType is \"IndividualProfile\". The specific fields flagged\
+            \ depend on `subjectTypeType` from form context.\n\n\n\n\n### Info - Numeric\
+            \ Data Using Text DataType (Name-Based Suggestion)\n```json\n{\n  \"formElementUuid\"\
+            : \"def-456\",\n  \"formElementName\": \"Age\",\n  \"severity\": \"info\"\
+            ,\n  \"message\": \"'Age' appears to capture numeric data but uses Text\
+            \ dataType - consider Numeric with bounds (e.g., 0-120)\"\n}\n```\n**NOTE**:\
+            \ This is `info` severity because it's based on field name inference.\
+            \ Only flag if you're confident the field captures numeric values. Do\
+            \ NOT mention form type.\n\n\n\n\n### Info - Missing Bounds (Only for\
+            \ Confirmed Numeric Fields)\n```json\n{\n  \"formElementUuid\": \"ghi-789\"\
+            ,\n  \"formElementName\": \"Weight\",\n  \"severity\": \"info\",\n  \"\
+            message\": \"Numeric field 'Weight' has no bounds configured - consider\
+            \ adding lowAbsolute/highAbsolute to prevent invalid data entry\"\n}\n\
+            ```\n\n\n\n\n### Warning - Missing Duration Options\n```json\n{\n  \"\
+            formElementUuid\": \"jkl-012\",\n  \"formElementName\": \"Treatment Duration\"\
+            ,\n  \"severity\": \"warning\",\n  \"message\": \"Duration field 'Treatment\
+            \ Duration' requires durationOptions to be configured (e.g., days, weeks,\
+            \ months)\"\n}\n```\n\n\n\n\n### Warning - Field Should Be Mandatory (ONLY\
+            \ for Cancellation/Exit Reasons)\n```json\n{\n  \"formElementUuid\": \"\
+            mand-001\",\n  \"formElementName\": \"Cancellation Reason\",\n  \"severity\"\
+            : \"warning\",\n  \"message\": \"'Cancellation Reason' should be mandatory\
+            \ in cancellation forms\"\n}\n```\n**NOTE**: Only flag mandatory issues\
+            \ for cancellation reasons (in Cancellation forms) and exit reasons (in\
+            \ ProgramExit forms). Do NOT flag mandatory warnings for general fields\
+            \ like 'Diagnosis'.\n\n\n\n\n### Info - \"Other\" Option Needs Companion\
+            \ Field\n```json\n{\n  \"formElementUuid\": \"other-001\",\n  \"formElementName\"\
+            : \"Symptoms\",\n  \"severity\": \"info\",\n  \"message\": \"'Symptoms'\
+            \ has an 'Other' option - ensure there is a companion text field (e.g.,\
+            \ 'Symptoms - Other details') with a visibility rule to capture specifics\"\
+            \n}\n```\n\n\n\n\n### Warning - MultiSelect Contains Conflicting Options\n\
+            ```json\n{\n  \"formElementUuid\": \"conflict-001\",\n  \"formElementName\"\
+            : \"Test Result\",\n  \"severity\": \"warning\",\n  \"message\": \"MultiSelect\
+            \ 'Test Result' contains potentially conflicting options ('Positive',\
+            \ 'Negative') - consider using SingleSelect or reviewing answer options\"\
+            \n}\n```\n\n\n\n\n### Warning - Aggregate Answer Missing Exclusive Flag\n\
+            ```json\n{\n  \"formElementUuid\": \"excl-001\",\n  \"formElementName\"\
+            : \"Complications\",\n  \"severity\": \"warning\",\n  \"message\": \"\
+            Answer 'None of the above' in 'Complications' should be marked as exclusive\
+            \ to prevent selection with other options\"\n}\n```\n\n\n\n\n---\n\n\n\
+            \n\n## FORM CONTEXT\n\n\n\n\nThis is the current form context: {{#1711528708197.form_context#}}"
         - id: 609d0c40-8344-4127-b72e-a368586e079d
           role: user
           text: '{{#sys.files#}} {{#sys.query#}}'
@@ -614,7 +679,7 @@ workflow:
         type: llm
         vision:
           enabled: false
-      height: 94
+      height: 86
       id: '1762509929006'
       position:
         x: 942.0309443515424
@@ -626,7 +691,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 'true'
@@ -661,7 +726,7 @@ workflow:
         selected: false
         title: Route by Request Type
         type: if-else
-      height: 198
+      height: 196
       id: '1732870000001'
       position:
         x: 650
@@ -673,7 +738,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         dataset_ids:
         - PbU6BVReZ2F8Rm8JIn99UcGfvldJo3V6x0FYp4TfMA3owZBXaUbASK7kegUbSk8S
@@ -697,7 +762,7 @@ workflow:
         selected: false
         title: Knowledge Retrieval - Visit Schedule
         type: knowledge-retrieval
-      height: 90
+      height: 88
       id: '1732870000002'
       position:
         x: 950
@@ -709,7 +774,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -3502,7 +3567,7 @@ workflow:
         type: llm
         vision:
           enabled: false
-      height: 94
+      height: 86
       id: '1732870000003'
       position:
         x: 1253.1774428463061
@@ -3514,14 +3579,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#1732870000003.text#}}'
         selected: false
         title: Answer - Visit Schedule
         type: answer
         variables: []
-      height: 102
+      height: 101
       id: '1732870000004'
       position:
         x: 1550
@@ -3533,9 +3598,9 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     viewport:
-      x: -101.10603334722009
-      y: -199.48445203333802
-      zoom: 0.698687882255976
+      x: -988.699474260505
+      y: -786.9518352098517
+      zoom: 1.627042351833292
   rag_pipeline_variables: []
