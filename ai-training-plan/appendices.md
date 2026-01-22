@@ -1,26 +1,34 @@
 # Appendices
 
 ---
+## Appendix A: Reference websites
 
-## Appendix A: Codebase Reference
+- [Avni Website](https://avniproject.org)
+- [Avni Documentation](https://avni.readme.io/docs/implementers-concept-guide-introduction)
+
+- [Avni Staging](https://staging.avniproject.org/)
+- [Dify Platform](https://dify.ai/)
+- [Cloud Dify](https://cloud.dify.ai/)
+
+## Appendix B: Codebase Reference
 
 ### Key Files for Rule Generation
-- `@/Users/himeshr/IdeaProjects/avni-ai/dify/assistant_prompt.md` - Main assistant prompt
-- `@/Users/himeshr/IdeaProjects/avni-ai/src/services/config_processor.py` - Config processing logic
-- `@/Users/himeshr/IdeaProjects/avni-ai/src/tools/` - Tool implementations
+- `avni-ai/dify/assistant_prompt.md` - Main assistant prompt
+- `avni-ai/src/services/config_processor.py` - Config processing logic
+- `avni-ai/src/tools/` - Tool implementations
 
 ### Key Files for Form Creation
-- `@/Users/himeshr/IdeaProjects/avni-ai/src/tools/app_designer/` - App designer tools
-- `@/Users/himeshr/IdeaProjects/avni-ai/AvniFormElementValidatorPrompt.md` - Form validation reference
-- `@/Users/himeshr/IdeaProjects/avni-ai/src/services/tool_registry.py` - Tool registration
+- `avni-ai/src/tools/app_designer/` - App designer tools
+- `avni-ai/AvniFormElementValidatorPrompt.md` - Form validation reference
+- `avni-ai/src/services/tool_registry.py` - Tool registration
 
 ### Testing Framework
-- `@/Users/himeshr/IdeaProjects/avni-ai/tests/judge_framework/` - LLM-as-judge testing
-- `@/Users/himeshr/IdeaProjects/avni-ai/tests/` - Unit tests
+- `avni-ai/tests/judge_framework/` - LLM-as-judge testing
+- `avni-ai/tests/` - Unit tests
 
 ---
 
-## Appendix B: Sample CSV Schema (Draft)
+## Appendix C: Sample CSV Schema (Draft)
 
 ```csv
 page,group,field_name,data_type,mandatory,display_order,options
