@@ -1,10 +1,21 @@
 # Avni AI
-A Model Context Protocol (MCP) server that provides AI assistants with programmatic access to the Avni platform. This server enables LLMs like OpenAI GPT-4 to interact with Avni's system through standardized tool calling.
+
+A Function Tool Calling server that provides AI assistants with programmatic access to the Avni platform. This server enables LLMs like OpenAI GPT-4 to interact with Avni's system through standardized tool calling.
 
 ## 🚀 Features
 
 - Built-in monitoring support at `/health`
 - Deployed with HTTP transport and proper error handling
+- Comprehensive admin tools for managing Avni entities:
+  - Address Level Types
+  - Locations
+  - Catchments
+  - Users
+  - Programs
+  - Subject Types
+  - Encounters
+  - Implementations
+- Async configuration processing with status tracking
 
 ## 📋 Prerequisites
 
@@ -26,8 +37,8 @@ brew install uv
 ### 2. Clone and setup project
 
 ```bash
-git clone https://github.com/avniproject/avni-mcp-server
-cd avni-mcp-server
+git clone https://github.com/avniproject/avni-ai
+cd avni-ai
 uv sync
 ```
 
@@ -57,18 +68,26 @@ AVNI_BASE_URL=https://staging.avniproject.org
 AVNI_AI_SERVER_URL=https://staging-mcp.avniproject.org/
 ```
 
+**Production:**
+```env
+AVNI_BASE_URL=https://avniproject.org
+AVNI_AI_SERVER_URL=https://mcp.avniproject.org/
+```
+
 ## 🚀 Usage
 
 ### Development
 
 ```bash
 # Run the server
-uv run avni-mcp-server
+uv run avni-ai-server
 
 # Server will start on http://localhost:8023
-# MCP endpoint: http://localhost:8023/mcp (no longer used, as we call tools in code now)
 # Health check: http://localhost:8023/health
+# Config processing: http://localhost:8023/process-config-async
 ```
+
+### Testing
 
 ```bash
 # Run linting
@@ -84,28 +103,58 @@ uv run pytest --cov=.
 uv run pytest tests/test_tools.py
 ```
 
-### Environment Variables Export
+### Production Deployment
 
 Ensure your deployment exports these variables:
 
 ```bash
 export OPENAI_API_KEY={{ openai_api_key }}
 export AVNI_BASE_URL={{ avni_base_url }}
-export AVNI_MCP_SERVER_URL={{ avni_mcp_server_url }}
+export AVNI_AI_SERVER_URL={{ avni_ai_server_url }}
 export PORT=8023
 ```
 
 ### Logs
 
 ```bash
-# Check server logs
+# Check server logs (systemd service)
 sudo journalctl -u avni-ai -f
 
 # Development debugging
-uv run python main.py --log-level DEBUG
+uv run avni-ai-server --log-level DEBUG
 ```
 
+## 🔧 Available Tools
+
+The server provides MCP tools for:
+
+### Admin Tools
+- **Address Level Types**: Create, search, and manage address level types
+- **Locations**: Create, search, and manage location hierarchy
+- **Catchments**: Create and manage catchment areas
+- **Users**: Search and manage user accounts
+
+### App Designer Tools
+- **Programs**: Create and manage programs
+- **Subject Types**: Create and manage subject types
+- **Encounters**: Create and manage encounter types
+
+### Implementation Tools
+- **Implementations**: Manage organization implementations
+
+## 📚 API Endpoints
+
+- `GET /health` - Health check endpoint
+- `POST /process-config-async` - Process configuration asynchronously
+- `GET /process-config-status/{task_id}` - Get async processing status
+
 ## 🔗 Related Links
+
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [FastMCP Documentation](https://gofastmcp.com/)
 - [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses)
+- [Avni Platform](https://avniproject.org/)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
