@@ -1,0 +1,224 @@
+# Avni AI Repository Codemap
+
+## Overview
+Avni AI is a Model Context Protocol (MCP) server that provides AI assistants with programmatic access to the Avni platform. This repository contains the complete infrastructure for AI-powered configuration management, form validation, and domain-specific applications for community health and social programs.
+
+## Architecture
+```
+avni-ai/
+├── src/                    # Core MCP server implementation
+├── dify/                   # Dify workflow configurations and prompts
+├── docs/                   # Documentation and analysis reports
+├── tests/                  # Test suites
+├── tools/                  # Utility scripts
+└── trained_models/         # AI model artifacts
+```
+
+## Core Components
+
+### 1. MCP Server (`src/`)
+**Main Entry Point**: `src/main.py`
+- FastMCP-based server with HTTP transport
+- Health check endpoint: `/health`
+- Async configuration processing: `/process-config-async`
+- Task status tracking: `/process-config-status/{task_id}`
+
+#### Tool Categories (`src/tools/`)
+**Admin Tools** (`src/tools/admin/`):
+- `addressleveltypes.py` - Location hierarchy management
+- `catchments.py` - Geographic area definitions
+- `locations.py` - Physical location entities
+- `users.py` - User management
+
+**App Designer Tools** (`src/tools/app_designer/`):
+- `encounters.py` - Data collection interactions
+- `programs.py` - Structured interventions/workflows
+- `subject_types.py` - Persistent entity definitions
+
+**Implementation Tools** (`src/tools/implementation/`):
+- `implementations.py` - Configuration deployment
+
+#### Services (`src/services/`)
+**Core Services**:
+- `config_llm_helper.py` (40KB) - AI-powered configuration assistance
+- `config_processor.py` - Configuration validation and processing
+- `task_manager.py` - Async task orchestration
+- `tool_registry.py` - MCP tool registration
+
+**Avni Integration** (`src/services/avni/`):
+- `config_fetcher.py` - Configuration data retrieval
+- `form_mapping_processor.py` - Form data transformation
+
+#### Schemas (`src/schemas/`)
+Contract definitions for all entity types:
+- `address_level_type_contract.py`
+- `catchment_contract.py`
+- `encounter_type_contract.py`
+- `location_contract.py`
+- `program_contract.py`
+- `subject_type_contract.py`
+- `user_contract.py`
+
+### 2. Dify Workflows (`dify/`)
+**AI Assistant Configurations**:
+- `Avni designer assistant.yml` - Primary design assistant
+- `Avni [Staging] Assistant.yml` - Staging environment
+- `Avni form Assistant.yml` - Form-specific assistant
+
+**Core Prompts**:
+- `assistant_prompt.md` (45KB) - Main assistant behavior and capabilities
+- `orchestrator_prompt.md` - Workflow orchestration logic
+- `rag_prompt.md` - Retrieval-augmented generation
+
+**API Specifications**:
+- `async-endpoints-openapi.yaml` - Async API documentation
+- Test configurations for various operations
+
+**Analytics Tools** (`dify/analytics_tools/`):
+- `analytics.py` - Data analysis utilities
+- `dify_data_extractor.py` - Data extraction from Dify
+
+### 3. Domain Applications
+
+Based on the system memory, the platform supports these domain-specific applications:
+
+#### Health Programs
+- **GST (General Health Screening)**: Diabetes, hypertension, NCD screening
+- **Sickle Cell Screening**: Disease detection and treatment tracking
+- **Maternal & Child Health**: Antenatal care, child development
+
+#### Education
+- **CINI**: School monitoring, teacher training, student assessments
+- **Teach Tool**: World Bank-based classroom observations
+
+#### Social Programs
+- **Phulwari**: Rural crèche management (children under 6)
+- **Social Security**: Government welfare scheme facilitation (45+ schemes, 5 states)
+
+#### Infrastructure
+- **Waste Management**: Collection monitoring
+- **Waterbody Desilting**: Restoration project tracking
+
+### 4. Form Validation System
+**Core Document**: `AvniFormElementValidatorPrompt.md` (21KB)
+- Comprehensive form element validation rules
+- False positive prevention mechanisms
+- Static field validation by form type
+- Data type validation guidelines
+
+**Validation Reports** (`docs/form_validation/`):
+- Analysis reports for various form types
+- Test case generation
+- Quick form analysis summaries
+
+### 5. Configuration Management
+
+#### CRUD Operations Schema
+**File**: `src/schemas/crud_operations_schema.json`
+- Standardized create, read, update, delete operations
+- Entity relationship management
+- Validation rules
+
+#### API Endpoint Mapping
+Based on system memory:
+```python
+# Requires /web prefix (admin endpoints)
+subjectType → /web/subjectType
+program → /web/program
+encounterType → /web/encounterType
+
+# No /web prefix (basic entities)
+addressLevelType → /addressLevelType
+locations → /locations
+catchment → /catchment
+```
+
+### 6. Development Infrastructure
+
+#### Dependencies (`pyproject.toml`)
+**Core Stack**:
+- `fastmcp>=2.11.3` - MCP server framework
+- `fastapi>=0.118.0` - API framework
+- `openai>=1.99.9` - AI integration
+- `dspy-ai>=3.0.3` - AI programming framework
+- `httpx>=0.28.1` - HTTP client
+- `pandas>=2.3.3` - Data manipulation
+
+#### Environment Configuration
+**Files**: `.env`, `.env.staging`, `.env.production`
+- OpenAI API integration
+- Avni platform URLs
+- Server configuration
+
+#### Testing (`tests/`)
+- 69 test files covering all components
+- Pytest-based testing framework
+- Coverage reporting available
+
+## Key Workflows
+
+### 1. Configuration Creation Flow
+```
+User Request → Dify Assistant → LLM Processing → MCP Server → Avni API
+```
+
+### 2. Async Processing
+```
+POST /process-config-async → Task ID → Background Processing → Status Check
+```
+
+### 3. Form Validation
+```
+Form JSON → Validator → Issues Report → Recommendations
+```
+
+## Integration Points
+
+### External Systems
+- **Avni Platform**: Primary data collection system
+- **OpenAI**: AI model provider
+- **Dify**: Workflow orchestration platform
+
+### Internal APIs
+- **MCP Tools**: 20+ tools for entity management
+- **HTTP Endpoints**: Health check, async processing
+- **WebSocket**: Real-time task updates (if implemented)
+
+## Security Considerations
+- Authentication via `avni-auth-token` header
+- Environment-specific API keys
+- CORS middleware configuration
+- No direct database access (API-only)
+
+## Deployment Architecture
+- **Staging**: `https://staging.avniproject.org`
+- **Production**: `https://avniproject.org`
+- **MCP Server**: Port 8023 (configurable)
+- **Health Monitoring**: `/health` endpoint
+
+## Data Flow
+1. **Configuration Design**: Natural language → Structured configuration
+2. **Validation**: Configuration JSON → Rule validation
+3. **Deployment**: Validated config → Avni API entities
+4. **Monitoring**: Task status → Progress tracking
+
+## Key Design Patterns
+- **MCP Protocol**: Standardized tool calling
+- **Async Processing**: Non-blocking operations
+- **Schema-First**: Type-safe entity definitions
+- **Prompt Engineering**: Specialized AI behaviors
+- **Multi-Tenancy**: Environment-aware configurations
+
+## Known Limitations
+- No rule/JavaScript code generation support
+- Attribute collection not automated
+- Production/UAT organizations require manual configuration
+- Static field validation is form-type dependent
+
+## Future Enhancements
+Based on codebase analysis:
+- Enhanced form validation rules
+- Additional domain applications
+- Real-time collaboration features
+- Advanced analytics capabilities
+- Mobile app integration improvements
