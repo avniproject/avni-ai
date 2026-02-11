@@ -1,10 +1,10 @@
 app:
   description: Avni AI Assistant
-  icon: 🤖
+  icon: 075d276c-4cd3-42d9-8f65-a9f194c966ec
   icon_background: '#FFEAD5'
   mode: advanced-chat
-  name: Avni [Staging] Assistant
-  use_icon_as_answer_icon: false
+  name: Avni [Prerelease] Assistant
+  use_icon_as_answer_icon: true
 dependencies:
 - current_identifier: null
   type: marketplace
@@ -1383,7 +1383,7 @@ workflow:
         - '1711528708197'
         - sys.query
         retrieval_mode: multiple
-        selected: true
+        selected: false
         title: Knowledge Retrieval
         type: knowledge-retrieval
       height: 90
@@ -1866,7 +1866,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -0.8836517364242127
-      y: 586.7968623202154
-      zoom: 0.5549594637769413
+      x: 406.6749222181145
+      y: 612.7476373785773
+      zoom: 0.3190270587430874
   rag_pipeline_variables: []
