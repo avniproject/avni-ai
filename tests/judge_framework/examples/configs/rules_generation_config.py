@@ -25,16 +25,18 @@ def create_rules_generation_test_config() -> TestConfiguration:
 
     evaluation_config = EvaluationConfig(
         evaluation_metrics=[
+            "scenario_validation",
+            "response_suitability",
             "rule_correctness",
             "timing_accuracy",
             "code_quality",
-            "user_communication",
         ],
         success_thresholds={
+            "scenario_validation": 75.0,
+            "response_suitability": 75.0,
             "rule_correctness": 80.0,
             "timing_accuracy": 85.0,
             "code_quality": 75.0,
-            "user_communication": 75.0,
         },
         openai_model="gpt-4o",
         openai_temperature=0.1,

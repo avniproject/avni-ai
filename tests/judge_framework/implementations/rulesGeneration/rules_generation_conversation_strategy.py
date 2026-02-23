@@ -2,6 +2,7 @@
 Rules Generation Conversation Strategy for the Judge Framework
 """
 
+import re
 from typing import Dict, Any, List
 
 from tests.judge_framework.interfaces.conversation_strategy import (
@@ -12,69 +13,90 @@ from tests.judge_framework.interfaces.conversation_strategy import (
 class RulesGenerationConversationStrategy(ConversationGenerationStrategy):
     """
     Conversation strategy for rules generation that knows when to end conversations
-    based on rule generation patterns
+    based on rule generation patterns.
     """
 
     def __init__(self):
-        pass
+        self._confirmation_patterns = (
+            "reply yes",
+            "do these scenarios match",
+            "do these scenarios align",
+            "if yes, i'll generate the rule code",
+            "let me know what to change",
+            "confirm and i'll generate",
+            "here are the scheduling scenarios",
+            "here are scheduling scenarios",
+        )
+        self._rule_code_patterns = (
+            "```javascript",
+            "```js",
+            '"use strict";',
+            "({params, imports}) =>",
+            "({ params, imports }) =>",
+            "visitschedulebuilder",
+        )
 
     def generate_next_message(
         self, conversation_history: List[Dict[str, Any]], context: Dict[str, Any]
     ) -> str:
         """
-        Generate the next user message for rules generation conversation
+        Generate the next user message for rules generation conversation.
         """
         if len(conversation_history) < 1:
             return ""
 
-        # Get the last assistant response
         last_assistant_response = conversation_history[-1].get("assistant_response", "")
+        normalized_response = self._normalize(last_assistant_response)
 
-        # If assistant is asking for confirmation, respond with YES
-        if (
-            "Reply YES" in last_assistant_response
-            or "tell me what to change" in last_assistant_response
-            or "Do these scenarios match exactly what you want?"
-            in last_assistant_response
-        ):
+        if self._is_confirmation_request(normalized_response):
             return "YES"
 
-        # Otherwise, no more messages needed
         return ""
 
     def should_continue_conversation(
         self, conversation_history: List[Dict[str, Any]], context: Dict[str, Any]
     ) -> bool:
         """
-        Determine if rules generation conversation should continue
-        Rules generation conversations should end when:
-        1. Assistant provides the final JavaScript rule code
-        2. Assistant provides final explanation after rule code
+        Determine if rules generation conversation should continue.
         """
         if len(conversation_history) < 1:
-            return True  # Always continue if no history yet
+            return True
 
-        # Get the last assistant response
         last_assistant_response = conversation_history[-1].get("assistant_response", "")
+        normalized_response = self._normalize(last_assistant_response)
 
-        # Check if the last assistant response contains JavaScript code
-        has_rule_code = (
-            "```js" in last_assistant_response
-            or "```javascript" in last_assistant_response
-            or "Js\n\n" in last_assistant_response
-        )
-
-        # If assistant just provided rule code, end the conversation
-        if has_rule_code:
+        if self._contains_rule_code(normalized_response):
             return False
 
-        # If assistant is asking for confirmation (ends with question or "Reply YES"), continue
-        if (
-            last_assistant_response.strip().endswith("?")
-            or "Reply YES" in last_assistant_response
-            or "tell me what to change" in last_assistant_response
+        if self._is_confirmation_request(normalized_response):
+            return True
+
+        return len(conversation_history) < 5
+
+    @staticmethod
+    def _normalize(text: str) -> str:
+        text = text or ""
+        text = text.lower()
+        text = re.sub(r"\s+", " ", text).strip()
+        return text
+
+    def _contains_rule_code(self, normalized_response: str) -> bool:
+        return any(pattern in normalized_response for pattern in self._rule_code_patterns)
+
+    def _is_confirmation_request(self, normalized_response: str) -> bool:
+        if any(
+            pattern in normalized_response for pattern in self._confirmation_patterns
         ):
             return True
 
-        # Continue for clarification but limit to max rounds
-        return len(conversation_history) < 5
+        # Some model responses provide only the scenario table and do not include
+        # explicit confirmation sentence at the end.
+        has_table_markers = (
+            "| case |" in normalized_response
+            and "| trigger |" in normalized_response
+            and "| will schedule? |" in normalized_response
+        )
+        if has_table_markers:
+            return True
+
+        return normalized_response.endswith("?")

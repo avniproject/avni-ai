@@ -1,0 +1,27 @@
+{
+  "generated_at_utc": "2026-02-23T11:09:31.160270+00:00",
+  "total_conversations": 22,
+  "valid_query_conversations": 22,
+  "quality_distribution": {
+    "Good response": 14,
+    "Bad response": 8
+  },
+  "relevance_distribution": {
+    "Relevant to Avni": 22
+  },
+  "query_type_distribution": {
+    "Programmatic": 22
+  },
+  "feasibility_distribution": {
+    "Feasible with Avni/AI Assistant": 22
+  },
+  "concern_tag_distribution": {
+    "missing_final_rule_code": 7,
+    "missing_scenario_validation": 1
+  },
+  "top_bad_topics": {
+    "gestational_age_timing_rules": 3,
+    "nutrition_followup_rules": 2,
+    "anc_followup_rules": 3
+  }
+}

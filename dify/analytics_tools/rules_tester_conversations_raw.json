@@ -1,0 +1,1315 @@
+[
+  {
+    "conversation": {
+      "id": "f2eb9be0-a653-4b80-b3d2-f48a2e3c01a7",
+      "name": "Scheduling ANC Follow Up Based on Gestational Age",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771842709,
+      "updated_at": 1771842723
+    },
+    "messages": [
+      {
+        "id": "ec6084c6-9d0f-4e83-b9ab-901bad7d0f21",
+        "conversation_id": "f2eb9be0-a653-4b80-b3d2-f48a2e3c01a7",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+        },
+        "query": "Schedule ANC Follow Up at 20 weeks if gestational age is less than 16 weeks, otherwise at 28 weeks",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1 | GA less than 16 weeks | LMP date 2025-03-01 | 20 weeks from LMP | 2025-07-19 | 2025-07-26 | Yes |\n| 2 | GA less than 16 weeks (boundary) | LMP date 2025-02-01 | 20 weeks from LMP | 2025-06-22 | 2025-06-29 | Yes |\n| 3 | GA 16 weeks or more | LMP date 2025-01-01 | 28 weeks from LMP | 2025-09-05 | 2025-09-12 | Yes |\n| 4 | GA >=16 weeks but already past threshold / no follow-up needed (exclusion) | LMP date 2025-06-01 | 28 weeks from LMP | 2025-10-10 | 2025-10-17 | No (e.g., delivery or another condition prevents scheduling) |\n\nNotes:\n- Reference Date is the basis used to determine the follow-up timing (e.g., Last Menstrual Period date).\n- Earliest and Latest are concrete dates for when the follow-up could be scheduled (earliest, latest).\n- “Will Schedule?”: Yes if the rule would propose a follow-up on the given window; No if an exclusion applies.\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842709,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "21022d23-9e47-4cac-b7f8-dd60bea76420",
+        "conversation_id": "f2eb9be0-a653-4b80-b3d2-f48a2e3c01a7",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+        },
+        "query": "YES",
+        "answer": "Here is the rule code based on your confirmation.\n\n\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const programEnrolment = programEncounter.programEnrolment;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Retrieve LMP (gestational baseline)\n  // Try common concept names; adjust if your instance uses UUIDs\n  const lmpRaw = programEnrolment.getObservationReadableValue('lmp-date') ||\n                 programEnrolment.getObservationReadableValue('LMP Date') ||\n                 programEnrolment.getObservationReadableValue('Last menstrual period');\n  const lmpDate = lmpRaw ? moment(lmpRaw).startOf('day').toDate() : null;\n\n  // Retrieve Gestational Age in weeks\n  const gaRaw = programEnrolment.getObservationReadableValue('gestational-age') ||\n                programEnrolment.getObservationReadableValue('Gestational age') ||\n                programEnrolment.getObservationReadableValue('GA (weeks)');\n  const gaWeeks = gaRaw ? parseFloat(gaRaw) : null;\n\n  if (!lmpDate || isNaN(gaWeeks)) {\n    return scheduleBuilder.getAll();\n  }\n\n  // Decide offset based on GA\n  const offsetWeeks = gaWeeks < 16 ? 20 : 28;\n  const earliestDate = moment(lmpDate).add(offsetWeeks, 'weeks').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n\n  scheduleBuilder.add({\n    name: \"ANC Follow Up\",\n    encounterType: \"ANC - Follow Up\",\n    earliestDate,\n    maxDate\n  });\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842724,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "140d4814-fa13-48f8-806c-a3ba7fc5b624",
+      "name": "Scheduling Child Follow-Up Based on Nutritional Status",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771842680,
+      "updated_at": 1771842694
+    },
+    "messages": [
+      {
+        "id": "325af434-e9c7-4300-a39a-d169596913e7",
+        "conversation_id": "140d4814-fa13-48f8-806c-a3ba7fc5b624",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+        },
+        "query": "Schedule Child Followup in 7 days if nutritional status is 'SAM', in 14 days if 'MAM', and in 30 days if normal",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|--------|----------------|\n| 1 | SAM status observed | 2025-04-01 | 2025-04-08 | 2025-04-08 | Yes |\n| 2 | MAM status observed | 2025-04-01 | 2025-04-15 | 2025-04-15 | Yes |\n| 3 | Normal status observed | 2025-04-01 | 2025-05-01 | 2025-05-01 | Yes |\n| 4 | Status not defined or not SAM/MAM/Normal | 2025-04-01 | — | — | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842680,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "35aed916-f44b-4396-b88e-4872942b32a4",
+        "conversation_id": "140d4814-fa13-48f8-806c-a3ba7fc5b624",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Determine nutrition status from available observations\n  const nutritionStatus = programEncounter.getObservationReadableValue('Nutritional status of child') ||\n                          programEncounter.getObservationReadableValue('Current nutritional status according to weight and age');\n\n  if (!nutritionStatus) {\n    return scheduleBuilder.getAll();\n  }\n\n  let earliestDate;\n  const encounterDate = programEncounter.encounterDateTime;\n\n  if (nutritionStatus === 'SAM') {\n    earliestDate = moment(encounterDate).add(7, 'days').toDate();\n  } else if (nutritionStatus === 'MAM') {\n    earliestDate = moment(encounterDate).add(14, 'days').toDate();\n  } else if (nutritionStatus === 'Normal') {\n    earliestDate = moment(encounterDate).add(30, 'days').toDate();\n  } else {\n    // status not SAM/MAM/Normal - no scheduling\n    return scheduleBuilder.getAll();\n  }\n\n  const maxDate = moment(earliestDate).add(7, 'days').toDate();\n\n  scheduleBuilder.add({\n    name: 'Child Followup',\n    encounterType: 'Child Followup',\n    earliestDate,\n    maxDate\n  });\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842694,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "1fb8e3f4-f86b-4226-bbef-7c48e5d2e059",
+      "name": "Scheduling ANC Follow-up Visit",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771842652,
+      "updated_at": 1771842664
+    },
+    "messages": [
+      {
+        "id": "d2b165a3-2af7-4faa-9bd5-59cc7d732d45",
+        "conversation_id": "1fb8e3f4-f86b-4226-bbef-7c48e5d2e059",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are scheduling validation scenarios for a rule to schedule ANC Follow Up 28 days after the current ANC encounter. Please review and confirm.\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1. Happy path | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-07 | Yes |\n| 2. Boundary date | ANC completed on last day of month | 2025-04-30 | ANC Follow Up | 2025-05-28 | 2025-06-04 | Yes |\n| 3. Excluded program state | Program exited | 2025-04-01 | ANC Follow Up | — | — | No |\n| 4. Follow-up already scheduled | ANC Follow Up already exists for same window | ANC Follow Up on 2025-04-01 | ANC Follow Up | — | — | No |\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or tell me what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842652,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "a3cf5f61-5214-4cc8-8ceb-01bfd46082e2",
+        "conversation_id": "1fb8e3f4-f86b-4226-bbef-7c48e5d2e059",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "```javascript\n\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Standard early exit if the enrolment has exited the program\n  const hasExitedProgram = !!programEncounter.programEnrolment.programExitDateTime;\n  if (hasExitedProgram) return scheduleBuilder.getAll();\n\n  const encounterDate = programEncounter.encounterDateTime;\n  if (!encounterDate) return scheduleBuilder.getAll();\n\n  // Schedule 28 days after the current ANC encounter\n  const earliestDate = moment(encounterDate).add(28, 'days').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(2, 'days').endOf('day').toDate();\n\n  // Do not duplicate an ANC - Follow Up scheduled for the same window\n  const existingFollowUps = programEncounter.programEnrolment.getEncountersOfType(\"ANC - Follow Up\");\n  const isAlreadyScheduled = existingFollowUps.some(enc =>\n    enc.earliestVisitDateTime && moment(enc.earliestVisitDateTime).isSame(earliestDate, 'day')\n  );\n\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: \"ANC - Follow Up\",\n      encounterType: \"ANC - Follow Up\",\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};\n```",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842664,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "6d1475a0-0246-4f5f-b2eb-4c8de5f4ff57",
+      "name": "Scheduling ANC Follow-Up Based on Gestational Age",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771842238,
+      "updated_at": 1771842257
+    },
+    "messages": [
+      {
+        "id": "5554d01e-d957-4c2f-b090-e725dedaa73b",
+        "conversation_id": "6d1475a0-0246-4f5f-b2eb-4c8de5f4ff57",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+        },
+        "query": "Schedule ANC Follow Up at 20 weeks if gestational age is less than 16 weeks, otherwise at 28 weeks",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1 | GA < 16 weeks → schedule at 20 weeks | 2025-01-01 | ANC Follow Up at 20 weeks | 2025-05-21 | 2025-05-28 | Yes |\n| 2 | GA = 16 weeks → schedule at 28 weeks | 2025-01-01 | ANC Follow Up at 28 weeks | 2025-07-16 | 2025-07-23 | Yes |\n| 3 | Program exit already occurred → do not schedule | 2025-01-01 | — | — | — | No |\n| 4 | GA < 16 weeks but current date already beyond 20-week mark (still schedule at 20 weeks when applicable) | 2025-01-01 | ANC Follow Up at 20 weeks (if still within window) | 2025-05-21 | 2025-05-28 | Yes (when applicable) |\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842238,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "1a724aa6-5833-4ea2-9857-b34f81f8ada8",
+        "conversation_id": "6d1475a0-0246-4f5f-b2eb-4c8de5f4ff57",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+        },
+        "query": "YES",
+        "answer": "Here is the rule code based on your confirmation:\n\n```javascript\n\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Do not schedule if the participant has exited the program\n  const hasExitedProgram = () => !!programEncounter.programEnrolment.programExitDateTime;\n  if (hasExitedProgram()) return scheduleBuilder.getAll();\n\n  // Get gestational age in weeks (as a number)\n  const gestationalAgeWeeks = programEncounter.getObservationReadableValue('gestational-age') \n                              ? parseFloat(programEncounter.getObservationReadableValue('gestational-age'))\n                              : null;\n\n  // Get Last Menstrual Period date to anchor GA calculations\n  const lmpDateValue = programEncounter.programEnrolment.getObservationReadableValue('lmp-date');\n  const lmpDate = lmpDateValue ? moment(lmpDateValue).toDate() : null;\n\n  if (isNaN(gestationalAgeWeeks) || gestationalAgeWeeks === null || !lmpDate) {\n    // Insufficient data to compute follow-up; do not schedule\n    return scheduleBuilder.getAll();\n  }\n\n  // Determine target follow-up date based on GA\n  let targetFollowUpDate;\n  if (gestationalAgeWeeks < 16) {\n    targetFollowUpDate = moment(lmpDate).add(20, 'weeks').startOf('day').toDate();\n  } else {\n    targetFollowUpDate = moment(lmpDate).add(28, 'weeks').startOf('day').toDate();\n  }\n\n  // Define a small scheduling window (e.g., +/- 3-4 days if needed). Here we keep a simple 7-day window\n  const earliestDate = targetFollowUpDate;\n  const latestDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n\n  scheduleBuilder.add({\n    name: \"ANC - Follow Up\",\n    encounterType: \"ANC - Follow Up\",\n    earliestDate,\n    maxDate: latestDate\n  });\n\n  return scheduleBuilder.getAll();\n};\n```",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842257,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "d6a505dc-fca4-4749-b77b-b2b10854b2f9",
+      "name": "Scheduling Child Nutrition Follow-up",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771842200,
+      "updated_at": 1771842213
+    },
+    "messages": [
+      {
+        "id": "dd68979f-2bd5-409b-8b84-f63f41fe87dc",
+        "conversation_id": "d6a505dc-fca4-4749-b77b-b2b10854b2f9",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+        },
+        "query": "Schedule Child Followup in 7 days if nutritional status is 'SAM', in 14 days if 'MAM', and in 30 days if normal",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1 | SAM status observed | 2025-04-01 | Child Followup | 2025-04-08 | 2025-04-15 | Yes |\n| 2 | MAM status observed | 2025-04-01 | Child Followup | 2025-04-15 | 2025-04-29 | Yes |\n| 3 | Normal status observed | 2025-04-01 | Child Followup | 2025-05-01 | 2025-05-08 | Yes |\n| 4 | Program exited before follow-up | 2025-04-01 | — | — | — | No |\n\n- Reference Date uses a realistic baseline (2025-04-01).\n- Earliest = Reference Date + offset (SAM: +7d, MAM: +14d, Normal: +30d).\n- Latest = Earliest + a reasonable window (SAM: +8d window to 04-15, etc. for clarity in this example).\n- Will Schedule? Yes if the status triggers and no exclusion applies; No if program exited or other exclusion applies.\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842200,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "a75f410d-08f9-4e48-918f-2fc7a01d3055",
+        "conversation_id": "d6a505dc-fca4-4749-b77b-b2b10854b2f9",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n  const moment = imports.moment;\n\n  // Basic guard: only if still active in program\n  if (programEncounter.programEnrolment.programExitDateTime) {\n    return scheduleBuilder.getAll();\n  }\n\n  const status = programEncounter.getObservationReadableValue('Nutritional status of child') || programEncounter.getObservationReadableValue('Current nutritional status according to weight and age');\n\n  // Determine earliest and latest dates based on status\n  let earliestDate = null;\n  let latestDate = null;\n\n  if (status === 'SAM') {\n    earliestDate = moment(programEncounter.encounterDateTime).add(7, 'days').startOf('day').toDate();\n    latestDate = moment(earliestDate).add(7, 'days').endOf('day').toDate(); // ~1 week window\n  } else if (status === 'MAM') {\n    earliestDate = moment(programEncounter.encounterDateTime).add(14, 'days').startOf('day').toDate();\n    latestDate = moment(earliestDate).add(14, 'days').endOf('day').toDate(); // ~2 weeks window\n  } else if (status === 'Normal') {\n    earliestDate = moment(programEncounter.encounterDateTime).add(30, 'days').startOf('day').toDate();\n    latestDate = moment(earliestDate).add(7, 'days').endOf('day').toDate(); // ~1 week window\n  } else {\n    // status not recognized - do not schedule\n    return scheduleBuilder.getAll();\n  }\n\n  // Avoid duplicate scheduling: if a Child Followup is already scheduled for the same earliestDate, skip\n  const encounterTypeName = 'Child Followup';\n  const isAlreadyScheduled = programEncounter.programEnrolment.encounters.some(enc =>\n    enc.encounterType.name === encounterTypeName &&\n    enc.voided === false &&\n    moment(enc.earliestVisitDateTime).isSame(moment(earliestDate), 'day')\n  );\n\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: 'Child Followup',\n      encounterType: encounterTypeName,\n      earliestDate,\n      maxDate: latestDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842213,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "6971919a-8b76-4e5a-8a8e-735b24d6f3ce",
+      "name": "Scheduling ANC Follow-Up Visit",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771842175,
+      "updated_at": 1771842185
+    },
+    "messages": [
+      {
+        "id": "40f99308-92bd-41d1-9179-952a1170cd49",
+        "conversation_id": "6971919a-8b76-4e5a-8a8e-735b24d6f3ce",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1. Happy path | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| 2. Boundary | ANC completed on last day of month | 2025-03-31 | ANC Follow Up | 2025-04-28 | 2025-05-05 | Yes |\n| 3. Exclusion: program end | ANC completed but program already exited | 2025-04-01 | ANC Follow Up | — | — | No |\n| 4. Conditional: already scheduled | ANC completed but an ANC Follow Up already exists for the date | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | No |\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842175,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "041ca399-63ca-4846-ba00-8c9f5e4eb346",
+        "conversation_id": "6971919a-8b76-4e5a-8a8e-735b24d6f3ce",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({params, imports}) => {\n  const programEncounter = params.entity;\n  const programEnrolment = programEncounter.programEnrolment;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({programEncounter});\n\n  // If the program is exited, do not schedule\n  if (programEnrolment.programExitDateTime) {\n    return scheduleBuilder.getAll();\n  }\n\n  const encounterDate = programEncounter.encounterDateTime;\n  if (!encounterDate) {\n    return scheduleBuilder.getAll();\n  }\n\n  const earliestDate = moment(encounterDate).add(28, 'days').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(7, 'days').toDate();\n\n  const existingFollowUps = programEnrolment.getEncountersOfType('ANC - Follow Up') || [];\n  const isAlreadyScheduled = existingFollowUps.some(enc =>\n    enc.earliestVisitDateTime && moment(enc.earliestVisitDateTime).isSame(earliestDate, 'day')\n  );\n\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: 'ANC - Follow Up',\n      encounterType: 'ANC - Follow Up',\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842185,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "63134023-879b-40b5-b467-fc1c6e296b37",
+      "name": "Scheduling ANC Follow Up 📅",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771842069,
+      "updated_at": 1771842070
+    },
+    "messages": [
+      {
+        "id": "d49b1168-52f0-4c20-97e3-5c0491943641",
+        "conversation_id": "63134023-879b-40b5-b467-fc1c6e296b37",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+        },
+        "query": "Schedule ANC Follow Up at 20 weeks if gestational age is less than 16 weeks, otherwise at 28 weeks",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| Case 1 (Happy path) | GA < 16 weeks → schedule at 20 weeks | 2025-01-01 | ANC Follow Up | 2025-05-21 | 2025-05-28 | Yes |\n| Case 2 (Boundary) | GA >= 16 weeks → schedule at 28 weeks | 2025-01-01 | ANC Follow Up | 2025-07-16 | 2025-07-23 | Yes |\n| Case 3 (No GA data) | Gestational age missing/not defined | 2025-01-01 | ANC Follow Up | — | — | No |\n| Case 4 (Already scheduled) | GA < 16 weeks, but ANC Follow Up for that date already exists | 2025-01-01 | ANC Follow Up | 2025-05-21 | 2025-05-28 | No |\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or tell me what to adjust.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842069,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "dddcd229-970a-456f-8e11-dc1e5c0188e6",
+      "name": "Scheduling Follow-ups Based on Child's Nutritional Status",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771842055,
+      "updated_at": 1771842056
+    },
+    "messages": [
+      {
+        "id": "02a678a0-dd87-4792-afe4-ebceabe48737",
+        "conversation_id": "dddcd229-970a-456f-8e11-dc1e5c0188e6",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+        },
+        "query": "Schedule Child Followup in 7 days if nutritional status is 'SAM', in 14 days if 'MAM', and in 30 days if normal",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| SAM case | Nutritional status SAM | 2025-04-01 | Child Followup | 2025-04-08 | 2025-04-15 | Yes |\n| MAM case | Nutritional status MAM | 2025-04-01 | Child Followup | 2025-04-15 | 2025-04-22 | Yes |\n| Normal nutrition | Nutritional status Normal | 2025-04-01 | Child Followup | 2025-05-01 | 2025-05-04 | Yes |\n| Already scheduled follow-up | Nutritional status SAM but follow-up already exists | 2025-04-01 | (no new) | — | — | No |\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771842055,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "6a78833b-fa88-40cb-b437-c73248e13a94",
+      "name": "Programming ANC Follow-Up Schedules",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771841995,
+      "updated_at": 1771841995
+    },
+    "messages": [
+      {
+        "id": "155b6176-553e-4d7e-91cc-843f86ad6fba",
+        "conversation_id": "6a78833b-fa88-40cb-b437-c73248e13a94",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+        },
+        "query": "Schedule ANC Follow Up at 20 weeks if gestational age is less than 16 weeks, otherwise at 28 weeks",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1) Happy path - GA < 16 weeks | GA < 16 weeks threshold met | 2025-04-01 | ANC Follow Up (20 weeks GA) | 2025-06-20 | 2025-06-27 | Yes |\n| 2) Boundary - GA = 16 weeks | GA is 16 weeks (falls into >=16 weeks branch) | 2025-04-01 | ANC Follow Up (28 weeks GA) | 2025-06-29 | 2025-07-06 | Yes |\n| 3) Exclusion - Delivery occurred | Delivery completed (or program exited) | 2025-04-01 | No follow-up scheduled | — | — | No |\n| 4) Exclusion - Already scheduled | An ANC follow-up already scheduled for this gestation window | 2025-04-01 | ANC Follow Up already scheduled | — | — | No |\n\nNotes:\n- Reference Date is the date used to anchor the calculation (use the current ANC encounter date in your real run).\n- Earliest date is the proposed start of the follow-up window; Latest is the end of the window.\n- “Will Schedule?” reflects whether scheduling should occur given the scenario (Yes for the happy path and boundary; No for exclusions).\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or tell me what to adjust.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841995,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "21fb728e-7af9-4218-be16-2dfccbcf4dee",
+      "name": "Scheduling Followup Based on Child's Nutritional Status",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771841977,
+      "updated_at": 1771841978
+    },
+    "messages": [
+      {
+        "id": "bb701214-82a8-4448-8503-f432d11aad01",
+        "conversation_id": "21fb728e-7af9-4218-be16-2dfccbcf4dee",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+        },
+        "query": "Schedule Child Followup in 7 days if nutritional status is 'SAM', in 14 days if 'MAM', and in 30 days if normal",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1 | SAM status | 2025-04-01 | Child Followup | 2025-04-08 | 2025-04-15 | Yes |\n| 2 | MAM status | 2025-04-01 | Child Followup | 2025-04-15 | 2025-04-22 | Yes |\n| 3 | Normal status | 2025-04-01 | Child Followup | 2025-05-01 | 2025-05-08 | Yes |\n| 4 | Status not SAM/MAM/Normal | 2025-04-01 | — | — | — | No |\n\n- Reference Date is the actual date used as basis (YYYY-MM-DD).\n- Earliest is Reference Date plus the specified offset.\n- Latest is Earliest plus a 7-day window.\n- \"Will Schedule?\" reflects whether a schedule entry would be created.\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841977,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "e5108944-d222-45fb-a325-a2584b41631a",
+      "name": "Scheduling 28 Days Post-ANC Encounter",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771841950,
+      "updated_at": 1771841961
+    },
+    "messages": [
+      {
+        "id": "381fa1f7-7a34-48ca-b97d-a15d10fc79b4",
+        "conversation_id": "e5108944-d222-45fb-a325-a2584b41631a",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1. Happy path | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| 2. Boundary (exact 28 days) | ANC completed | 2025-04-28 | ANC Follow Up | 2025-05-26 | 2025-05-29 | Yes |\n| 3. Exclusion: program exit | ANC completed but program exited | 2025-03-15 | ANC Follow Up | — | — | No |\n| 4. Conditional: already scheduled for follow-up | ANC completed but follow-up of same type already exists | 2025-04-01 | ANC Follow Up | — | — | No |\n\nNotes:\n- Earliest = Reference Date + 28 days\n- Latest = Earliest + 7 days (unless constrained by other rules)\n- Reference dates are illustrative; use the actual current encounter date in your data\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or tell me what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841950,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "6f322f45-8c5e-417d-97bb-2eb4b398e8c0",
+        "conversation_id": "e5108944-d222-45fb-a325-a2584b41631a",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  const isActiveInProgram = !programEncounter.programEnrolment.programExitDateTime;\n  if (!isActiveInProgram) {\n    return scheduleBuilder.getAll();\n  }\n\n  const referenceDate = programEncounter.encounterDateTime;\n  const earliestDate = moment(referenceDate).add(28, 'days').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n\n  const existingEncounters = programEncounter.programEnrolment.getEncountersOfType('ANC - Follow Up');\n  const isAlreadyScheduled = existingEncounters.some(enc => {\n    const scheduledDate = enc.earliestVisitDateTime ? moment(enc.earliestVisitDateTime).startOf('day') : null;\n    return scheduledDate && scheduledDate.isSame(moment(earliestDate).startOf('day'));\n  });\n\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: \"ANC - Follow Up\",\n      encounterType: \"ANC - Follow Up\",\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841961,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "032c37b4-6a2e-40b4-ac03-2e3a3bf4fdc4",
+      "name": "Scheduling ANC Follow Up Visit",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771841859,
+      "updated_at": 1771841874
+    },
+    "messages": [
+      {
+        "id": "eda51af0-4721-4941-b28f-13946a4cbca5",
+        "conversation_id": "032c37b4-6a2e-40b4-ac03-2e3a3bf4fdc4",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1 | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| 2 | ANC completed (boundary) | 2025-03-28 | ANC Follow Up | 2025-04-25 | 2025-05-02 | Yes |\n| 3 | Excluded (Delivery occurred) | 2025-06-15 | — | — | — | No |\n| 4 | Already scheduled for same date | 2025-04-01 | ANC Follow Up (exists) | 2025-04-29 | 2025-05-06 | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or tell me what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841859,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "d479d74d-e9ba-46ef-8638-962e79f585e4",
+        "conversation_id": "032c37b4-6a2e-40b4-ac03-2e3a3bf4fdc4",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Early exit if already exited from the program\n  const hasExitedProgram = () => !!programEncounter.programEnrolment.programExitDateTime;\n  if (hasExitedProgram()) return scheduleBuilder.getAll();\n\n  const ancEncounterDate = programEncounter.encounterDateTime;\n  if (!ancEncounterDate) return scheduleBuilder.getAll();\n\n  // Calculate the next ANC follow-up date (28 days after current ANC encounter)\n  const earliestDate = moment(ancEncounterDate).add(28, 'days').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n\n  // Avoid duplicating an identical scheduled encounter\n  const scheduledEncounters = programEncounter.programEnrolment.getEncountersOfType('ANC - Follow Up', false);\n  const isAlreadyScheduled = scheduledEncounters.some(enc =>\n    enc.earliestVisitDateTime && moment(enc.earliestVisitDateTime).isSame(earliestDate, 'day')\n  );\n\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: \"ANC - Follow Up\",\n      encounterType: \"ANC - Follow Up\",\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841875,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "84c50165-47d9-4d53-b477-9fb437aab306",
+      "name": "Scheduling Follow-up ANC Visit in 28 Days",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771841826,
+      "updated_at": 1771841827
+    },
+    "messages": [
+      {
+        "id": "75510ba3-9662-48b5-b9b5-a889ce9ba894",
+        "conversation_id": "84c50165-47d9-4d53-b477-9fb437aab306",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Earliest (28 days after) | Latest | Will Schedule? |\n|------|---------|----------------|--------------------------|--------|----------------|\n| 1. Happy path: standard ANC | ANC completed | 2025-04-01 | 2025-04-29 | 2025-05-06 | Yes |\n| 2. Boundary: end-of-month +28 | ANC completed | 2025-04-30 | 2025-05-28 | 2025-06-04 | Yes |\n| 3. Already scheduled | ANC completed but follow-up already exists for the same window | 2025-04-01 | 2025-04-29 | 2025-05-06 | No |\n| 4. Program exited | ANC completed but person exited the program | 2025-04-01 | 2025-04-29 | 2025-05-06 | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841826,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "0ec2f6a8-7ffa-4a2a-a940-7ef80f3cacbd",
+      "name": "Planning ANC Follow-Up Visit",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771841794,
+      "updated_at": 1771841794
+    },
+    "messages": [
+      {
+        "id": "5290ee63-646d-4fa7-84d8-54fd701989cf",
+        "conversation_id": "0ec2f6a8-7ffa-4a2a-a940-7ef80f3cacbd",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1 | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| 2 | ANC completed (early) | 2025-03-20 | ANC Follow Up | 2025-04-17 | 2025-04-24 | Yes |\n| 3 | Delivery recorded (no follow-up allowed) | 2025-06-15 | — | — | — | No |\n| 4 | Program exited before follow-up could be scheduled | 2025-05-10 | — | — | — | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841794,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "3f3a04eb-dee9-4bb7-b618-e4132f6cc27f",
+      "name": "Planning ANC Follow Up Visit",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771841639,
+      "updated_at": 1771841640
+    },
+    "messages": [
+      {
+        "id": "63884474-fb3c-45c9-8309-be4097a4f51f",
+        "conversation_id": "3f3a04eb-dee9-4bb7-b618-e4132f6cc27f",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Earliest (ANC) | Latest | Will Schedule? |\n|------|---------|----------------|------------------|--------|----------------|\n| 1 | ANC completed | 2025-04-01 | 2025-04-29 | 2025-05-06 | Yes |\n| 2 | ANC completed (boundary) | 2025-03-20 | 2025-04-17 | 2025-04-24 | Yes |\n| 3 | Program exit before follow-up | 2025-02-15 | — | — | No |\n| 4 | Follow-up already scheduled for ANC | 2025-04-10 | — | — | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841639,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "6873c1e7-d559-45bb-b444-2dc50b65020a",
+      "name": "Scheduling ANC Follow Up Visit",
+      "inputs": {
+        "auth_token": "new_org_for_testing_auth_token_here",
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771841568,
+      "updated_at": 1771841578
+    },
+    "messages": [
+      {
+        "id": "4d9a1dcd-ebda-404e-b243-148bade4e6da",
+        "conversation_id": "6873c1e7-d559-45bb-b444-2dc50b65020a",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| Standard ANC follow-up | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| Boundary (exact 28 days) | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| Post-exit (no scheduling allowed) | Program exited | 2025-04-01 | ANC Follow Up | — | — | No |\n| Already scheduled conflict | Another ANC Follow Up exists | 2025-04-01 | ANC Follow Up | — | — | No |\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or tell me what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841568,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "6ab17434-8900-417e-9544-9973d3c3ccdd",
+        "conversation_id": "6873c1e7-d559-45bb-b444-2dc50b65020a",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": "new_org_for_testing_auth_token_here",
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n  const moment = imports.moment;\n  const programEnrolment = programEncounter.programEnrolment;\n\n  // Standard exit check\n  const hasExitedProgram = () => !!programEnrolment.programExitDateTime;\n  if (hasExitedProgram()) return scheduleBuilder.getAll();\n\n  // Calculate 28 days after the current ANC encounter\n  const currentANCDate = programEncounter.encounterDateTime;\n  if (!currentANCDate) return scheduleBuilder.getAll();\n\n  const earliestDate = moment(currentANCDate).add(28, 'days').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n\n  // Check if an ANC Follow Up already scheduled for the same date\n  const existingFollowUps = programEnrolment.getEncountersOfType('ANC - Follow Up');\n  const isAlreadyScheduled = existingFollowUps && existingFollowUps.some(enc => {\n    const scheduledDate = enc.earliestVisitDateTime ? moment(enc.earliestVisitDateTime) : null;\n    return scheduledDate && scheduledDate.isSame(earliestDate, 'day');\n  });\n\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: 'ANC - Follow Up',\n      encounterType: 'ANC - Follow Up',\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771841579,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "f7e1acd2-3ca3-4878-a0c4-c6b20dc7d091",
+      "name": "Scheduling ANC Follow-up Visit",
+      "inputs": {
+        "auth_token": null,
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771838941,
+      "updated_at": 1771838957
+    },
+    "messages": [
+      {
+        "id": "5cc95154-c098-4f4b-bad8-ab2e4138d54d",
+        "conversation_id": "f7e1acd2-3ca3-4878-a0c4-c6b20dc7d091",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| Case A (Happy path) | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| Case B (Boundary) | ANC completed | 2025-04-02 | ANC Follow Up | 2025-04-30 | 2025-05-07 | Yes |\n| Case C (Already scheduled) | ANC completed, follow-up already planned | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | No |\n| Case D (Program exited) | ANC completed but program exited | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838941,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "2b639d80-00ea-49f9-b169-c8c222ac5454",
+        "conversation_id": "f7e1acd2-3ca3-4878-a0c4-c6b20dc7d091",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const programEnrolment = programEncounter.programEnrolment;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Exit early if the participant has exited the program\n  if (programEnrolment.programExitDateTime) return scheduleBuilder.getAll();\n\n  // If this isn't an ANC follow-up context or encounter, still schedule based on current ANC encounter\n  const encounterDateTime = programEncounter.encounterDateTime;\n\n  const earliestDate = moment(encounterDateTime).add(28, 'days').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(8, 'days').endOf('day').toDate();\n\n  scheduleBuilder.add({\n    name: \"ANC - Follow Up\",\n    encounterType: \"ANC - Follow Up\",\n    earliestDate,\n    maxDate\n  });\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838958,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "8e7c8646-c87e-4f79-beaa-0596c926706a",
+      "name": "Scheduling ANC Follow-Up",
+      "inputs": {
+        "auth_token": null,
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771838464,
+      "updated_at": 1771838479
+    },
+    "messages": [
+      {
+        "id": "f298cfd6-3ef6-4a93-8115-67ff4e39496b",
+        "conversation_id": "8e7c8646-c87e-4f79-beaa-0596c926706a",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+        },
+        "query": "Schedule ANC Follow Up at 20 weeks if gestational age is less than 16 weeks, otherwise at 28 weeks",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger (short) | Reference Date | Earliest | Latest | Will Schedule? |\n|------|-----------------|----------------|----------|--------|----------------|\n| 1. Happy path (GA <16w) | GA < 16 weeks at reference | 2025-04-01 | 2025-08-01 | 2025-08-08 | Yes |\n| 2. Boundary (GA = 16w) | GA >=16 weeks -> schedule at 28 weeks | 2025-04-01 | 2025-10-01 | 2025-10-08 | Yes |\n| 3. Exclusion (no GA data) | Gestational age not available | 2025-04-01 | — | — | No |\n| 4. Exclusion (ANC not active / not in encounter window) | ANC follow-up not applicable in current window | 2025-04-01 | — | — | No |\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or tell me what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838464,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "824bc7ad-884d-4793-ab19-5acdc3e796c7",
+        "conversation_id": "8e7c8646-c87e-4f79-beaa-0596c926706a",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"High Risk ANC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"gestational-age\", \"high-risk-factors\", \"lmp-date\", \"bp-systolic\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Retrieve LMP date and Gestational age from the enrolment (best-effort with multiple concept names)\n  const enrolment = programEncounter.programEnrolment;\n\n  // Attempt to get LMP date from common concept names\n  const lmpDateReadable = enrolment.findLatestObservationInEntireEnrolment('lmp-date') ||\n                        enrolment.findLatestObservationInEntireEnrolment('LMP date');\n  const lmpDateValue = lmpDateReadable ? lmpDateReadable.getReadableValue() : null;\n\n  // Attempt to get gestational age in weeks\n  const gaReadable = enrolment.findLatestObservationInEntireEnrolment('gestational-age') ||\n                   enrolment.findLatestObservationInEntireEnrolment('Gestational age');\n  const gestationalAgeWeeks = gaReadable ? parseFloat(gaReadable.getReadableValue()) : null;\n\n  // If we don't have the necessary data, do not schedule\n  if (!lmpDateValue || isNaN(gestationalAgeWeeks)) {\n    return scheduleBuilder.getAll();\n  }\n\n  // Calculate earliestDate based on GA\n  const lmpDate = moment(lmpDateValue).startOf('day');\n  const weeksToAdd = gestationalAgeWeeks < 16 ? 20 : 28;\n  const earliestDate = lmpDate.add(weeksToAdd, 'weeks').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n\n  // Schedule ANC Follow Up if not already scheduled (basic guard)\n  const existingANCFollowUps = enrolment.getEncountersOfType('ANC - Follow Up');\n  const isAlreadyScheduled = existingANCFollowUps && existingANCFollowUps.length > 0;\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: 'ANC - Follow Up',\n      encounterType: 'ANC - Follow Up',\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838479,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "3e11b015-1480-42e7-85e2-38b6beb7b2de",
+      "name": "Child Nutrition Follow-Up Scheduling",
+      "inputs": {
+        "auth_token": null,
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771838431,
+      "updated_at": 1771838445
+    },
+    "messages": [
+      {
+        "id": "fc3f3a6c-fa2a-4ea6-8d2f-dcf102c423e4",
+        "conversation_id": "3e11b015-1480-42e7-85e2-38b6beb7b2de",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+        },
+        "query": "Schedule Child Followup in 7 days if nutritional status is 'SAM', in 14 days if 'MAM', and in 30 days if normal",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|----------|--------|----------------|\n| 1 | SAM status | 2025-04-01 | 2025-04-08 | 2025-04-15 | Yes |\n| 2 | MAM status | 2025-04-01 | 2025-04-15 | 2025-04-22 | Yes |\n| 3 | Normal status | 2025-04-01 | 2025-05-01 | 2025-05-08 | Yes |\n| 4 | Status not SAM/MAM/Normal (e.g., other) | 2025-04-01 | — | — | No |\n\nDo these scenarios match what you want? If yes, I’ll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838431,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "1a9c0b42-7f24-4828-99e5-574a1de47726",
+        "conversation_id": "3e11b015-1480-42e7-85e2-38b6beb7b2de",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"Growth Monitoring\", \"encounterTypes\": [{\"name\": \"Growth Monitoring\", \"program\": \"Child Health\"}, {\"name\": \"Child Followup\", \"program\": \"Child Health\"}, {\"name\": \"NRC Admission\", \"program\": \"Child Health\"}], \"concepts\": [\"nutritional-status\", \"weight\", \"height\", \"muac-measurement\"]}"
+        },
+        "query": "YES",
+        "answer": "```javascript\n\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Determine current nutritional status from observations\n  const nutritionStatus = programEncounter.getObservationReadableValue('Nutritional status of child') ||\n                          programEncounter.getObservationReadableValue('Current nutritional status according to weight and age');\n\n  // If there is no relevant status, do nothing\n  if (!nutritionStatus) return scheduleBuilder.getAll();\n\n  // Baseline date to calculate follow-up from\n  const baseDate = programEncounter.earliestVisitDateTime || programEncounter.encounterDateTime;\n  if (!baseDate) return scheduleBuilder.getAll();\n\n  // Decide days to wait based on status\n  let daysToAdd = null;\n  if (nutritionStatus === 'SAM') {\n    daysToAdd = 7;\n  } else if (nutritionStatus === 'MAM') {\n    daysToAdd = 14;\n  } else if (nutritionStatus === 'Normal') {\n    daysToAdd = 30;\n  } else {\n    // Other statuses do not trigger\n    return scheduleBuilder.getAll();\n  }\n\n  // Compute earliest and max dates\n  const earliestDate = moment(baseDate).add(daysToAdd, 'days').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n\n  // Optional: avoid duplicating an existing similar schedule for the same encounter type\n  const existingEncounters = programEncounter.programEnrolment.getEncountersOfType('Child Followup');\n  const isAlreadyScheduled = existingEncounters && existingEncounters.some(enc => {\n    // If an encounter with same type and same day already exists, skip\n    const existingDate = enc.earliestVisitDateTime ? moment(enc.earliestVisitDateTime).startOf('day') : null;\n    return existingDate && moment(earliestDate).isSame(existingDate, 'day');\n  });\n\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: 'Child Followup',\n      encounterType: 'Child Followup',\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};\n```",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838445,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "7f4179e8-71e1-46fb-a31f-57d1c6768abd",
+      "name": "Scheduling ANC Follow-up Visit",
+      "inputs": {
+        "auth_token": null,
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771838407,
+      "updated_at": 1771838417
+    },
+    "messages": [
+      {
+        "id": "74ad97fc-b5a4-4779-a026-49f4f8b9155a",
+        "conversation_id": "7f4179e8-71e1-46fb-a31f-57d1c6768abd",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| Standard ANC visit | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| Boundary threshold | ANC completed | 2025-03-20 | ANC Follow Up | 2025-04-17 | 2025-04-24 | Yes |\n| Exclusion - delivery occurred | Delivery already happened | 2025-04-10 | — | — | — | No |\n| Already scheduled case | ANC Follow Up already scheduled for same period | 2025-04-12 | ANC Follow Up | 2025-05-10 | 2025-05-17 | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or tell me what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838407,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "042d86c1-9929-4fa5-aacc-fb98aee81d1b",
+        "conversation_id": "7f4179e8-71e1-46fb-a31f-57d1c6768abd",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({params, imports}) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Early exit if the client has exited the program\n  const hasExitedProgram = () => !!programEncounter.programEnrolment.programExitDateTime;\n  if (hasExitedProgram()) return scheduleBuilder.getAll();\n\n  // Determine if an ANC follow-up is already scheduled for the same period\n  const encountersOfType = programEncounter.programEnrolment.getEncountersOfType('ANC - Follow Up');\n  const isAlreadyScheduledForPeriod = encountersOfType && encountersOfType.length > 0;\n\n  // Reference date: actual ANC encounter date\n  const referenceDate = programEncounter.encounterDateTime;\n  if (!referenceDate) {\n    // If there is no actual encounter date, do not schedule\n    return scheduleBuilder.getAll();\n  }\n\n  // Calculate earliest and latest follow-up dates\n  const earliestDate = moment(referenceDate).add(28, 'days').startOf('day').toDate();\n  const maxDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n\n  // Schedule only if not already scheduled\n  if (!isAlreadyScheduledForPeriod) {\n    scheduleBuilder.add({\n      name: \"ANC - Follow Up\",\n      encounterType: \"ANC - Follow Up\",\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838418,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "3e292df3-90b5-437f-8e11-ee4965406e1b",
+      "name": "Scheduling 28-Day Post-ANC Visit",
+      "inputs": {
+        "auth_token": null,
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771838285,
+      "updated_at": 1771838293
+    },
+    "messages": [
+      {
+        "id": "899ae3cf-8f8d-4a15-b57a-e8c1fa3c912b",
+        "conversation_id": "3e292df3-90b5-437f-8e11-ee4965406e1b",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are the scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1 | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| 2 | ANC completed (boundary) | 2025-03-20 | ANC Follow Up | 2025-04-17 | 2025-04-24 | Yes |\n| 3 | Program exit before follow-up | 2025-04-10 | ANC Follow Up | — | — | No |\n| 4 | ANC Follow Up already scheduled | 2025-04-01 | ANC Follow Up (existing on 2025-04-29) | — | — | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838285,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "0d5a24a2-2435-4c68-973c-eba0887caa71",
+        "conversation_id": "3e292df3-90b5-437f-8e11-ee4965406e1b",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // Early exit if the program has ended\n  const hasExitedProgram = () => !!programEncounter.programEnrolment.programExitDateTime;\n  if (hasExitedProgram()) return scheduleBuilder.getAll();\n\n  // Check if ANC follow-up already scheduled for 28 days after this ANC encounter\n  const ancFollowUpEncounters = programEncounter.programEnrolment.getEncountersOfType('ANC - Follow Up');\n  const nextFollowUpDate = moment(programEncounter.encounterDateTime).add(28, 'days');\n  const isAlreadyScheduled = ancFollowUpEncounters.some(enc =>\n    enc.earliestVisitDateTime && moment(enc.earliestVisitDateTime).isSame(nextFollowUpDate, 'day')\n  );\n\n  if (!isAlreadyScheduled) {\n    const earliestDate = nextFollowUpDate.startOf('day').toDate();\n    const latestDate = moment(earliestDate).add(7, 'days').endOf('day').toDate();\n    scheduleBuilder.add({\n      name: \"ANC - Follow Up\",\n      encounterType: \"ANC - Follow Up\",\n      earliestDate,\n      maxDate: latestDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838294,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  },
+  {
+    "conversation": {
+      "id": "b25928b9-9ea2-4069-a22b-8a3aa19cabe3",
+      "name": "Planning 28 Days Later ANC Checkup",
+      "inputs": {
+        "auth_token": null,
+        "org_name": "Social Welfare Foundation Trust",
+        "org_type": "trial",
+        "user_name": "xxx",
+        "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+        "requestType": "VisitSchedule",
+        "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+      },
+      "status": "normal",
+      "introduction": "👋 Hey! Let’s get started with configuring Avni.",
+      "created_at": 1771838214,
+      "updated_at": 1771838226
+    },
+    "messages": [
+      {
+        "id": "a0ae48d3-bcb7-489f-b691-e441ec4222a6",
+        "conversation_id": "b25928b9-9ea2-4069-a22b-8a3aa19cabe3",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "Schedule ANC Follow Up visit 28 days after the current ANC encounter",
+        "answer": "Here are scheduling scenarios for this rule:\n\n| Case | Trigger | Reference Date | Next Visit | Earliest | Latest | Will Schedule? |\n|------|---------|----------------|------------|----------|--------|----------------|\n| 1 | ANC completed | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| 2 | ANC completed (boundary) | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | Yes |\n| 3 | Excluded (program exited) | 2025-06-01 | ANC Follow Up | — | — | No |\n| 4 | Already scheduled for follow-up | 2025-04-01 | ANC Follow Up | 2025-04-29 | 2025-05-06 | No |\n\nDo these scenarios match what you want? If yes, I'll generate the rule code. Or let me know what to change.",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838214,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      },
+      {
+        "id": "072ee4b8-3f34-413b-9bec-5643780b7e9b",
+        "conversation_id": "b25928b9-9ea2-4069-a22b-8a3aa19cabe3",
+        "parent_message_id": "00000000-0000-0000-0000-000000000000",
+        "inputs": {
+          "auth_token": null,
+          "org_name": "Social Welfare Foundation Trust",
+          "org_type": "trial",
+          "user_name": "xxx",
+          "avni_mcp_server_url": "https://staging-mcp.avniproject.org",
+          "requestType": "VisitSchedule",
+          "form_context": "{\"formType\": \"ProgramEncounter\", \"encounterType\": \"ANC\", \"encounterTypes\": [{\"name\": \"ANC\", \"program\": \"Maternal Health\"}, {\"name\": \"ANC - Follow Up\", \"program\": \"Maternal Health\"}, {\"name\": \"Delivery\", \"program\": \"Maternal Health\"}, {\"name\": \"PNC\", \"program\": \"Maternal Health\"}], \"concepts\": [\"lmp-date\", \"edd-date\", \"gestational-age\", \"high-risk-factors\"]}"
+        },
+        "query": "YES",
+        "answer": "Here is the production rule code for scheduling ANC Follow Up 28 days after the current ANC encounter.\n\n```javascript\n\"use strict\";\n({ params, imports }) => {\n  const programEncounter = params.entity;\n  const moment = imports.moment;\n  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });\n\n  // If the program has exited, do nothing\n  const hasExitedProgram = () => !!programEncounter.programEnrolment.programExitDateTime;\n  if (hasExitedProgram()) {\n    return scheduleBuilder.getAll();\n  }\n\n  // Only proceed if this is an ANC encounter\n  // Compute the earliest and latest dates for the follow-up\n  const earliestDate = moment(programEncounter.earliestVisitDateTime || programEncounter.encounterDateTime)\n    .add(28, 'days')\n    .startOf('day')\n    .toDate();\n\n  const maxDate = moment(earliestDate).add(2, 'days').endOf('day').toDate();\n\n  // Do not schedule if a follow-up already exists for the same date\n  const existingFollowUps = programEncounter.programEnrolment.getEncountersOfType('ANC - Follow Up', false) || [];\n  const isAlreadyScheduled = existingFollowUps.some((enc) =>\n    enc.earliestVisitDateTime ? moment(enc.earliestVisitDateTime).isSame(earliestDate, 'day') : false\n  );\n\n  // If no conflicting follow-up exists, add the follow-up schedule\n  if (!isAlreadyScheduled) {\n    scheduleBuilder.add({\n      name: 'ANC - Follow Up',\n      encounterType: 'ANC - Follow Up',\n      earliestDate,\n      maxDate\n    });\n  }\n\n  return scheduleBuilder.getAll();\n};\n```",
+        "feedback": null,
+        "retriever_resources": [],
+        "created_at": 1771838226,
+        "agent_thoughts": [],
+        "message_files": [],
+        "status": "normal",
+        "error": null
+      }
+    ]
+  }
+]

@@ -23,15 +23,15 @@ import time
 # =============================================================================
 
 # Authentication tokens (update these with your actual values)
-CSRF_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjQxNTkyNDIsInN1YiI6ImIyODlmZmMwLTNmNTYtNDYxOS05OTE5LTVlYjIxYzFkNjk2YyJ9.JbtKlDG6KS8PlgsHdO3cqjNstFOWF0OJqM5uQdNXJII"
+CSRF_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0MTkzNTcsInN1YiI6IjA2N2M3MTRjLTBlYWYtNGVlYy1hOThjLTRhMTYzMGIzZDQxMSJ9.tLAUJGBnFDLV3nRrjUkMOY8ZA61bQ0LtGK2T7lp8wr4"
 
-COOKIES = "cookieyes-consent=consentid:THl1cnRLYVhpZ1dJVUxsMDhpSklMN3JEbTRSUDIzUU8,consent:no,action:,necessary:yes,functional:no,analytics:no,performance:no,advertisement:no,other:no; __Host-csrf_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjQxNTkyNDIsInN1YiI6ImIyODlmZmMwLTNmNTYtNDYxOS05OTE5LTVlYjIxYzFkNjk2YyJ9.JbtKlDG6KS8PlgsHdO3cqjNstFOWF0OJqM5uQdNXJII; __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjI4OWZmYzAtM2Y1Ni00NjE5LTk5MTktNWViMjFjMWQ2OTZjIiwiZXhwIjoxNzY0MTU5MjQyLCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.JeyVq3234-FFS5ZuRrLYMGVhNBvIFbHp59LOdinYVdM; __Host-refresh_token=828209a515330d6528b645c10d47e90f2ba69b77c749ea2ab6b3afb26759080dbb0b9ac21b0f0af9f31b9294f278bef1223f1b8dcbe61d36a82a87d0a5beb379"
+COOKIES = "consentid:QXB5VDMwd3I1bHlLZGhOS25EY1FVQnJaR09BdFZ6UlI,consent:yes,action:yes,necessary:yes,functional:yes,analytics:yes,performance:yes,advertisement:yes,other:yes"
 
-BAGGAGE = "sentry-environment=production,sentry-public_key=c0bcc0e36783694f41e4fb1e6a3efea9,sentry-trace_id=2a09ba8e279f44678d71c11831bab59c,sentry-sample_rate=0.1,sentry-sampled=false"
+BAGGAGE = "sentry-environment=production,sentry-public_key=12f61d63153348398b196f99bc2a04c4,sentry-trace_id=3522bae1d0ba46e78e7435b776f777f9,sentry-sample_rate=0.1,sentry-sampled=true"
 
 # Date range for conversation retrieval
-START_DATE = "2025-08-19 00:00"
-END_DATE = "2025-11-26 23:59"
+START_DATE = "2026-01-01 00:00"
+END_DATE = "2026-02-23 23:59"
 
 # Output settings
 OUTPUT_FORMAT = "csv"  # Options: "csv", "json", "both" - set to csv only
