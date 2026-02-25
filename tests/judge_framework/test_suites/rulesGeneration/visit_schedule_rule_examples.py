@@ -1284,35 +1284,62 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   
   const moment = imports.moment;
   
-  // Schedule PT Sessions twice weekly for 4 weeks
-  for (let week = 1; week <= 4; week++) {
-    // First session of the week
-    const firstSessionDate = moment(encounter.encounterDateTime).add(week * 7 - 5, 'days').toDate();
-    const firstSessionMaxDate = moment(firstSessionDate).add(1, 'day').toDate();
-    
-    scheduleBuilder.add({
-      name: `PT Session Week ${week} - 1`,
-      encounterType: "PT Session",
-      earliestDate: firstSessionDate,
-      maxDate: firstSessionMaxDate
-    });
-    
-    // Second session of the week
-    const secondSessionDate = moment(encounter.encounterDateTime).add(week * 7 - 2, 'days').toDate();
-    const secondSessionMaxDate = moment(secondSessionDate).add(1, 'day').toDate();
-    
-    scheduleBuilder.add({
-      name: `PT Session Week ${week} - 2`,
-      encounterType: "PT Session",
-      earliestDate: secondSessionDate,
-      maxDate: secondSessionMaxDate
-    });
+  // Legacy approach (kept for reference) added multiple PT Session schedules without duplicate guard.
+  // This can overwrite same encounterType schedules in edit flows.
+  // for (let week = 1; week <= 4; week++) {
+  //   const firstSessionDate = moment(encounter.encounterDateTime).add(week * 7 - 5, 'days').toDate();
+  //   const firstSessionMaxDate = moment(firstSessionDate).add(1, 'day').toDate();
+  //   scheduleBuilder.add({
+  //     name: `PT Session Week ${week} - 1`,
+  //     encounterType: "PT Session",
+  //     earliestDate: firstSessionDate,
+  //     maxDate: firstSessionMaxDate
+  //   });
+  //   const secondSessionDate = moment(encounter.encounterDateTime).add(week * 7 - 2, 'days').toDate();
+  //   const secondSessionMaxDate = moment(secondSessionDate).add(1, 'day').toDate();
+  //   scheduleBuilder.add({
+  //     name: `PT Session Week ${week} - 2`,
+  //     encounterType: "PT Session",
+  //     earliestDate: secondSessionDate,
+  //     maxDate: secondSessionMaxDate
+  //   });
+  // }
+
+  const existingPTSessions = encounter.individual.scheduledEncountersOfType("PT Session") || [];
+
+  // Schedule PT Sessions twice weekly for 4 weeks only when no pending PT Session already exists.
+  if (existingPTSessions.length === 0) {
+    for (let week = 1; week <= 4; week++) {
+      // First session of the week
+      const firstSessionDate = moment(encounter.encounterDateTime).add(week * 7 - 5, 'days').toDate();
+      const firstSessionMaxDate = moment(firstSessionDate).add(1, 'day').toDate();
+
+      scheduleBuilder.add({
+        name: `PT Session Week ${week} - 1`,
+        encounterType: "PT Session",
+        earliestDate: firstSessionDate,
+        maxDate: firstSessionMaxDate,
+        visitCreationStrategy: "createNew"
+      });
+
+      // Second session of the week
+      const secondSessionDate = moment(encounter.encounterDateTime).add(week * 7 - 2, 'days').toDate();
+      const secondSessionMaxDate = moment(secondSessionDate).add(1, 'day').toDate();
+
+      scheduleBuilder.add({
+        name: `PT Session Week ${week} - 2`,
+        encounterType: "PT Session",
+        earliestDate: secondSessionDate,
+        maxDate: secondSessionMaxDate,
+        visitCreationStrategy: "createNew"
+      });
+    }
   }
-  
+
   // Schedule monthly Home Exercise Review after 4 weeks
   const homeExerciseDate = moment(encounter.encounterDateTime).add(5, 'weeks').toDate();
   const homeExerciseMaxDate = moment(homeExerciseDate).add(1, 'week').toDate();
-  
+
   scheduleBuilder.add({
     name: "Home Exercise Review",
     encounterType: "Home Exercise Review",
@@ -2995,7 +3022,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   // Do not reschedule if migrated
   if (cancellationReason === 'Migrated' || cancellationReason === 'Migration') {
@@ -3003,7 +3037,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   }
   
   // Schedule ANC Follow Up on 1st of next month
-  const nextMonth = moment(programEncounter.cancelDateTime).add(1, 'month');
+  const nextMonth = moment(cancellationDate).add(1, 'month');
   const earliestDate = nextMonth.date(1).startOf('day').toDate();
   const maxDate = moment(earliestDate).add(1, 'week').toDate();
   
@@ -3041,9 +3075,12 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   // Always schedule Growth Monitoring 2 weeks from cancellation
-  const earliestDate = moment(programEncounter.cancelDateTime).add(2, 'weeks').toDate();
+  const earliestDate = moment(cancellationDate).add(2, 'weeks').toDate();
   const maxDate = moment(earliestDate).add(3, 'days').toDate();
   
   scheduleBuilder.add({
@@ -3084,7 +3121,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Emergency' || cancellationReason === 'Medical Emergency') {
@@ -3097,7 +3141,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(3, 'days').toDate();
   
   scheduleBuilder.add({
@@ -3134,7 +3178,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Patient unavailable' || cancellationReason === 'Patient not found') {
@@ -3147,7 +3198,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'day').toDate();
   
   scheduleBuilder.add({
@@ -3188,7 +3239,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Crisis' || cancellationReason === 'Mental Health Crisis') {
@@ -3201,7 +3259,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(4, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -3242,7 +3300,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Medical Reason' || cancellationReason === 'Treatment Complication') {
@@ -3255,7 +3320,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(6, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -3292,7 +3357,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Illness' || cancellationReason === 'Child Sick') {
@@ -3309,7 +3381,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(3, 'days').toDate();
   
   scheduleBuilder.add({
@@ -3350,7 +3422,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Readmission' || cancellationReason === 'Hospital Readmission') {
@@ -3363,7 +3442,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'days';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'day').toDate();
   
   scheduleBuilder.add({
@@ -3404,7 +3483,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Chest Pain' || cancellationReason === 'Cardiac Symptoms') {
@@ -3417,7 +3503,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(2, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -3458,7 +3544,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Breathing Problems' || cancellationReason === 'Shortness of Breath') {
@@ -3471,7 +3564,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(2, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -3512,7 +3605,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Severe Pain' || cancellationReason === 'Pain Crisis') {
@@ -3525,7 +3625,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'days';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(2, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -3566,7 +3666,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   // Do not reschedule if completed elsewhere
   if (cancellationReason === 'Completed Elsewhere' || cancellationReason === 'Procedure Done Elsewhere') {
@@ -3575,7 +3682,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   
   // Schedule Crisis Pregnancy Support if changed mind
   if (cancellationReason === 'Changed Mind' || cancellationReason === 'Reconsidering Decision') {
-    const earliestDate = moment(programEncounter.cancelDateTime).add(48, 'hours').toDate();
+    const earliestDate = moment(cancellationDate).add(48, 'hours').toDate();
     const maxDate = moment(earliestDate).add(6, 'hours').toDate();
     
     scheduleBuilder.add({
@@ -3613,7 +3720,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Relapse' || cancellationReason === 'Substance Use Relapse') {
@@ -3626,7 +3740,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(4, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -3663,7 +3777,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   // Do not reschedule if patient passed away
   if (cancellationReason === 'Patient Passed Away' || cancellationReason === 'Death') {
@@ -3672,7 +3793,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   
   // Schedule End of Life Support if patient deteriorated
   if (cancellationReason === 'Patient Deteriorated' || cancellationReason === 'Condition Worsened') {
-    const earliestDate = moment(programEncounter.cancelDateTime).add(2, 'hours').toDate();
+    const earliestDate = moment(cancellationDate).add(2, 'hours').toDate();
     const maxDate = moment(earliestDate).add(1, 'hour').toDate();
     
     scheduleBuilder.add({
@@ -3683,7 +3804,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     });
   } else {
     // Regular hospice care rescheduling
-    const earliestDate = moment(programEncounter.cancelDateTime).add(1, 'day').toDate();
+    const earliestDate = moment(cancellationDate).add(1, 'day').toDate();
     const maxDate = moment(earliestDate).add(4, 'hours').toDate();
     
     scheduleBuilder.add({
@@ -3725,7 +3846,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'High BP Symptoms' || cancellationReason === 'Hypertensive Crisis') {
@@ -3738,7 +3866,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(2, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -3779,7 +3907,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Vision Problems' || cancellationReason === 'Eye Pain') {
@@ -3792,7 +3927,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'month';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(3, 'days').toDate();
   
   scheduleBuilder.add({
@@ -3829,7 +3964,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const cancellationReason = programEncounter.getCancelReason();
+  // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    programEncounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    programEncounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = programEncounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : programEncounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Wound Deterioration' || cancellationReason === 'Infection Signs') {
@@ -3842,7 +3984,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'days';
   }
   
-  const earliestDate = moment(programEncounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(4, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -3877,7 +4019,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Symptoms' || cancellationReason === 'New Symptoms') {
@@ -3890,7 +4039,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'month';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'day').toDate();
   
   scheduleBuilder.add({
@@ -3928,7 +4077,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Condition Worsened' || cancellationReason === 'Urgent Need') {
@@ -3941,7 +4097,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(2, 'days').toDate();
   
   scheduleBuilder.add({
@@ -3975,7 +4131,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Pain Increase' || cancellationReason === 'Too Painful') {
@@ -3988,7 +4151,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'days';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'day').toDate();
   
   scheduleBuilder.add({
@@ -4022,7 +4185,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Infection Concern' || cancellationReason === 'Signs of Infection') {
@@ -4035,7 +4205,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'days';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(2, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -4069,7 +4239,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Side Effects' || cancellationReason === 'Adverse Reaction') {
@@ -4082,7 +4259,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(4, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -4116,7 +4293,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Safety Concerns' || cancellationReason === 'Driving Safety') {
@@ -4129,7 +4313,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(3, 'days').toDate();
   
   scheduleBuilder.add({
@@ -4163,7 +4347,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Lesion Changes' || cancellationReason === 'Skin Changes') {
@@ -4176,7 +4367,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'week').toDate();
   
   scheduleBuilder.add({
@@ -4210,7 +4401,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Vision Loss' || cancellationReason === 'Sudden Vision Change') {
@@ -4223,7 +4421,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'day').toDate();
   
   scheduleBuilder.add({
@@ -4257,7 +4455,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Work Injury' || cancellationReason === 'Exposure Incident') {
@@ -4270,7 +4475,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'months';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(2, 'days').toDate();
   
   scheduleBuilder.add({
@@ -4301,7 +4506,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Exposure Risk' || cancellationReason === 'Disease Exposure') {
@@ -4314,7 +4526,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'day').toDate();
   
   scheduleBuilder.add({
@@ -4348,7 +4560,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Safety Risk' || cancellationReason === 'Crisis') {
@@ -4361,7 +4580,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'week';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(4, 'hours').toDate();
   
   scheduleBuilder.add({
@@ -4399,7 +4618,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Chest Pain' || cancellationReason === 'Cardiac Symptoms') {
@@ -4412,7 +4638,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'hour').toDate();
   
   scheduleBuilder.add({
@@ -4446,7 +4672,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Severe Reaction' || cancellationReason === 'Allergic Emergency') {
@@ -4459,7 +4692,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'day').toDate();
   
   scheduleBuilder.add({
@@ -4493,7 +4726,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Nutritional Emergency' || cancellationReason === 'Critical Weight Loss') {
@@ -4506,7 +4746,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'weeks';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(2, 'days').toDate();
   
   scheduleBuilder.add({
@@ -4544,7 +4784,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Breathing Emergency' || cancellationReason === 'Respiratory Distress') {
@@ -4557,7 +4804,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'days';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(30, 'minutes').toDate();
   
   scheduleBuilder.add({
@@ -4591,7 +4838,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ individual: encounter.individual });
   
   const moment = imports.moment;
-  const cancellationReason = encounter.getCancelReason();
+  // const cancellationReason = encounter.getCancelReason(); // legacy helper kept for reference
+  const cancellationReason =
+    encounter.findCancelEncounterObservationReadableValue("Cancellation reason") ||
+    encounter.findCancelEncounterObservationReadableValue("Cancel Reason") ||
+    "";
+  const cancelDateObs = encounter.findCancelEncounterObservation("Cancel date");
+  // const cancellationDate = encounter.cancelDateTime; // legacy property kept for reference
+  const cancellationDate = cancelDateObs ? cancelDateObs.getValue() : encounter.encounterDateTime;
   
   let encounterType, timeOffset, timeUnit;
   if (cancellationReason === 'Test Results Available' || cancellationReason === 'Urgent Results') {
@@ -4604,7 +4858,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     timeUnit = 'month';
   }
   
-  const earliestDate = moment(encounter.cancelDateTime).add(timeOffset, timeUnit).toDate();
+  const earliestDate = moment(cancellationDate).add(timeOffset, timeUnit).toDate();
   const maxDate = moment(earliestDate).add(1, 'week').toDate();
   
   scheduleBuilder.add({
@@ -4887,7 +5141,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "relapse-prevention",
             ],
         },
-        "rule_request": "Schedule Final Assessment before exit, Relapse Prevention Plan session, Community Support Linkage within 2 weeks of exit",
+        # "rule_request": "Schedule Final Assessment before exit, Relapse Prevention Plan session, Community Support Linkage within 2 weeks of exit",  # legacy reference
+        "rule_request": "Schedule Final Assessment at exit, Relapse Prevention Plan session after exit, Community Support Linkage within 2 weeks of exit",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -4899,21 +5154,25 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const exitDate = programEnrolment.programExitDateTime || moment().add(1, 'week').toDate();
   
   // Final Assessment before exit
-  const finalAssessmentDate = moment(exitDate).subtract(1, 'week').toDate();
+  // const finalAssessmentDate = moment(exitDate).subtract(1, 'week').toDate(); // legacy reference
+  const finalAssessmentDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Final Assessment",
     encounterType: "Final Assessment",
     earliestDate: finalAssessmentDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Relapse Prevention Plan session
-  const preventionPlanDate = moment(exitDate).subtract(3, 'days').toDate();
+  // const preventionPlanDate = moment(exitDate).subtract(3, 'days').toDate(); // legacy reference
+  const preventionPlanDate = moment(exitDate).add(3, 'days').toDate();
   scheduleBuilder.add({
     name: "Relapse Prevention Plan",
     encounterType: "Relapse Prevention Plan",
     earliestDate: preventionPlanDate,
-    maxDate: moment(exitDate).add(1, 'day').toDate()
+    // maxDate: moment(exitDate).add(1, 'day').toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Community Support Linkage within 2 weeks of exit
@@ -4947,7 +5206,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "psychosocial-support",
             ],
         },
-        "rule_request": "Schedule Survivorship Plan before exit, Long-term Follow-up annually for 5 years, Quality of Life Assessment at 6 months",
+        # "rule_request": "Schedule Survivorship Plan before exit, Long-term Follow-up annually for 5 years, Quality of Life Assessment at 6 months",  # legacy reference
+        "rule_request": "Schedule Survivorship Plan at exit, Long-term Follow-up annually for 5 years, Quality of Life Assessment at 6 months",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -4959,12 +5219,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const exitDate = programEnrolment.programExitDateTime || moment().toDate();
   
   // Survivorship Plan before exit
-  const survivorshipPlanDate = moment(exitDate).subtract(1, 'week').toDate();
+  // const survivorshipPlanDate = moment(exitDate).subtract(1, 'week').toDate(); // legacy reference
+  const survivorshipPlanDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Survivorship Plan",
     encounterType: "Survivorship Plan",
     earliestDate: survivorshipPlanDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Long-term Follow-up annually for 5 years
@@ -5009,7 +5271,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "aftercare-needs",
             ],
         },
-        "rule_request": "Schedule Recovery Assessment before exit, Aftercare Planning session, Peer Support Transition within 1 week of completion",
+        # "rule_request": "Schedule Recovery Assessment before exit, Aftercare Planning session, Peer Support Transition within 1 week of completion",  # legacy reference
+        "rule_request": "Schedule Recovery Assessment at exit, Aftercare Planning session after exit, Peer Support Transition within 1 week of completion",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -5021,21 +5284,25 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const exitDate = programEnrolment.programExitDateTime || moment().toDate();
   
   // Recovery Assessment before exit
-  const recoveryAssessmentDate = moment(exitDate).subtract(3, 'days').toDate();
+  // const recoveryAssessmentDate = moment(exitDate).subtract(3, 'days').toDate(); // legacy reference
+  const recoveryAssessmentDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Recovery Assessment",
     encounterType: "Recovery Assessment",
     earliestDate: recoveryAssessmentDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Aftercare Planning session
-  const aftercarePlanningDate = moment(exitDate).subtract(1, 'day').toDate();
+  // const aftercarePlanningDate = moment(exitDate).subtract(1, 'day').toDate(); // legacy reference
+  const aftercarePlanningDate = moment(exitDate).add(1, 'day').toDate();
   scheduleBuilder.add({
     name: "Aftercare Planning",
     encounterType: "Aftercare Planning",
     earliestDate: aftercarePlanningDate,
-    maxDate: moment(exitDate).add(1, 'day').toDate()
+    // maxDate: moment(exitDate).add(1, 'day').toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Peer Support Transition within 1 week
@@ -5137,12 +5404,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const exitDate = programEnrolment.programExitDateTime || moment().toDate();
   
   // Exercise Tolerance Test at completion
-  const toleranceTestDate = moment(exitDate).subtract(1, 'week').toDate();
+  // const toleranceTestDate = moment(exitDate).subtract(1, 'week').toDate(); // legacy reference
+  const toleranceTestDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Exercise Tolerance Test",
     encounterType: "Exercise Tolerance Test",
     earliestDate: toleranceTestDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Maintenance Program enrollment
@@ -5185,7 +5454,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "adaptive-equipment",
             ],
         },
-        "rule_request": "Schedule Functional Assessment before exit, Community Reintegration planning, Caregiver Training if ongoing support needed",
+        # "rule_request": "Schedule Functional Assessment before exit, Community Reintegration planning, Caregiver Training if ongoing support needed",  # legacy reference
+        "rule_request": "Schedule Functional Assessment at exit, Community Reintegration planning, Caregiver Training if ongoing support needed",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -5198,12 +5468,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const caregiverNeed = individual.getObservationValue('caregiver-needs');
   
   // Functional Assessment before exit
-  const functionalAssessmentDate = moment(exitDate).subtract(1, 'week').toDate();
+  // const functionalAssessmentDate = moment(exitDate).subtract(1, 'week').toDate(); // legacy reference
+  const functionalAssessmentDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Functional Assessment",
     encounterType: "Functional Assessment",
     earliestDate: functionalAssessmentDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Community Reintegration planning
@@ -5248,7 +5520,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "donor-status",
             ],
         },
-        "rule_request": "Schedule Transplant Preparation immediately, CKD Program Closure when transplant occurs, Post-Transplant Planning before surgery",
+        # "rule_request": "Schedule Transplant Preparation immediately, CKD Program Closure when transplant occurs, Post-Transplant Planning before surgery",  # legacy reference
+        "rule_request": "Schedule Transplant Preparation immediately, CKD Program Closure when transplant occurs, Post-Transplant Planning after surgery",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -5282,12 +5555,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   
   // Post-Transplant Planning before surgery
   if (transplantDate) {
-    const postTransplantPlanningDate = moment(transplantDate).subtract(1, 'week').toDate();
+    // const postTransplantPlanningDate = moment(transplantDate).subtract(1, 'week').toDate(); // legacy reference
+    const postTransplantPlanningDate = moment(transplantDate).add(1, 'day').toDate();
     scheduleBuilder.add({
       name: "Post-Transplant Planning",
       encounterType: "Post-Transplant Planning",
       earliestDate: postTransplantPlanningDate,
-      maxDate: moment(transplantDate).toDate()
+      // maxDate: moment(transplantDate).toDate() // legacy reference
+      maxDate: moment(transplantDate).add(2, 'weeks').toDate()
     });
   }
   
@@ -5313,7 +5588,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "support-needs",
             ],
         },
-        "rule_request": "Schedule Maintenance Planning before exit, Lifestyle Sustainability session, Long-term Support check-ins every 3 months",
+        # "rule_request": "Schedule Maintenance Planning before exit, Lifestyle Sustainability session, Long-term Support check-ins every 3 months",  # legacy reference
+        "rule_request": "Schedule Maintenance Planning at exit, Lifestyle Sustainability session, Long-term Support check-ins every 3 months",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -5325,12 +5601,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const exitDate = programEnrolment.programExitDateTime || moment().toDate();
   
   // Maintenance Planning before exit
-  const maintenancePlanningDate = moment(exitDate).subtract(1, 'week').toDate();
+  // const maintenancePlanningDate = moment(exitDate).subtract(1, 'week').toDate(); // legacy reference
+  const maintenancePlanningDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Maintenance Planning",
     encounterType: "Maintenance Planning",
     earliestDate: maintenancePlanningDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Lifestyle Sustainability session
@@ -5381,7 +5659,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "independence-skills",
             ],
         },
-        "rule_request": "Schedule Adult Health Transition appointment, Reproductive Health Consult if sexually active, Health Independence Training before age 18",
+        # "rule_request": "Schedule Adult Health Transition appointment, Reproductive Health Consult if sexually active, Health Independence Training before age 18",  # legacy reference
+        "rule_request": "Schedule Adult Health Transition appointment, Reproductive Health Consult if sexually active, Health Independence Training after transition",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -5414,12 +5693,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   }
   
   // Health Independence Training before age 18
-  const independenceTrainingDate = moment(exitDate).subtract(1, 'month').toDate();
+  // const independenceTrainingDate = moment(exitDate).subtract(1, 'month').toDate(); // legacy reference
+  const independenceTrainingDate = moment(exitDate).add(1, 'week').toDate();
   scheduleBuilder.add({
     name: "Health Independence Training",
     encounterType: "Health Independence Training",
     earliestDate: independenceTrainingDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   return scheduleBuilder.getAll();
@@ -5444,7 +5725,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "ongoing-monitoring",
             ],
         },
-        "rule_request": "Schedule Immune Status Assessment before exit, Vaccination Catch-up as needed, Risk Assessment for future care",
+        # "rule_request": "Schedule Immune Status Assessment before exit, Vaccination Catch-up as needed, Risk Assessment for future care",  # legacy reference
+        "rule_request": "Schedule Immune Status Assessment at exit, Vaccination Catch-up as needed, Risk Assessment for future care",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -5457,12 +5739,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const vaccinationNeeds = individual.getObservationValue('vaccination-needs');
   
   // Immune Status Assessment before exit
-  const immuneAssessmentDate = moment(exitDate).subtract(1, 'week').toDate();
+  // const immuneAssessmentDate = moment(exitDate).subtract(1, 'week').toDate(); // legacy reference
+  const immuneAssessmentDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Immune Status Assessment",
     encounterType: "Immune Status Assessment",
     earliestDate: immuneAssessmentDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Vaccination Catch-up as needed
@@ -5507,7 +5791,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "self-care-skills",
             ],
         },
-        "rule_request": "Schedule Pain Assessment Final before exit, Self-Management Plan review, Primary Care Transition for ongoing management",
+        # "rule_request": "Schedule Pain Assessment Final before exit, Self-Management Plan review, Primary Care Transition for ongoing management",  # legacy reference
+        "rule_request": "Schedule Pain Assessment Final at exit, Self-Management Plan review, Primary Care Transition for ongoing management",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -5519,12 +5804,14 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const exitDate = programEnrolment.programExitDateTime || moment().toDate();
   
   // Pain Assessment Final before exit
-  const painAssessmentDate = moment(exitDate).subtract(3, 'days').toDate();
+  // const painAssessmentDate = moment(exitDate).subtract(3, 'days').toDate(); // legacy reference
+  const painAssessmentDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Pain Assessment Final",
     encounterType: "Pain Assessment Final",
     earliestDate: painAssessmentDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Self-Management Plan review
@@ -5567,7 +5854,8 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
                 "transition-planning",
             ],
         },
-        "rule_request": "Schedule Care Needs Assessment before transition, Facility Transition planning, Family Conference for decision making",
+        # "rule_request": "Schedule Care Needs Assessment before transition, Facility Transition planning, Family Conference for decision making",  # legacy reference
+        "rule_request": "Schedule Care Needs Assessment at transition, Facility Transition planning, Family Conference for decision making",
         "expected_generated_rule": """
 "use strict";
 ({ params, imports }) => {
@@ -5580,31 +5868,37 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const familyInvolvement = individual.getObservationValue('family-involvement');
   
   // Care Needs Assessment before transition
-  const careAssessmentDate = moment(exitDate).subtract(2, 'weeks').toDate();
+  // const careAssessmentDate = moment(exitDate).subtract(2, 'weeks').toDate(); // legacy reference
+  const careAssessmentDate = moment(exitDate).toDate();
   scheduleBuilder.add({
     name: "Care Needs Assessment",
     encounterType: "Care Needs Assessment",
     earliestDate: careAssessmentDate,
-    maxDate: moment(exitDate).subtract(1, 'week').toDate()
+    // maxDate: moment(exitDate).subtract(1, 'week').toDate() // legacy reference
+    maxDate: moment(exitDate).add(1, 'week').toDate()
   });
   
   // Facility Transition planning
-  const facilityTransitionDate = moment(exitDate).subtract(1, 'week').toDate();
+  // const facilityTransitionDate = moment(exitDate).subtract(1, 'week').toDate(); // legacy reference
+  const facilityTransitionDate = moment(exitDate).add(3, 'days').toDate();
   scheduleBuilder.add({
     name: "Facility Transition",
     encounterType: "Facility Transition",
     earliestDate: facilityTransitionDate,
-    maxDate: moment(exitDate).toDate()
+    // maxDate: moment(exitDate).toDate() // legacy reference
+    maxDate: moment(exitDate).add(2, 'weeks').toDate()
   });
   
   // Family Conference for decision making
   if (familyInvolvement === 'Yes' || familyInvolvement === 'Active') {
-    const familyConferenceDate = moment(exitDate).subtract(10, 'days').toDate();
+    // const familyConferenceDate = moment(exitDate).subtract(10, 'days').toDate(); // legacy reference
+    const familyConferenceDate = moment(exitDate).add(1, 'week').toDate();
     scheduleBuilder.add({
       name: "Family Conference",
       encounterType: "Family Conference",
       earliestDate: familyConferenceDate,
-      maxDate: moment(exitDate).subtract(3, 'days').toDate()
+      // maxDate: moment(exitDate).subtract(3, 'days').toDate() // legacy reference
+      maxDate: moment(exitDate).add(2, 'weeks').toDate()
     });
   }
   

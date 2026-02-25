@@ -11,8 +11,7 @@ from tests.judge_framework.interfaces.result_models import (
 class RulesGenerationJudgeWrapper(JudgeStrategy):
     """
     Rules-specific AI judge.
-    Evaluates both conversation protocol adherence (scenario table + confirmation)
-    and final JavaScript rule quality.
+    Evaluates conversation protocol adherence and final JavaScript rule quality.
     """
 
     def __init__(self, config: TestConfiguration):
@@ -28,7 +27,7 @@ class RulesGenerationJudgeWrapper(JudgeStrategy):
         self, test_input: Dict[str, Any], test_output: Dict[str, Any]
     ) -> EvaluationResult:
         test_identifier = test_input.get("test_identifier", "unknown")
-        conversation_history = test_output.get("conversation_history", [])
+        conversation_history = test_output.get("conversation_history", []) or []
         reference_context = test_input.get("reference_context", {})
         reference_rule = test_input.get("reference_rule", "")
         rule_request = test_input.get("rule_request", test_input.get("query", ""))
@@ -92,6 +91,7 @@ Evaluate this run on the required metrics and return JSON only.
                 "total_iterations": test_output.get("total_iterations", 0),
                 "final_conversation_id": test_output.get("final_conversation_id", ""),
                 "judge_type": "rules_generation_ai_judge",
+                "evaluation_mode": "ai_primary",
             },
             raw_input=test_input,
             raw_output=test_output,
@@ -108,22 +108,28 @@ Your job is to evaluate BOTH:
 Score strictly on these metrics (0-100):
 1. scenario_validation
    - Did assistant present a realistic validation/scenario table before code?
-   - Did it include concrete dates/cases and ask for confirmation?
+   - Did it include concrete cases and ask for confirmation?
 2. response_suitability
-   - Is the assistant response structure suitable for user needs?
-   - Is it clear, concise, context-aware, and does it follow required sequence?
+   - Is the response sequence suitable (scenario -> confirm -> final code)?
+   - Is it clear, concise, and context-aware?
 3. rule_correctness
    - Does final rule implement requested scheduling logic correctly?
+   - Does it use VisitScheduleBuilder and valid schedule output structure?
 4. timing_accuracy
-   - Are date calculations/offsets/thresholds accurate for request and context?
+   - Are offsets/thresholds/anchors in request reflected in code logic?
 5. code_quality
-   - Is rule production-ready JavaScript with good structure and edge-case handling?
+   - Is it executable, production-ready JavaScript with robust structure?
 
-Important:
-- Use the full conversation history.
+Important Avni-specific checks:
 - Penalize if code is generated before confirmation.
-- Penalize if scenario table is missing or weak.
+- Penalize if scenario table/pre-validation is missing.
 - Penalize if final answer is not executable JavaScript rule.
+- For cancellation form types, check helper usage:
+  - findCancelEncounterObservation(...)
+  - findCancelEncounterObservationReadableValue(...)
+- For ProgramExit form type, check exit-date-based scheduling logic.
+- Penalize unsafe scheduling patterns (duplicate encounter type overwrite risk,
+  createNew without dedupe guard).
 
 Return STRICT JSON only in this format:
 {
@@ -169,7 +175,6 @@ EVALUATION INPUT:
             except (TypeError, ValueError):
                 value = 0.0
 
-            # Clamp to valid score range
             normalized[metric] = max(0.0, min(100.0, value))
         return normalized
 
@@ -215,19 +220,27 @@ EVALUATION INPUT:
             "VisitScheduleBuilder",
         )
 
-        # Prefer the last assistant turn containing rule code markers.
         for turn in reversed(conversation_history):
             response = turn.get("assistant_response", "") or ""
             if any(marker in response for marker in code_markers):
                 return response
 
-        # Fallback to the last assistant response.
         return conversation_history[-1].get("assistant_response", "")
 
     @staticmethod
     def _confirmation_turn_exists(conversation_history: List[Dict[str, Any]]) -> bool:
         for turn in conversation_history:
             user_message = (turn.get("user_message", "") or "").strip().lower()
-            if user_message in {"yes", "y", "ok", "okay", "proceed", "go ahead"}:
+            if user_message in {
+                "yes",
+                "y",
+                "ok",
+                "okay",
+                "proceed",
+                "go ahead",
+                "looks good",
+                "approved",
+                "confirmed",
+            }:
                 return True
         return False

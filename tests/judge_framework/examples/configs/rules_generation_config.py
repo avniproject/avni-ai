@@ -1,4 +1,5 @@
 import json
+import os
 
 from src.utils.env import DIFY_API_KEY, DIFY_API_BASE_URL
 from tests.judge_framework.interfaces.result_models import (
@@ -11,7 +12,23 @@ from tests.judge_framework.test_suites.rulesGeneration.visit_schedule_rule_examp
     VISIT_SCHEDULE_RULE_EXAMPLES,
 )
 
-_ALL_EXAMPLES = VISIT_SCHEDULE_RULE_EXAMPLES
+
+def _resolve_examples():
+    max_cases = os.getenv("RULES_GENERATION_MAX_CASES", "").strip()
+    if not max_cases:
+        return VISIT_SCHEDULE_RULE_EXAMPLES
+
+    try:
+        count = int(max_cases)
+    except ValueError:
+        return VISIT_SCHEDULE_RULE_EXAMPLES
+
+    if count <= 0:
+        return VISIT_SCHEDULE_RULE_EXAMPLES
+    return VISIT_SCHEDULE_RULE_EXAMPLES[:count]
+
+
+_ALL_EXAMPLES = _resolve_examples()
 
 
 def create_rules_generation_test_config() -> TestConfiguration:
@@ -19,7 +36,7 @@ def create_rules_generation_test_config() -> TestConfiguration:
         api_key=DIFY_API_KEY or "",
         base_url=DIFY_API_BASE_URL,
         workflow_name="avni_rules_assistant",
-        test_user="rules_tester",
+        test_user=os.getenv("DIFY_TEST_USER", "rules_tester"),
         timeout_seconds=180,
     )
 
