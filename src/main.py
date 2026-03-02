@@ -25,8 +25,44 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def _create_fastmcp_server() -> FastMCP:
+    """Support both FastMCP v2 (constructor kwarg) and v3 (removed kwarg)."""
+    try:
+        return FastMCP(name="Avni AI Server", stateless_http=True)
+    except TypeError as exc:
+        if "stateless_http" not in str(exc):
+            raise
+        return FastMCP(name="Avni AI Server")
+
+
+def _create_http_app(server: FastMCP):
+    """Keep stateless HTTP behavior across FastMCP versions."""
+    middleware = [create_cors_middleware()]
+    try:
+        return server.http_app(middleware=middleware, stateless_http=True)
+    except TypeError as exc:
+        if "stateless_http" not in str(exc):
+            raise
+        return server.http_app(middleware=middleware)
+
+
+def _run_http_server(server: FastMCP, host: str, port: int):
+    run_kwargs = {
+        "transport": "http",
+        "host": host,
+        "port": port,
+        "middleware": [create_cors_middleware()],
+    }
+    try:
+        server.run(**run_kwargs, stateless_http=True)
+    except TypeError as exc:
+        if "stateless_http" not in str(exc):
+            raise
+        server.run(**run_kwargs)
+
+
 async def create_server():
-    server = FastMCP(name="Avni AI Server", stateless_http=True)
+    server = _create_fastmcp_server()
 
     register_address_level_type_tools()
     register_catchment_tools()
@@ -69,7 +105,7 @@ async def initialize_server():
 
 ai_server = asyncio.run(initialize_server())
 
-app = ai_server.http_app(middleware=[create_cors_middleware()])
+app = _create_http_app(ai_server)
 
 logger.info("ASGI application created successfully")
 
@@ -79,12 +115,7 @@ def main():
     logger.info(f"Starting Avni MCP server on 0.0.0.0:{port}")
 
     try:
-        ai_server.run(
-            transport="http",
-            host="0.0.0.0",
-            port=port,
-            middleware=[create_cors_middleware()],
-        )
+        _run_http_server(ai_server, host="0.0.0.0", port=port)
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
     except Exception as e:

@@ -129,11 +129,13 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const gestationalAge = programEncounter.getObservationReadableValue('gestational-age');
-  const lmpDate = programEncounter.getObservationReadableValue('lmp-date');
+  // getObservationValue returns raw Number for numeric concepts
+  const gestationalAge = programEncounter.getObservationValue('gestational-age');
+  // getObservationValue returns raw Date for Date concepts
+  const lmpDate = programEncounter.getObservationValue('lmp-date');
   
   let targetWeeks;
-  if (gestationalAge < 16) {
+  if (gestationalAge !== undefined && gestationalAge < 16) {
     targetWeeks = 20;
   } else {
     targetWeeks = 28;
@@ -182,9 +184,11 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const childAgeMonths = programEncounter.getObservationReadableValue('child-age-months');
+  // Use individual.getAgeInMonths() for age-based scheduling — correct Avni helper for pediatric age
+  const individual = programEncounter.programEnrolment.individual;
+  const childAgeMonths = individual.getAgeInMonths(programEncounter.encounterDateTime);
   
-  // Schedule next immunization based on age
+  // Schedule next immunization based on child's current age — fixed 6-week offset
   const earliestDate = moment(programEncounter.encounterDateTime).add(6, 'weeks').toDate();
   const maxDate = moment(earliestDate).add(1, 'week').toDate();
   
@@ -330,15 +334,16 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const hba1cLevel = programEncounter.getObservationReadableValue('hba1c-level');
+  // getObservationValue returns raw Number for Numeric concepts — use for numeric comparisons
+  const hba1cLevel = programEncounter.getObservationValue('hba1c-level');
   
   let encounterType, timeOffset, timeUnit;
   
-  if (hba1cLevel > 9) {
+  if (hba1cLevel !== undefined && hba1cLevel > 9) {
     encounterType = "Emergency Diabetes Care";
     timeOffset = 1;
     timeUnit = 'week';
-  } else if (hba1cLevel >= 7 && hba1cLevel <= 9) {
+  } else if (hba1cLevel !== undefined && hba1cLevel >= 7 && hba1cLevel <= 9) {
     encounterType = "Diabetes Follow-up";
     timeOffset = 1;
     timeUnit = 'month';
@@ -391,12 +396,13 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const systolicBP = programEncounter.getObservationReadableValue('systolic-bp');
-  const diastolicBP = programEncounter.getObservationReadableValue('diastolic-bp');
+  // getObservationValue returns raw Number for Numeric concepts — use for numeric comparisons
+  const systolicBP = programEncounter.getObservationValue('systolic-bp');
+  const diastolicBP = programEncounter.getObservationValue('diastolic-bp');
   
   let encounterType, timeOffset, timeUnit;
   
-  if (systolicBP > 160 || diastolicBP > 100) {
+  if ((systolicBP !== undefined && systolicBP > 160) || (diastolicBP !== undefined && diastolicBP > 100)) {
     encounterType = "BP Monitoring";
     timeOffset = 2;
     timeUnit = 'weeks';
@@ -501,10 +507,11 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const treatmentMonth = programEncounter.getObservationReadableValue('treatment-month');
+  // getObservationValue returns raw Number — use for numeric comparisons
+  const treatmentMonth = programEncounter.getObservationValue('treatment-month');
   
   let timeOffset;
-  if (treatmentMonth <= 2) {
+  if (treatmentMonth !== undefined && treatmentMonth <= 2) {
     // Intensive phase - every 2 months
     timeOffset = 2;
   } else {
@@ -555,15 +562,16 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const phq9Score = programEncounter.getObservationReadableValue('phq9-score');
+  // getObservationValue returns raw Number — use for numeric comparisons
+  const phq9Score = programEncounter.getObservationValue('phq9-score');
   
   let encounterType, timeOffset, timeUnit;
   
-  if (phq9Score > 15) {
+  if (phq9Score !== undefined && phq9Score > 15) {
     encounterType = "Crisis Intervention";
     timeOffset = 1;
     timeUnit = 'week';
-  } else if (phq9Score >= 10 && phq9Score <= 15) {
+  } else if (phq9Score !== undefined && phq9Score >= 10 && phq9Score <= 15) {
     encounterType = "Mental Health Follow-up";
     timeOffset = 2;
     timeUnit = 'weeks';
@@ -616,10 +624,11 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const birthWeight = programEncounter.getObservationReadableValue('birth-weight');
+  // getObservationValue returns raw Number — use for numeric comparisons
+  const birthWeight = programEncounter.getObservationValue('birth-weight');
   
   let encounterType, dayOffset;
-  if (birthWeight < 2.5) {
+  if (birthWeight !== undefined && birthWeight < 2.5) {
     encounterType = "LBW Follow-up";
     dayOffset = 3;
   } else {
@@ -730,14 +739,15 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const muacMeasurement = programEncounter.getObservationReadableValue('muac-measurement');
+  // getObservationValue returns raw Number — use for numeric comparisons
+  const muacMeasurement = programEncounter.getObservationValue('muac-measurement');
   
   let encounterType, timeOffset, timeUnit;
-  if (muacMeasurement < 11.5) {
+  if (muacMeasurement !== undefined && muacMeasurement < 11.5) {
     encounterType = "SAM Treatment";
     timeOffset = 0;
     timeUnit = 'days';
-  } else if (muacMeasurement >= 11.5 && muacMeasurement <= 12.5) {
+  } else if (muacMeasurement !== undefined && muacMeasurement >= 11.5 && muacMeasurement <= 12.5) {
     encounterType = "MAM Treatment";
     timeOffset = 3;
     timeUnit = 'days';
@@ -790,10 +800,12 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const breathlessnessScore = programEncounter.getObservationReadableValue('breathlessness-score');
+  // For numeric threshold: use getObservationValue; for coded/string value: use getObservationReadableValue
+  const breathlessnessScore = programEncounter.getObservationValue('breathlessness-score');
+  const breathlessnessCategory = programEncounter.getObservationReadableValue('breathlessness-score');
   
   let encounterType, timeOffset, timeUnit;
-  if (breathlessnessScore > 3 || breathlessnessScore === 'Worsening') {
+  if ((breathlessnessScore !== undefined && breathlessnessScore > 3) || breathlessnessCategory === 'Worsening') {
     encounterType = "COPD Exacerbation";
     timeOffset = 3;
     timeUnit = 'days';
@@ -846,10 +858,11 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
-  const asthmaControlTest = programEncounter.getObservationReadableValue('asthma-control-test');
+  // getObservationValue returns raw Number — use for numeric comparisons
+  const asthmaControlTest = programEncounter.getObservationValue('asthma-control-test');
   
   let encounterType, timeOffset, timeUnit;
-  if (asthmaControlTest < 15) {
+  if (asthmaControlTest !== undefined && asthmaControlTest < 15) {
     encounterType = "Asthma Education";
     timeOffset = 1;
     timeUnit = 'week';
@@ -951,13 +964,16 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const bloodPressure = encounter.getObservationReadableValue('blood-pressure');
-  const cholesterol = encounter.getObservationReadableValue('cholesterol');
-  const bloodGlucose = encounter.getObservationReadableValue('blood-glucose');
+  // getObservationValue returns raw Number — use for numeric comparisons
+  const bloodPressure = encounter.getObservationValue('blood-pressure');
+  const cholesterol = encounter.getObservationValue('cholesterol');
+  const bloodGlucose = encounter.getObservationValue('blood-glucose');
   
   let timeOffset;
   // Check for abnormal values
-  if (bloodPressure > 140 || cholesterol > 200 || bloodGlucose > 126) {
+  if ((bloodPressure !== undefined && bloodPressure > 140) ||
+      (cholesterol !== undefined && cholesterol > 200) ||
+      (bloodGlucose !== undefined && bloodGlucose > 126)) {
     timeOffset = 1; // 1 month for abnormal values
   } else {
     timeOffset = 6; // 6 months for routine
@@ -1120,11 +1136,12 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const medicationCount = encounter.getObservationReadableValue('medication-count');
+  // getObservationValue returns raw Number; getObservationReadableValue for coded string
+  const medicationCount = encounter.getObservationValue('medication-count');
   const drugInteractions = encounter.getObservationReadableValue('drug-interactions');
   
   let encounterType, timeOffset, timeUnit;
-  if (medicationCount > 5 || drugInteractions === 'Yes') {
+  if ((medicationCount !== undefined && medicationCount > 5) || drugInteractions === 'Yes') {
     encounterType = "Pharmacy Consultation";
     timeOffset = 2;
     timeUnit = 'weeks';
@@ -1753,11 +1770,13 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ encounter });
   
   const moment = imports.moment;
-  const painScore = encounter.getObservationReadableValue('pain-score');
+  // getObservationValue for numeric comparisons
+  const painScore = encounter.getObservationValue('pain-score');
+  // getObservationReadableValue for coded/string comparison
   const medicationEffectiveness = encounter.getObservationReadableValue('medication-effectiveness');
-  const painDuration = encounter.getObservationReadableValue('pain-duration');
+  const painDuration = encounter.getObservationValue('pain-duration');
   
-  if (painScore > 6 || medicationEffectiveness === 'Poor') {
+  if ((painScore !== undefined && painScore > 6) || medicationEffectiveness === 'Poor') {
     const medicationAdjustmentDate = moment(encounter.encounterDateTime).add(1, 'week').toDate();
     const medicationAdjustmentMaxDate = moment(medicationAdjustmentDate).add(2, 'days').toDate();
     
@@ -1769,7 +1788,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
     });
   }
   
-  if (painDuration > 90) { // Chronic pain (>3 months)
+  if (painDuration !== undefined && painDuration > 90) { // Chronic pain (>3 months)
     const painPsychologyDate = moment(encounter.encounterDateTime).add(2, 'weeks').toDate();
     const painPsychologyMaxDate = moment(painPsychologyDate).add(1, 'week').toDate();
     
@@ -1903,6 +1922,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Pregnancy Registration",
             "encounterTypes": [
+                {"name": "Pregnancy Registration", "program": "Maternal Health"},
                 {"name": "First ANC", "program": "Maternal Health"},
                 {"name": "Risk Assessment", "program": "Maternal Health"},
                 {"name": "Baseline Tests", "program": "Maternal Health"},
@@ -1960,6 +1980,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Child Registration",
             "encounterTypes": [
+                {"name": "Child Registration", "program": "Child Health"},
                 {"name": "Newborn Assessment", "program": "Child Health"},
                 {"name": "First Immunization", "program": "Child Health"},
                 {"name": "Growth Monitoring", "program": "Child Health"},
@@ -2024,6 +2045,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Diabetes Enrollment",
             "encounterTypes": [
+                {"name": "Diabetes Enrollment", "program": "Diabetes Care"},
                 {"name": "Baseline Assessment", "program": "Diabetes Care"},
                 {"name": "Diabetes Education", "program": "Diabetes Care"},
                 {"name": "Medication Initiation", "program": "Diabetes Care"},
@@ -2088,6 +2110,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "HTN Enrollment",
             "encounterTypes": [
+                {"name": "HTN Enrollment", "program": "Hypertension Care"},
                 {"name": "BP Monitoring Setup", "program": "Hypertension Care"},
                 {"name": "Lifestyle Counseling", "program": "Hypertension Care"},
                 {"name": "Medication Review", "program": "Hypertension Care"},
@@ -2107,7 +2130,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEnrolment });
   
   const moment = imports.moment;
-  const baselineBP = programEnrolment.getObservationReadableValue('baseline-bp');
+  const baselineBP = programEnrolment.getObservationValue('baseline-bp');
   
   // Schedule BP Monitoring Setup immediately
   const bpMonitoringSetupDate = moment(programEnrolment.enrolmentDateTime).add(1, 'day').toDate();
@@ -2132,7 +2155,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   });
   
   // Schedule Medication Review if BP not controlled
-  if (baselineBP >= 140) {
+  if (baselineBP !== null && baselineBP >= 140) {
     const medicationReviewDate = moment(programEnrolment.enrolmentDateTime).add(2, 'weeks').toDate();
     const medicationReviewMaxDate = moment(medicationReviewDate).add(3, 'days').toDate();
     
@@ -2155,6 +2178,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "TB Program Entry",
             "encounterTypes": [
+                {"name": "TB Program Entry", "program": "TB Program"},
                 {"name": "Treatment Initiation", "program": "TB Program"},
                 {"name": "Contact Tracing", "program": "TB Program"},
                 {"name": "Baseline Tests", "program": "TB Program"},
@@ -2219,6 +2243,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Mental Health Intake",
             "encounterTypes": [
+                {"name": "Mental Health Intake", "program": "Mental Health"},
                 {"name": "Psychiatric Assessment", "program": "Mental Health"},
                 {"name": "Treatment Planning", "program": "Mental Health"},
                 {"name": "Crisis Plan", "program": "Mental Health"},
@@ -2282,6 +2307,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Oncology Intake",
             "encounterTypes": [
+                {"name": "Oncology Intake", "program": "Cancer Care"},
                 {"name": "Staging Assessment", "program": "Cancer Care"},
                 {"name": "Treatment Planning", "program": "Cancer Care"},
                 {"name": "Palliative Consult", "program": "Cancer Care"},
@@ -2349,6 +2375,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Addiction Intake",
             "encounterTypes": [
+                {"name": "Addiction Intake", "program": "Addiction Treatment"},
                 {"name": "Detox Assessment", "program": "Addiction Treatment"},
                 {"name": "Treatment Plan", "program": "Addiction Treatment"},
                 {"name": "Family Meeting", "program": "Addiction Treatment"},
@@ -2416,6 +2443,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "CKD Enrollment",
             "encounterTypes": [
+                {"name": "CKD Enrollment", "program": "CKD Care"},
                 {"name": "Nephrology Consult", "program": "CKD Care"},
                 {"name": "Education Session", "program": "CKD Care"},
                 {"name": "Preparation Planning", "program": "CKD Care"},
@@ -2478,6 +2506,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Heart Failure Intake",
             "encounterTypes": [
+                {"name": "Heart Failure Intake", "program": "Heart Failure"},
                 {"name": "Cardiology Consult", "program": "Heart Failure"},
                 {"name": "Medication Optimization", "program": "Heart Failure"},
                 {"name": "Device Assessment", "program": "Heart Failure"},
@@ -2497,7 +2526,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEnrolment });
   
   const moment = imports.moment;
-  const ejectionFraction = programEnrolment.getObservationReadableValue('ejection-fraction');
+  const ejectionFraction = programEnrolment.getObservationValue('ejection-fraction');
   const deviceEligibility = programEnrolment.getObservationReadableValue('device-eligibility');
   
   // Schedule Cardiology Consult within 1 week
@@ -2523,7 +2552,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   });
   
   // Schedule Device Assessment if indicated
-  if (ejectionFraction < 35 || deviceEligibility === 'Yes') {
+  if ((ejectionFraction !== null && ejectionFraction < 35) || deviceEligibility === 'Yes') {
     const deviceAssessmentDate = moment(programEnrolment.enrolmentDateTime).add(3, 'weeks').toDate();
     const deviceAssessmentMaxDate = moment(deviceAssessmentDate).add(1, 'week').toDate();
     
@@ -2546,6 +2575,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Stroke Rehab Intake",
             "encounterTypes": [
+                {"name": "Stroke Rehab Intake", "program": "Stroke Rehab"},
                 {"name": "Rehab Assessment", "program": "Stroke Rehab"},
                 {"name": "Therapy Initiation", "program": "Stroke Rehab"},
                 {"name": "Caregiver Training", "program": "Stroke Rehab"},
@@ -2613,6 +2643,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Asthma Enrollment",
             "encounterTypes": [
+                {"name": "Asthma Enrollment", "program": "Asthma Care"},
                 {"name": "Pulmonary Function", "program": "Asthma Care"},
                 {"name": "Trigger Assessment", "program": "Asthma Care"},
                 {"name": "Inhaler Training", "program": "Asthma Care"},
@@ -2677,6 +2708,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Palliative Intake",
             "encounterTypes": [
+                {"name": "Palliative Intake", "program": "Palliative Care"},
                 {"name": "Symptom Assessment", "program": "Palliative Care"},
                 {"name": "Goals Discussion", "program": "Palliative Care"},
                 {"name": "Family Meeting", "program": "Palliative Care"},
@@ -2736,6 +2768,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Weight Management Intake",
             "encounterTypes": [
+                {"name": "Weight Management Intake", "program": "Weight Management"},
                 {"name": "Metabolic Assessment", "program": "Weight Management"},
                 {"name": "Nutrition Counseling", "program": "Weight Management"},
                 {"name": "Exercise Planning", "program": "Weight Management"},
@@ -2800,6 +2833,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Pain Clinic Intake",
             "encounterTypes": [
+                {"name": "Pain Clinic Intake", "program": "Pain Management"},
                 {"name": "Pain Assessment", "program": "Pain Management"},
                 {"name": "Medication Review", "program": "Pain Management"},
                 {"name": "Psychology Consult", "program": "Pain Management"},
@@ -2819,7 +2853,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEnrolment });
   
   const moment = imports.moment;
-  const painDuration = programEnrolment.getObservationReadableValue('pain-duration');
+  const painDuration = programEnrolment.getObservationValue('pain-duration');
   
   // Schedule Pain Assessment within 1 week
   const painAssessmentDate = moment(programEnrolment.enrolmentDateTime).add(1, 'week').toDate();
@@ -2844,7 +2878,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   });
   
   // Schedule Psychology Consult if chronic pain (>3 months)
-  if (painDuration > 90) {
+  if (painDuration !== null && painDuration > 90) {
     const psychologyConsultDate = moment(programEnrolment.enrolmentDateTime).add(3, 'weeks').toDate();
     const psychologyConsultMaxDate = moment(psychologyConsultDate).add(1, 'week').toDate();
     
@@ -2867,6 +2901,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Sleep Clinic Intake",
             "encounterTypes": [
+                {"name": "Sleep Clinic Intake", "program": "Sleep Medicine"},
                 {"name": "Sleep Study", "program": "Sleep Medicine"},
                 {"name": "CPAP Setup", "program": "Sleep Medicine"},
                 {"name": "Sleep Hygiene", "program": "Sleep Medicine"},
@@ -2934,6 +2969,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramEnrolment",
             "encounterType": "Adolescent Health Intake",
             "encounterTypes": [
+                {"name": "Adolescent Health Intake", "program": "Adolescent Health"},
                 {"name": "Health Screening", "program": "Adolescent Health"},
                 {"name": "Risk Behavior Assessment", "program": "Adolescent Health"},
                 {"name": "Reproductive Health", "program": "Adolescent Health"},
@@ -3018,8 +3054,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3071,8 +3105,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   const cancelDateObs = programEncounter.findCancelEncounterObservation("Cancel date");
@@ -3117,8 +3149,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3174,8 +3204,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3235,8 +3263,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3296,8 +3322,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3353,8 +3377,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3418,8 +3440,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3479,8 +3499,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3540,8 +3558,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3601,8 +3617,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3662,8 +3676,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3716,8 +3728,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3773,8 +3783,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3842,8 +3850,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3903,8 +3909,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -3960,8 +3964,6 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
   const programEncounter = params.entity;
   const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({ programEncounter });
   
-  const hasExitedProgram = (programEncounter) => programEncounter.programEnrolment.programExitDateTime;
-  if(hasExitedProgram(programEncounter)) return scheduleBuilder.getAll();
 
   const moment = imports.moment;
   // const cancellationReason = programEncounter.getCancelReason(); // legacy helper kept for reference
@@ -4880,6 +4882,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Pregnancy Completion",
             "encounterTypes": [
+                {"name": "Pregnancy Completion", "program": "Maternal Health"},
                 {"name": "Final PNC", "program": "Maternal Health"},
                 {"name": "Child Health Transition", "program": "Child Health"},
                 {"name": "Family Planning Consult", "program": "Reproductive Health"},
@@ -4942,6 +4945,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Child Program Graduation",
             "encounterTypes": [
+                {"name": "Child Program Graduation", "program": "School Health"},
                 {"name": "School Health Transition", "program": "School Health"},
                 {"name": "Final Growth Assessment", "program": "Child Health"},
                 {"name": "Adolescent Program Referral", "program": "Adolescent Health"},
@@ -5009,6 +5013,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "TB Treatment Completion",
             "encounterTypes": [
+                {"name": "TB Treatment Completion", "program": "TB Program"},
                 {"name": "Treatment Success Assessment", "program": "TB Program"},
                 {"name": "Contact Follow-up", "program": "TB Program"},
                 {"name": "Long-term Monitoring", "program": "General Health"},
@@ -5071,6 +5076,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Patient Death",
             "encounterTypes": [
+                {"name": "Patient Death", "program": "Diabetes Care"},
                 {"name": "Death Verification", "program": "Diabetes Care"},
                 {"name": "Family Counseling", "program": "Family Support"},
                 {"name": "Program Closure", "program": "Diabetes Care"},
@@ -5127,6 +5133,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Mental Health Recovery",
             "encounterTypes": [
+                {"name": "Mental Health Recovery", "program": "Mental Health"},
                 {"name": "Final Assessment", "program": "Mental Health"},
                 {"name": "Relapse Prevention Plan", "program": "Mental Health"},
                 {
@@ -5195,6 +5202,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Cancer Remission",
             "encounterTypes": [
+                {"name": "Cancer Remission", "program": "Cancer Care"},
                 {"name": "Survivorship Plan", "program": "Cancer Care"},
                 {"name": "Long-term Follow-up", "program": "Oncology Surveillance"},
                 {"name": "Quality of Life Assessment", "program": "Cancer Care"},
@@ -5260,6 +5268,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Addiction Recovery",
             "encounterTypes": [
+                {"name": "Addiction Recovery", "program": "Addiction Treatment"},
                 {"name": "Recovery Assessment", "program": "Addiction Treatment"},
                 {"name": "Aftercare Planning", "program": "Addiction Treatment"},
                 {"name": "Peer Support Transition", "program": "Recovery Support"},
@@ -5325,6 +5334,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "End of Life",
             "encounterTypes": [
+                {"name": "End of Life", "program": "Palliative Care"},
                 {"name": "Death Certification", "program": "Palliative Care"},
                 {"name": "Bereavement Support", "program": "Family Support"},
                 {"name": "Program Review", "program": "Palliative Care"},
@@ -5381,6 +5391,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Cardiac Rehab Graduation",
             "encounterTypes": [
+                {"name": "Cardiac Rehab Graduation", "program": "Cardiac Rehab"},
                 {"name": "Exercise Tolerance Test", "program": "Cardiac Rehab"},
                 {"name": "Maintenance Program", "program": "Cardiac Care"},
                 {"name": "Home Exercise Plan", "program": "Cardiac Rehab"},
@@ -5443,6 +5454,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Stroke Rehab Completion",
             "encounterTypes": [
+                {"name": "Stroke Rehab Completion", "program": "Stroke Rehab"},
                 {"name": "Functional Assessment", "program": "Stroke Rehab"},
                 {"name": "Community Reintegration", "program": "Rehabilitation"},
                 {"name": "Caregiver Training", "program": "Stroke Rehab"},
@@ -5509,6 +5521,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Pre-Transplant Transition",
             "encounterTypes": [
+                {"name": "Pre-Transplant Transition", "program": "Transplant Care"},
                 {"name": "Transplant Preparation", "program": "Transplant Care"},
                 {"name": "CKD Program Closure", "program": "CKD Care"},
                 {"name": "Post-Transplant Planning", "program": "Transplant Care"},
@@ -5577,6 +5590,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Weight Goal Achievement",
             "encounterTypes": [
+                {"name": "Weight Goal Achievement", "program": "Weight Management"},
                 {"name": "Maintenance Planning", "program": "Weight Management"},
                 {"name": "Lifestyle Sustainability", "program": "Weight Management"},
                 {"name": "Long-term Support", "program": "Nutrition Support"},
@@ -5642,6 +5656,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Adult Transition",
             "encounterTypes": [
+                {"name": "Adult Transition", "program": "Adult Health"},
                 {"name": "Adult Health Transition", "program": "Adult Health"},
                 {
                     "name": "Reproductive Health Consult",
@@ -5714,6 +5729,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Immune Recovery",
             "encounterTypes": [
+                {"name": "Immune Recovery", "program": "Immunology"},
                 {"name": "Immune Status Assessment", "program": "Immunology"},
                 {"name": "Vaccination Catch-up", "program": "Immunization"},
                 {"name": "Risk Assessment", "program": "General Health"},
@@ -5780,6 +5796,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Pain Control Achievement",
             "encounterTypes": [
+                {"name": "Pain Control Achievement", "program": "Pain Management"},
                 {"name": "Pain Assessment Final", "program": "Pain Management"},
                 {"name": "Self-Management Plan", "program": "Pain Management"},
                 {"name": "Primary Care Transition", "program": "General Care"},
@@ -5843,6 +5860,7 @@ VISIT_SCHEDULE_RULE_EXAMPLES = [
             "formType": "ProgramExit",
             "encounterType": "Care Level Transition",
             "encounterTypes": [
+                {"name": "Care Level Transition", "program": "Elderly Care"},
                 {"name": "Care Needs Assessment", "program": "Elderly Care"},
                 {"name": "Facility Transition", "program": "Long-term Care"},
                 {"name": "Family Conference", "program": "Elderly Care"},

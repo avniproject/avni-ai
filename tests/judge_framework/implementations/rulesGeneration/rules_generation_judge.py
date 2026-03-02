@@ -42,6 +42,9 @@ TEST IDENTIFIER: {test_identifier}
 RULE REQUEST:
 {rule_request}
 
+FORM TYPE: {reference_context.get("formType", "Unknown")}
+ENCOUNTER TYPE: {reference_context.get("encounterType", "Unknown")}
+
 REFERENCE CONTEXT:
 {json.dumps(reference_context, indent=2)}
 
@@ -62,7 +65,7 @@ FINAL ASSISTANT RESPONSE (expected JS rule):
 WAS USER CONFIRMATION TURN PRESENT?:
 {confirmation_detected}
 
-Evaluate this run on the required metrics and return JSON only.
+Evaluate this run on ALL required metrics including helper_method_correctness and return JSON only.
 """
 
         ai_evaluation = self._call_openai_for_evaluation(evaluation_context)
@@ -105,31 +108,132 @@ Your job is to evaluate BOTH:
 1) Scenario validation quality before code generation
 2) Final JavaScript rule quality and suitability
 
-Score strictly on these metrics (0-100):
-1. scenario_validation
-   - Did assistant present a realistic validation/scenario table before code?
-   - Did it include concrete cases and ask for confirmation?
-2. response_suitability
-   - Is the response sequence suitable (scenario -> confirm -> final code)?
-   - Is it clear, concise, and context-aware?
-3. rule_correctness
-   - Does final rule implement requested scheduling logic correctly?
-   - Does it use VisitScheduleBuilder and valid schedule output structure?
-4. timing_accuracy
-   - Are offsets/thresholds/anchors in request reflected in code logic?
-5. code_quality
-   - Is it executable, production-ready JavaScript with robust structure?
+=== AVNI HELPER METHODS REFERENCE ===
 
-Important Avni-specific checks:
-- Penalize if code is generated before confirmation.
-- Penalize if scenario table/pre-validation is missing.
-- Penalize if final answer is not executable JavaScript rule.
-- For cancellation form types, check helper usage:
-  - findCancelEncounterObservation(...)
-  - findCancelEncounterObservationReadableValue(...)
-- For ProgramExit form type, check exit-date-based scheduling logic.
-- Penalize unsafe scheduling patterns (duplicate encounter type overwrite risk,
-  createNew without dedupe guard).
+Use these rules to judge helper method correctness:
+
+OBSERVATION ACCESS:
+- getObservationReadableValue(conceptName) → returns String (coded answer name, formatted date)
+  Use for: displaying values, comparing to string literals (e.g., === 'SAM', === 'Yes')
+- getObservationValue(conceptName) → returns raw value (Number, Date, UUID for coded)
+  Use for: numeric comparisons (>, <, ===) with numbers, date arithmetic
+- findObservation(conceptName) → returns Observation object
+  Use for: checking existence, accessing .getValue(), .isAbnormal()
+
+CRITICAL RULE: Never compare getObservationReadableValue() result to a number using > or <.
+  WRONG: programEncounter.getObservationReadableValue('hba1c') > 9
+  RIGHT: programEncounter.getObservationValue('hba1c') > 9
+  ALSO VALID: programEncounter.getObservationReadableValue('status') === 'SAM'  (string comparison)
+
+AGE METHODS (on Individual):
+- individual.getAgeInYears() → Number: use for year-based age conditions
+- individual.getAgeInMonths() → Number: use for infant/pediatric age checks (< 5 years)
+- individual.getAgeInWeeks() → Number: use for newborn checks (< 6 weeks)
+- individual.getAge() → Duration object: use for display only
+
+Access pattern from ProgramEncounter: programEncounter.programEnrolment.individual.getAgeInYears()
+Access pattern from Encounter: encounter.individual.getAgeInYears()
+
+GENDER METHODS (on Individual):
+- individual.isFemale() → Boolean
+- individual.isMale() → Boolean
+Always gate gender-specific scheduling behind isFemale() or isMale() when the request implies it.
+
+CANCELLATION FORM TYPES (ProgramEncounterCancellation, IndividualEncounterCancellation):
+- Use findCancelEncounterObservationReadableValue("Cancellation reason") for reason (string)
+- Use findCancelEncounterObservation("Cancel date") for date object, then .getValue() for Date
+- NEVER use programEncounter.cancelDateTime (legacy, deprecated)
+- NEVER use getCancelReason() (legacy, deprecated)
+- Cancellation date fallback: cancelDateObs ? cancelDateObs.getValue() : entity.encounterDateTime
+
+PROGRAM EXIT FORM TYPE:
+- Entity is programEnrolment (not programEncounter)
+- Access exit date via: programEnrolment.programExitDateTime
+- Access individual subject: programEnrolment.individual
+- VisitScheduleBuilder init: new imports.rulesConfig.VisitScheduleBuilder({ programEnrolment })
+- For REGISTRATION-LEVEL observations on the subject (recorded during registration, e.g. delivery-date,
+  school-readiness, transplant-date), use: individual.getObservationValue(conceptName)
+  or individual.getObservationReadableValue(conceptName) — this is CORRECT
+- For PROGRAM/ENROLMENT-LEVEL observations (recorded during enrolment or program encounters),
+  use: programEnrolment.getObservationValue() or programEnrolment.getObservationReadableValue()
+- Do NOT use programEncounter in ProgramExit rules — entity is programEnrolment
+
+PROGRAM ENROLMENT FORM TYPE:
+- Entity is programEnrolment
+- VisitScheduleBuilder init: new imports.rulesConfig.VisitScheduleBuilder({ programEnrolment })
+- Access enrolment date: programEnrolment.enrolmentDateTime
+
+ENCOUNTER FORM TYPE (General/Individual):
+- Entity is encounter (not programEncounter)
+- VisitScheduleBuilder init: new imports.rulesConfig.VisitScheduleBuilder({ encounter })
+- No programEnrolment available; access individual via encounter.individual
+
+PROGRAM EXIT GUARD (for ProgramEncounter only):
+- Always guard: if (programEncounter.programEnrolment.programExitDateTime) return scheduleBuilder.getAll();
+- NOT required for and MUST NOT appear in: ProgramExit, ProgramEnrolment, Encounter,
+  ProgramEncounterCancellation, IndividualEncounterCancellation form types
+- Having a programEncounter-style exit guard in a cancellation rule is WRONG — penalize
+
+SCHEDULING PATTERNS:
+- scheduleBuilder.add({ name, encounterType, earliestDate, maxDate }) — standard
+- maxDate should always be AFTER earliestDate (typically 3-14 days after)
+- Avoid createNew strategy unless request explicitly requires multiple instances
+
+CROSS-ENCOUNTER OBSERVATION:
+- programEnrolment.findLatestObservationInEntireEnrolment(conceptName) → finds latest obs across all encounters
+- individual.findLatestObservationFromEncounters(conceptName) → finds latest obs across all individual encounters
+- Use these for trend-based scheduling (e.g., "based on latest reading")
+
+=== SCORING METRICS (0-100) ===
+
+1. scenario_validation
+   - Did assistant present a realistic scenario/validation table before code?
+   - Did it include concrete cases and ask for user confirmation?
+   - Score 0 if code was generated directly without scenario step.
+
+2. response_suitability
+   - Is the response sequence correct: scenario → confirmation → final code?
+   - Is it clear, concise, and context-aware?
+   - Penalize (not zero) if confirmation step was absent — deduct 20-30 points.
+
+3. rule_correctness
+   - Does the final rule implement the requested scheduling logic correctly?
+   - Does it use VisitScheduleBuilder with correct entity initialization?
+   - Is the correct entity used (programEncounter vs encounter vs programEnrolment)?
+   - Are all branches from the request implemented?
+
+4. timing_accuracy
+   - Are offsets/thresholds/anchors from the request reflected correctly in code?
+   - Are date anchors appropriate (encounterDateTime, programExitDateTime, lmpDate, cancelDate)?
+   - Are time units correct (days, weeks, months)?
+
+5. code_quality
+   - Is it executable, production-ready JavaScript?
+   - Are null/undefined guards present for observations used in numeric comparisons?
+   - Is the code free of deprecated API usage?
+
+6. helper_method_correctness
+   - Is getObservationValue used for numeric comparisons (not getObservationReadableValue)?
+   - Is getObservationReadableValue used for string/coded comparisons?
+   - Are cancellation helpers (findCancelEncounterObservation*) used for cancellation form types?
+   - Is the correct individual access chain used (programEncounter.programEnrolment.individual)?
+   - Are age methods used correctly (getAgeInYears vs getAgeInMonths vs getAgeInWeeks)?
+   - Are gender guards (isFemale/isMale) used when gender-specific scheduling is required?
+   - Is cross-encounter observation lookup (findLatestObservationInEntireEnrolment) used when appropriate?
+
+=== PENALIZE THESE PATTERNS ===
+- getObservationReadableValue() result compared numerically (> < >= <=) → deduct from helper_method_correctness
+  (e.g., const hba1c = entity.getObservationReadableValue('hba1c'); if (hba1c > 9) — WRONG)
+- getCancelReason() or .cancelDateTime in cancellation forms → deduct from helper_method_correctness
+- Program exit guard (hasExitedProgram / programExitDateTime check) in cancellation rules → deduct from rule_correctness
+- programEncounter entity used in ProgramExit rules → deduct from rule_correctness
+- isFemale()/isMale() missing when request explicitly requires gender-specific scheduling → deduct from rule_correctness
+- individual.getAgeInYears() used when request requires pediatric age (< 2 years) — should use getAgeInMonths() → deduct from helper_method_correctness
+- individual.getAgeInYears() used when request requires newborn age (< 6 weeks) — should use getAgeInWeeks() → deduct from helper_method_correctness
+- Unused observation variable (read but never referenced in logic) → deduct from code_quality
+- maxDate set to BEFORE or equal to earliestDate → deduct from code_quality
+- No null/undefined guard before numeric observation comparison → deduct from code_quality
+- createNew strategy without duplicate guard → deduct from code_quality
 
 Return STRICT JSON only in this format:
 {
@@ -138,7 +242,8 @@ Return STRICT JSON only in this format:
     "response_suitability": <0-100>,
     "rule_correctness": <0-100>,
     "timing_accuracy": <0-100>,
-    "code_quality": <0-100>
+    "code_quality": <0-100>,
+    "helper_method_correctness": <0-100>
   },
   "overall_success": <true/false>,
   "error_categories": ["<optional categories>"],
@@ -163,6 +268,7 @@ EVALUATION INPUT:
             "supported_metrics": self._get_evaluation_metrics(),
             "javascript_aware": True,
             "protocol_aware": True,
+            "helper_method_aware": True,
             "uses_openai_for_judging": True,
         }
 
@@ -186,6 +292,7 @@ EVALUATION INPUT:
             "rule_correctness",
             "timing_accuracy",
             "code_quality",
+            "helper_method_correctness",
         ]
 
     @staticmethod
@@ -196,6 +303,7 @@ EVALUATION INPUT:
             "rule_correctness": 80.0,
             "timing_accuracy": 85.0,
             "code_quality": 75.0,
+            "helper_method_correctness": 80.0,
         }
 
     @staticmethod
@@ -229,18 +337,19 @@ EVALUATION INPUT:
 
     @staticmethod
     def _confirmation_turn_exists(conversation_history: List[Dict[str, Any]]) -> bool:
+        _CONFIRMATION_TOKENS = {
+            "yes", "y", "ok", "okay", "proceed", "go ahead", "looks good",
+            "approved", "confirmed", "confirm", "sure", "yep", "yup",
+            "correct", "that's correct", "sounds good", "perfect", "great",
+        }
         for turn in conversation_history:
             user_message = (turn.get("user_message", "") or "").strip().lower()
-            if user_message in {
-                "yes",
-                "y",
-                "ok",
-                "okay",
-                "proceed",
-                "go ahead",
-                "looks good",
-                "approved",
-                "confirmed",
-            }:
+            # Exact match against known confirmation tokens
+            if user_message in _CONFIRMATION_TOKENS:
+                return True
+            # Short message (≤ 30 chars) that starts with an affirmative
+            if len(user_message) <= 30 and any(
+                user_message.startswith(token) for token in ("yes", "ok", "sure", "confirm", "proceed")
+            ):
                 return True
         return False
