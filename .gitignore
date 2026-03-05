@@ -56,3 +56,10 @@ htmlcov/
 .env
 *.egg-info/
 reference_forms/**/*
+reference_forms/**/*
+
+# Test report artifacts
+rules_generation_test_report.*
+form_validation_test_report.*
+*_test_report.csv
+*_test_report.json

@@ -142,9 +142,11 @@ Always gate gender-specific scheduling behind isFemale() or isMale() when the re
 CANCELLATION FORM TYPES (ProgramEncounterCancellation, IndividualEncounterCancellation):
 - Use findCancelEncounterObservationReadableValue("Cancellation reason") for reason (string)
 - Use findCancelEncounterObservation("Cancel date") for date object, then .getValue() for Date
-- NEVER use programEncounter.cancelDateTime (legacy, deprecated)
+- NEVER use programEncounter.cancelDateTime or encounter.cancelDateTime (legacy, deprecated)
 - NEVER use getCancelReason() (legacy, deprecated)
 - Cancellation date fallback: cancelDateObs ? cancelDateObs.getValue() : entity.encounterDateTime
+- ProgramEncounterCancellation: entity=programEncounter, builder init: { programEncounter }
+- IndividualEncounterCancellation: entity=encounter, builder init: { encounter } OR { individual: encounter.individual } (both valid)
 
 PROGRAM EXIT FORM TYPE:
 - Entity is programEnrolment (not programEncounter)
@@ -221,7 +223,20 @@ CROSS-ENCOUNTER OBSERVATION:
    - Are gender guards (isFemale/isMale) used when gender-specific scheduling is required?
    - Is cross-encounter observation lookup (findLatestObservationInEntireEnrolment) used when appropriate?
 
+=== TOLERANCE FOR EXTRA DEFENSIVE CHECKS ===
+The generated code may include extra defensive checks not in the reference rule, such as:
+- Additional encounter type name verification
+- Duplicate scheduling guards (checking existing scheduled visits)
+- Extra null checks beyond what's strictly necessary
+These are NOT errors — they show defensive coding. Do NOT penalize rule_correctness or code_quality
+for extra guards that don't change the core logic. Only penalize if the extra logic is WRONG
+(e.g., wrong entity name, wrong API call) or if a REQUIRED check from the request is MISSING.
+
 === PENALIZE THESE PATTERNS ===
+- Using cancelDateTime property directly (e.g. programEncounter.cancelDateTime, encounter.cancelDateTime) in cancellation rules → SEVERE deduction from helper_method_correctness (this is the #1 cancellation error)
+- Using getCancelReason() in cancellation rules → SEVERE deduction from helper_method_correctness
+- Not using findCancelEncounterObservation("Cancel date") for cancel date in cancellation rules → deduct from helper_method_correctness
+- Not using findCancelEncounterObservationReadableValue("Cancellation reason") for cancel reason in cancellation rules → deduct from helper_method_correctness
 - getObservationReadableValue() result compared numerically (> < >= <=) → deduct from helper_method_correctness
   (e.g., const hba1c = entity.getObservationReadableValue('hba1c'); if (hba1c > 9) — WRONG)
 - getCancelReason() or .cancelDateTime in cancellation forms → deduct from helper_method_correctness
@@ -342,14 +357,31 @@ EVALUATION INPUT:
             "approved", "confirmed", "confirm", "sure", "yep", "yup",
             "correct", "that's correct", "sounds good", "perfect", "great",
         }
+        # Keywords that indicate a confirmation message containing a code-generation request
+        _CONFIRMATION_KEYWORDS = (
+            "scenarios look correct",
+            "scenarios are correct",
+            "looks correct",
+            "generate the final",
+            "generate the rule code",
+            "please generate",
+            "go ahead and generate",
+            "proceed with generating",
+            "generate the executable",
+        )
         for turn in conversation_history:
             user_message = (turn.get("user_message", "") or "").strip().lower()
-            # Exact match against known confirmation tokens
+            if not user_message:
+                continue
+            # Exact match against known short confirmation tokens
             if user_message in _CONFIRMATION_TOKENS:
                 return True
             # Short message (≤ 30 chars) that starts with an affirmative
             if len(user_message) <= 30 and any(
                 user_message.startswith(token) for token in ("yes", "ok", "sure", "confirm", "proceed")
             ):
+                return True
+            # Longer confirmation message (strategy sends "YES. These scenarios look correct...")
+            if any(keyword in user_message for keyword in _CONFIRMATION_KEYWORDS):
                 return True
         return False
