@@ -66,7 +66,7 @@ def create_rules_generation_test_config() -> TestConfiguration:
             "code_quality": 75.0,
             "helper_method_correctness": 80.0,
         },
-        openai_model="gpt-4o",
+        openai_model="gpt-4.1",
         openai_temperature=0.1,
         include_detailed_analysis=True,
     )
