@@ -71,9 +71,9 @@ Evaluate this run on ALL required metrics including helper_method_correctness an
         ai_evaluation = self._call_openai_for_evaluation(evaluation_context)
         scores = self._normalize_scores(ai_evaluation.get("scores", {}))
 
-        overall_success = ai_evaluation.get("overall_success")
-        if not isinstance(overall_success, bool):
-            overall_success = self._calculate_overall_success(scores)
+        # Always derive overall_success from scores — never trust the LLM's
+        # overall_success field, which can contradict the numeric scores.
+        overall_success = self._calculate_overall_success(scores)
 
         return EvaluationResult(
             test_identifier=test_identifier,
