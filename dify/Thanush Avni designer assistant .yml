@@ -81,7 +81,7 @@ workflow:
         - local_file
         - remote_url
       number_limits: 3
-    opening_statement: 👋 Hey! Let’s get started with configuring Avni.
+    opening_statement: 👋 Hey! Let's get started with configuring Avni.
     retriever_resource:
       enabled: false
     sensitive_word_avoidance:
@@ -164,17 +164,6 @@ workflow:
       id: 1732870000001-7a557c49-05d9-4157-8b6b-ce31b2ed7d6a-1732870000002-target
       source: '1732870000001'
       sourceHandle: 7a557c49-05d9-4157-8b6b-ce31b2ed7d6a
-      target: '1732870000002'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: knowledge-retrieval
-      id: 1732870000001-false-1732870000002-target
-      source: '1732870000001'
-      sourceHandle: 'false'
       target: '1732870000002'
       targetHandle: target
       type: custom
@@ -986,7 +975,7 @@ workflow:
           role: user
           text: '{{#sys.query#}} {{#sys.files#}}'
         reasoning_format: tagged
-        selected: true
+        selected: false
         title: LLM - Visit Schedule
         type: llm
         vision:
@@ -999,7 +988,7 @@ workflow:
       positionAbsolute:
         x: 1066
         y: 183
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1024,7 +1013,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -293.29999999999995
-      y: 237.95
+      x: 71.70000000000005
+      y: 256.95
       zoom: 0.7
   rag_pipeline_variables: []
