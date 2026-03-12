@@ -1,0 +1,130 @@
+SUMMARY METRICS,,
+metric,value,description
+total_messages,69,Overall total messages
+total_conversations,22,Overall total conversations
+unique_users,8,Overall unique users
+unique_organizations,9,Overall unique organizations
+date_range_days,100,Overall date range days
+messages_per_day,0.69,Overall messages per day
+,,
+,,
+ENVIRONMENT DISTRIBUTION,,
+environment,message_count,percentage
+Production,16,32.7%
+Dev,13,26.5%
+Trial,12,24.5%
+UAT,4,8.2%
+Training,3,6.1%
+trial,1,2.0%
+,,
+,,
+TOP 10 ORGANIZATIONS,
+organization,message_count
+APF Odisha,14
+achtest,13
+maha16_5,10
+APF Odisha UAT ,4
+Test din,3
+SEARCH Trial,1
+JSSCP,1
+maha16_2,1
+Goonj,1
+,
+,
+TOP 10 USERS,
+user_name,message_count
+Dinesh G,17
+acha,13
+maha,12
+Achala,7
+admin1,4
+Dinesh,4
+Himesh R,3
+Nupoor khandelwal,1
+,
+,
+HOURLY USAGE PATTERNS,
+hour,message_count
+03:00,14
+04:00,18
+05:00,1
+06:00,2
+07:00,2
+08:00,6
+09:00,4
+10:00,7
+11:00,10
+12:00,2
+15:00,1
+17:00,2
+,
+,
+DAILY USAGE PATTERNS,
+day_of_week,message_count
+Monday,0
+Tuesday,12
+Wednesday,7
+Thursday,41
+Friday,8
+Saturday,0
+Sunday,1
+,
+,
+CONVERSATION ANALYSIS,,
+metric,value,description
+avg_length,3.1363636363636362,Conversation avg length
+median_length,1.0,Conversation median length
+max_length,14,Conversation max length
+single_message_convs,13,Conversation single message convs
+,,
+,,
+TEXT ANALYSIS,,
+metric,value,unit
+avg_query_length,27.956521739130434,characters
+avg_answer_length,515.4347826086956,characters
+max_query_length,245,characters
+max_answer_length,2054,characters
+,,
+,,
+PERFORMANCE METRICS,,
+metric,value,unit
+avg_response_time,8.32,seconds
+median_response_time,8.01,seconds
+min_response_time,0.00,seconds
+max_response_time,14.97,seconds
+,,
+,,
+TOKEN USAGE,,
+metric,value,unit
+total_prompt_tokens,487443,tokens
+total_completion_tokens,9903,tokens
+total_tokens,497346,tokens
+avg_tokens_per_message,7207.913043478261,tokens
+,,
+,,
+COST ANALYSIS,,
+metric,value,unit
+total_cost,1.562135,USD
+avg_cost_per_message,0.022640,USD
+,,
+,,
+COST BY ENVIRONMENT,,
+environment,total_cost,unit
+Production,0.445383,USD
+Dev,0.419119,USD
+Trial,0.366882,USD
+UAT,0.131358,USD
+Training,0.097041,USD
+trial,0.001737,USD
+,,
+,,
+DUPLICATE QUERIES,
+query,frequency
+hi,5
+u can create it ,4
+"Name: State
+Level: 3.0
+Parent: None
+",2
+locationTypes are wha?,2
+Yes you can processed with creating location,2

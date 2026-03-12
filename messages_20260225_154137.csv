@@ -1,0 +1,47 @@
+conversation_id,message_id,org_name,org_type,user_name,query,answer,message_tokens,answer_tokens,provider_response_latency,from_source,from_end_user_id,status,created_at,prompt_tokens,completion_tokens,total_tokens,total_price,currency,latency,time_to_first_token,time_to_generate
+6349f114-d5d6-4b69-b235-0dd1db9840dc,8c6a1ccc-94ea-41b9-bd70-aaf03dedb906,Test din,Training,Dinesh G,can you delete the organisation ,"Dinesh G, when you mention deleting the organization, are you referring to deleting the entire configuration within Avni, including both the admin configuration (location types, locations, catchments) and the app designer configuration (subject types, programs, encounters)? 
+
+Please confirm if you want to delete everything or if there's a specific part of the configuration you want to remove. Note that deleting the admin configuration will also require deleting the app designer configuration since they are dependent.",9089,143,6.1203400529921055,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764152359,9089,143,9232,0.0320145,USD,3.683,5.545,0.53
+6349f114-d5d6-4b69-b235-0dd1db9840dc,5da5593d-848f-4e83-b362-e72a056eb1d0,Test din,Training,Dinesh G,delete everything ,"Deleting everything will remove both the admin configuration (location types, locations, catchments) and the app designer configuration (subject types, programs, encounters) from your Avni setup. This action is irreversible.
+
+Are you sure you want to proceed with deleting everything? Please confirm so I can proceed with the deletion.",9146,109,6.763352854002733,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764152386,9146,109,9255,0.0320606,USD,4.252,6.389,0.355
+6349f114-d5d6-4b69-b235-0dd1db9840dc,fc5d8748-5866-4b96-97bd-1de78a3017b1,Test din,Training,Dinesh G,yes ,"Thank you for confirming, Dinesh G. I will proceed with deleting the entire configuration, including both the admin and app designer configurations.
+
+Here is the configuration for deletion:
+
+```json
+{
+  ""delete"": {
+    ""implementation"": {
+      ""deleteMetadata"": true,
+      ""deleteAdminConfig"": true
+    }
+  }
+}
+```
+
+This will ensure that all configurations are removed. If you have any further questions or need assistance with setting up a new configuration, feel free to ask!",8936,153,10.508009226003196,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764152400,8936,153,9089,0.0329663,USD,8.302999999999999,9.974,0.511
+1c9b668a-4a9f-45fc-91f3-3038d0aba0fb,9c777700-8bcf-4cc9-a58a-c7e3476fcef8,,,Himesh R,locationTypes are wha?,"Location Types are used to classify different geographical locations into categories. For example, ""State,"" ""District,"" and ""City"" are different Location Types. Each Location Type can have a ""Parent"" Location Type, which helps in creating a hierarchy, and a ""Level"" value, which indicates its relative position compared to other Location Types. This hierarchy is used to organize locations systematically within an organization.",3970,132,6.692169103771448,api,31325b52-6d82-4bf6-8939-61be6f267148,normal,1763457369,,,,,,,,
+1c9b668a-4a9f-45fc-91f3-3038d0aba0fb,334fba3a-7d6c-409f-b6a0-9cc0e8acaf6e,,,Himesh R,locationTypes are wha?,"Location Types are used to classify different geographical locations into categories. For example, ""State,"" ""District,"" and ""City"" are different Location Types. Each Location Type can have a ""Parent"" Location Type, which helps in creating a hierarchy, and a ""Level"" value that indicates its relative position compared to others. This hierarchy is used to define the lineage of locations, such as ""State -> District -> City.""",3970,136,6.981903731357306,api,31325b52-6d82-4bf6-8939-61be6f267148,normal,1763457455,,,,,,,,
+e5274754-f598-4070-9672-92748d8e0477,aa4efd1b-be26-4cc9-bc19-5635e78dd248,,,,hi,Hello! How can I assist you today with the Avni system?,2688,82,4.765175160951912,api,c425e1f0-7f52-48ea-b472-42e2584e7751,normal,1763456565,,,,,,,,
+e5274754-f598-4070-9672-92748d8e0477,81c61248-7681-408a-ac37-3f5be33a10e2,,,,Identifiers in Avni,"In Avni, identifiers are used to link different types of data, similar to foreign key linkages in databases. They allow users to connect records across various forms, such as Woman Registration, Pregnancy Program Enrolment, and Ante Natal Visit Form. Users can create unique identifiers for each record, which are used during CSV uploads to match records but are not visible in Avni after uploading.
+
+Identifiers can be generated offline in batches and assigned automatically by the Avni Android app. While Avni supports multiple identifiers for the same subject, it's generally recommended to avoid them unless they are strictly managed to prevent duplication issues.
+
+If you have any specific questions about identifiers or need further assistance, feel free to ask!",4632,190,7.472856604959816,api,c425e1f0-7f52-48ea-b472-42e2584e7751,normal,1763456640,,,,,,,,
+494154c3-6ce5-4b32-8eeb-adefeb38d500,9a33534c-633e-4d81-89c9-f5d2c49c9cf1,,,,go now,This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.,2661,48,5.170496362261474,api,c425e1f0-7f52-48ea-b472-42e2584e7751,normal,1763456350,,,,,,,,
+c9a312d9-e2d0-4fef-bb0c-6a7971307497,bd79fde8-c2e5-4e2d-a862-b98d002589ce,,,,catchment kya hain,"Catchment ek group of locations hain. Ye locations ka group kisi user ya group of users ke operation areas ko alag karne ke liye use hota hain. Catchments ka istemal karke, Avni field app sirf unhi locations ka data sync karti hain jo user ke assigned catchment mein aati hain. Isse data usage aur storage kam hota hain, aur performance improve hoti hain.",3672,140,6.3158081830479205,api,c425e1f0-7f52-48ea-b472-42e2584e7751,normal,1763455897,,,,,,,,
+ff5eff50-e3b3-4075-9c9b-eb7a3234f820,81a15f1e-55c5-4e30-ba80-c19782f85f3d,,,,hi,Hello! How can I assist you today with the Avni system?,2688,82,6.655588890891522,api,2b8241b1-0a58-4e5b-8e98-26ef402bda72,normal,1763455840,,,,,,,,
+59f12e77-d3e8-459f-993e-24953281fa97,c012e573-7dd2-4e72-a886-46a10a069304,Goonj,Production,maha,How do i get started?,"To get started with Avni, you can follow these steps:
+
+1. **Install the Avni Field App**: Download the Avni Field App from the Google Play Store or install it using an APK file. This app is used for data entry and collection in the field and can work offline.
+
+2. **Set Up the Avni Web App**: Use the Avni Web App for administration tasks. This includes configuring the Avni server, setting up master data for locations, hierarchies, and users, and designing program forms. You can also use it for data imports, exports, and data entry.
+
+3. **Utilize Avni Reporting and Dashboard**: Connect to the Avni server to generate custom reports and dashboards. These can be viewed in a web browser or exported as PDFs.
+
+4. **Choose Avni Hosted Service or Local Setup**: Decide whether to use the Avni Hosted Service on the cloud or set up your own local instance of Avni on your server. Avni is open-source, so you have the flexibility to choose.
+
+5. **Configure Your Program**: Consider the data you need to collect and configure your program accordingly. This involves setting up encounter types and forms for each stage of your program.
+
+By following these steps, you can effectively implement your program workflows using Avni. If you have specific questions or need further assistance, feel free to ask!",4070,336,8.549715877976269,api,fe38c803-0e0b-4a0d-b971-8b0190986a62,normal,1763440729,,,,,,,,

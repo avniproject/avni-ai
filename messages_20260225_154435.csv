@@ -1,0 +1,603 @@
+conversation_id,message_id,org_name,org_type,user_name,query,answer,message_tokens,answer_tokens,provider_response_latency,from_source,from_end_user_id,status,created_at,prompt_tokens,completion_tokens,total_tokens,total_price,currency,latency,time_to_first_token,time_to_generate
+89980174-804c-458f-82ae-f360e08cd4ca,7f34f191-fa57-4937-b7bb-7f5fb67e10a9,,trial,,hii,Hello! How can I assist you today?,2162,77,9.415011842735112,console,,normal,1771998150,2162,77,2239,0.0017369,USD,2.471,8.838,0.013
+10ceb2b3-2123-46f6-9101-f4aa922ffa9b,e7cc985e-808a-49d8-89aa-23ab83bc9152,SEARCH Trial,Trial,Himesh R,"as per https://avni.readme.io/docs/checklist-requirements-capture-guide
+for checklist, do we mandatorily need to specify 
+
+Due by (days)	Critical (days)	Overdue (days)	Expired (days)	..
+What if i dont want overdue, or expiry at all for a vaccine","For a checklist in Avni, you don't necessarily have to specify all the phases like ""Overdue"" or ""Expired"" for a vaccine. You can define only the phases that are relevant to your use case. If you don't want an item to have an ""Overdue"" or ""Expired"" status, you can simply omit those fields from the checklist item configuration. You can define the phases that are applicable, such as ""Due"" and ""Critical,"" and leave out the others if they are not needed.",4199,158,8.972703123930842,api,9cde19e5-c589-4827-85ab-b2e847823c14,normal,1770204777,4199,158,4357,0.0068736,USD,5.476,7.362,1.496
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,5e67ac3f-ef89-4a45-8545-5cf6fb74f505,achtest,Dev,acha,create a location type ,"To create a Location Type, follow these steps:
+
+1. Click on the “CREATE” button located at the top right corner of the “Location Types” screen.
+2. Enter an appropriate name for the Location Type in the “Name” field, starting with an uppercase letter.
+3. Set the “Level” field to a numeric value that is lower than its “Parent” Location Type’s “Level” value. For example, use values like “2.0”, “3”, or “4.5”.
+4. If applicable, associate a “Parent” Location Type, unless this is the highest Location Type in the hierarchy.
+5. Click on the “SAVE” button to save the new Location Type.
+
+This process helps in defining the hierarchy of locations needed for your program.",3577,210,13.300171134993434,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769687104,3577,210,3787,0.0060806,USD,5.515000000000001,10.405,2.772
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,2dddfefa-b5ad-44be-8370-970d1bff26df,achtest,Dev,acha,create location type state,"To create a Location Type for ""State,"" let's define its hierarchy level. Typically, ""State"" is at the top of the hierarchy. Here's how you can set it up:
+
+1. **Name**: State
+2. **Level**: 3.0 (since it's usually at the top, you can assign it the highest level number)
+3. **Parent**: None (as it's the top level)
+
+Would you like me to automatically create this configuration for you, or would you prefer step-by-step navigation instructions to do it yourself in Avni?",9288,162,9.299713402986526,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769687192,9288,162,9450,0.0331244,USD,6.2989999999999995,9.19,0.01
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,c20f26e6-cc10-47d3-b80d-195d4623158e,achtest,Dev,acha,Name: State,"Thank you for confirming the details for the ""State"" location type. Let's proceed with creating this configuration.
+
+Would you like me to automatically create this configuration for you, or would you prefer step-by-step navigation instructions to do it yourself in Avni?",9105,101,9.205914101097733,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769687654,9105,101,9206,0.032745,USD,2.926,9.087,0.005
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,321f7714-9306-4770-95a9-75c72a1c4eb6,achtest,Dev,acha,"Name: State
+Level: 3.0
+Parent: None
+","Thank you for providing the details for the ""State"" location type. Here's a summary of what we will create:
+
+- **Name**: State
+- **Level**: 3.0
+- **Parent**: None (as it's the top level)
+
+Would you like me to automatically create this configuration for you, or would you prefer step-by-step navigation instructions to do it yourself in Avni?",9869,150,13.556495477911085,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769687712,9869,150,10019,0.0337039,USD,10.533,13.437,0.009
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,ff2a0c7f-9281-445c-be13-8e104aa4c271,achtest,Dev,acha,yes,"Just to clarify - would you like me to automatically create the configuration for you (Option 1), or would you prefer step-by-step instructions to do it manually (Option 2)? Please let me know which approach you'd prefer.",9481,99,5.491759963333607,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769687756,9481,99,9580,0.033538,USD,2.482,5.285,0.003
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,d13888a0-0604-4d1c-bf0a-bd10d8d55ca9,achtest,Dev,acha,1,"It seems like there might be a misunderstanding. Could you please clarify if you would like me to automatically create the ""State"" location type configuration for you, or if you prefer step-by-step instructions to do it manually in Avni?",9560,95,7.816531768999994,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769687774,9560,95,9655,0.0338335,USD,3.0780000000000003,7.679,0.004
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,d16b7124-c473-4369-b1d9-834609cf4f38,achtest,Dev,acha,Option 1,"Great! I'll proceed with automatically creating the ""State"" location type configuration for you. Here's what will be set up:
+
+- **Name**: State
+- **Level**: 3.0
+- **Parent**: None
+
+Let's generate the configuration:
+
+```json
+{
+  ""response"": ""The 'State' location type has been created with Level 3.0 and no parent."",
+  ""config"": {
+    ""create"": {
+      ""addressLevelTypes"": [
+        {
+          ""name"": ""State"",
+          ""level"": 3.0,
+          ""parentId"": null,
+          ""voided"": false
+        }
+      ]
+    },
+    ""update"": {
+      ""users"": [
+        {
+          ""name"": ""acha""
+        }
+      ]
+    }
+  },
+  ""next_step"": ""Let's create locations now to populate your location hierarchy.""
+}
+```
+
+This configuration will set up the ""State"" location type for you. Would you like to proceed with creating locations next?",9680,256,10.149226079229265,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769687823,9680,256,9936,0.0365141,USD,3.8149999999999995,10.0,0.016
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,07c11a77-59cb-4b93-89c9-c5232040f80f,achtest,Dev,acha,"Name: State
+Level: 3.0
+Parent: None
+","It looks like you're ready to proceed with creating the ""State"" location type with the following details:
+
+- **Name**: State
+- **Level**: 3.0
+- **Parent**: None
+
+I'll go ahead and generate the configuration for you:
+
+```json
+{
+  ""response"": ""The 'State' location type has been created with Level 3.0 and no parent."",
+  ""config"": {
+    ""create"": {
+      ""addressLevelTypes"": [
+        {
+          ""name"": ""State"",
+          ""level"": 3.0,
+          ""parentId"": null,
+          ""voided"": false
+        }
+      ]
+    },
+    ""update"": {
+      ""users"": [
+        {
+          ""name"": ""acha""
+        }
+      ]
+    }
+  },
+  ""next_step"": ""Let's create locations now to populate your location hierarchy.""
+}
+```
+
+This configuration will set up the ""State"" location type for you. Would you like to proceed with creating locations next?",10755,257,8.01487908186391,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769687981,10755,257,11012,0.037801,USD,3.851,7.884,0.025
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,399ed3c9-2030-4f9a-a233-5a38026f2d04,achtest,Dev,acha,Yes you can processed with creating location,"Great! Let's proceed with creating the ""State"" location type configuration for you. Here's what will be set up:
+
+- **Name**: State
+- **Level**: 3.0
+- **Parent**: None
+
+I'll generate the configuration for you:
+
+```json
+{
+  ""response"": ""The 'State' location type has been created with Level 3.0 and no parent."",
+  ""config"": {
+    ""create"": {
+      ""addressLevelTypes"": [
+        {
+          ""name"": ""State"",
+          ""level"": 3.0,
+          ""parentId"": null,
+          ""voided"": false
+        }
+      ]
+    },
+    ""update"": {
+      ""users"": [
+        {
+          ""name"": ""acha""
+        }
+      ]
+    }
+  },
+  ""next_step"": ""Let's create locations now to populate your location hierarchy.""
+}
+```
+
+This configuration will set up the ""State"" location type for you. Would you like to proceed with creating locations next?",10907,259,11.116248111706227,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769688049,10907,259,11166,0.0389017,USD,4.9,10.92,0.024
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,0bf5ef39-eb14-456d-9e74-ce1d01f4e18b,achtest,Dev,acha,Yes you can processed with creating location,"Great! Let's move on to creating the actual locations within your ""State"" location type. 
+
+Could you please provide the names of the states you would like to create? For example, Karnataka, Maharashtra, etc.",11356,95,13.463381851091981,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769743761,11356,95,11451,0.0375858,USD,7.561,13.325,0.004
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,68e47be2-0055-4885-a2bf-87f25c3df5d3,achtest,Dev,acha,Maharashtra,"Thank you for providing the state name. Let's proceed with creating the location for ""Maharashtra"" under the ""State"" location type.
+
+Here's what we will set up:
+
+- **Location Name**: Maharashtra
+- **Level**: 3 (matching the ""State"" level)
+- **Type**: State
+- **Parent**: None (since it's a top-level location)
+
+I'll generate the configuration for you:
+
+```json
+{
+  ""response"": ""The location 'Maharashtra' has been created under the 'State' location type."",
+  ""config"": {
+    ""create"": {
+      ""locations"": [
+        {
+          ""name"": ""Maharashtra"",
+          ""level"": 3,
+          ""type"": ""State"",
+          ""parents"": []
+        }
+      ]
+    },
+    ""update"": {
+      ""users"": [
+        {
+          ""name"": ""acha""
+        }
+      ]
+    }
+  },
+  ""next_step"": ""Now let's define catchments if needed, or proceed to create subject types.""
+}
+```
+
+This configuration will set up the ""Maharashtra"" location for you. Would you like to proceed with defining catchments, or move on to creating subject types?",13326,299,14.96948764193803,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769743970,13326,299,13625,0.0412079,USD,9.113,14.801,0.023
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,69b5725b-4dad-41b4-a99a-c1c93f98fe38,achtest,Dev,acha,Yes you can processed ,"It seems like you're ready to proceed with the next steps. Since we've created the ""Maharashtra"" location, let's decide on the next part of your configuration.
+
+Would you like to set up catchments, which are groups of locations for field workers, or would you prefer to move on to defining the people or things you want to track over time (subject types)? Please let me know your preference.",11757,137,10.75566625688225,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769744034,11757,137,11894,0.0397412,USD,5.111000000000001,10.591,0.007
+2af97a67-90b1-4a9f-bce4-7da937c1b2f1,10ed37f0-1dda-4e53-8f64-a565af25644f,achtest,Dev,acha,how to publish form,"To publish a form in Avni, follow these steps:
+
+1. **Navigate to the Form Designer**: Go to the section where you can design or edit forms within the Avni system.
+
+2. **Select the Form**: Choose the form you want to publish from the list of available forms.
+
+3. **Review the Form**: Ensure that all the fields and configurations are correctly set up. Make any necessary adjustments before publishing.
+
+4. **Publish the Form**: Look for a ""Publish"" button or option within the form designer interface. Click on it to publish the form.
+
+5. **Sync the Changes**: Once the form is published, ensure that field users sync their devices to receive the latest version of the form.
+
+By following these steps, the form will be available to field users after they sync their devices. If you need further assistance, feel free to ask!",6718,234,9.621564145199955,api,06f680ac-2d37-45aa-b5c7-8813f8ff0236,normal,1769959024,6718,234,6952,0.0143424,USD,4.984,6.166,3.336
+3c25dcf8-12d3-4ea6-899d-f4f54cd666dc,e1ad44a7-b39b-4735-a606-db8a578e9c21,,,,What are visit scheduling capabilities in avni?,"Avni supports scheduling visits in advance using the visit schedule rule. You can configure the rule logic to set up seasonal or recurring visits, such as annual surveys, quarterly check-ins, or any other periodic follow-up. Avni evaluates how to create a visit based on the visit schedules returned. If there's already a scheduled visit for a given encounter type, it updates it with the incoming scheduled visit's details. This system also allows for modeling workflows where visits reduce over time, such as scheduling more frequent visits for babies and less frequent ones for older children.",3441,163,7.358968480955809,api,c0b14b8d-8392-4fcb-8726-676e90124533,normal,1769503316,3441,163,3604,0.0049964,USD,2.993,4.596,2.541
+3c25dcf8-12d3-4ea6-899d-f4f54cd666dc,b461b092-0ffd-4bcc-93a6-4bc1245e1649,,,,"No, i meant what businesss capabilities around case management does it support?","Avni offers several advanced business capabilities around case management, including:
+
+1. **Advanced Case Management Features**: Avni provides robust tools for managing cases, allowing users to track and manage individual cases effectively.
+
+2. **Customizable Decision Support Algorithms**: Users can tailor decision support algorithms to fit specific program needs, enhancing decision-making processes.
+
+3. **Multi-language Support**: Avni supports multiple languages, making it accessible to a diverse user base.
+
+4. **Offline Capabilities**: Users can access and manage cases even without an internet connection, ensuring continuity in data collection and management.
+
+5. **Full Control Over Data**: Users have complete control over their data, which is crucial for privacy and security.
+
+6. **High Level of Security/Privacy**: Avni ensures that data is secure and private, meeting high standards of data protection.
+
+7. **Open-source Flexibility**: Being fully open-source, Avni is more flexible and cost-effective compared to many proprietary competitors.
+
+These capabilities make Avni a powerful tool for managing cases efficiently and effectively.",3786,270,8.084929042030126,api,c0b14b8d-8392-4fcb-8726-676e90124533,normal,1769503369,3786,270,4056,0.0074489,USD,5.016,4.292,3.696
+8f209216-b7e9-444b-b45a-1dd5390cdcbc,458f799e-9617-40ed-8936-b1f1bf36974a,JSSCP,Production,Nupoor khandelwal,hi,,2487,68,8.406696411781013,api,ee0b185c-7c33-45a5-8b3b-5e0580b5dfc3,normal,1769169701,2487,68,2555,0.0004139,USD,3.882,2.548,1.334
+69165cff-e4e3-49f3-bbce-69bc033e545a,5578794c-2271-409c-8346-b92957c5d0a3,,,Achala,hi,Hello Achala! How can I assist you today with the Avni system?,2694,88,7.286168415099382,api,b958d471-305f-4a6c-8e80-836ffa98cd3f,normal,1768980368,2694,88,2782,0.0016913,USD,2.856,7.174,0.002
+69165cff-e4e3-49f3-bbce-69bc033e545a,00a000b9-b7ca-4036-97d8-dbae8fe8cca4,,,Achala,is admin user having access of data enrty app,"Yes, an admin user can access the Data Entry App. They can view and enter data directly through the app. However, their ability to create or update entities will be subject to the sync settings configured for their access.",3435,95,13.477896922267973,api,b958d471-305f-4a6c-8e80-836ffa98cd3f,normal,1768980435,3435,95,3530,0.0039946,USD,4.82,12.693,0.683
+69165cff-e4e3-49f3-bbce-69bc033e545a,5c29b83e-6421-4c49-9329-774275b5886b,,,Achala,create location,"To create a location, we first need to define the hierarchy of geographic areas, known as Address Level Types. These define the structure of your locations, such as State, District, Block, and Village.
+
+Could you please tell me the hierarchy levels you want to use for your locations? For example, do you want to organize them by State, District, and Village?",8967,122,7.682415343821049,api,b958d471-305f-4a6c-8e80-836ffa98cd3f,normal,1769683961,8967,122,9089,0.0320689,USD,3.7190000000000003,7.496,0.007
+69165cff-e4e3-49f3-bbce-69bc033e545a,ee540ab9-9c7f-4884-a39b-bfa9816d8679,,,Achala,carete state,"To create a state, we first need to define the Address Level Type for it. Typically, a state would be at a higher level in the hierarchy.
+
+Could you confirm if you want ""State"" to be the top level in your location hierarchy? If there are other levels, such as District or Village, please let me know their order as well.",8868,128,11.80161813274026,api,b958d471-305f-4a6c-8e80-836ffa98cd3f,normal,1769685031,8868,128,8996,0.0324267,USD,5.981,11.684,0.006
+69165cff-e4e3-49f3-bbce-69bc033e545a,d6c9d1b2-88ea-48bb-8a6f-ff4fe62cb3a9,,,Achala,how to enable calling,"To enable calling in Avni, you need to configure the contact number in your implementation. Here's how you can do it:
+
+1. **Configure Contact Number**: Ensure that a contact number is configured through concept attributes in your implementation. This will allow the ""Call"" button to appear on the subject's dashboard.
+
+2. **Enable Call Masking (Optional)**: If you want to use the call masking feature, you need to:
+   - Purchase an Exophone.
+   - Configure this Exophone in Avni by adding a row to the `external_api` table.
+   - Enable the call masking feature through user settings.
+
+3. **User Settings**: There is a toggle in user settings to turn the call masking feature on or off. Make sure this is set according to your preference.
+
+Once these steps are completed, users will be able to make calls directly or through the Exotel Masked Call feature, depending on the configuration.",3886,241,11.892985201906413,api,b958d471-305f-4a6c-8e80-836ffa98cd3f,normal,1769762893,3886,241,4127,0.0073096,USD,6.698,8.284,3.467
+69165cff-e4e3-49f3-bbce-69bc033e545a,59083349-090a-43dd-97b3-35fafc28411a,,,Achala,ion,This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.,2967,83,7.403865986969322,api,b958d471-305f-4a6c-8e80-836ffa98cd3f,normal,1770141535,2967,83,3050,0.0004949,USD,2.97,7.227,0.0
+69165cff-e4e3-49f3-bbce-69bc033e545a,621938b2-71d7-420f-9d20-9c9f0f74a545,,,Achala,location,"To manage locations in Avni, you need to follow these steps:
+
+1. **Define Location Types**: Before adding locations, define the hierarchy of location types (e.g., State, District, Village) through the [Location Types menu](#/admin/addressLevelType).
+
+2. **Add Locations**: Once the location types are defined, you can add locations manually or in bulk:
+   - **Manually**: Add each location through the user interface by navigating to the appropriate section.
+   - **Bulk Upload**: Use the [upload screen](#/admin/upload) to upload multiple locations at once. This method automatically creates location types if they don't already exist.
+
+3. **Associate Locations with Subjects**: Ensure that all subjects are associated with the appropriate locations. The field app requires you to provide this location to the lowest level available in the system.
+
+4. **Location Concepts**: Utilize location concepts to support hierarchical location selection and configure attributes like ""Within Catchment,"" ""Lowest Level(s),"" and ""Highest Level"" to control how locations are captured and selected.
+
+If you need further assistance with any specific step, feel free to ask!",4436,310,12.414274617098272,api,b958d471-305f-4a6c-8e80-836ffa98cd3f,normal,1770141565,4436,310,4746,0.0093334,USD,9.408999999999999,5.898,6.386
+1eced8bf-0db9-4ab9-9ba9-a9acede504cb,51ace73b-208d-4edf-b2dc-63512f266a58,,,admin1,goonj,This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.,2717,50,8.385208937106654,api,64957f87-e7e7-439f-b2e4-c04368fc1a3f,normal,1765535009,2717,50,2767,0.0004376,USD,2.944,4.276,0.0
+82691634-4ff1-4adf-ae30-1267b85b1e74,eb43ffa9-73ff-49d2-810e-e7225f168294,,,admin1,irudala,This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.,2556,48,3.647137511987239,api,64957f87-e7e7-439f-b2e4-c04368fc1a3f,normal,1765534655,2556,48,2604,0.0004122,USD,1.436,3.52,0.0
+076cb01c-5078-45dd-b7ec-3a01c4f2fa6d,35dcb46a-80a1-49bb-ba4d-06377168fa67,,,admin1,hwini,,0,0,0.0,api,64957f87-e7e7-439f-b2e4-c04368fc1a3f,normal,1765449569,,,,,,,,
+49057aa7-e79c-4573-8125-502892aa4fed,8d9dca0d-d8e9-4d15-83e1-18ecc4a68837,maha16_5,Trial,maha,hi,"Hello maha, how can I assist you today with Avni?",2696,86,6.359015630994691,api,c3eaee2e-5b65-4c31-b2db-359a9be2d6d3,normal,1764305427,2696,86,2782,0.0016569,USD,3.7880000000000003,6.118,0.093
+e33256ca-d557-45d8-8cf7-16bc83d18746,fffd6928-ecba-48be-b61a-ec9b88701a07,,,admin1,edh,,0,0,0.0,api,64957f87-e7e7-439f-b2e4-c04368fc1a3f,normal,1764226361,,,,,,,,
+a269ea72-4a2b-4414-bd75-a97b7b38898f,f9d52dfe-520a-4cb0-9d96-734e03ecd610,maha16_2,Trial,maha,Create a new Encounter Type Service Followup..,"To create a new type of visit or interaction, let's first clarify a few details:
+
+1. Is this ""Service Followup"" interaction part of a structured program, or is it a standalone interaction not tied to any program? 
+
+This will help us determine whether it should be a ""Program Encounter"" or a ""General Encounter.""",9134,116,13.089758762012934,api,84ce8e63-1f31-49e3-b603-7755e9ae3858,normal,1764223797,9134,116,9250,0.0315823,USD,4.5489999999999995,12.422,0.643
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,4a2137b7-49bc-4785-8ccb-5c3978b3970c,maha16_5,Trial,maha,can you create the subject type test ind and individual ,"Maha, before we proceed with creating the subject types ""test ind"" and ""individual,"" could you please confirm if these are new entities you want to track over time? If they are, we can proceed with setting them up. If they already exist, we can focus on any additional configurations you might need. Let me know!",9128,118,7.406105925998418,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764217631,9128,118,9246,0.0316018,USD,4.337,7.001,0.383
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,a4792d00-4eae-4453-83fe-33cf8f3b8dcd,maha16_5,Trial,maha,new entities,"Great! Since ""test ind"" and ""individual"" are new entities you want to track, let's proceed with setting them up. 
+
+Could you please specify if these entities are living entities (like people) or non-living entities (like equipment or resources)? This will help us determine the appropriate settings for each subject type.",9144,113,7.332380968990037,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764217696,9144,113,9257,0.0319507,USD,3.303,6.885,0.421
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,fb228aa5-29a0-44a9-b2a3-438972159fca,maha16_5,Trial,maha,like people ,"Thank you for clarifying, Maha. Since both ""test ind"" and ""individual"" are living entities, we'll set them up as subject types for people. 
+
+Now, let's define some basic attributes for these subject types. Would you like to include any specific attributes such as middle name, last name, or profile picture for these entities? Let me know your preferences!",9207,124,6.86140585000976,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764217762,9207,124,9331,0.0324601,USD,3.503,6.33,0.509
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,99b4d444-c2f6-46fe-b8b6-9b531c145d02,maha16_5,Trial,maha,no specific attributes ,"Thank you for the information, Maha. Since there are no specific attributes you want to include, we'll proceed with the default settings for these subject types.
+
+Here's a quick summary of what we'll set up for both ""test ind"" and ""individual"":
+- They will be set up as living entities (people).
+- No additional attributes like middle name, last name, or profile picture will be included.
+
+Would you like me to automatically create this configuration for you, or would you prefer step-by-step navigation instructions to do it yourself in Avni?",9246,158,8.182132835994707,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764217820,9246,158,9404,0.0333931,USD,3.9000000000000004,7.207,0.954
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,1a66bc2b-bf5c-4922-8c9f-8eead6b06e53,maha16_5,Trial,maha,u can create it ,"Great, Maha! I'll proceed with creating the configuration for the subject types ""test ind"" and ""individual"" for you. Here's what will be set up:
+
+- Two new subject types: ""test ind"" and ""individual""
+- Both will be configured as living entities (people) with default settings
+
+Let me generate the configuration for you:
+
+```json
+{
+  ""config"": {
+    ""create"": {
+      ""subjectTypes"": [
+        {
+          ""name"": ""test ind"",
+          ""uuid"": ""generate-v4-uuid"",
+          ""type"": ""Person"",
+          ""active"": true,
+          ""voided"": false,
+          ""group"": false,
+          ""household"": false,
+          ""allowEmptyLocation"": true,
+          ""allowMiddleName"": false,
+          ""lastNameOptional"": false,
+          ""allowProfilePicture"": false,
+          ""uniqueName"": false,
+          ""directlyAssignable"": false,
+          ""shouldSyncByLocation"": true,
+          ""settings"": {
+            ""displayRegistrationDetails"": true,
+            ""displayPlannedEncounters"": true
+          },
+          ""groupRoles"": [],
+          ""registrationFormUuid"": null
+        },
+        {
+          ""name"": ""individual"",
+          ""uuid"": ""generate-v4-uuid"",
+          ""type"": ""Person"",
+          ""active"": true,
+          ""voided"": false,
+          ""group"": false,
+          ""household"": false,
+          ""allowEmptyLocation"": true,
+          ""allowMiddleName"": false,
+          ""lastNameOptional"": false,
+          ""allowProfilePicture"": false,
+          ""uniqueName"": false,
+          ""directlyAssignable"": false,
+          ""shouldSyncByLocation"": true,
+          ""settings"": {
+            ""displayRegistrationDetails"": true,
+            ""displayPlannedEncounters"": true
+          },
+          ""groupRoles"": [],
+          ""registrationFormUuid"": null
+        }
+      ]
+    },
+    ""update"": {
+      ""users"": [
+        {
+          ""name"": ""maha""
+        }
+      ]
+    }
+  }
+}
+```
+
+This configuration will create the subject types ""test ind"" and ""individual"" with the specified settings. If you're happy with this setup, I'll proceed with the creation. Let me know!",9343,511,13.212195144995349,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764217841,9343,511,9854,0.0393039,USD,7.0009999999999994,9.048,4.143
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,1a3a02ac-0902-4292-aec4-4a745c272cad,maha16_5,Trial,maha,u can create it ,"It looks like you're ready for me to proceed with creating the configuration for the subject types ""test ind"" and ""individual."" I'll go ahead and finalize this setup for you.
+
+Here's the configuration that will be implemented:
+
+- Two new subject types: ""test ind"" and ""individual""
+- Both configured as living entities (people) with default settings
+
+```json
+{
+  ""config"": {
+    ""create"": {
+      ""subjectTypes"": [
+        {
+          ""name"": ""test ind"",
+          ""uuid"": ""generate-v4-uuid"",
+          ""type"": ""Person"",
+          ""active"": true,
+          ""voided"": false,
+          ""group"": false,
+          ""household"": false,
+          ""allowEmptyLocation"": true,
+          ""allowMiddleName"": false,
+          ""lastNameOptional"": false,
+          ""allowProfilePicture"": false,
+          ""uniqueName"": false,
+          ""directlyAssignable"": false,
+          ""shouldSyncByLocation"": true,
+          ""settings"": {
+            ""displayRegistrationDetails"": true,
+            ""displayPlannedEncounters"": true
+          },
+          ""groupRoles"": [],
+          ""registrationFormUuid"": null
+        },
+        {
+          ""name"": ""individual"",
+          ""uuid"": ""generate-v4-uuid"",
+          ""type"": ""Person"",
+          ""active"": true,
+          ""voided"": false,
+          ""group"": false,
+          ""household"": false,
+          ""allowEmptyLocation"": true,
+          ""allowMiddleName"": false,
+          ""lastNameOptional"": false,
+          ""allowProfilePicture"": false,
+          ""uniqueName"": false,
+          ""directlyAssignable"": false,
+          ""shouldSyncByLocation"": true,
+          ""settings"": {
+            ""displayRegistrationDetails"": true,
+            ""displayPlannedEncounters"": true
+          },
+          ""groupRoles"": [],
+          ""registrationFormUuid"": null
+        }
+      ]
+    },
+    ""update"": {
+      ""users"": [
+        {
+          ""name"": ""maha""
+        }
+      ]
+    }
+  }
+}
+```
+
+This configuration will be created for you. If you have any further questions or need additional configurations, feel free to let me know!",10298,502,9.52650549999089,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764217914,10298,502,10800,0.0416015,USD,5.507,7.116,2.39
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,49b87af0-6e4c-447b-b5a7-f2786cc1e873,maha16_5,Trial,maha,can you apply the template ,"Maha, could you please clarify which template you are referring to? Are you looking to apply a specific configuration template to your current setup, or is there a particular aspect of the configuration you want to adjust using a template? Let me know so I can assist you better!",11376,104,6.999331081984565,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764218549,11376,104,11480,0.0380677,USD,3.4749999999999996,6.395,0.578
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,9b38c1d2-a6fa-4b0c-bad7-ccb123ee22a4,maha16_5,Trial,maha,specific configuration templates ,"Maha, it seems like you're interested in applying specific configuration templates to your setup. Could you please provide more details on what kind of template or configuration you're looking to apply? For example, are you looking to set up a specific program, encounter type, or another aspect of your configuration? Let me know so I can guide you accordingly!",11611,117,6.087099883006886,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764218612,11611,117,11728,0.0386229,USD,2.9459999999999997,5.432,0.629
+2a0c9d3f-22b4-495f-bc04-a5fe1498232a,fe4e7920-d354-44fc-98dd-af8d0ec0106b,maha16_5,Trial,maha,i want to applu slit excavation program template ,"Maha, it sounds like you're interested in applying a ""slit excavation program"" template to your configuration. Let's start by understanding the key components of this program. 
+
+Could you please provide some details about the slit excavation program? Specifically:
+1. What are the main activities or interventions involved in this program?
+2. Are there any specific types of visits or data collection activities that occur within this program?
+3. Is there a particular group of people or entities that will be participating in this program?
+
+These details will help us tailor the configuration to fit your needs.",11956,163,7.89524015202187,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764218669,11956,163,12119,0.0397673,USD,4.6419999999999995,7.31,0.565
+6e504a07-1fcc-434e-a41b-02e939be6f28,b0fb6a8b-093e-430b-a714-d6e2a311c93c,APF Odisha UAT ,UAT,Dinesh,can you create the user ,"Dinesh, I can help you with creating configurations related to location types, locations, subject types, programs, and encounters. However, creating users is not part of the configuration capabilities I can assist with. 
+
+If you need to create a user, you might want to check the user management section in your Avni platform or consult the Avni documentation for guidance on user creation. 
+
+If you have any other configuration needs or questions, feel free to let me know!",9466,144,7.448713588993996,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764216451,9466,144,9610,0.0320907,USD,3.5309999999999997,6.791,0.634
+6e504a07-1fcc-434e-a41b-02e939be6f28,7c102612-38d5-4753-93cb-ec4d7d28113e,APF Odisha UAT ,UAT,Dinesh,can you create the subject type individual and name is test ind,"Dinesh, before we proceed with creating the subject type ""Individual"" with the name ""Test Ind"", let's confirm a few details:
+
+1. Is ""Test Ind"" a new type of person or thing you want to track over time?
+2. Do you have any specific attributes or information you want to collect for ""Test Ind"" during registration?
+
+Once we have this information, we can proceed with the configuration. Let me know your thoughts!",9363,141,5.938796798989642,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764216549,9363,141,9504,0.0325641,USD,3.535,5.372,0.546
+6e504a07-1fcc-434e-a41b-02e939be6f28,749230ab-d565-4d23-a4b8-94b2c4e711ca,APF Odisha UAT ,UAT,Dinesh,no specific iformation ,"Thank you for confirming, Dinesh. Since there are no specific attributes to collect for ""Test Ind,"" we can proceed with creating this subject type as a basic entity.
+
+Would you like me to automatically create this configuration for you, or would you prefer step-by-step navigation instructions to do it yourself in Avni? Please let me know which approach you'd prefer.",8973,123,7.465598056995077,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764216609,8973,123,9096,0.0327495,USD,2.98,6.807,0.611
+6e504a07-1fcc-434e-a41b-02e939be6f28,167079a0-ea0e-4c19-9ed2-8f7ee05bce10,APF Odisha UAT ,UAT,Dinesh,u can create it ,"Dinesh, since your organization type is UAT, we do not support automatic configurations for this type. However, I can guide you through the process of creating the subject type ""Individual"" with the name ""Test Ind"" manually.
+
+Here's how you can do it:
+
+1. Go to the **App Designer section** on the homepage.
+2. Click on **Subject Types** in the left sidebar.
+3. Create a new subject type with the name ""Test Ind"" and select ""Individual"" as the type.
+
+Let me know if you need further assistance or if there's anything else you'd like to configure!",9227,171,7.893299073009985,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764216640,9227,171,9398,0.0339535,USD,3.8930000000000002,7.072,0.797
+b6956a38-2ac0-43c9-8c80-a96016f160a0,04b14023-cabb-424a-859d-c9cdda950fac,APF Odisha,Production,Dinesh G,can you create the subject type ,"Dinesh G, before we proceed with creating a subject type, could you please let me know what kind of people or things you want to track over time? For example, are you looking to track individuals like farmers or patients, or perhaps non-living entities like machines or work orders? This will help us define the subject type accurately.",9460,120,7.94263162399875,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215612,9460,120,9580,0.0317156,USD,4.532,7.493,0.427
+b6956a38-2ac0-43c9-8c80-a96016f160a0,0d786d94-94b3-4ebc-a611-b1ada1ec0aa3,APF Odisha,Production,Dinesh G,Individual subject type and name should be test ind,"Thank you for providing that information, Dinesh G. To create the subject type ""Test Ind"" for tracking individuals, could you please confirm if there are any specific attributes or details you would like to collect for each individual? For example, do you need to track their age, gender, or any other specific information?",9841,113,8.059408636996523,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215645,9841,113,9954,0.0321329,USD,5.099,7.645,0.393
+b6956a38-2ac0-43c9-8c80-a96016f160a0,6b242d6f-55a3-49b1-94ff-48b3916fa15b,APF Odisha,Production,Dinesh G,no specific information right now ,"Got it, Dinesh G. We'll proceed with creating a basic subject type for ""Test Ind"" without any specific attributes for now. 
+
+Would you like me to automatically create this configuration for you, or would you prefer step-by-step navigation instructions to do it yourself in Avni? Please let me know which approach you'd prefer.",8993,115,9.9100326540065,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215676,8993,115,9108,0.032414,USD,6.779999999999999,9.492,0.396
+b6956a38-2ac0-43c9-8c80-a96016f160a0,ca4a1e26-f0ad-4b3e-b6ab-210efc56795e,APF Odisha,Production,Dinesh G,u can create it ,"Since your organization type is ""Production,"" we do not support automatic configurations for your organization type. However, I can guide you through the process of creating the subject type manually.
+
+Here's how you can do it:
+
+1. **Go to the App Designer section**: Click the home icon (top right) to go back to the homepage, then click on ""App Designer.""
+
+2. **Create the Subject Type**: In the App Designer, click on ""Subject Types"" in the left sidebar. Here, you can create a new subject type named ""Test Ind.""
+
+3. **Set the Details**: Enter ""Test Ind"" as the name and select ""Individual"" as the type. Since there are no specific attributes to add right now, you can proceed with the default settings.
+
+4. **Save the Configuration**: Once you've entered the details, save the configuration.
+
+Let me know if you need any further assistance or if you have completed this step!",9111,242,10.862691140006064,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215697,9111,242,9353,0.0347103,USD,5.62,9.531,1.309
+b6956a38-2ac0-43c9-8c80-a96016f160a0,8c076035-29e5-47c8-9485-1b18083e554d,APF Odisha,Production,Dinesh G,can you delete the subject type household ,"Dinesh G, before proceeding with the deletion, I want to confirm if you want to delete only the subject type ""Household"" or if there are any other configurations you would like to delete as well. Please let me know your preference.",10138,98,7.187674282002263,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215777,10138,98,10236,0.0337324,USD,2.747,6.816,0.294
+b6956a38-2ac0-43c9-8c80-a96016f160a0,43373106-51c9-4043-9320-0f65ad7b0489,APF Odisha,Production,Dinesh G,household alone ,"Thank you for clarifying, Dinesh G. We'll proceed with deleting only the subject type ""Household.""
+
+Since your organization type is ""Production,"" we do not support automatic configurations for your organization type. However, I can guide you through the process of deleting the subject type manually.
+
+Here's how you can do it:
+
+1. **Go to the App Designer section**: Click the home icon (top right) to go back to the homepage, then click on ""App Designer.""
+
+2. **Access Subject Types**: In the App Designer, click on ""Subject Types"" in the left sidebar.
+
+3. **Find and Delete ""Household""**: Locate the subject type named ""Household"" in the list. Click on it to open the details, and then look for the option to delete or void the subject type.
+
+4. **Confirm Deletion**: Follow the prompts to confirm the deletion of the ""Household"" subject type.
+
+Let me know if you need any further assistance or if you have completed this step!",9891,258,8.132130373996915,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215798,9891,258,10149,0.0363912,USD,3.5519999999999996,6.409,1.702
+b6956a38-2ac0-43c9-8c80-a96016f160a0,50ff42dd-80cf-4614-8a01-8f76836ce270,APF Odisha,Production,Dinesh G,can you create the concept name as test text and datatype is text ,"Dinesh G, it seems like you're looking to create a concept with the name ""Test Text"" and a data type of ""text."" However, I want to clarify that creating concepts is not part of the configuration elements I can assist with directly, as it involves more technical aspects of Avni's system.
+
+For creating concepts, you would typically need to access the concept dictionary in Avni, where you can define new concepts and specify their data types.
+
+Here's a general guide on how you might do this:
+
+1. **Access the Concept Dictionary**: In Avni, navigate to the section where concepts are managed. This is usually found in the admin or configuration settings.
+
+2. **Create a New Concept**: Look for an option to add or create a new concept.
+
+3. **Define the Concept**: Enter ""Test Text"" as the name of the concept and select ""text"" as the data type.
+
+4. **Save the Concept**: Once you've entered the necessary details, save the new concept.
+
+If you need further assistance with this process, I recommend consulting the Avni documentation or reaching out to the Avni support team for more detailed guidance. Let me know if there's anything else I can help with!",11310,296,9.897245274012676,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215833,11310,296,11606,0.0383041,USD,5.981,8.116,1.729
+b6956a38-2ac0-43c9-8c80-a96016f160a0,fa5e3943-cf1c-4ba6-929c-d750048b8bb7,APF Odisha,Production,Dinesh G,can you create it ,"Dinesh G, just to clarify, are you referring to creating the subject type ""Test Ind"" that we discussed earlier? If so, please remember that since your organization type is ""Production,"" we do not support automatic configurations for your organization type. However, I can guide you through the process of creating it manually.
+
+If you meant something else by ""create it,"" please let me know so I can assist you accordingly!",10637,132,6.269534791004844,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215869,10637,132,10769,0.0370378,USD,2.843,5.307,0.937
+b6956a38-2ac0-43c9-8c80-a96016f160a0,51dbe70f-1402-49ef-ac47-33a4717f95b7,APF Odisha,Production,Dinesh G,create the concept named test text and datatype is text ,"Dinesh G, I understand you're looking to create a concept named ""Test Text"" with a data type of ""text."" However, as mentioned earlier, creating concepts is not part of the configuration elements I can assist with directly, as it involves more technical aspects of Avni's system.
+
+For creating concepts, you would typically need to access the concept dictionary in Avni, where you can define new concepts and specify their data types. Unfortunately, I cannot create this for you automatically due to the limitations with your organization type being ""Production.""
+
+Here's a general guide on how you might do this:
+
+1. **Access the Concept Dictionary**: In Avni, navigate to the section where concepts are managed. This is usually found in the admin or configuration settings.
+
+2. **Create a New Concept**: Look for an option to add or create a new concept.
+
+3. **Define the Concept**: Enter ""Test Text"" as the name of the concept and select ""text"" as the data type.
+
+4. **Save the Concept**: Once you've entered the necessary details, save the new concept.
+
+If you need further assistance with this process, I recommend consulting the Avni documentation or reaching out to the Avni support team for more detailed guidance. Let me know if there's anything else I can help with!",12052,314,8.855601449002279,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215913,12052,314,12366,0.0404461,USD,4.435,7.277,1.555
+b6956a38-2ac0-43c9-8c80-a96016f160a0,30b22f8a-e99c-44c1-b55a-e4316493d011,APF Odisha,Production,Dinesh G,can you create the dashboard ,"Dinesh G, creating a dashboard involves setting up visualizations and data displays based on the information you want to track and analyze. However, creating dashboards is not part of the configuration elements I can assist with directly, as it involves more technical aspects of Avni's system.
+
+To create a dashboard, you would typically need to:
+
+1. **Identify Key Metrics**: Determine what data and metrics you want to display on the dashboard.
+
+2. **Access the Dashboard Configuration**: In Avni, navigate to the section where dashboards are managed. This is usually found in the admin or configuration settings.
+
+3. **Create Visualizations**: Use the available tools to create charts, graphs, or tables that represent your data.
+
+4. **Arrange the Dashboard**: Organize the visualizations in a way that makes sense for your analysis and reporting needs.
+
+5. **Save and Share**: Once the dashboard is set up, save it and share it with relevant stakeholders.
+
+If you need further assistance with this process, I recommend consulting the Avni documentation or reaching out to the Avni support team for more detailed guidance. Let me know if there's anything else I can help with!",11682,284,8.937324472994078,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215939,11682,284,11966,0.0413369,USD,4.590999999999999,7.437,1.441
+b6956a38-2ac0-43c9-8c80-a96016f160a0,d6d5e4cc-9361-4de5-92c8-006ab2dc8f05,APF Odisha,Production,Dinesh G,as part of configuration what u can do ,"Dinesh G, as part of the configuration process in Avni, I can assist you with the following elements:
+
+1. **Location Hierarchy**: Define the hierarchical structure of geographic areas, such as State, District, Block, and Village.
+
+2. **Locations**: Create actual geographic places within your hierarchy, like Karnataka state, Bangalore district, and Koramangala village.
+
+3. **Catchments**: Set up groups of locations for field workers, allowing you to assign specific areas to them.
+
+4. **Subject Types**: Define the core entities you want to track over time, such as individuals, households, machines, or work orders.
+
+5. **Programs**: Create structured interventions or workflows that subjects enroll into and exit from, like training programs or health programs.
+
+6. **Encounters**: Set up visits or data collection points, either as part of a program (Program Encounters) or standalone (General Encounters).
+
+I can guide you through the process of setting up these configurations manually, or if your organization type were ""Trial,"" I could assist with automatic creation. Since your organization type is ""Production,"" I can provide step-by-step navigation instructions to help you set up these configurations in Avni.
+
+Please let me know which specific area you'd like to focus on, and I can guide you through the process!",12095,318,11.627229164994787,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764215976,12095,318,12413,0.0431312,USD,6.652,9.558,2.047
+b6956a38-2ac0-43c9-8c80-a96016f160a0,e050deab-cfe8-4273-beeb-ce3f35f6be39,APF Odisha,Production,Dinesh G,can you consider the org as trial and proceed with the configuration ,"Dinesh G, I understand you're asking if we can consider the organization type as ""Trial"" to proceed with the configuration. However, since your organization type is ""Production,"" we must adhere to the guidelines and cannot proceed with automatic configurations.
+
+I can still guide you through the manual setup process for any configuration elements you need. Please let me know which specific area you'd like to focus on, and I'll provide step-by-step instructions to help you set it up in Avni.",12616,149,8.232121562992688,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764216034,12616,149,12765,0.0420042,USD,4.1579999999999995,7.549,0.66
+b6956a38-2ac0-43c9-8c80-a96016f160a0,81061e63-721f-40ed-9524-db03bba43acb,APF Odisha,Production,Dinesh G,can you change the organsiation type to trail ,This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.,5171,56,3.304324232012732,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764216077,5171,56,5227,0.0008093,USD,1.823,3.23,0.0
+b6956a38-2ac0-43c9-8c80-a96016f160a0,54fd2912-c396-4ffa-b8a7-ce011f986a89,APF Odisha,Production,Dinesh G,can you change the organsiation type to trial,This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.,5127,57,4.349416334996931,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764216104,5127,57,5184,0.0008033,USD,2.119,4.252,0.0
+6349f114-d5d6-4b69-b235-0dd1db9840dc,8c6a1ccc-94ea-41b9-bd70-aaf03dedb906,Test din,Training,Dinesh G,can you delete the organisation ,"Dinesh G, when you mention deleting the organization, are you referring to deleting the entire configuration within Avni, including both the admin configuration (location types, locations, catchments) and the app designer configuration (subject types, programs, encounters)? 
+
+Please confirm if you want to delete everything or if there's a specific part of the configuration you want to remove. Note that deleting the admin configuration will also require deleting the app designer configuration since they are dependent.",9089,143,6.1203400529921055,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764152359,9089,143,9232,0.0320145,USD,3.683,5.545,0.53
+6349f114-d5d6-4b69-b235-0dd1db9840dc,5da5593d-848f-4e83-b362-e72a056eb1d0,Test din,Training,Dinesh G,delete everything ,"Deleting everything will remove both the admin configuration (location types, locations, catchments) and the app designer configuration (subject types, programs, encounters) from your Avni setup. This action is irreversible.
+
+Are you sure you want to proceed with deleting everything? Please confirm so I can proceed with the deletion.",9146,109,6.763352854002733,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764152386,9146,109,9255,0.0320606,USD,4.252,6.389,0.355
+6349f114-d5d6-4b69-b235-0dd1db9840dc,fc5d8748-5866-4b96-97bd-1de78a3017b1,Test din,Training,Dinesh G,yes ,"Thank you for confirming, Dinesh G. I will proceed with deleting the entire configuration, including both the admin and app designer configurations.
+
+Here is the configuration for deletion:
+
+```json
+{
+  ""delete"": {
+    ""implementation"": {
+      ""deleteMetadata"": true,
+      ""deleteAdminConfig"": true
+    }
+  }
+}
+```
+
+This will ensure that all configurations are removed. If you have any further questions or need assistance with setting up a new configuration, feel free to ask!",8936,153,10.508009226003196,api,eb8f6d48-a789-4e43-b36c-0a8c3dccf0c3,normal,1764152400,8936,153,9089,0.0329663,USD,8.302999999999999,9.974,0.511
+1c9b668a-4a9f-45fc-91f3-3038d0aba0fb,9c777700-8bcf-4cc9-a58a-c7e3476fcef8,,,Himesh R,locationTypes are wha?,"Location Types are used to classify different geographical locations into categories. For example, ""State,"" ""District,"" and ""City"" are different Location Types. Each Location Type can have a ""Parent"" Location Type, which helps in creating a hierarchy, and a ""Level"" value, which indicates its relative position compared to other Location Types. This hierarchy is used to organize locations systematically within an organization.",3970,132,6.692169103771448,api,31325b52-6d82-4bf6-8939-61be6f267148,normal,1763457369,,,,,,,,
+1c9b668a-4a9f-45fc-91f3-3038d0aba0fb,334fba3a-7d6c-409f-b6a0-9cc0e8acaf6e,,,Himesh R,locationTypes are wha?,"Location Types are used to classify different geographical locations into categories. For example, ""State,"" ""District,"" and ""City"" are different Location Types. Each Location Type can have a ""Parent"" Location Type, which helps in creating a hierarchy, and a ""Level"" value that indicates its relative position compared to others. This hierarchy is used to define the lineage of locations, such as ""State -> District -> City.""",3970,136,6.981903731357306,api,31325b52-6d82-4bf6-8939-61be6f267148,normal,1763457455,,,,,,,,
+e5274754-f598-4070-9672-92748d8e0477,aa4efd1b-be26-4cc9-bc19-5635e78dd248,,,,hi,Hello! How can I assist you today with the Avni system?,2688,82,4.765175160951912,api,c425e1f0-7f52-48ea-b472-42e2584e7751,normal,1763456565,,,,,,,,
+e5274754-f598-4070-9672-92748d8e0477,81c61248-7681-408a-ac37-3f5be33a10e2,,,,Identifiers in Avni,"In Avni, identifiers are used to link different types of data, similar to foreign key linkages in databases. They allow users to connect records across various forms, such as Woman Registration, Pregnancy Program Enrolment, and Ante Natal Visit Form. Users can create unique identifiers for each record, which are used during CSV uploads to match records but are not visible in Avni after uploading.
+
+Identifiers can be generated offline in batches and assigned automatically by the Avni Android app. While Avni supports multiple identifiers for the same subject, it's generally recommended to avoid them unless they are strictly managed to prevent duplication issues.
+
+If you have any specific questions about identifiers or need further assistance, feel free to ask!",4632,190,7.472856604959816,api,c425e1f0-7f52-48ea-b472-42e2584e7751,normal,1763456640,,,,,,,,
+494154c3-6ce5-4b32-8eeb-adefeb38d500,9a33534c-633e-4d81-89c9-f5d2c49c9cf1,,,,go now,This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.,2661,48,5.170496362261474,api,c425e1f0-7f52-48ea-b472-42e2584e7751,normal,1763456350,,,,,,,,
+c9a312d9-e2d0-4fef-bb0c-6a7971307497,bd79fde8-c2e5-4e2d-a862-b98d002589ce,,,,catchment kya hain,"Catchment ek group of locations hain. Ye locations ka group kisi user ya group of users ke operation areas ko alag karne ke liye use hota hain. Catchments ka istemal karke, Avni field app sirf unhi locations ka data sync karti hain jo user ke assigned catchment mein aati hain. Isse data usage aur storage kam hota hain, aur performance improve hoti hain.",3672,140,6.3158081830479205,api,c425e1f0-7f52-48ea-b472-42e2584e7751,normal,1763455897,,,,,,,,
+ff5eff50-e3b3-4075-9c9b-eb7a3234f820,81a15f1e-55c5-4e30-ba80-c19782f85f3d,,,,hi,Hello! How can I assist you today with the Avni system?,2688,82,6.655588890891522,api,2b8241b1-0a58-4e5b-8e98-26ef402bda72,normal,1763455840,,,,,,,,
+59f12e77-d3e8-459f-993e-24953281fa97,c012e573-7dd2-4e72-a886-46a10a069304,Goonj,Production,maha,How do i get started?,"To get started with Avni, you can follow these steps:
+
+1. **Install the Avni Field App**: Download the Avni Field App from the Google Play Store or install it using an APK file. This app is used for data entry and collection in the field and can work offline.
+
+2. **Set Up the Avni Web App**: Use the Avni Web App for administration tasks. This includes configuring the Avni server, setting up master data for locations, hierarchies, and users, and designing program forms. You can also use it for data imports, exports, and data entry.
+
+3. **Utilize Avni Reporting and Dashboard**: Connect to the Avni server to generate custom reports and dashboards. These can be viewed in a web browser or exported as PDFs.
+
+4. **Choose Avni Hosted Service or Local Setup**: Decide whether to use the Avni Hosted Service on the cloud or set up your own local instance of Avni on your server. Avni is open-source, so you have the flexibility to choose.
+
+5. **Configure Your Program**: Consider the data you need to collect and configure your program accordingly. This involves setting up encounter types and forms for each stage of your program.
+
+By following these steps, you can effectively implement your program workflows using Avni. If you have specific questions or need further assistance, feel free to ask!",4070,336,8.549715877976269,api,fe38c803-0e0b-4a0d-b971-8b0190986a62,normal,1763440729,,,,,,,,

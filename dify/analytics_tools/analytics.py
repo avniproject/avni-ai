@@ -5,7 +5,7 @@ from datetime import datetime
 import csv
 
 
-def analyze_real_data(csv_file: str = "messages_cleaned.csv"):
+def analyze_real_data(csv_file: str = "messages_20260225_154435.csv"):
     df = pd.read_csv(csv_file)
     df["created_at"] = pd.to_datetime(df["created_at"], unit="s")
     df["date"] = df["created_at"].dt.date

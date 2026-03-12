@@ -23,15 +23,14 @@ import time
 # =============================================================================
 
 # Authentication tokens (update these with your actual values)
-CSRF_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjQxNTkyNDIsInN1YiI6ImIyODlmZmMwLTNmNTYtNDYxOS05OTE5LTVlYjIxYzFkNjk2YyJ9.JbtKlDG6KS8PlgsHdO3cqjNstFOWF0OJqM5uQdNXJII"
+CSRF_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzIwMTU3MjUsInN1YiI6IjA2N2M3MTRjLTBlYWYtNGVlYy1hOThjLTRhMTYzMGIzZDQxMSJ9.2fxqhRAknbljILklf-nJuazgMfAKiM0kwFrMpM-5GLk"
 
-COOKIES = "cookieyes-consent=consentid:THl1cnRLYVhpZ1dJVUxsMDhpSklMN3JEbTRSUDIzUU8,consent:no,action:,necessary:yes,functional:no,analytics:no,performance:no,advertisement:no,other:no; __Host-csrf_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjQxNTkyNDIsInN1YiI6ImIyODlmZmMwLTNmNTYtNDYxOS05OTE5LTVlYjIxYzFkNjk2YyJ9.JbtKlDG6KS8PlgsHdO3cqjNstFOWF0OJqM5uQdNXJII; __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjI4OWZmYzAtM2Y1Ni00NjE5LTk5MTktNWViMjFjMWQ2OTZjIiwiZXhwIjoxNzY0MTU5MjQyLCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.JeyVq3234-FFS5ZuRrLYMGVhNBvIFbHp59LOdinYVdM; __Host-refresh_token=828209a515330d6528b645c10d47e90f2ba69b77c749ea2ab6b3afb26759080dbb0b9ac21b0f0af9f31b9294f278bef1223f1b8dcbe61d36a82a87d0a5beb379"
+COOKIES = "cookieyes-consent=consentid:bExXS3pFNE9mZkJvWGVjWDJxc29QT2lsZHB5VURNMXE,consent:yes,action:yes,necessary:yes,functional:yes,analytics:yes,performance:yes,advertisement:yes,other:yes; _ga=GA1.1.612065041.1771235992; _ga_HHGQ6GKNCE=GS2.1.s1771237235$o1$g1$t1771238873$j60$l0$h0; AMP_MKTG_83d4855862=JTdCJTdE; __Host-csrf_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzIwMTU3MjUsInN1YiI6IjA2N2M3MTRjLTBlYWYtNGVlYy1hOThjLTRhMTYzMGIzZDQxMSJ9.2fxqhRAknbljILklf-nJuazgMfAKiM0kwFrMpM-5GLk; __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMDY3YzcxNGMtMGVhZi00ZWVjLWE5OGMtNGExNjMwYjNkNDExIiwiZXhwIjoxNzcyMDE1NzI1LCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.DCYU74IfYkBjlPosOK7coB8_kvk8pZuvvp4wuJ2p8XY; __Host-refresh_token=a3652ee9c196452a2ef860a5062799c722715ea35aaddda73bd0e7f98d017a157c02b2f32ddef56e006837b8019f228341c0c9e05668cd82d35d5d0eaca3c169; _ga_L4R9FT3GMD=GS2.1.s1772013968$o8$g1$t1772014360$j59$l0$h0; AMP_83d4855862=JTdCJTIyZGV2aWNlSWQlMjIlM0ElMjIyZWU4Mjk5ZS0wNzIxLTQ1MzMtOWIxYy1iNWNmMmI3MmUzNmIlMjIlMkMlMjJ1c2VySWQlMjIlM0ElMjJhdm5pLWFpJTQwc2FtYW52YXlmb3VuZGF0aW9uLm9yZyUyMiUyQyUyMnNlc3Npb25JZCUyMiUzQTE3NzIwMTM5MjgyMjAlMkMlMjJvcHRPdXQlMjIlM0FmYWxzZSUyQyUyMmxhc3RFdmVudFRpbWUlMjIlM0ExNzcyMDE0MzYwOTUxJTJDJTIybGFzdEV2ZW50SWQlMjIlM0ExNTQlMkMlMjJwYWdlQ291bnRlciUyMiUzQTE2JTdE"
 
-BAGGAGE = "sentry-environment=production,sentry-public_key=c0bcc0e36783694f41e4fb1e6a3efea9,sentry-trace_id=2a09ba8e279f44678d71c11831bab59c,sentry-sample_rate=0.1,sentry-sampled=false"
-
+BAGGAGE = "sentry-environment=production,sentry-public_key=12f61d63153348398b196f99bc2a04c4,sentry-trace_id=ebac605265fd489fad86d21ebd8beeb6,sentry-sample_rate=0.1,sentry-sampled=false"
 # Date range for conversation retrieval
-START_DATE = "2025-08-19 00:00"
-END_DATE = "2025-11-26 23:59"
+START_DATE = "2000-01-01 00:00"
+END_DATE = "2099-12-31 23:59"
 
 # Output settings
 OUTPUT_FORMAT = "csv"  # Options: "csv", "json", "both" - set to csv only
@@ -56,7 +55,7 @@ class DifyDataExtractor:
             cookies: Cookie header value
             baggage: Baggage header value
         """
-        self.base_url = "https://cloud.dify.ai/console/api/apps/31143de1-fbca-4692-9897-badc6a40daff"
+        self.base_url = "https://cloud.dify.ai/console/api/apps/f4d597f0-431a-4444-ad06-d8e9fdba54b7"
         self.headers = {
             "accept": "*/*",
             "accept-language": "en-GB,en;q=0.7",
