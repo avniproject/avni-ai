@@ -55,10 +55,12 @@ The user interacts with a **conversational chat interface inside Avni Webapp**. 
 
 **Phase 1 — Structured spec → Avni app:**
 1. User uploads a structured specification spreadsheet (Excel/CSV) in the chat
-2. AI acknowledges receipt, parses the file, and shows a summary: *"Found 2 subject types, 3 programs, 14 encounter types, 18 forms…"*
-3. AI generates the full app configuration and applies it to the user's organisation
-4. User is told to sync their mobile app or browse App Designer to see the result
-5. User can ask follow-up corrections in chat: *"Rename program X to Y"*, *"Add a field 'Blood Group' to ANC form"* — AI updates and re-applies
+2. AI parses the Modelling sheet, checks for ambiguities (missing program associations, unknown types), and presents a summary: *"Found 1 subject type, 2 programs, 5 encounter types. Issue: Encounter type 'Delivery' has no program associated — please clarify."*
+3. User confirms or corrects via chat; AI resolves ambiguities before proceeding
+4. AI generates entity configuration (subject types, programs, encounter types) and applies it — user sees confirmation: *"Entities are now live in your org."*
+5. AI then parses form sheets, presents per-form summary with inferred properties: *"ANC Form: 14 fields across 3 pages. Inferred: BP Systolic cannot be negative."*
+6. User confirms forms; AI generates and applies form configuration
+7. User can ask follow-up corrections in chat: *"Rename program X to Y"*, *"Add a field 'Blood Group' to ANC form"* — AI updates and re-applies
 
 **Phase 2 — Unstructured requirements → Structured spec → Avni app:**
 1. User uploads raw requirements (PDFs, call notes, free-text Excel)
@@ -141,17 +143,29 @@ Upload Excel/CSV
        │
        ▼
   ┌─────────────────┐
-  │  Spec Parser    │  ← Deterministic: openpyxl reads sheets,
-  │  (rule-based)   │    maps columns to structured data
+  │  Spec Parser    │  ← Deterministic: openpyxl reads sheets;
+  │  (rule-based)   │    produces JSONL (one JSON object per row)
   └────────┬────────┘
-           │ parsed entities, fields, options, conditions
+           │ JSONL rows
+           ▼
+  ┌─────────────────┐
+  │  Ambiguity      │  ← Deterministic: validate completeness,
+  │  Checker        │    flag missing associations, unknown types
+  └────────┬────────┘
+           │ summary + ambiguity report
+           ▼
+  ┌─────────────────┐
+  │  User           │  ← Dify chat: present summary to user,
+  │  Confirmation   │    resolve ambiguities before proceeding
+  └────────┬────────┘
+           │ confirmed JSONL
            ▼
   ┌─────────────────┐
   │  LLM Reasoner   │  ← AI: infers missing properties
   │  (OpenAI)       │    (negative/decimal/future-date flags,
   │                 │     normal ranges, field grouping hints)
   └────────┬────────┘
-           │ enriched spec
+           │ enriched JSONL
            ▼
   ┌─────────────────┐
   │  Bundle         │  ← Deterministic: generates JSON config
@@ -160,7 +174,8 @@ Upload Excel/CSV
            │ JSON assets
            ▼
   ┌─────────────────┐
-  │  Asset Store    │  ← Persist, version, allow updates
+  │  Asset Store    │  ← MongoDB: persist JSONL + bundle JSON,
+  │  (MongoDB)      │    versioned, resumable across restarts
   └────────┬────────┘
            │
            ▼
@@ -169,7 +184,11 @@ Upload Excel/CSV
   └─────────────────┘
 ```
 
-The **LLM Reasoner** step is critical — it addresses the pain point that *"too many form fields have self-evident answers."* For example, given a field named "Number of children delivered" with data type "Numeric", the LLM infers:
+The **JSONL intermediate step** produces one JSON object per row from the Excel, making the parsed data inspectable, storable in MongoDB, and usable as LLM context for reasoning.
+
+The **Ambiguity Checker** runs before the LLM — it flags structural issues (missing program associations, duplicate field names, unknown data types) that must be resolved before generation proceeds.
+
+The **LLM Reasoner** step addresses the pain point that *"too many form fields have self-evident answers."* For example, given a field named "Number of children delivered" with data type "Numeric", the LLM infers:
 - `allowNegativeValue: false` (count cannot be negative)
 - `allowDecimalValue: false` (count must be integer)
 - `lowAbsolute: 0, highAbsolute: 15` (reasonable range)
@@ -224,9 +243,9 @@ Every generated config file is an **asset** — stored, retrievable, updatable, 
 
 | Operation | Description |
 |-----------|-------------|
-| **Generate** | Parse spec → produce JSON config files |
-| **Store** | Persist per organisation/session on filesystem |
-| **Retrieve** | Read back for inspection or LLM context |
+| **Generate** | Parse spec → produce JSONL rows → generate JSON config files |
+| **Store** | Persist JSONL + bundle JSON per org/session in MongoDB (versioned) |
+| **Retrieve** | Read back for inspection or LLM context; resume after restart |
 | **Update** | Modify specific assets (via chat correction or re-parse) |
 | **Bundle** | Assemble all assets into a Metadata ZIP |
 | **Upload** | Push ZIP to avni-server (full bundle or incremental) |
@@ -255,9 +274,12 @@ Each phase produces incremental assets that are added to the store. At any point
 | Decision | Rationale |
 |----------|-----------|
 | **Bundle upload, not individual API calls** | Avni-server's Metadata ZIP import is the production-proven path; handles ordering, upsert, and validation internally |
+| **JSONL as intermediate representation** | One JSON object per Excel row makes parsed data inspectable, storable in MongoDB, and usable as LLM context; separates parsing from generation |
+| **Ambiguity check before generation** | Structural issues (missing program associations, unknown types) are caught and resolved via conversation before any bundle is generated — avoids silent failures |
+| **Iterative confirmation loop** | Entities confirmed first, then forms; user approves each phase before config is applied — matches the delivery manager review workflow |
+| **MongoDB for asset store** | Enables session resume across restarts, versioned history, and LLM context refresh; `motor` async driver fits the FastAPI/asyncio stack |
 | **Deterministic generation + LLM enrichment** (not pure LLM generation) | Config JSON requires exact schemas — LLM hallucinations in JSON structure would cause upload failures; LLM adds value in reasoning about field semantics |
 | **Python port of srs-bundle-generator** (not Node.js subprocess) | Single runtime, easier debugging, same deployment unit as avni-ai service |
-| **Asset store with session persistence** | Enables iterative refinement; user can correct via chat without regenerating everything |
 | **Dify as orchestration layer** | Reuses existing chat infrastructure; intent routing separates file-setup from Q&A flows |
 
 ---
@@ -266,16 +288,17 @@ Each phase produces incremental assets that are added to the store. At any point
 
 ```
 avni-ai service (new modules):
-  ├── Spec Parser          — reads Excel/CSV, extracts structured data
+  ├── Spec Parser          — reads Excel/CSV; produces JSONL (one object per row)
+  ├── Ambiguity Checker    — validates JSONL completeness before generation
   ├── LLM Reasoner         — infers missing field properties, interprets ambiguous specs
-  ├── Bundle Generator      — produces Avni config JSON files (deterministic)
-  ├── Asset Store           — persists/retrieves/updates generated configs
-  ├── Bundle Uploader       — assembles ZIP, uploads to avni-server
-  └── UUID Registry         — standard UUIDs + deterministic generation for stability
+  ├── Bundle Generator     — JSONL → Avni config JSON files (deterministic)
+  ├── Asset Store          — MongoDB: persists/retrieves/versions JSONL + bundle JSON
+  ├── Bundle Uploader      — assembles ZIP, uploads to avni-server
+  └── UUID Registry        — 143 standard UUIDs + deterministic UUID5 generation
 
 Dify (modified):
   ├── Intent classifier     — routes file uploads to FILE_SETUP path
-  └── FILE_SETUP workflow   — orchestrates parse → generate → upload cycle
+  └── FILE_SETUP workflow   — parse → ambiguity check → confirm → generate → upload cycle
 
 Avni Webapp (modified):
   └── Chat UI               — file upload enabled (.xlsx, .csv, .pdf)
