@@ -12,9 +12,9 @@ DEFAULT_DIFY_API_BASE_URL = "https://api.dify.ai/v1"
 class DifyClient:
     def __init__(self, api_key: str):
         self.api_key = api_key
-        self.base_url = (
-            os.getenv("DIFY_API_BASE_URL", DEFAULT_DIFY_API_BASE_URL).rstrip("/")
-        )
+        self.base_url = os.getenv(
+            "DIFY_API_BASE_URL", DEFAULT_DIFY_API_BASE_URL
+        ).rstrip("/")
         self.max_retries = int(os.getenv("DIFY_MAX_RETRIES", "3"))
         self.retry_backoff_seconds = float(os.getenv("DIFY_RETRY_BACKOFF_SECONDS", "2"))
         self.headers = {
@@ -86,7 +86,10 @@ class DifyClient:
                     last_error = f"{last_error} | response={response_snippet}"
                 retryable = self._is_retryable_error(e)
                 logger.error(
-                    "Error calling Dify API (attempt %s/%s): %s", attempt, attempts, last_error
+                    "Error calling Dify API (attempt %s/%s): %s",
+                    attempt,
+                    attempts,
+                    last_error,
                 )
 
                 if not retryable or attempt == attempts:
@@ -140,7 +143,7 @@ class DifyClient:
 
             # SSE lines are either "event: <type>" or "data: <json>"
             if raw_line.startswith("data: "):
-                json_str = raw_line[len("data: "):]
+                json_str = raw_line[len("data: ") :]
                 try:
                     data = _json.loads(json_str)
                 except _json.JSONDecodeError:
@@ -160,9 +163,12 @@ class DifyClient:
 
                 # Check for workflow/message errors
                 if event_type == "error":
-                    error_msg = data.get("message") or data.get("error", "Unknown Dify error")
+                    error_msg = data.get("message") or data.get(
+                        "error", "Unknown Dify error"
+                    )
                     return {
-                        "answer": "".join(answer_parts) or "Sorry, I encountered an error.",
+                        "answer": "".join(answer_parts)
+                        or "Sorry, I encountered an error.",
                         "conversation_id": conversation_id,
                         "message_id": message_id,
                         "success": False,
@@ -208,7 +214,10 @@ class DifyClient:
         ):
             return True
 
-        if isinstance(error, requests.exceptions.HTTPError) and error.response is not None:
+        if (
+            isinstance(error, requests.exceptions.HTTPError)
+            and error.response is not None
+        ):
             # Retry on throttling and transient server failures
             if error.response.status_code in {429, 500, 502, 503, 504}:
                 return True

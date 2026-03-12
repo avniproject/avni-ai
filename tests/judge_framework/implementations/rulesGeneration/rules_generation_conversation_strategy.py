@@ -99,10 +99,18 @@ class RulesGenerationConversationStrategy(ConversationGenerationStrategy):
         already_confirmed = self._already_confirmed(conversation_history)
 
         if self._is_confirmation_request(normalized_response):
-            return self._force_code_reply if already_confirmed else self._confirmation_reply
+            return (
+                self._force_code_reply
+                if already_confirmed
+                else self._confirmation_reply
+            )
 
         if self._looks_like_pre_code_response(normalized_response):
-            return self._force_code_reply if already_confirmed else self._confirmation_reply
+            return (
+                self._force_code_reply
+                if already_confirmed
+                else self._confirmation_reply
+            )
 
         if already_confirmed:
             return self._force_code_reply
@@ -143,7 +151,9 @@ class RulesGenerationConversationStrategy(ConversationGenerationStrategy):
         return text
 
     def _contains_rule_code(self, normalized_response: str) -> bool:
-        return any(pattern in normalized_response for pattern in self._rule_code_patterns)
+        return any(
+            pattern in normalized_response for pattern in self._rule_code_patterns
+        )
 
     @staticmethod
     def _has_scenario_table(normalized_response: str) -> bool:
@@ -179,11 +189,14 @@ class RulesGenerationConversationStrategy(ConversationGenerationStrategy):
             return False
         if self._has_scenario_table(normalized_response):
             return True
-        return any(pattern in normalized_response for pattern in self._pre_code_patterns)
+        return any(
+            pattern in normalized_response for pattern in self._pre_code_patterns
+        )
 
     def _is_terminal_failure(self, normalized_response: str) -> bool:
         return any(
-            pattern in normalized_response for pattern in self._terminal_failure_patterns
+            pattern in normalized_response
+            for pattern in self._terminal_failure_patterns
         )
 
     def _already_confirmed(self, conversation_history: List[Dict[str, Any]]) -> bool:

@@ -353,9 +353,24 @@ EVALUATION INPUT:
     @staticmethod
     def _confirmation_turn_exists(conversation_history: List[Dict[str, Any]]) -> bool:
         _CONFIRMATION_TOKENS = {
-            "yes", "y", "ok", "okay", "proceed", "go ahead", "looks good",
-            "approved", "confirmed", "confirm", "sure", "yep", "yup",
-            "correct", "that's correct", "sounds good", "perfect", "great",
+            "yes",
+            "y",
+            "ok",
+            "okay",
+            "proceed",
+            "go ahead",
+            "looks good",
+            "approved",
+            "confirmed",
+            "confirm",
+            "sure",
+            "yep",
+            "yup",
+            "correct",
+            "that's correct",
+            "sounds good",
+            "perfect",
+            "great",
         }
         # Keywords that indicate a confirmation message containing a code-generation request
         _CONFIRMATION_KEYWORDS = (
@@ -378,7 +393,8 @@ EVALUATION INPUT:
                 return True
             # Short message (≤ 30 chars) that starts with an affirmative
             if len(user_message) <= 30 and any(
-                user_message.startswith(token) for token in ("yes", "ok", "sure", "confirm", "proceed")
+                user_message.startswith(token)
+                for token in ("yes", "ok", "sure", "confirm", "proceed")
             ):
                 return True
             # Longer confirmation message (strategy sends "YES. These scenarios look correct...")

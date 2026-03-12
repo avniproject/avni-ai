@@ -90,10 +90,13 @@ def create_rules_generation_test_config() -> TestConfiguration:
 
         # For cancellation form types, add explicit helper method hints so Dify's
         # RAG retrieves the correct KB chunks instead of falling back to deprecated APIs.
-        if form_type in ("ProgramEncounterCancellation", "IndividualEncounterCancellation"):
+        if form_type in (
+            "ProgramEncounterCancellation",
+            "IndividualEncounterCancellation",
+        ):
             enriched_query += (
-                ". IMPORTANT: Use findCancelEncounterObservationReadableValue(\"Cancellation reason\") for cancellation reason"
-                " and findCancelEncounterObservation(\"Cancel date\").getValue() for cancellation date."
+                '. IMPORTANT: Use findCancelEncounterObservationReadableValue("Cancellation reason") for cancellation reason'
+                ' and findCancelEncounterObservation("Cancel date").getValue() for cancellation date.'
                 " Do NOT use cancelDateTime or getCancelReason — they are deprecated."
             )
 

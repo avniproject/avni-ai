@@ -32,17 +32,23 @@ VALID_FORM_TYPES = {
     "ProgramExit",
 }
 
-REQUIRED_EXAMPLE_KEYS = {"id", "scenario", "context", "rule_request", "expected_generated_rule"}
+REQUIRED_EXAMPLE_KEYS = {
+    "id",
+    "scenario",
+    "context",
+    "rule_request",
+    "expected_generated_rule",
+}
 REQUIRED_CONTEXT_KEYS = {"formType"}  # minimum; encounterType is optional for some
 
 # Patterns that should appear in every well-formed generated rule
 RULE_MUST_CONTAIN = [
-    "use strict",                   # strict-mode pragma
-    "params",                       # destructured params
-    "imports",                      # destructured imports
-    "scheduleBuilder",              # builder variable
-    "VisitScheduleBuilder",         # builder constructor
-    "scheduleBuilder.getAll()",     # return value
+    "use strict",  # strict-mode pragma
+    "params",  # destructured params
+    "imports",  # destructured imports
+    "scheduleBuilder",  # builder variable
+    "VisitScheduleBuilder",  # builder constructor
+    "scheduleBuilder.getAll()",  # return value
 ]
 
 # At least one date helper must be used
@@ -57,6 +63,7 @@ DATE_PATTERNS = [
 
 
 # ── fixtures ──────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture(scope="module")
 def all_examples():
@@ -73,6 +80,7 @@ def examples_by_form_type(all_examples):
 
 
 # ── structural tests ──────────────────────────────────────────────────────────
+
 
 class TestExampleStructure:
     """Verify that every example has the required shape."""
@@ -103,9 +111,7 @@ class TestExampleStructure:
     )
     def test_required_keys(self, example):
         missing = REQUIRED_EXAMPLE_KEYS - example.keys()
-        assert not missing, (
-            f"Example {example.get('id', '?')} missing keys: {missing}"
-        )
+        assert not missing, f"Example {example.get('id', '?')} missing keys: {missing}"
 
     @pytest.mark.parametrize(
         "example",
@@ -142,6 +148,7 @@ class TestExampleStructure:
 
 # ── form-type distribution ────────────────────────────────────────────────────
 
+
 class TestFormTypeDistribution:
     """Ensure roughly equal coverage across all 6 form types."""
 
@@ -168,6 +175,7 @@ class TestFormTypeDistribution:
 
 # ── context quality ───────────────────────────────────────────────────────────
 
+
 class TestContextQuality:
     """Validate that context objects are well-formed."""
 
@@ -178,8 +186,12 @@ class TestContextQuality:
     )
     def test_encounter_types_list(self, example):
         ctx = example["context"]
-        if ctx["formType"] in ("ProgramEncounter", "ProgramEncounterCancellation",
-                                "ProgramEnrolment", "ProgramExit"):
+        if ctx["formType"] in (
+            "ProgramEncounter",
+            "ProgramEncounterCancellation",
+            "ProgramEnrolment",
+            "ProgramExit",
+        ):
             assert "encounterTypes" in ctx, (
                 f"Example {example['id']} ({ctx['formType']}) should have encounterTypes"
             )
@@ -208,6 +220,7 @@ class TestContextQuality:
 
 # ── expected rule code quality ────────────────────────────────────────────────
 
+
 class TestExpectedRuleQuality:
     """Validate that reference rules look like valid Avni visit-schedule rules."""
 
@@ -219,7 +232,7 @@ class TestExpectedRuleQuality:
     def test_rule_contains_strict_mode(self, example):
         rule = example["expected_generated_rule"]
         assert '"use strict"' in rule, (
-            f"Example {example['id']} rule missing \"use strict\""
+            f'Example {example["id"]} rule missing "use strict"'
         )
 
     @pytest.mark.parametrize(
@@ -282,7 +295,9 @@ class TestExpectedRuleQuality:
         assert "name:" in rule.replace('"name"', "name:").replace("'name'", "name:"), (
             f"Example {example['id']} scheduled visit missing 'name' field"
         )
-        assert "encounterType:" in rule.replace('"encounterType"', "encounterType:").replace("'encounterType'", "encounterType:"), (
+        assert "encounterType:" in rule.replace(
+            '"encounterType"', "encounterType:"
+        ).replace("'encounterType'", "encounterType:"), (
             f"Example {example['id']} scheduled visit missing 'encounterType' field"
         )
 
@@ -317,6 +332,7 @@ class TestExpectedRuleQuality:
 
 
 # ── cross-example consistency ─────────────────────────────────────────────────
+
 
 class TestCrossExampleConsistency:
     """Check relationships across examples."""

@@ -168,7 +168,9 @@ def get_messages(
     return messages
 
 
-def build_records(conversations: List[Dict], base_url: str, headers: Dict[str, str], user: str):
+def build_records(
+    conversations: List[Dict], base_url: str, headers: Dict[str, str], user: str
+):
     raw_dump = []
     records = []
 
@@ -185,9 +187,9 @@ def build_records(conversations: List[Dict], base_url: str, headers: Dict[str, s
         initial_query = user_queries[0] if user_queries else ""
 
         first_answer = messages[0].get("answer", "") if messages else ""
-        has_scenarios_table = (
-            "| case |" in normalize(first_answer) and "| trigger |" in normalize(first_answer)
-        )
+        has_scenarios_table = "| case |" in normalize(
+            first_answer
+        ) and "| trigger |" in normalize(first_answer)
         has_confirmation_prompt = (
             "do these scenarios match" in normalize(first_answer)
             or "if yes, i’ll generate" in normalize(first_answer)
@@ -208,7 +210,9 @@ def build_records(conversations: List[Dict], base_url: str, headers: Dict[str, s
         )
 
         relevance = classify_relevance(initial_query, request_type)
-        query_type = classify_query_type(initial_query) if initial_query else "Programmatic"
+        query_type = (
+            classify_query_type(initial_query) if initial_query else "Programmatic"
+        )
 
         if any(has_pattern(m.get("answer", ""), INFEASIBLE_PATTERNS) for m in messages):
             feasibility = "Not-feasible with Avni/AI Assistant"
@@ -218,7 +222,9 @@ def build_records(conversations: List[Dict], base_url: str, headers: Dict[str, s
             feasibility = "Not-feasible with Avni/AI Assistant"
 
         response_quality = (
-            "Good response" if has_scenarios_table and has_final_code else "Bad response"
+            "Good response"
+            if has_scenarios_table and has_final_code
+            else "Bad response"
         )
 
         concern_tags = []
@@ -293,7 +299,11 @@ def build_summary(records: List[Dict]) -> Dict[str, Any]:
 
 
 def write_outputs(
-    out_dir: str, user: str, raw_dump: List[Dict], records: List[Dict], summary: Dict[str, Any]
+    out_dir: str,
+    user: str,
+    raw_dump: List[Dict],
+    records: List[Dict],
+    summary: Dict[str, Any],
 ) -> Dict[str, str]:
     raw_path = os.path.join(out_dir, "rules_tester_conversations_raw.json")
     csv_path = os.path.join(out_dir, "visit_schedule_query_classification.csv")
