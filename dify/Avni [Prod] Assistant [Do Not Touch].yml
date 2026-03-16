@@ -14,10 +14,10 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/openai:0.2.8@aae2be0913b8c6f0b80cff58e08d7a8b4c214569b41778413fcaea204561ff16
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.10@7ca552fb9e48caa4deddfdef5aa71c200d06d03c26c2e8bb428b3250101b9cb3
     version: null
 kind: app
-version: 0.5.0
+version: 0.6.0
 workflow:
   conversation_variables:
   - description: ''
@@ -1383,7 +1383,7 @@ workflow:
         - '1711528708197'
         - sys.query
         retrieval_mode: multiple
-        selected: true
+        selected: false
         title: Knowledge Retrieval
         type: knowledge-retrieval
       height: 90
@@ -1866,7 +1866,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -10.329002406792824
-      y: 1014.4305465736124
-      zoom: 1
+      x: 241.3339325899408
+      y: 390.5937301106775
+      zoom: 0.25
   rag_pipeline_variables: []
