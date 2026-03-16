@@ -6,7 +6,7 @@ lint:
 	uv run ruff check --fix
 
 start:
-	uv run avni-mcp-server
+	uv run avni-ai-server
 
 test:
 	uv run pytest --cov=.
