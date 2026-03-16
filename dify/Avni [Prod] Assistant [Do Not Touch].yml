@@ -92,12 +92,22 @@ workflow:
     retriever_resource:
       enabled: false
     sensitive_word_avoidance:
-      enabled: false
+      config:
+        inputs_config:
+          enabled: true
+          preset_response: In-appropriate input, only designed to help with Avni implementation
+            tasks.
+        outputs_config:
+          enabled: true
+          preset_response: I apologize, but I can only provide assistance with Avni
+            implementation topics.
+      enabled: true
+      type: openai_moderation
     speech_to_text:
       enabled: false
     suggested_questions: []
     suggested_questions_after_answer:
-      enabled: false
+      enabled: true
     text_to_speech:
       enabled: false
       language: ''
