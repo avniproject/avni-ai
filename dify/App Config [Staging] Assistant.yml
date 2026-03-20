@@ -2,8 +2,9 @@ app:
   description: Avni AI Assistant
   icon: 🤖
   icon_background: '#FFEAD5'
+  icon_type: emoji
   mode: advanced-chat
-  name: App Config [Staging] Assistant
+  name: UpdatedApp Config [Staging] Assistant
   use_icon_as_answer_icon: false
 dependencies:
 - current_identifier: null
@@ -20,6 +21,46 @@ kind: app
 version: 0.6.0
 workflow:
   conversation_variables:
+  - description: ''
+    id: f3337c5a-b833-47a7-8eeb-1d29182542f9
+    name: auth_token
+    selector:
+    - conversation
+    - auth_token
+    value: ''
+    value_type: string
+  - description: ''
+    id: 4c1c713d-15fd-4a91-904b-20ef56e53cd0
+    name: avni_mcp_server_url
+    selector:
+    - conversation
+    - avni_mcp_server_url
+    value: ''
+    value_type: string
+  - description: ''
+    id: bcee7516-c52d-4ed0-aff4-50107f092ca0
+    name: session_status
+    selector:
+    - conversation
+    - session_status
+    value: ''
+    value_type: string
+  - description: ''
+    id: dada7c31-e9c4-4b37-838c-00f71b67c54a
+    name: entities_jsonl
+    selector:
+    - conversation
+    - entities_jsonl
+    value: []
+    value_type: array[object]
+  - description: ''
+    id: ee0fbd12-9867-4b7c-95d5-4b74e03475be
+    name: uploaded_files
+    selector:
+    - conversation
+    - uploaded_files
+    value: []
+    value_type: array[object]
   - description: ''
     id: 80e10fd7-a4a9-4300-ad77-fd31a27bb86b
     name: 'True'
@@ -63,11 +104,12 @@ workflow:
       - .WEBP
       - .SVG
       allowed_file_types:
+      - document
       - image
       allowed_file_upload_methods:
-      - local_file
       - remote_url
-      enabled: false
+      - local_file
+      enabled: true
       fileUploadConfig:
         attachment_image_file_size_limit: 2
         audio_file_size_limit: 50
@@ -372,6 +414,211 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: if-else
+      id: 1757493270484-8fdce35c-5052-4a27-b5d5-8c1b1ea49e73-fs-check-processed-target
+      source: '1757493270484'
+      sourceHandle: 8fdce35c-5052-4a27-b5d5-8c1b1ea49e73
+      target: fs-check-processed
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: fs-check-processed-false-1773908701222-target
+      selected: false
+      source: fs-check-processed
+      sourceHandle: 'false'
+      target: '1773908701222'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: llm
+      id: fs-save-jsonl-source-1773909315118-target
+      source: fs-save-jsonl
+      sourceHandle: source
+      target: '1773909315118'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1773909315118-source-1773909436902-target
+      selected: false
+      source: '1773909315118'
+      sourceHandle: source
+      target: '1773909436902'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: human-input
+      id: 1773909436902-source-fs-human-input-target
+      selected: false
+      source: '1773909436902'
+      sourceHandle: source
+      target: fs-human-input
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: fs-human-input-No-fs-ask-corrections-target
+      selected: false
+      source: fs-human-input
+      sourceHandle: 'No'
+      target: fs-ask-corrections
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: fs-human-input-timeout-fs-timeout-target
+      selected: false
+      source: fs-human-input
+      sourceHandle: timeout
+      target: fs-timeout
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: fs-check-processed-true-1773981975918-target
+      selected: false
+      source: fs-check-processed
+      sourceHandle: 'true'
+      target: '1773981975918'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1773981975918-source-1773982043351-target
+      selected: false
+      source: '1773981975918'
+      sourceHandle: source
+      target: '1773982043351'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 1773982043351-source-1773984373385-target
+      source: '1773982043351'
+      sourceHandle: source
+      target: '1773984373385'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 1773908701222-source-fs-save-jsonl-target
+      source: '1773908701222'
+      sourceHandle: source
+      target: fs-save-jsonl
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: llm
+      id: 1773984373385-source-1774002885641-target
+      source: '1773984373385'
+      sourceHandle: source
+      target: '1774002885641'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1774002885641-source-1773909436902-target
+      source: '1774002885641'
+      sourceHandle: source
+      target: '1773909436902'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: fs-human-input-__timeout-fs-timeout-target
+      source: fs-human-input
+      sourceHandle: __timeout
+      target: fs-timeout
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1774005032398-source-1774005187885-target
+      source: '1774005032398'
+      sourceHandle: source
+      target: '1774005187885'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: 1711528708197-source-1774005428719-target
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1774005428719'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: 1711528708197-source-1774005484035-target
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1774005484035'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: http-request
+      id: fs-human-input-Yes-1774005032398-target
+      source: fs-human-input
+      sourceHandle: 'Yes'
+      target: '1774005032398'
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         desc: Define the initial parameters for launching a workflow
@@ -410,7 +657,7 @@ workflow:
           required: false
           type: text-input
           variable: user_name
-        - default: https://staging-mcp.avniproject.org
+        - default: https://staging-ai.avniproject.org/
           hide: true
           hint: ''
           label: avni_mcp_server_url
@@ -420,15 +667,15 @@ workflow:
           required: false
           type: text-input
           variable: avni_mcp_server_url
-      height: 257
+      height: 255
       id: '1711528708197'
       position:
-        x: 120
-        y: -839
+        x: 0
+        y: 430
       positionAbsolute:
-        x: 120
-        y: -839
-      selected: true
+        x: 0
+        y: 430
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -484,12 +731,17 @@ workflow:
           text: "You are the Avni Platform Orchestrator of the Avni AI Assistant.\
             \ Route user messages based on their PRIMARY INTENT, not the complexity\
             \ or specificity of their\nquestion.\n\n<context>\n{{#context#}}\n</context>\n\
-            \n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
+            \n<user_uploaded_files>\n{{#sys.files#}}\n</user_uploaded_files>\n\n##\
+            \ Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
             \ NOT about Avni or data collection platforms → OUT_OF_SCOPE\n2. If a\
-            \ message starts with capability questions (\"Is it possible\", \"Can\
-            \ Avni\", \"Does Avni support\", \"Is there a way\", \"How can I\"), it\
-            \ is ALWAYS RAG regardless of complexity.\n\n\n### RAG - Platform Knowledge\
-            \ & Capabilities\n\n\n**Primary Intent**: Learning what Avni can/cannot\
+            \ user uploads a file (.xlsx, .xls, .csv) or mentions uploading a specification/SRS/field\
+            \ workflow file → FILE_SETUP (STOP HERE)\n3. If a message starts with\
+            \ capability questions (\"Is it possible\", \"Can Avni\", \"Does Avni\
+            \ support\", \"Is there a way\", \"How can I\"), it is ALWAYS RAG regardless\
+            \ of complexity.\n4. If the conversation context shows the user is already\
+            \ discussing a specific Avni feature, follow-up requests about that feature\
+            \ should be RAG (not OUT_OF_SCOPE)\n\n\n### RAG - Platform Knowledge &\
+            \ Capabilities\n\n\n**Primary Intent**: Learning what Avni can/cannot\
             \ do\n\n\n**Definitive Indicators** (Route to RAG even if complex):\n\
             - \"What is Avni?\" → RAG (basic platform knowledge)\n- \"Tell me about\
             \ Avni\" → RAG (platform overview)\n- \"Is it possible to...\" → RAG (capability\
@@ -497,48 +749,100 @@ workflow:
             \ support...\" → RAG (feature question)\n- \"Is there a way to...\" →\
             \ RAG (method inquiry)\n- \"How can I...\" → RAG (step-by-step guidance\
             \ inquiry)\n- \"What are the limitations of...\" → RAG (constraint question)\n\
-            - \"How does Avni handle...\" → RAG (mechanism inquiry)\n\n\n**Key Principle**:\
+            - \"How does Avni handle...\" → RAG (mechanism inquiry)\n- Questions about\
+            \ existing Avni features (uploads, sync, forms, encounters, subjects,\
+            \ programs, reports, data export, data entry app, etc.) → RAG\n- Questions\
+            \ about stopping, monitoring, or managing ongoing Avni activities → RAG\n\
+            - Questions about downloading, exporting, or accessing data/reports from\
+            \ Avni → RAG\n- Requests for tutorials, guides, or instructions about\
+            \ Avni features → RAG\n- Questions about core Avni terminology (encounter,\
+            \ subject, program, catchment, form, etc.) → RAG\n\n\n**Key Principle**:\
             \ Complexity of the scenario does NOT change the\nintent. A detailed capability\
-            \ question is still a capability question.\n\n\n\n### ASSISTANT - Custom/Novel\
-            \ Requirements\n\n\n**Primary Intent**: Building something new or unique\n\
-            \n\n**Indicators**: - \"We need something that doesn't exist...\" - \"\
-            Can you\nbuild/create/develop...\" - \"We have unique requirements...\"\
-            \ -\n\"Integration with external system X...\" - \"Delete everything and\
-            \ start fresh...\" - \"Clean slate configuration...\" - \"Remove all my\
-            \ current setup...\"\n\n\n### OUT_OF_SCOPE - Not Avni Related\n\n\n**Primary\
-            \ Intent**: Questions completely unrelated to Avni or data collection\
-            \ platforms\n\n\n**Definitive Indicators**:\n- Questions for which no\
-            \ relevant context available in this prompt\n- General programming/coding\
-            \ questions not specific to Avni\n- Questions about other software platforms\
-            \ (Salesforce, Excel, etc.)\n- Personal questions, weather, news, entertainment\n\
-            - Academic questions unrelated to health/social programs\n- Technical\
-            \ questions about non-Avni systems\n- \"What is the capital of...\" /\
-            \ \"How do I cook...\" / \"What's the weather...\"\n- Questions about\
-            \ competitors without Avni context\n\n\n\n**EXCEPTION**: Greeting messages\
-            \ (\"Hi\", \"Hello\", \"Good morning\") should NOT be marked as OUT_OF_SCOPE.\
-            \ These require clarification to understand the user's actual intent.\n\
-            \n\n## Decision Framework\n\n\n**Step 1**: Check relevance - If clearly\
-            \ NOT about Avni/data collection → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**:\
-            \ If greeting message → Set clarification_needed = true\n\n\n**Step 2**:\
-            \ Identify the question type - If starts with capability\nquestions →\
-            \ RAG (STOP HERE) - If describes implementation needs →\nASSISTANT - If\
-            \ requests deletion/configuration changes → ASSISTANT\n\n\n## Critical\
-            \ Examples\n\n✅ \"What is Avni?\" → **RAG** (basic platform knowledge)\n\
-            \n✅ \"Tell me about Avni platform\" → **RAG** (platform overview)\n\n\
-            ✅ \"What does Avni do?\" → **RAG** (platform purpose/functionality)\n\n\
-            ✅ \"Is it possible to automatically show selected answers from Clinical\n\
+            \ question is still a capability question.\n\n\n\n### FILE_SETUP - App\
+            \ Configuration from Specification File\n\n\n**Primary Intent**: Setting\
+            \ up an Avni app from an uploaded specification/SRS/field workflow Excel\
+            \ file\n\n\n**Definitive Indicators** (Route to FILE_SETUP immediately):\n\
+            - User uploads an Excel file (.xlsx, .xls) or CSV file\n- \"Here is my\
+            \ SRS file\" / \"I'm uploading the field workflow specification\"\n- \"\
+            Set up the app from this file\" / \"Configure Avni from this spreadsheet\"\
+            \n- \"Process this specification file\" / \"Create entities from this\
+            \ Excel\"\n- \"Upload my modelling sheet\" / \"Here's the field workflow\
+            \ document\"\n- Conversation context shows a FILE_SETUP flow is already\
+            \ in progress (user is confirming/correcting parsed entities)\n\n**Key\
+            \ Principle**: Any file upload of a specification document triggers FILE_SETUP.\
+            \ This is distinct from ASSISTANT which handles manual configuration requests\
+            \ without a file.\n\n\n### ASSISTANT - Custom/Novel Requirements\n\n\n\
+            **Primary Intent**: Building something new or unique\n\n\n**Indicators**:\
+            \ - \"We need something that doesn't exist...\" - \"Can you\nbuild/create/develop...\"\
+            \ - \"We have unique requirements...\" -\n\"Integration with external\
+            \ system X...\" - \"Delete everything and start fresh...\" - \"Clean slate\
+            \ configuration...\" - \"Remove all my current setup...\"\n\n\n### OUT_OF_SCOPE\
+            \ - Not Avni Related\n\n\n**Primary Intent**: Questions completely unrelated\
+            \ to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n\
+            - Questions for which no relevant context available in this prompt\n-\
+            \ General programming/coding questions not specific to Avni\n- Questions\
+            \ about other software platforms (Salesforce, Excel, etc.)\n- Personal\
+            \ questions, weather, news, entertainment\n- Academic questions unrelated\
+            \ to health/social programs\n- Technical questions about non-Avni systems\n\
+            - \"What is the capital of...\" / \"How do I cook...\" / \"What's the\
+            \ weather...\"\n- Questions about competitors without Avni context\n\n\
+            \n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\"\
+            ) should NOT be marked as OUT_OF_SCOPE. These require clarification to\
+            \ understand the user's actual intent.\n\n\n## Decision Framework\n\n\n\
+            **Step 1**: Check relevance - If clearly NOT about Avni/data collection\
+            \ → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**: If greeting message → Set\
+            \ clarification_needed = true\n\n\n**Step 2**: Check for file upload -\
+            \ If user uploads a file or mentions uploading a spec/SRS file → FILE_SETUP\
+            \ (STOP HERE)\n\n**Step 3**: Identify the question type - If starts with\
+            \ capability\nquestions → RAG (STOP HERE) - If describes implementation\
+            \ needs →\nASSISTANT - If requests deletion/configuration changes → ASSISTANT\n\
+            \n\n## Critical Examples\n\n✅ \"What is Avni?\" → **RAG** (basic platform\
+            \ knowledge)\n\n✅ \"Tell me about Avni platform\" → **RAG** (platform\
+            \ overview)\n\n✅ \"What does Avni do?\" → **RAG** (platform purpose/functionality)\n\
+            \n✅ \"Is it possible to automatically show selected answers from Clinical\n\
             Assessment in Follow-up Visit forms?\" → **RAG** (capability question,\n\
             regardless of technical complexity)\n\n✅ \"Can Avni restrict encounter\
             \ forms to single entry per individual?\" →\n**RAG** (capability question)\n\
             \n✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
             \n→ **RAG** (capability question, even if the workflow is complex)\n\n\
-            ✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"What are identifiers\"\
-            \n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\
-            \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n✅ \"How can I\
-            \ setup the assignment feature in Avni?\" → **RAG** (step-by-step guidance\
-            \ question)\n\n✅ \"I want to delete my entire configuration and start\
-            \ fresh\" → **ASSISTANT** (implementation request for complete deletion)\n\
-            \n✅ \"Can you help me clean slate my Avni setup?\" → **ASSISTANT** (configuration\
+            ✅ \"What are catchments\" → **RAG** (Avni terminology question)\n✅ \"\
+            What are user groups\" → **RAG** (Avni terminology question)\n✅ \"What\
+            \ are identifiers\" → **RAG** (Avni terminology question)\n✅ \"What is\
+            \ an identifier source\" → **RAG** (Avni terminology question)\n✅ \"How\
+            \ do I create a new catchment\" → **RAG** (step-by-step guidance question)\n\
+            ✅ \"What is a program\" → **RAG** (Avni terminology question)\n✅ \"What\
+            \ is a subject type\" → **RAG** (Avni terminology question)\n✅ \"What's\
+            \ an encounter\" → **RAG** (Avni terminology question)\n✅ \"What is an\
+            \ encounter\" → **RAG** (Avni terminology question)\n✅ \"What's a form\"\
+            \ → **RAG** (Avni terminology question)\n✅ \"How can I setup the assignment\
+            \ feature in Avni?\" → **RAG** (step-by-step guidance question)\n\n✅ \"\
+            Can you stop the uploading activity\" → **RAG** (question about existing\
+            \ Avni upload feature)\n\n✅ \"How do I monitor upload progress\" → **RAG**\
+            \ (question about existing Avni monitoring feature)\n\n✅ \"What happens\
+            \ when upload fails\" → **RAG** (question about existing Avni upload behavior)\n\
+            \n✅ \"Can you download a report and say the numbers\" → **RAG** (question\
+            \ about Avni reporting and data access)\n\n✅ \"How do I export data to\
+            \ Excel\" → **RAG** (question about existing Avni export feature)\n\n\
+            ✅ \"Can I generate PDF reports from Avni\" → **RAG** (question about existing\
+            \ Avni reporting capability)\n\n✅ \"Give me a data entry tutorial\" →\
+            \ **RAG** (request for tutorial about Avni data entry feature)\n\n✅ \"\
+            I need a tutorial on how to use forms\" → **RAG** (request for guidance\
+            \ on existing Avni feature)\n\n✅ \"Show me how to set up encounters\"\
+            \ → **RAG** (request for instructions on existing Avni functionality)\n\
+            \n✅ \"Yes, I need further tutorial\" (after discussing Avni Data Entry\
+            \ App) → **RAG** (follow-up request for more guidance on established Avni\
+            \ feature)\n\n✅ [User uploads an .xlsx file] → **FILE_SETUP** (file upload\
+            \ triggers app setup)\n\n✅ \"Here is my SRS file, please set up the app\"\
+            \ → **FILE_SETUP** (spec file upload)\n\n✅ \"I'm uploading the field workflow\
+            \ specification\" → **FILE_SETUP** (spec file reference)\n\n✅ \"Process\
+            \ this modelling sheet and create the entities\" → **FILE_SETUP** (explicit\
+            \ file processing request)\n\n✅ \"Yes, the entities look correct, go ahead\"\
+            \ (after FILE_SETUP summary) → **FILE_SETUP** (confirmation in ongoing\
+            \ FILE_SETUP flow)\n\n✅ \"Rename 'Beneficiary Registration' to 'Individual'\"\
+            \ (after FILE_SETUP summary) → **FILE_SETUP** (correction in ongoing FILE_SETUP\
+            \ flow)\n\n✅ \"I want to delete my entire configuration and start fresh\"\
+            \ → **ASSISTANT** (implementation request for complete deletion)\n\n✅\
+            \ \"Can you help me clean slate my Avni setup?\" → **ASSISTANT** (configuration\
             \ deletion and rebuild request)\n\n✅ \"Remove everything and build a new\
             \ configuration\" → **ASSISTANT** (delete and create request)\n\n\n\n\
             ✅ \"What is the capital of France?\" → **OUT_OF_SCOPE** (not related to\
@@ -559,9 +863,13 @@ workflow:
             \ Assumption - ❌ \"Any question = must be Avni-related\" - ✅ \"Check if\
             \ actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting\
             \ Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification\
-            \ to understand intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"\
-            service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"confidence\": 0.0-1.0,\n\
-            \  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
+            \ to understand intent\"\n\n**Trap 6**: Terminology Misrouting - ❌ \"\
+            Single word like 'encounter' = not specific enough = OUT_OF_SCOPE\" -\
+            \ ✅ \"Core Avni terminology questions = RAG\"\n\n**Trap 7**: File Upload\
+            \ Misrouting - ❌ \"User uploaded a file and asked to configure = ASSISTANT\"\
+            \ - ✅ \"File upload with spec/SRS = FILE_SETUP\"\n\n\n## Response Format\n\
+            \n\n``` json\n{\n  \"service\": \"RAG|ASSISTANT|FILE_SETUP|OUT_OF_SCOPE\"\
+            ,\n  \"confidence\": 0.0-1.0,\n  \"question_type\": \"capability_inquiry|implementation_request|file_setup|novel_requirement|not_avni_related\"\
             ,\n  \"routing_reason\": \"Brief explanation focusing on question structure,\
             \ not content complexity\",\n  \"clarification_needed\": true|false,\n\
             \  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\
@@ -579,20 +887,23 @@ workflow:
             \ capabilities (RAG) or needs implementation help\n(ASSISTANT). Never\
             \ ask more than two questions at once.\n\n\n## Mental Model Validation\n\
             \n\nBefore routing, ask:\n1. **\"Is this just a greeting message?\"**\
-            \ - YES → RAG with clarification_needed = true\n2. **\"Is this question\
-            \ actually about Avni or data collection platforms?\"** - NO → OUT_OF_SCOPE\n\
-            3. **\"Is the user asking IF something is possible, or telling me they\
-            \ WANT something implemented?\"** - IF possible → RAG - WANT implemented\
-            \ → ASSISTANT\n\n\n## Decision Tree for Edge Cases\n\n\n    User Message\n\
-            \        │\n        ├── NOT about Avni/data collection (general questions,\
-            \ other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n        │\n \
-            \       ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does\
-            \ Avni...\" / \"How can I...\" ?\n        │   └── YES → RAG (regardless\
+            \ - YES → RAG with clarification_needed = true\n2. **\"Did the user upload\
+            \ a file or mention a spec/SRS/workflow file?\"** - YES → FILE_SETUP\n\
+            3. **\"Is this question actually about Avni or data collection platforms?\"\
+            ** - NO → OUT_OF_SCOPE\n4. **\"Is the user asking IF something is possible,\
+            \ or telling me they WANT something implemented?\"** - IF possible → RAG\
+            \ - WANT implemented → ASSISTANT\n\n\n## Decision Tree for Edge Cases\n\
+            \n\n    User Message\n        │\n        ├── NOT about Avni/data collection\
+            \ (general questions, other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n\
+            \        │\n        ├── File uploaded (.xlsx, .xls, .csv) or mentions\
+            \ spec/SRS/workflow file?\n        │   └── YES → FILE_SETUP\n        │\n\
+            \        ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"\
+            Does Avni...\" / \"How can I...\" ?\n        │   └── YES → RAG (regardless\
             \ of complexity)\n        │\n        ├── Describes implementation needs\
             \ (\"We need...\", \"Help us set up...\", \"Our org wants...\") or deletion\
-            \       requests (\"Delete everything...\", \"Clean slate...\", \"Remove\
-            \ all...\")?\n        │   └── YES → ASSISTANT\n        │\n        └──\
-            \ UNCLEAR → Default to RAG (safer for capability questions)"
+            \ requests (\"Delete everything...\", \"Clean slate...\", \"Remove all...\"\
+            )?\n        │   └── YES → ASSISTANT\n        │\n        └── UNCLEAR →\
+            \ Default to RAG (safer for capability questions)"
         - id: 36b2faa1-0e45-4962-8107-74a07045af09
           role: user
           text: ''
@@ -629,19 +940,19 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1757492907627'
       position:
-        x: 716
-        y: -462
+        x: 683
+        y: 451
       positionAbsolute:
-        x: 716
-        y: -462
-      selected: true
+        x: 683
+        y: 451
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
@@ -688,6 +999,18 @@ workflow:
             - service
           id: 00ce954d-b2ca-42aa-b302-dc2c163dd1d0
           logical_operator: and
+        - case_id: 8fdce35c-5052-4a27-b5d5-8c1b1ea49e73
+          conditions:
+          - comparison_operator: is
+            id: c59bc564-3f78-44f5-b112-60966725f8e7
+            value: FILE_SETUP
+            varType: object
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: 8fdce35c-5052-4a27-b5d5-8c1b1ea49e73
+          logical_operator: and
         - case_id: 8ad5b2c6-6d29-4e4f-9f13-7682d4803a70
           conditions:
           - comparison_operator: is
@@ -704,19 +1027,19 @@ workflow:
         selected: false
         title: IF/ELSE
         type: if-else
-      height: 294
+      height: 484
       id: '1757493270484'
       position:
-        x: 1002
-        y: -321
+        x: 1024
+        y: 252
       positionAbsolute:
-        x: 1002
-        y: -321
-      selected: true
+        x: 1024
+        y: 252
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -767,39 +1090,39 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1757495664531'
       position:
-        x: 1388
-        y: 615
+        x: 1385
+        y: 732
       positionAbsolute:
-        x: 1388
-        y: 615
-      selected: true
+        x: 1385
+        y: 732
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
-        answer: '{{#1757495664531.text#}}'
+        answer: '{{#1757495664531.text#}}  Sooooooo: {{#sys.files#}}'
         desc: ''
         selected: false
         title: RAG Answer
         type: answer
         variables: []
-      height: 103
+      height: 120
       id: '1757495688732'
       position:
-        x: 1730
-        y: 607
+        x: 1746
+        y: 623
       positionAbsolute:
-        x: 1730
-        y: 607
-      selected: true
+        x: 1746
+        y: 623
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -1311,38 +1634,38 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '17580163919060'
       position:
-        x: 1388
-        y: 18
+        x: 1385
+        y: 140
       positionAbsolute:
-        x: 1388
-        y: 18
-      selected: true
+        x: 1385
+        y: 140
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
         selected: false
         title: Clarify the question
         type: answer
         variables: []
-      height: 137
+      height: 136
       id: '1758608702077'
       position:
-        x: 1388
-        y: 186
+        x: 1385
+        y: 306
       positionAbsolute:
-        x: 1388
-        y: 186
-      selected: true
+        x: 1385
+        y: 306
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: This assistant can help you with any questions related to Avni. This
           does not seem relevant to Avni.
@@ -1350,19 +1673,19 @@ workflow:
         title: Unrelated Question
         type: answer
         variables: []
-      height: 132
+      height: 130
       id: '1758699378772'
       position:
-        x: 1388
-        y: 403
+        x: 1385
+        y: 522
       positionAbsolute:
-        x: 1388
-        y: 403
-      selected: true
+        x: 1385
+        y: 522
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         dataset_ids:
         - EcEHhfyw2lTA/pRvqDse3E7RCHi8WmJgNSgzX1pQN+8cN6n17MR+Rps3VogupFsu
@@ -1386,19 +1709,19 @@ workflow:
         selected: false
         title: Knowledge Retrieval
         type: knowledge-retrieval
-      height: 90
+      height: 88
       id: '1758713692744'
       position:
-        x: 414
-        y: -655
+        x: 342
+        y: 450
       positionAbsolute:
-        x: 414
-        y: -655
-      selected: true
+        x: 342
+        y: 450
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 'true'
@@ -1416,38 +1739,38 @@ workflow:
         selected: false
         title: IF/ELSE 2
         type: if-else
-      height: 124
+      height: 138
       id: '1760358453289'
       position:
-        x: 1730
-        y: 0
+        x: 1726
+        y: 114
       positionAbsolute:
-        x: 1730
-        y: 0
-      selected: true
+        x: 1726
+        y: 114
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#17580163919060.structured_output.response#}}'
         selected: false
         title: Assistant LLM Response
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1760358474156'
       position:
-        x: 2092
-        y: 142.0508392628631
+        x: 2087
+        y: 0
       positionAbsolute:
-        x: 2092
-        y: 142.0508392628631
-      selected: true
+        x: 2087
+        y: 0
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
           \ submit_async_config(\n    configuration: Dict[str, Any],\n    avni_auth_token:\
@@ -1501,19 +1824,19 @@ workflow:
           - avni_mcp_server_url
           value_type: string
           variable: avni_mcp_server_url
-      height: 88
+      height: 86
       id: '1760416664434'
       position:
-        x: 2092
-        y: -66.24690036776286
+        x: 2087
+        y: 181
       positionAbsolute:
-        x: 2092
-        y: -66.24690036776286
-      selected: true
+        x: 2087
+        y: 181
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         break_conditions:
         - comparison_operator: is
@@ -1543,12 +1866,12 @@ workflow:
       height: 416
       id: '1760423058735'
       position:
-        x: 2445.308378071105
-        y: 9.184497627950861
+        x: 2448
+        y: 2
       positionAbsolute:
-        x: 2445.308378071105
-        y: 9.184497627950861
-      selected: true
+        x: 2448
+        y: 2
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1566,11 +1889,12 @@ workflow:
       parentId: '1760423058735'
       position:
         x: 60
-        y: 109
+        y: 111
       positionAbsolute:
-        x: 2505.308378071105
-        y: 118.18449762795086
+        x: 2508
+        y: 113
       selectable: false
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom-loop-start
@@ -1624,20 +1948,20 @@ workflow:
             type: constant
             value: 5
         type: tool
-      height: 52
+      height: 50
       id: '1760423070414'
       parentId: '1760423058735'
       position:
         x: 184
-        y: 107
+        y: 110
       positionAbsolute:
-        x: 2629.308378071105
-        y: 116.18449762795086
-      selected: true
+        x: 2632
+        y: 112
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         code: "import json\nimport requests\nfrom typing import Dict, Any\n\n\ndef\
@@ -1681,20 +2005,20 @@ workflow:
           - avni_mcp_server_url
           value_type: string
           variable: avni_mcp_server_url
-      height: 52
+      height: 50
       id: '1760423078948'
       parentId: '1760423058735'
       position:
-        x: 506
-        y: 107
+        x: 505
+        y: 110
       positionAbsolute:
-        x: 2951.308378071105
-        y: 116.18449762795086
-      selected: true
+        x: 2953
+        y: 112
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         answer: '
@@ -1709,20 +2033,20 @@ workflow:
         title: End User Result
         type: answer
         variables: []
-      height: 121
+      height: 120
       id: '1760424043492'
       parentId: '1760423058735'
       position:
-        x: 1492
-        y: 204
+        x: 1488
+        y: 202
       positionAbsolute:
-        x: 3937.308378071105
-        y: 213.18449762795086
-      selected: true
+        x: 3936
+        y: 204
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         cases:
@@ -1744,20 +2068,20 @@ workflow:
         selected: false
         title: 'Processing Status '
         type: if-else
-      height: 124
+      height: 146
       id: '1760424086059'
       parentId: '1760423058735'
       position:
-        x: 828
-        y: 70.1865858522658
+        x: 826
+        y: 62
       positionAbsolute:
-        x: 3273.308378071105
-        y: 79.37108348021665
-      selected: true
+        x: 3274
+        y: 64
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         answer: '
@@ -1770,20 +2094,20 @@ workflow:
         title: Config under process
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1760424123324'
       parentId: '1760423058735'
       position:
-        x: 1170
+        x: 1167
         y: 60
       positionAbsolute:
-        x: 3615.308378071105
-        y: 69.18449762795086
-      selected: true
+        x: 3615
+        y: 62
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         isInIteration: false
@@ -1803,20 +2127,20 @@ workflow:
         title: Break Loop
         type: assigner
         version: '2'
-      height: 84
+      height: 82
       id: '1760426022942'
       parentId: '1760423058735'
       position:
-        x: 1170
-        y: 223
+        x: 1167
+        y: 221
       positionAbsolute:
-        x: 3615.308378071105
-        y: 232.18449762795086
-      selected: true
+        x: 3615
+        y: 223
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         items:
@@ -1833,40 +2157,758 @@ workflow:
         title: Update Loop Boolean
         type: assigner
         version: '2'
-      height: 84
+      height: 82
       id: '1760434909468'
       position:
-        x: 4443.347431585707
-        y: 193.31705379355293
+        x: 4409
+        y: 169
       positionAbsolute:
-        x: 4443.347431585707
-        y: 193.31705379355293
-      selected: true
+        x: 4409
+        y: 169
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#1760416664434.error_message#}}'
         selected: false
         title: Answer 7
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1763959812229'
       position:
-        x: 2454
-        y: 506
+        x: 2448
+        y: 498
       positionAbsolute:
-        x: 2454
-        y: 506
+        x: 2448
+        y: 498
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        code: "import requests\n\ndef main(file_info: list, existing_entities_jsonl:\
+          \ str, avni_mcp_server_url: str):\n    file_url = \"\"\n    if file_info\
+          \ and len(file_info) > 0:\n        first_file = file_info[0]\n        if\
+          \ isinstance(first_file, dict):\n            file_url = first_file.get(\"\
+          url\", \"\") or first_file.get(\"remote_url\", \"\")\n        elif isinstance(first_file,\
+          \ str):\n            file_url = first_file\n\n    if not file_url:\n   \
+          \     return {\"output\": {\n            \"entities_jsonl\": [],\n     \
+          \       \"summary\": \"Error: No file URL found in uploaded files\",\n \
+          \           \"ambiguity_report\": {},\n        }}\n\n    try:\n        url\
+          \ = f\"{avni_mcp_server_url}/parse-and-validate\"\n        body = {\n  \
+          \          \"file_url\": file_url,\n            \"existing_entities_jsonl\"\
+          : existing_entities_jsonl or \"\",\n        }\n\n        print(f\"Calling\
+          \ {url} with file URL: {file_url[:80]}...\")\n        response = requests.post(url,\
+          \ json=body, timeout=60)\n        response.raise_for_status()\n        result\
+          \ = response.json()\n\n        return {\"output\": result}\n\n    except\
+          \ Exception as e:\n        print(f\"Error: {e}\")\n        return {\"output\"\
+          : {\n            \"entities_jsonl\": [],\n            \"summary\": f\"Error:\
+          \ {e}\",\n            \"ambiguity_report\": {},\n        }}\n"
+        code_language: python3
+        outputs:
+          output:
+            children: null
+            type: object
+        selected: false
+        title: Spec Parser and Validator
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - files
+          value_type: array[file]
+          variable: file_info
+        - value_selector:
+          - conversation
+          - entities_jsonl
+          value_type: string
+          variable: existing_entities_jsonl
+        - value_selector:
+          - '1711528708197'
+          - avni_mcp_server_url
+          value_type: string
+          variable: avni_mcp_server_url
+      height: 50
+      id: '1773908701222'
+      position:
+        x: 1746
+        y: 823
+      positionAbsolute:
+        x: 1746
+        y: 823
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: cond-already-processed
+            varType: string
+            variable_selector:
+            - conversation
+            - entities_jsonl
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: Already Processed?
+        type: if-else
+      height: 122
+      id: fs-check-processed
+      position:
+        x: 1385
+        y: 898
+      positionAbsolute:
+        x: 1385
+        y: 898
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - entities_jsonl
+        input_variable_selector:
+        - '1773908701222'
+        - output
+        - entities_jsonl
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1773908701222'
+          - output
+          - entities_jsonl
+          variable_selector:
+          - conversation
+          - entities_jsonl
+          write_mode: over-write
+        selected: false
+        title: Save Entities JSONL
+        type: assigner
+        version: '2'
+        write_mode: over-write
+      height: 82
+      id: fs-save-jsonl
+      position:
+        x: 2107
+        y: 789
+      positionAbsolute:
+        x: 2107
+        y: 789
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 51066c17-8638-4392-9c7f-9a1b479d288a
+          role: system
+          text: 'You are presenting a summary of parsed entities from a field workflow
+            specification file. Present the following summary and ambiguity report
+            to the user in a clear, readable format. Ask them to confirm if everything
+            looks correct, or tell you what needs to be corrected.
+
+
+            Summary:
+
+            {{#1773908701222.output.summary#}}
+
+
+            Ambiguity Report:
+
+            {{#1773908701222.output.ambiguity_report#}}
+
+
+            Previously stored entities (if any corrections were made):
+
+            {{#conversation.entities_jsonl#}}
+
+
+            User''s latest message:
+
+            {{#sys.query#}}'
+        selected: false
+        title: Summary LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 86
+      id: '1773909315118'
+      position:
+        x: 2769
+        y: 787
+      positionAbsolute:
+        x: 2769
+        y: 787
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        answer: '{{#1773909315118.text#}} {{#1774002885641.text#}}'
+        selected: false
+        title: Summary Answer
+        type: answer
+        variables: []
+      height: 120
+      id: '1773909436902'
+      position:
+        x: 3130
+        y: 916
+      positionAbsolute:
+        x: 3130
+        y: 916
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        delivery_methods:
+        - enabled: true
+          id: 8b5a32a3-115e-45a0-95e3-29256edc9047
+          type: webapp
+        form_content: ''
+        inputs: []
+        selected: false
+        timeout: 1
+        timeout_unit: day
+        title: Confirm Entities
+        type: human-input
+        user_actions:
+        - button_style: primary
+          id: 'Yes'
+          title: 'Yes'
+        - button_style: default
+          id: 'No'
+          title: 'No'
+      height: 187
+      id: fs-human-input
+      position:
+        x: 3471
+        y: 882
+      positionAbsolute:
+        x: 3471
+        y: 882
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        answer: Tell me what corrections are needed and I will update the entities.
+        selected: false
+        title: Ask Corrections
+        type: answer
+        variables: []
+      height: 114
+      id: fs-ask-corrections
+      position:
+        x: 3832
+        y: 775
+      positionAbsolute:
+        x: 3832
+        y: 775
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        answer: Session timed out. Please upload your file again to start over.
+        selected: false
+        title: Timeout
+        type: answer
+        variables: []
+      height: 114
+      id: fs-timeout
+      position:
+        x: 3832
+        y: 969
+      positionAbsolute:
+        x: 3832
+        y: 969
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-5
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 9e3f4fee-df92-4529-a660-1f3802422240
+          role: system
+          text: "You are an entity correction assistant. The user has reviewed a list\
+            \ of parsed entities from their field workflow specification and wants\
+            \ to make changes.\n\nBelow are the current entities in JSONL format:\n\
+            \n```json\n{{#conversation.entities_jsonl#}} \n```\n\nThe user's correction\
+            \ request:\n{{#sys.query#}}\n\nYour job: output ONLY a JSON array of the\
+            \ entities that need to change. Each entity in your output must be a complete\
+            \ entity object (not a diff).\n\nEntity types and their fields:\n\n**subject_type**:\
+            \ `{\"type\": \"subject_type\", \"name\": \"...\", \"subjectTypeKind\"\
+            : \"Person|Household\", \"sheet\": \"...\", \"row\": N}`\n\n**program**:\
+            \ `{\"type\": \"program\", \"name\": \"...\", \"subject\": \"...\", \"\
+            sheet\": \"...\", \"row\": N}`\n\n**encounter_type**: `{\"type\": \"encounter_type\"\
+            , \"name\": \"...\", \"program\": \"...\", \"subject\": \"...\", \"encounterType\"\
+            : \"Scheduled|Unscheduled\", \"is_program_encounter\": true|false, \"\
+            sheet\": \"...\", \"row\": N}`\n\n**address_level**: `{\"type\": \"address_level\"\
+            , \"name\": \"...\", \"level\": N, \"parent\": \"...|null\", \"sheet\"\
+            : \"Location Hierarchy\", \"row\": 0}`\n\nRules:\n1. Always include `sheet`\
+            \ and `row` from the original entity — this is how the code matches which\
+            \ entity to update.\n2. Include ALL fields for the entity, not just the\
+            \ changed ones.\n3. To rename: output the entity with the new name but\
+            \ same sheet+row.\n4. To delete: output `{\"_delete\": true, \"sheet\"\
+            : \"...\", \"row\": N, \"name\": \"...\", \"type\": \"...\"}`.\n5. To\
+            \ add a new entity: output the full entity with `\"sheet\": \"User Added\"\
+            ` and `\"row\": 0`.\n6. If the user's request is unclear, output an empty\
+            \ array `[]` and explain in a separate `\"clarification\"` field.\n\n\
+            Output format — respond with ONLY valid JSON, no markdown:\n```\n[\n \
+            \ {\"type\": \"subject_type\", \"name\": \"Updated Name\", \"subjectTypeKind\"\
+            : \"Person\", \"sheet\": \"Subject Types\", \"row\": 2},\n  {\"_delete\"\
+            : true, \"sheet\": \"Program\", \"row\": 3, \"name\": \"Old Program\"\
+            , \"type\": \"program\"}\n]\n```\n\nIf no changes are needed, output `[]`."
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              corrections:
+                items:
+                  additionalProperties: false
+                  properties:
+                    _delete:
+                      type: boolean
+                    encounterType:
+                      type: string
+                    is_program_encounter:
+                      type: boolean
+                    level:
+                      type: number
+                    name:
+                      type: string
+                    parent:
+                      type: string
+                    program:
+                      type: string
+                    row:
+                      type: number
+                    sheet:
+                      type: string
+                    subject:
+                      type: string
+                    subjectTypeKind:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                  - type
+                  - name
+                  - sheet
+                  - row
+                  type: object
+                type: array
+            required:
+            - corrections
+            type: object
+        structured_output_enabled: true
+        title: Entities Corrector LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 86
+      id: '1773981975918'
+      position:
+        x: 1746
+        y: 953
+      positionAbsolute:
+        x: 1746
+        y: 953
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        code: "\"\"\"\nApply Corrections code node for Dify chatflow.\n\nTakes the\
+          \ current entities JSONL and the Correction LLM's output\n(a list of updated/new/deleted\
+          \ entities), applies the changes.\n\nMatching logic:\n  1. Match by (sheet,\
+          \ row) — stable even after renames\n  2. Fallback: match by (type, name)\
+          \ — for manually added entities\n  3. No match → append as new entity\n\n\
+          If an entity has \"_delete\": true, it is removed.\n\nInput:\n  entities_jsonl\
+          \ (list) — current entities from conv var (array[object])\n  corrections_str\
+          \ (str) — LLM's output: JSON with corrections array\nOutput:\n  result (list)\
+          \ — updated entities array\n\"\"\"\n\nimport json\n\n\ndef main(entities_jsonl:\
+          \ list, corrections_str: str):\n    entities = list(entities_jsonl) if entities_jsonl\
+          \ else []\n\n    try:\n        parsed = json.loads(corrections_str) if corrections_str\
+          \ else {}\n        if isinstance(parsed, dict):\n            corrections\
+          \ = parsed.get(\"corrections\", [])\n        elif isinstance(parsed, list):\n\
+          \            corrections = parsed\n        else:\n            corrections\
+          \ = []\n    except (json.JSONDecodeError, TypeError):\n        return {\"\
+          result\": entities}\n\n    if not corrections:\n        return {\"result\"\
+          : entities}\n\n    for correction in corrections:\n        if not isinstance(correction,\
+          \ dict):\n            continue\n\n        if correction.get(\"_delete\"\
+          ):\n            sheet = correction.get(\"sheet\", \"\")\n            row\
+          \ = correction.get(\"row\", 0)\n            name = correction.get(\"name\"\
+          , \"\")\n            entity_type = correction.get(\"type\", \"\")\n\n  \
+          \          for i, entity in enumerate(entities):\n                if sheet\
+          \ and row and entity.get(\"sheet\") == sheet and entity.get(\"row\") ==\
+          \ row:\n                    entities.pop(i)\n                    break\n\
+          \                elif entity.get(\"type\") == entity_type and entity.get(\"\
+          name\") == name:\n                    entities.pop(i)\n                \
+          \    break\n            continue\n\n        sheet = correction.get(\"sheet\"\
+          , \"\")\n        row = correction.get(\"row\", 0)\n        matched_idx =\
+          \ None\n\n        if sheet and row:\n            for i, entity in enumerate(entities):\n\
+          \                if entity.get(\"sheet\") == sheet and entity.get(\"row\"\
+          ) == row:\n                    matched_idx = i\n                    break\n\
+          \n        if matched_idx is None:\n            c_type = correction.get(\"\
+          type\", \"\")\n            c_name = correction.get(\"name\", \"\")\n   \
+          \         for i, entity in enumerate(entities):\n                if entity.get(\"\
+          type\") == c_type and entity.get(\"name\") == c_name:\n                \
+          \    matched_idx = i\n                    break\n\n        if matched_idx\
+          \ is not None:\n            entities[matched_idx] = correction\n       \
+          \ else:\n            entities.append(correction)\n\n    return {\"result\"\
+          : entities}\n"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: array[object]
+        selected: false
+        title: Entities Corrector
+        type: code
+        variables:
+        - value_selector:
+          - conversation
+          - entities_jsonl
+          value_type: string
+          variable: entities_jsonl
+        - value_selector:
+          - '1773981975918'
+          - structured_output
+          value_type: object
+          variable: corrections_str
+      height: 50
+      id: '1773982043351'
+      position:
+        x: 2087
+        y: 971
+      positionAbsolute:
+        x: 2087
+        y: 971
       selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1773982043351'
+          - result
+          variable_selector:
+          - conversation
+          - entities_jsonl
+          write_mode: over-write
+        selected: false
+        title: Update entities_jsonl
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1773984373385'
+      position:
+        x: 2428
+        y: 955
+      positionAbsolute:
+        x: 2428
+        y: 955
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: d05c2b08-4a54-4016-9e99-65ae39b3c7e1
+          role: system
+          text: 'You are presenting updated entities after the user requested corrections.
+
+            Read the entities below and present them in a clear, readable format grouped
+            by type (subject types, programs, encounters, program encounters, address
+            levels). Show what changed compared to the user''s correction request.
+
+
+            After the summary, ask the user to confirm if everything looks correct
+            now, or tell you what else needs to be corrected.
+
+            Updated Entities:
+
+            {{#conversation.entities_jsonl#}}
+
+            User''s correction request:
+
+            {{#sys.query#}}'
+        selected: false
+        title: Correction Summary LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 86
+      id: '1774002885641'
+      position:
+        x: 2769
+        y: 953
+      positionAbsolute:
+        x: 2769
+        y: 953
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-131
+            key: ''
+            type: text
+            value: '{
+
+                  "entities_jsonl": {{conversation.entities_jsonl}},              
+                                                                                  
+                     
+
+                  "skip_upload": true                                            
+
+                }'
+          type: json
+        headers: 'Content-Type:application/json
+
+          avni-auth-token:{{#conversation.auth_token#}}'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: Call Generate Bundle
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}generate-bundle'
+        variables: []
+      height: 139
+      id: '1774005032398'
+      position:
+        x: 3832
+        y: 1163
+      positionAbsolute:
+        x: 3832
+        y: 1163
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        answer: '{{#1774005032398.body#}}'
+        selected: false
+        title: Answer 12
+        type: answer
+        variables: []
+      height: 101
+      id: '1774005187885'
+      position:
+        x: 4173
+        y: 1182
+      positionAbsolute:
+        x: 4173
+        y: 1182
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1711528708197'
+          - avni_mcp_server_url
+          variable_selector:
+          - conversation
+          - avni_mcp_server_url
+          write_mode: over-write
+        selected: false
+        title: AI Server url assigner
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1774005428719'
+      position:
+        x: 362
+        y: 618
+      positionAbsolute:
+        x: 362
+        y: 618
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1711528708197'
+          - auth_token
+          variable_selector:
+          - conversation
+          - auth_token
+          write_mode: over-write
+        selected: false
+        title: Auth token var assigner
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1774005484035'
+      position:
+        x: 362
+        y: 780
+      positionAbsolute:
+        x: 362
+        y: 780
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        author: avniplatform@samanvayfoundation.org
+        desc: ''
+        height: 88
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"There
+          is some bug in dify due to which code node was failing hence I had to use
+          HTTP REQUEST Node","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 88
+      id: '1774005765849'
+      position:
+        x: 3560.7535471305596
+        y: 1202.822386943088
+      positionAbsolute:
+        x: 3560.7535471305596
+        y: 1202.822386943088
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: avniplatform@samanvayfoundation.org
+        desc: ''
+        height: 88
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"These
+          two variable assigners were added so that we can use these variables in
+          the http request nodes","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 88
+      id: '1774006189404'
+      position:
+        x: 384.7988858434296
+        y: 932.0695229898253
+      positionAbsolute:
+        x: 384.7988858434296
+        y: 932.0695229898253
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: avniplatform@samanvayfoundation.org
+        desc: ''
+        height: 88
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"This
+          API is still under dev","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 88
+      id: '1774008479412'
+      position:
+        x: 3889.2736133507224
+        y: 1348.1150288703843
+      positionAbsolute:
+        x: 3889.2736133507224
+        y: 1348.1150288703843
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
     viewport:
-      x: -912.5358498634969
-      y: 229.7933784057339
-      zoom: 0.5557293344626252
+      x: -1009.142318841519
+      y: -187.21109550840117
+      zoom: 0.7834738169679659
   rag_pipeline_variables: []
