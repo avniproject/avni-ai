@@ -51,8 +51,8 @@ workflow:
     selector:
     - conversation
     - entities_jsonl
-    value: []
-    value_type: array[object]
+    value: {}
+    value_type: object
   - description: ''
     id: ee0fbd12-9867-4b7c-95d5-4b74e03475be
     name: uploaded_files
@@ -427,29 +427,6 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: fs-check-processed-false-1773908701222-target
-      selected: false
-      source: fs-check-processed
-      sourceHandle: 'false'
-      target: '1773908701222'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: llm
-      id: fs-save-jsonl-source-1773909315118-target
-      source: fs-save-jsonl
-      sourceHandle: source
-      target: '1773909315118'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: llm
         targetType: answer
       id: 1773909315118-source-1773909436902-target
@@ -533,17 +510,6 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: 1773908701222-source-fs-save-jsonl-target
-      source: '1773908701222'
-      sourceHandle: source
-      target: fs-save-jsonl
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: assigner
         targetType: llm
       id: 1773984373385-source-1774002885641-target
@@ -616,6 +582,61 @@ workflow:
       source: fs-human-input
       sourceHandle: 'Yes'
       target: '1774005032398'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: fs-check-processed-false-1774264909113-target
+      source: fs-check-processed
+      sourceHandle: 'false'
+      target: '1774264909113'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1774264909113-source-1774264840300-target
+      source: '1774264909113'
+      sourceHandle: source
+      target: '1774264840300'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: assigner
+      id: 1774264840300-source-fs-save-jsonl-target
+      source: '1774264840300'
+      sourceHandle: source
+      target: fs-save-jsonl
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: code
+      id: fs-save-jsonl-source-1773908701222-target
+      source: fs-save-jsonl
+      sourceHandle: source
+      target: '1773908701222'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: 1773908701222-source-1773909315118-target
+      source: '1773908701222'
+      sourceHandle: source
+      target: '1773909315118'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -1113,11 +1134,11 @@ workflow:
       height: 120
       id: '1757495688732'
       position:
-        x: 1746
-        y: 623
+        x: 1726
+        y: 715
       positionAbsolute:
-        x: 1746
-        y: 623
+        x: 1726
+        y: 715
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2190,56 +2211,98 @@ workflow:
       type: custom
       width: 241
     - data:
-        code: "import requests\n\ndef main(file_info: list, existing_entities_jsonl:\
-          \ str, avni_mcp_server_url: str):\n    file_url = \"\"\n    if file_info\
-          \ and len(file_info) > 0:\n        first_file = file_info[0]\n        if\
-          \ isinstance(first_file, dict):\n            file_url = first_file.get(\"\
-          url\", \"\") or first_file.get(\"remote_url\", \"\")\n        elif isinstance(first_file,\
-          \ str):\n            file_url = first_file\n\n    if not file_url:\n   \
-          \     return {\"output\": {\n            \"entities_jsonl\": [],\n     \
-          \       \"summary\": \"Error: No file URL found in uploaded files\",\n \
-          \           \"ambiguity_report\": {},\n        }}\n\n    try:\n        url\
-          \ = f\"{avni_mcp_server_url}/parse-and-validate\"\n        body = {\n  \
-          \          \"file_url\": file_url,\n            \"existing_entities_jsonl\"\
-          : existing_entities_jsonl or \"\",\n        }\n\n        print(f\"Calling\
-          \ {url} with file URL: {file_url[:80]}...\")\n        response = requests.post(url,\
-          \ json=body, timeout=60)\n        response.raise_for_status()\n        result\
-          \ = response.json()\n\n        return {\"output\": result}\n\n    except\
-          \ Exception as e:\n        print(f\"Error: {e}\")\n        return {\"output\"\
-          : {\n            \"entities_jsonl\": [],\n            \"summary\": f\"Error:\
-          \ {e}\",\n            \"ambiguity_report\": {},\n        }}\n"
+        code: "\"\"\"\nAmbiguity Checker code node for Dify chatflow.\n\nTakes the\
+          \ structured extraction LLM output and validates for completeness,\nconsistency,\
+          \ and orphaned references. Runs in Dify's Python sandbox.\n\nInput:  extracted_entities\
+          \ (object) — from Extraction LLM structured output\n        {subject_types:\
+          \ [...], programs: [...], encounter_types: [...], address_levels: [...]}\n\
+          Output: output (object) — contains validated entities (same structure) +\
+          \ issues\n\"\"\"\n\n\ndef _fuzzy_match(name, known_names):\n    lower =\
+          \ name.strip().lower()\n    for known in known_names:\n        if lower\
+          \ == known.lower() or lower in known.lower() or known.lower() in lower:\n\
+          \            return True\n    return False\n\n\ndef main(extracted_entities:\
+          \ dict):\n    st_rows = extracted_entities.get(\"subject_types\", [])\n\
+          \    prog_rows = extracted_entities.get(\"programs\", [])\n    enc_rows\
+          \ = extracted_entities.get(\"encounter_types\", [])\n    addr_rows = extracted_entities.get(\"\
+          address_levels\", [])\n\n    subject_type_names = {r[\"name\"] for r in\
+          \ st_rows if r.get(\"name\")}\n    program_names = {r[\"name\"] for r in\
+          \ prog_rows if r.get(\"name\")}\n\n    issues = []\n\n    # Check duplicate\
+          \ subject types\n    seen = {}\n    for r in st_rows:\n        key = r.get(\"\
+          name\", \"\").strip().lower()\n        if not key:\n            continue\n\
+          \        if key in seen:\n            issues.append({\"severity\": \"error\"\
+          , \"entity_type\": \"subject_type\",\n                           \"message\"\
+          : f\"Duplicate subject type: '{r['name']}'\"})\n        else:\n        \
+          \    seen[key] = r[\"name\"]\n\n    # Check subject type fields\n    for\
+          \ r in st_rows:\n        if not r.get(\"subjectTypeKind\"):\n          \
+          \  issues.append({\"severity\": \"warning\", \"entity_type\": \"subject_type\"\
+          ,\n                           \"message\": f\"Subject type '{r.get('name',\
+          \ '?')}' is missing 'subjectTypeKind'\"})\n\n    # Check duplicate programs\n\
+          \    seen = {}\n    for r in prog_rows:\n        key = r.get(\"name\", \"\
+          \").strip().lower()\n        if not key:\n            continue\n       \
+          \ if key in seen:\n            issues.append({\"severity\": \"error\", \"\
+          entity_type\": \"program\",\n                           \"message\": f\"\
+          Duplicate program: '{r['name']}'\"})\n        else:\n            seen[key]\
+          \ = r[\"name\"]\n\n    # Check program references\n    for r in prog_rows:\n\
+          \        subject = r.get(\"subject\", \"\")\n        if not subject:\n \
+          \           issues.append({\"severity\": \"warning\", \"entity_type\": \"\
+          program\",\n                           \"message\": f\"Program '{r['name']}'\
+          \ is missing target subject type\"})\n        elif not _fuzzy_match(subject,\
+          \ subject_type_names):\n            issues.append({\"severity\": \"warning\"\
+          , \"entity_type\": \"program\",\n                           \"message\"\
+          : f\"Program '{r['name']}' references subject type '{subject}' which doesn't\
+          \ match any defined subject type\"})\n\n    # Check encounter references\n\
+          \    for r in enc_rows:\n        if r.get(\"is_program_encounter\"):\n \
+          \           program = r.get(\"program\", \"\")\n            if program and\
+          \ not _fuzzy_match(program, program_names):\n                issues.append({\"\
+          severity\": \"warning\", \"entity_type\": \"program_encounter\",\n     \
+          \                          \"message\": f\"Program encounter '{r['name']}'\
+          \ references program '{program}' which doesn't match any defined program\"\
+          })\n        else:\n            subject = r.get(\"subject\", \"\")\n    \
+          \        if subject and not _fuzzy_match(subject, subject_type_names):\n\
+          \                issues.append({\"severity\": \"warning\", \"entity_type\"\
+          : \"encounter\",\n                               \"message\": f\"Encounter\
+          \ '{r['name']}' references subject type '{subject}' which doesn't match\
+          \ any defined subject type\"})\n\n    # Check location hierarchy\n    if\
+          \ not addr_rows:\n        issues.append({\"severity\": \"warning\", \"entity_type\"\
+          : \"location_hierarchy\",\n                       \"message\": \"No location\
+          \ hierarchy found. A default hierarchy will be generated.\"})\n\n    error_count\
+          \ = sum(1 for i in issues if i[\"severity\"] == \"error\")\n    warning_count\
+          \ = sum(1 for i in issues if i[\"severity\"] == \"warning\")\n\n    if not\
+          \ issues:\n        issues_summary = \"No issues found. All entities look\
+          \ good.\"\n    else:\n        lines = []\n        errors = [i for i in issues\
+          \ if i[\"severity\"] == \"error\"]\n        warnings = [i for i in issues\
+          \ if i[\"severity\"] == \"warning\"]\n        if errors:\n            lines.append(f\"\
+          {len(errors)} error(s):\")\n            for e in errors:\n             \
+          \   lines.append(f\"  [ERROR] {e['message']}\")\n        if warnings:\n\
+          \            lines.append(f\"{len(warnings)} warning(s):\")\n          \
+          \  for w in warnings:\n                lines.append(f\"  [WARNING] {w['message']}\"\
+          )\n        issues_summary = \"\\n\".join(lines)\n\n    return {\"output\"\
+          : {\n        \"entities\": extracted_entities,\n        \"issues_summary\"\
+          : issues_summary,\n        \"error_count\": error_count,\n        \"warning_count\"\
+          : warning_count,\n        \"has_errors\": error_count > 0,\n        \"has_warnings\"\
+          : warning_count > 0,\n    }}\n"
         code_language: python3
         outputs:
           output:
             children: null
             type: object
         selected: false
-        title: Spec Parser and Validator
+        title: Ambiguity Checker
         type: code
         variables:
-        - value_selector:
-          - sys
-          - files
-          value_type: array[file]
-          variable: file_info
         - value_selector:
           - conversation
           - entities_jsonl
           value_type: string
-          variable: existing_entities_jsonl
-        - value_selector:
-          - '1711528708197'
-          - avni_mcp_server_url
-          value_type: string
-          variable: avni_mcp_server_url
+          variable: extracted_entities
       height: 50
       id: '1773908701222'
       position:
-        x: 1746
-        y: 823
+        x: 2478.7552609815316
+        y: 1223.9650038340435
       positionAbsolute:
-        x: 1746
-        y: 823
+        x: 2478.7552609815316
+        y: 1223.9650038340435
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2285,9 +2348,8 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - '1773908701222'
-          - output
-          - entities_jsonl
+          - '1774264840300'
+          - structured_output
           variable_selector:
           - conversation
           - entities_jsonl
@@ -2300,11 +2362,11 @@ workflow:
       height: 82
       id: fs-save-jsonl
       position:
-        x: 2107
-        y: 789
+        x: 2157.5952245990775
+        y: 1256.8092506002906
       positionAbsolute:
-        x: 2107
-        y: 789
+        x: 2157.5952245990775
+        y: 1256.8092506002906
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2329,19 +2391,16 @@ workflow:
             looks correct, or tell you what needs to be corrected.
 
 
-            Summary:
+            Entites:
 
-            {{#1773908701222.output.summary#}}
+            {{#conversation.entities_jsonl#}}
 
 
             Ambiguity Report:
 
-            {{#1773908701222.output.ambiguity_report#}}
 
+            {{#1773908701222.output.issues_summary#}}
 
-            Previously stored entities (if any corrections were made):
-
-            {{#conversation.entities_jsonl#}}
 
 
             User''s latest message:
@@ -2356,11 +2415,11 @@ workflow:
       id: '1773909315118'
       position:
         x: 2769
-        y: 787
+        y: 1081
       positionAbsolute:
         x: 2769
-        y: 787
-      selected: false
+        y: 1081
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -2375,10 +2434,10 @@ workflow:
       id: '1773909436902'
       position:
         x: 3130
-        y: 916
+        y: 918
       positionAbsolute:
         x: 3130
-        y: 916
+        y: 918
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2407,10 +2466,10 @@ workflow:
       id: fs-human-input
       position:
         x: 3471
-        y: 882
+        y: 884
       positionAbsolute:
         x: 3471
-        y: 882
+        y: 884
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2426,10 +2485,10 @@ workflow:
       id: fs-ask-corrections
       position:
         x: 3832
-        y: 775
+        y: 777
       positionAbsolute:
         x: 3832
-        y: 775
+        y: 777
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2445,10 +2504,10 @@ workflow:
       id: fs-timeout
       position:
         x: 3832
-        y: 969
+        y: 971
       positionAbsolute:
         x: 3832
-        y: 969
+        y: 971
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2547,10 +2606,10 @@ workflow:
       id: '1773981975918'
       position:
         x: 1746
-        y: 953
+        y: 915
       positionAbsolute:
         x: 1746
-        y: 953
+        y: 915
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2619,11 +2678,11 @@ workflow:
       id: '1773982043351'
       position:
         x: 2087
-        y: 971
+        y: 933
       positionAbsolute:
         x: 2087
-        y: 971
-      selected: true
+        y: 933
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -2647,10 +2706,10 @@ workflow:
       id: '1773984373385'
       position:
         x: 2428
-        y: 955
+        y: 917
       positionAbsolute:
         x: 2428
-        y: 955
+        y: 917
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2695,10 +2754,10 @@ workflow:
       id: '1774002885641'
       position:
         x: 2769
-        y: 953
+        y: 915
       positionAbsolute:
         x: 2769
-        y: 953
+        y: 915
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2746,10 +2805,10 @@ workflow:
       id: '1774005032398'
       position:
         x: 3832
-        y: 1163
+        y: 1165
       positionAbsolute:
         x: 3832
-        y: 1163
+        y: 1165
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2765,10 +2824,10 @@ workflow:
       id: '1774005187885'
       position:
         x: 4173
-        y: 1182
+        y: 1184
       positionAbsolute:
         x: 4173
-        y: 1182
+        y: 1184
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2907,8 +2966,224 @@ workflow:
       targetPosition: left
       type: custom-note
       width: 240
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-5
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 76d15d49-1bae-4d0b-baaa-58c8c6be3e59
+          role: system
+          text: "You are an entity extraction assistant for the Avni platform. You\
+            \ read the content of a field workflow specification document and extract\
+            \ structured entities from it.\n\nThe document content (converted from\
+            \ Excel to markdown by the Doc Extractor):\n\"\n{{#1774264909113.text#}}\
+            \ \n\"\n\nYour job: extract ALL entities from this document and output\
+            \ them as a JSON array. Each entity must be one of the following types:\n\
+            \n## Entity Types and Fields\n\n### subject_type\nRegistration/subject\
+            \ types (e.g., Individual, Beneficiary, School, Household)\n```json\n\
+            {\n  \"type\": \"subject_type\",\n  \"name\": \"...\",\n  \"subjectTypeKind\"\
+            : \"Person|Individual|Household|Group|User\",\n  \"formLink\": \"name\
+            \ of the registration form (if mentioned)\",\n  \"lowestAddressLevel\"\
+            : \"lowest location level for registration (e.g., Village, Hamlet)\",\n\
+            \  \"description\": \"description if provided\",\n  \"allowMiddleName\"\
+            : true|false,\n  \"lastNameOptional\": true|false,\n  \"uniqueName\":\
+            \ true|false,\n  \"allowProfilePicture\": true|false,\n  \"group\": true|false,\n\
+            \  \"household\": true|false\n}\n```\n- `subjectTypeKind` must be one\
+            \ of: Person, Individual, Household, Group, User\n- Set `group: true`\
+            \ and `household: true` only for Household/Group types\n- Only include\
+            \ fields that are explicitly mentioned or clearly implied in the document\n\
+            \n### program\nPrograms that subjects can be enrolled in\n```json\n{\n\
+            \  \"type\": \"program\",\n  \"name\": \"...\",\n  \"subject\": \"target\
+            \ subject type name\",\n  \"colour\": \"#hex color if mentioned\",\n \
+            \ \"enrolmentForm\": \"enrolment form name if mentioned\",\n  \"exitForm\"\
+            : \"exit form name if mentioned\",\n  \"description\": \"description if\
+            \ provided\",\n  \"programStartCondition\": \"start condition if mentioned\"\
+            ,\n  \"programEndCondition\": \"end condition if mentioned\",\n  \"allowMultipleEnrolments\"\
+            : true|false,\n  \"showGrowthChart\": true|false\n}\n```\n- `subject`\
+            \ should reference one of the subject_type names extracted above\n- `colour`\
+            \ is a hex colour code — if not mentioned, omit the field\n\n### encounter_type\n\
+            Visits/encounters (both general and program-linked)\n```json\n{\n  \"\
+            type\": \"encounter_type\",\n  \"name\": \"...\",\n  \"program\": \"program\
+            \ name or empty string\",\n  \"subject\": \"subject type name\",\n  \"\
+            encounterType\": \"Scheduled|Unscheduled\",\n  \"is_program_encounter\"\
+            : true|false,\n  \"frequency\": \"scheduling frequency if mentioned (e.g.,\
+            \ Monthly, Weekly, Daily)\",\n  \"formsLinked\": \"form name if mentioned\"\
+            ,\n  \"cancellationForm\": \"cancellation form name if mentioned\",\n\
+            \  \"description\": \"description or purpose if provided\"\n}\n```\n-\
+            \ If the encounter appears in a table with a \"Program name\" column,\
+            \ it is a program encounter: set `is_program_encounter: true` and fill\
+            \ in `program`\n- If the encounter appears in a table with a \"Subject\
+            \ Type\" column (but no program column), it is a general encounter: set\
+            \ `is_program_encounter: false` and `program: \"\"`\n- `encounterType`\
+            \ should be \"Scheduled\" or \"Unscheduled\" based on the document. Terms\
+            \ like \"Unplanned\" or \"As required\" or \"As cases arise\" mean \"\
+            Unscheduled\"\n\n### address_level\nLocation hierarchy levels (e.g., State\
+            \ → District → Block → Village)\n```json\n{\n  \"type\": \"address_level\"\
+            ,\n  \"name\": \"...\",\n  \"level\": 1,\n  \"parent\": \"parent level\
+            \ name or null\"\n}\n```\n- The topmost level has `parent: null` and the\
+            \ highest level number\n- Each child has a lower level number than its\
+            \ parent\n- For example: State(level=4) → District(level=3) → Block(level=2)\
+            \ → Village(level=1)\n- If multiple hierarchies share levels (e.g., \"\
+            District → Block → Hamlet\" and \"District → Block → School\"), extract\
+            \ each unique level only once but include all leaf levels\n\n## Rules\n\
+            \n1. Extract EVERY entity you can find. Look across all sheets/sections\
+            \ for subject types, programs, encounters/visits, and location hierarchies.\n\
+            2. Only include fields that are actually present or clearly implied in\
+            \ the document. Do not guess values.\n3. Ignore `nan` values — treat them\
+            \ as missing (omit the field).\n4. Trim whitespace from all names.\n5.\
+            \ Do NOT invent entities that are not in the document.\n6. Do NOT skip\
+            \ entities that are clearly defined, even if their formatting is unusual.\n\
+            \n## Output Format\n\nRespond with ONLY a valid JSON array. No markdown\
+            \ fences, no explanation — just the array:\n\n[\n  {\"type\": \"subject_type\"\
+            , \"name\": \"Beneficiary Registration\", \"subjectTypeKind\": \"Person\"\
+            , \"formLink\": \"Beneficiary Registration\"},\n  {\"type\": \"subject_type\"\
+            , \"name\": \"School Registration\", \"subjectTypeKind\": \"Individual\"\
+            , \"description\": \"They will provide the list of schools\"},\n  {\"\
+            type\": \"program\", \"name\": \"Maternal Health\", \"subject\": \"Beneficiary\
+            \ Registration\", \"enrolmentForm\": \"Maternal Enrolment\", \"exitForm\"\
+            : \"Maternal Exit\"},\n  {\"type\": \"encounter_type\", \"name\": \"ANC\
+            \ Visit\", \"program\": \"Maternal Health\", \"subject\": \"\", \"encounterType\"\
+            : \"Scheduled\", \"is_program_encounter\": true, \"frequency\": \"Monthly\"\
+            },\n  {\"type\": \"encounter_type\", \"name\": \"Home Visit\", \"program\"\
+            : \"\", \"subject\": \"Beneficiary Registration\", \"encounterType\":\
+            \ \"Unscheduled\", \"is_program_encounter\": false},\n  {\"type\": \"\
+            address_level\", \"name\": \"District\", \"level\": 3, \"parent\": null},\n\
+            \  {\"type\": \"address_level\", \"name\": \"Block\", \"level\": 2, \"\
+            parent\": \"District\"},\n  {\"type\": \"address_level\", \"name\": \"\
+            Village\", \"level\": 1, \"parent\": \"Block\"}\n]\n"
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              address_levels:
+                items:
+                  additionalProperties: false
+                  properties:
+                    level:
+                      type: number
+                    name:
+                      type: string
+                    parent:
+                      type: string
+                  required:
+                  - name
+                  - level
+                  - parent
+                  type: object
+                type: array
+              encounter_types:
+                items:
+                  additionalProperties: false
+                  properties:
+                    encounterType:
+                      type: string
+                    frequency:
+                      type: string
+                    is_program_encounter:
+                      type: string
+                    name:
+                      type: string
+                    program:
+                      type: string
+                    subject:
+                      type: string
+                  required:
+                  - name
+                  - program
+                  - subject
+                  - encounterType
+                  - is_program_encounter
+                  - frequency
+                  type: object
+                type: array
+              programs:
+                items:
+                  additionalProperties: false
+                  properties:
+                    enrolmentForm:
+                      type: string
+                    exitForm:
+                      type: string
+                    name:
+                      type: string
+                    subject:
+                      type: string
+                  required:
+                  - name
+                  - subject
+                  - enrolmentForm
+                  - exitForm
+                  type: object
+                type: array
+              subject_types:
+                items:
+                  additionalProperties: false
+                  properties:
+                    formLink:
+                      type: string
+                    name:
+                      type: string
+                    subjectTypeKind:
+                      type: string
+                  required:
+                  - name
+                  - subjectTypeKind
+                  - formLink
+                  type: object
+                type: array
+            required:
+            - subject_types
+            - programs
+            - encounter_types
+            - address_levels
+            type: object
+        structured_output_enabled: true
+        title: Spec Parser
+        type: llm
+        vision:
+          enabled: false
+      height: 86
+      id: '1774264840300'
+      position:
+        x: 1843.348961430316
+        y: 1232.0383886433995
+      positionAbsolute:
+        x: 1843.348961430316
+        y: 1232.0383886433995
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        is_array_file: true
+        selected: false
+        title: Doc Extractor
+        type: document-extractor
+        variable_selector:
+        - sys
+        - files
+      height: 102
+      id: '1774264909113'
+      position:
+        x: 1553.9127713301093
+        y: 1256.8092506002906
+      positionAbsolute:
+        x: 1553.9127713301093
+        y: 1256.8092506002906
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
     viewport:
-      x: -1009.142318841519
-      y: -187.21109550840117
-      zoom: 0.7834738169679659
+      x: 232.8494347047356
+      y: 176.32086809799728
+      zoom: 0.27850986799446326
   rag_pipeline_variables: []
