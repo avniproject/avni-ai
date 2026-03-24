@@ -1,0 +1,96 @@
+SUMMARY METRICS,,
+metric,value,description
+total_messages,11,Overall total messages
+total_conversations,7,Overall total conversations
+unique_users,3,Overall unique users
+unique_organizations,2,Overall unique organizations
+date_range_days,9,Overall date range days
+messages_per_day,1.2222222222222223,Overall messages per day
+,,
+,,
+ENVIRONMENT DISTRIBUTION,,
+environment,message_count,percentage
+Training,3,75.0%
+Production,1,25.0%
+,,
+,,
+TOP 10 ORGANIZATIONS,
+organization,message_count
+Test din,3
+Goonj,1
+,
+,
+TOP 10 USERS,
+user_name,message_count
+Dinesh G,3
+Himesh R,2
+maha,1
+,
+,
+HOURLY USAGE PATTERNS,
+hour,message_count
+04:00,1
+08:00,3
+09:00,4
+10:00,3
+,
+,
+DAILY USAGE PATTERNS,
+day_of_week,message_count
+Monday,0
+Tuesday,8
+Wednesday,3
+Thursday,0
+Friday,0
+Saturday,0
+Sunday,0
+,
+,
+CONVERSATION ANALYSIS,,
+metric,value,description
+avg_length,1.5714285714285714,Conversation avg length
+median_length,1.0,Conversation median length
+max_length,3,Conversation max length
+single_message_convs,4,Conversation single message convs
+,,
+,,
+TEXT ANALYSIS,,
+metric,value,unit
+avg_query_length,15.090909090909092,characters
+avg_answer_length,438.27272727272725,characters
+max_query_length,32,characters
+max_answer_length,1300,characters
+,,
+,,
+PERFORMANCE METRICS,,
+metric,value,unit
+avg_response_time,6.91,seconds
+median_response_time,6.69,seconds
+min_response_time,4.77,seconds
+max_response_time,10.51,seconds
+,,
+,,
+TOKEN USAGE,,
+metric,value,unit
+total_prompt_tokens,27171,tokens
+total_completion_tokens,405,tokens
+total_tokens,27576,tokens
+avg_tokens_per_message,2506.909090909091,tokens
+,,
+,,
+COST ANALYSIS,,
+metric,value,unit
+total_cost,0.097041,USD
+avg_cost_per_message,0.008822,USD
+,,
+,,
+COST BY ENVIRONMENT,,
+environment,total_cost,unit
+Training,0.097041,USD
+Production,0.000000,USD
+,,
+,,
+DUPLICATE QUERIES,
+query,frequency
+locationTypes are wha?,2
+hi,2

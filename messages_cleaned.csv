@@ -1,0 +1,1 @@
+conversation_id,message_id,org_name,org_type,user_name,query,answer,message_tokens,answer_tokens,provider_response_latency,from_source,from_end_user_id,status,created_at,prompt_tokens,completion_tokens,total_tokens,total_price,currency,latency,time_to_first_token,time_to_generate
