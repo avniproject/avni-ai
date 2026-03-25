@@ -44,6 +44,11 @@ This knowledge base helps Avni implementers configure and troubleshoot Avni impl
 - ✅ Troubleshooting guides from 90,000+ support tickets
 - ✅ Clear navigation and cross-references
 
+**Important Notes:**
+- 📄 **`merged_kb.md`** is the active Dify knowledge base source file used for chunking - do not delete
+- 📁 The 68 individual files in subdirectories (00-getting-started/, 01-core-concepts/, etc.) are for organization and reference
+- 📝 All examples use fictional organization names for illustration purposes (e.g., "MLD Trust", "admin@orgname")
+
 <!-- END CHUNK -->
 
 <!-- CHUNK: quick-navigation -->
