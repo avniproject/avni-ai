@@ -11,21 +11,20 @@ Your job: extract ALL entities from this document and output them as a JSON arra
 Registration/subject types (e.g., Individual, Beneficiary, School, Household)
 ```json
 {
-  "type": "subject_type",
   "name": "...",
-  "subjectTypeKind": "Person|Individual|Household|Group|User",
-  "formLink": "name of the registration form (if mentioned)",
-  "lowestAddressLevel": "lowest location level for registration (e.g., Village, Hamlet)",
+  "type": "Person|Individual|Household|Group|User",
+  "form_link": "name of the registration form (if mentioned)",
+  "lowest_address_level": "lowest location level for registration (e.g., Village, Hamlet)",
   "description": "description if provided",
-  "allowMiddleName": true|false,
-  "lastNameOptional": true|false,
-  "uniqueName": true|false,
-  "allowProfilePicture": true|false,
+  "allow_middle_name": true|false,
+  "last_name_optional": true|false,
+  "unique_name": true|false,
+  "allow_profile_picture": true|false,
   "group": true|false,
   "household": true|false
 }
 ```
-- `subjectTypeKind` must be one of: Person, Individual, Household, Group, User
+- `type` must be one of: Person, Individual, Household, Group, User
 - Set `group: true` and `household: true` only for Household/Group types
 - Only include fields that are explicitly mentioned or clearly implied in the document
 
@@ -33,47 +32,44 @@ Registration/subject types (e.g., Individual, Beneficiary, School, Household)
 Programs that subjects can be enrolled in
 ```json
 {
-  "type": "program",
   "name": "...",
-  "subject": "target subject type name",
+  "target_subject_type": "target subject type name",
   "colour": "#hex color if mentioned",
-  "enrolmentForm": "enrolment form name if mentioned",
-  "exitForm": "exit form name if mentioned",
+  "enrolment_form": "enrolment form name if mentioned",
+  "exit_form": "exit form name if mentioned",
   "description": "description if provided",
-  "programStartCondition": "start condition if mentioned",
-  "programEndCondition": "end condition if mentioned",
-  "allowMultipleEnrolments": true|false,
-  "showGrowthChart": true|false
+  "program_start_condition": "start condition if mentioned",
+  "program_end_condition": "end condition if mentioned",
+  "allow_multiple_enrolments": true|false,
+  "show_growth_chart": true|false
 }
 ```
-- `subject` should reference one of the subject_type names extracted above
+- `target_subject_type` should reference one of the subject_type names extracted above
 - `colour` is a hex colour code — if not mentioned, omit the field
 
 ### encounter_type
 Visits/encounters (both general and program-linked)
 ```json
 {
-  "type": "encounter_type",
   "name": "...",
-  "program": "program name or empty string",
-  "subject": "subject type name",
-  "encounterType": "Scheduled|Unscheduled",
+  "program_name": "program name or empty string",
+  "subject_type": "subject type name",
+  "encounter_type": "Scheduled|Unscheduled",
   "is_program_encounter": true|false,
   "frequency": "scheduling frequency if mentioned (e.g., Monthly, Weekly, Daily)",
-  "formsLinked": "form name if mentioned",
-  "cancellationForm": "cancellation form name if mentioned",
+  "forms_linked": "form name if mentioned",
+  "cancellation_form": "cancellation form name if mentioned",
   "description": "description or purpose if provided"
 }
 ```
-- If the encounter appears in a table with a "Program name" column, it is a program encounter: set `is_program_encounter: true` and fill in `program`
-- If the encounter appears in a table with a "Subject Type" column (but no program column), it is a general encounter: set `is_program_encounter: false` and `program: ""`
-- `encounterType` should be "Scheduled" or "Unscheduled" based on the document. Terms like "Unplanned" or "As required" or "As cases arise" mean "Unscheduled"
+- If the encounter appears in a table with a "Program name" column, it is a program encounter: set `is_program_encounter: true` and fill in `program_name`
+- If the encounter appears in a table with a "Subject Type" column (but no program column), it is a general encounter: set `is_program_encounter: false` and `program_name: ""`
+- `encounter_type` should be "Scheduled" or "Unscheduled" based on the document. Terms like "Unplanned" or "As required" or "As cases arise" mean "Unscheduled"
 
 ### address_level
 Location hierarchy levels (e.g., State → District → Block → Village)
 ```json
 {
-  "type": "address_level",
   "name": "...",
   "level": 1,
   "parent": "parent level name or null"
@@ -110,15 +106,15 @@ Respond with a JSON object containing four arrays — one per entity type:
 
 {
 "subject_types": [
-{"name": "Beneficiary Registration", "subjectTypeKind": "Person", "formLink": "Beneficiary Registration"},
-{"name": "School Registration", "subjectTypeKind": "Individual", "description": "They will provide the list of schools"}
+{"name": "Beneficiary Registration", "type": "Person", "form_link": "Beneficiary Registration"},
+{"name": "School Registration", "type": "Individual", "description": "They will provide the list of schools"}
 ],
 "programs": [
-{"name": "Maternal Health", "subject": "Beneficiary Registration", "enrolmentForm": "Maternal Enrolment", "exitForm": "Maternal Exit"}
+{"name": "Maternal Health", "target_subject_type": "Beneficiary Registration", "enrolment_form": "Maternal Enrolment", "exit_form": "Maternal Exit"}
 ],
 "encounter_types": [
-{"name": "ANC Visit", "program": "Maternal Health", "subject": "", "encounterType": "Scheduled", "is_program_encounter": true, "frequency": "Monthly"},
-{"name": "Home Visit", "program": "", "subject": "Beneficiary Registration", "encounterType": "Unscheduled", "is_program_encounter": false}
+{"name": "ANC Visit", "program_name": "Maternal Health", "subject_type": "", "encounter_type": "Scheduled", "is_program_encounter": true, "frequency": "Monthly"},
+{"name": "Home Visit", "program_name": "", "subject_type": "Beneficiary Registration", "encounter_type": "Unscheduled", "is_program_encounter": false}
 ],
 "address_levels": [
 {"name": "District", "level": 3, "parent": null},
