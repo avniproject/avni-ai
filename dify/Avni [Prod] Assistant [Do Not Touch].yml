@@ -439,7 +439,7 @@ workflow:
       positionAbsolute:
         x: 120
         y: -839
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -462,6 +462,20 @@ workflow:
         model:
           completion_params:
             enable_stream: true
+            json_schema: "{\n  \"type\": \"object\",\n  \"additionalProperties\":\
+              \ false,\n  \"required\": [\n    \"service\",\n    \"confidence\",\n\
+              \    \"question_type\",\n    \"routing_reason\",\n    \"clarification_needed\"\
+              ,\n    \"clarifying_questions\"\n  ],\n  \"properties\": {\n    \"service\"\
+              : {\n      \"type\": \"string\",\n      \"enum\": [\"RAG\", \"ASSISTANT\"\
+              , \"OUT_OF_SCOPE\"]\n    },\n    \"confidence\": {\n      \"type\":\
+              \ \"number\",\n      \"minimum\": 0,\n      \"maximum\": 1\n    },\n\
+              \    \"question_type\": {\n      \"type\": \"string\",\n      \"enum\"\
+              : [\n        \"capability_inquiry\",\n        \"implementation_request\"\
+              ,\n        \"novel_requirement\",\n        \"not_avni_related\"\n  \
+              \    ]\n    },\n    \"routing_reason\": {\n      \"type\": \"string\"\
+              \n    },\n    \"clarification_needed\": {\n      \"type\": \"boolean\"\
+              \n    },\n    \"clarifying_questions\": {\n      \"type\": \"array\"\
+              ,\n      \"items\": { \"type\": \"string\" }\n    }\n  }\n}"
             reasoning_effort: minimal
             verbosity: low
           mode: chat
@@ -701,7 +715,7 @@ workflow:
       positionAbsolute:
         x: 1002
         y: -321
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -765,7 +779,7 @@ workflow:
       positionAbsolute:
         x: 1388
         y: 616.7720481749584
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -785,7 +799,7 @@ workflow:
       positionAbsolute:
         x: 1730
         y: 607
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1311,7 +1325,7 @@ workflow:
       positionAbsolute:
         x: 1388
         y: 18
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1330,7 +1344,7 @@ workflow:
       positionAbsolute:
         x: 1388
         y: 186
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1350,7 +1364,7 @@ workflow:
       positionAbsolute:
         x: 1388
         y: 403
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1386,7 +1400,7 @@ workflow:
       positionAbsolute:
         x: 414
         y: -655
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1416,7 +1430,7 @@ workflow:
       positionAbsolute:
         x: 1730
         y: 0
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1435,7 +1449,7 @@ workflow:
       positionAbsolute:
         x: 2092
         y: 142.0508392628631
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1501,7 +1515,7 @@ workflow:
       positionAbsolute:
         x: 2092
         y: -66.24690036776286
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1540,7 +1554,7 @@ workflow:
       positionAbsolute:
         x: 2445.308378071105
         y: 9.184497627950861
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1563,6 +1577,7 @@ workflow:
         x: 2505.308378071105
         y: 118.18449762795086
       selectable: false
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom-loop-start
@@ -1625,7 +1640,7 @@ workflow:
       positionAbsolute:
         x: 2629.308378071105
         y: 116.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1682,7 +1697,7 @@ workflow:
       positionAbsolute:
         x: 2951.308378071105
         y: 116.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1710,7 +1725,7 @@ workflow:
       positionAbsolute:
         x: 3937.308378071105
         y: 213.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1745,7 +1760,7 @@ workflow:
       positionAbsolute:
         x: 3273.308378071105
         y: 79.37108348021665
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1771,7 +1786,7 @@ workflow:
       positionAbsolute:
         x: 3615.308378071105
         y: 69.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1804,7 +1819,7 @@ workflow:
       positionAbsolute:
         x: 3615.308378071105
         y: 232.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1833,7 +1848,7 @@ workflow:
       positionAbsolute:
         x: 4443.347431585707
         y: 193.31705379355293
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1852,13 +1867,13 @@ workflow:
       positionAbsolute:
         x: 2454
         y: 506
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: -474.9020758332024
-      y: 307.38815940779915
-      zoom: 0.5817947465333346
+      x: -259.8473355861688
+      y: 393.3989786932358
+      zoom: 0.564318743774258
   rag_pipeline_variables: []
