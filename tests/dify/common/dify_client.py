@@ -17,6 +17,7 @@ class DifyClient:
         )
         self.max_retries = int(os.getenv("DIFY_MAX_RETRIES", "3"))
         self.retry_backoff_seconds = float(os.getenv("DIFY_RETRY_BACKOFF_SECONDS", "2"))
+        self.max_stream_seconds = float(os.getenv("DIFY_STREAM_MAX_SECONDS", "180"))
         self.headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -75,7 +76,9 @@ class DifyClient:
                 )
                 response.raise_for_status()
 
-                return self._consume_sse_stream(response, conversation_id)
+                return self._consume_sse_stream(
+                    response, conversation_id, self.max_stream_seconds
+                )
 
             except requests.exceptions.HTTPError as e:
                 response_snippet = ""
@@ -123,6 +126,7 @@ class DifyClient:
     def _consume_sse_stream(
         response: requests.Response,
         fallback_conversation_id: str,
+        max_stream_seconds: float = 180.0,
     ) -> Dict[str, Any]:
         """Parse a Dify SSE stream and return a blocking-style result dict.
 
@@ -133,57 +137,74 @@ class DifyClient:
         answer_parts: list[str] = []
         conversation_id = fallback_conversation_id
         message_id = ""
+        stream_started_at = time.monotonic()
 
-        for raw_line in response.iter_lines(decode_unicode=True):
-            if not raw_line:
-                continue  # blank keep-alive line
-
-            # SSE lines are either "event: <type>" or "data: <json>"
-            if raw_line.startswith("data: "):
-                json_str = raw_line[len("data: "):]
-                try:
-                    data = _json.loads(json_str)
-                except _json.JSONDecodeError:
-                    continue
-
-                event_type = data.get("event", "")
-
-                # Accumulate streamed answer tokens
-                if event_type == "message":
-                    answer_parts.append(data.get("answer", ""))
-
-                # Capture IDs from any event that carries them
-                if data.get("conversation_id"):
-                    conversation_id = data["conversation_id"]
-                if data.get("message_id"):
-                    message_id = data["message_id"]
-
-                # Check for workflow/message errors
-                if event_type == "error":
-                    error_msg = data.get("message") or data.get("error", "Unknown Dify error")
+        try:
+            for raw_line in response.iter_lines(decode_unicode=True):
+                if (time.monotonic() - stream_started_at) > max_stream_seconds:
                     return {
-                        "answer": "".join(answer_parts) or "Sorry, I encountered an error.",
+                        "answer": "".join(answer_parts)
+                        or "Sorry, I encountered an error.",
                         "conversation_id": conversation_id,
                         "message_id": message_id,
                         "success": False,
-                        "error": error_msg,
+                        "error": (
+                            f"Dify streaming response exceeded {max_stream_seconds:.0f}s"
+                        ),
                     }
 
-                # message_end carries the final aggregated answer in some Dify versions
-                if event_type == "message_end":
-                    if not answer_parts and data.get("answer"):
-                        answer_parts.append(data["answer"])
+                if not raw_line:
+                    continue  # blank keep-alive line
 
-        response.close()
+                # SSE lines are either "event: <type>" or "data: <json>"
+                if raw_line.startswith("data: "):
+                    json_str = raw_line[len("data: "):]
+                    try:
+                        data = _json.loads(json_str)
+                    except _json.JSONDecodeError:
+                        continue
 
-        full_answer = "".join(answer_parts)
-        return {
-            "answer": full_answer,
-            "conversation_id": conversation_id,
-            "message_id": message_id,
-            "success": bool(full_answer),
-            **({"error": "Empty response from Dify"} if not full_answer else {}),
-        }
+                    event_type = data.get("event", "")
+
+                    # Accumulate streamed answer tokens
+                    if event_type == "message":
+                        answer_parts.append(data.get("answer", ""))
+
+                    # Capture IDs from any event that carries them
+                    if data.get("conversation_id"):
+                        conversation_id = data["conversation_id"]
+                    if data.get("message_id"):
+                        message_id = data["message_id"]
+
+                    # Check for workflow/message errors
+                    if event_type == "error":
+                        error_msg = data.get("message") or data.get(
+                            "error", "Unknown Dify error"
+                        )
+                        return {
+                            "answer": "".join(answer_parts)
+                            or "Sorry, I encountered an error.",
+                            "conversation_id": conversation_id,
+                            "message_id": message_id,
+                            "success": False,
+                            "error": error_msg,
+                        }
+
+                    # message_end carries the final aggregated answer in some Dify versions
+                    if event_type == "message_end":
+                        if not answer_parts and data.get("answer"):
+                            answer_parts.append(data["answer"])
+
+            full_answer = "".join(answer_parts)
+            return {
+                "answer": full_answer,
+                "conversation_id": conversation_id,
+                "message_id": message_id,
+                "success": bool(full_answer),
+                **({"error": "Empty response from Dify"} if not full_answer else {}),
+            }
+        finally:
+            response.close()
 
     # ── helpers ───────────────────────────────────────────────────────────
 

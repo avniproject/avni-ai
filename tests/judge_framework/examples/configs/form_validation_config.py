@@ -45,7 +45,7 @@ def create_form_validation_test_config() -> TestConfiguration:
             "recommendation_quality": 75.0,
             "completeness": 70.0,
         },
-        openai_model="gpt-4o",
+        openai_model="gpt-4.1",
         openai_temperature=0.1,
         include_detailed_analysis=True,
     )

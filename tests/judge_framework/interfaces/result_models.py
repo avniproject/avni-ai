@@ -25,7 +25,7 @@ class EvaluationConfig:
 
     evaluation_metrics: List[str] = field(default_factory=list)
     success_thresholds: Dict[str, float] = field(default_factory=dict)
-    openai_model: str = "gpt-4o"
+    openai_model: str = "gpt-4.1"
     openai_temperature: float = 0.1
     include_detailed_analysis: bool = True
 

@@ -26,7 +26,7 @@ class AIReviewer:
             full_prompt = self.review_prompt + conversation_text
 
             response = openai.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4.1",
                 messages=[{"role": "system", "content": full_prompt}],
                 temperature=0.1,
                 max_tokens=1500,
@@ -100,7 +100,7 @@ Explain each score in detail:
 """
 
             response = openai.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4.1",
                 messages=[{"role": "system", "content": validation_prompt}],
                 temperature=0.1,
                 max_tokens=1500,
