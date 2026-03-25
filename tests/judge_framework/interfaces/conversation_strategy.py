@@ -54,7 +54,7 @@ class AIConversationStrategy(ConversationGenerationStrategy):
     def __init__(
         self,
         scenario_prompts: List[str],
-        openai_model: str = "gpt-4o",
+        openai_model: str = "gpt-4.1-mini",
         temperature: float = 0.5,
     ):
         self.scenario_prompts = scenario_prompts

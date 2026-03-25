@@ -1,7 +1,8 @@
 app:
   description: Avni AI Assistant
   icon: b849950f-3cae-4021-afc0-ce88c5d12035
-  icon_background: '#FFEAD5'
+  icon_background: ''
+  icon_type: image
   mode: advanced-chat
   name: Avni [Prod] Assistant [Do Not Touch]
   use_icon_as_answer_icon: true
@@ -438,7 +439,7 @@ workflow:
       positionAbsolute:
         x: 120
         y: -839
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -460,33 +461,25 @@ workflow:
             size: 100
         model:
           completion_params:
-            json_schema: "{\n  \"name\": \"RoutingDecision\",\n  \"schema\": {\n \
-              \   \"type\": \"object\",\n    \"properties\": {\n      \"service\"\
-              : {\n        \"type\": \"string\",\n        \"enum\": [\"RAG\", \"ASSISTANT\"\
-              , \"TEMPLATE\"],\n        \"description\": \"Service to which the request\
-              \ is routed\"\n      },\n      \"confidence\": {\n        \"type\":\
-              \ \"number\",\n        \"minimum\": 0.0,\n        \"maximum\": 1.0,\n\
-              \        \"description\": \"Confidence score between 0.0 and 1.0\"\n\
-              \      },\n      \"question_type\": {\n        \"type\": \"string\"\
-              ,\n        \"enum\": [\"capability_inquiry\", \"implementation_request\"\
-              , \"novel_requirement\"],\n        \"description\": \"Categorization\
-              \ of the user's question\"\n      },\n      \"routing_reason\": {\n\
-              \        \"type\": \"string\",\n        \"description\": \"Brief explanation\
-              \ focusing on question structure, not content complexity\"\n      },\n\
-              \      \"clarification_needed\": {\n        \"type\": \"boolean\",\n\
-              \        \"description\": \"Whether clarifying questions are required\"\
-              \n      },\n      \"clarifying_questions\": {\n        \"type\": \"\
-              array\",\n        \"items\": {\n          \"type\": \"string\"\n   \
-              \     },\n        \"description\": \"Up to two clarifying questions,\
-              \ required only if clarification_needed is true\",\n        \"maxItems\"\
-              : 2\n      }\n    },\n    \"required\": [\n      \"service\",\n    \
-              \  \"confidence\",\n      \"question_type\",\n      \"routing_reason\"\
-              ,\n      \"clarification_needed\"\n    ],\n    \"additionalProperties\"\
-              : false\n  }\n}"
-            response_format: json_schema
-            temperature: 0.1
+            enable_stream: true
+            json_schema: "{\n  \"type\": \"object\",\n  \"additionalProperties\":\
+              \ false,\n  \"required\": [\n    \"service\",\n    \"confidence\",\n\
+              \    \"question_type\",\n    \"routing_reason\",\n    \"clarification_needed\"\
+              ,\n    \"clarifying_questions\"\n  ],\n  \"properties\": {\n    \"service\"\
+              : {\n      \"type\": \"string\",\n      \"enum\": [\"RAG\", \"ASSISTANT\"\
+              , \"OUT_OF_SCOPE\"]\n    },\n    \"confidence\": {\n      \"type\":\
+              \ \"number\",\n      \"minimum\": 0,\n      \"maximum\": 1\n    },\n\
+              \    \"question_type\": {\n      \"type\": \"string\",\n      \"enum\"\
+              : [\n        \"capability_inquiry\",\n        \"implementation_request\"\
+              ,\n        \"novel_requirement\",\n        \"not_avni_related\"\n  \
+              \    ]\n    },\n    \"routing_reason\": {\n      \"type\": \"string\"\
+              \n    },\n    \"clarification_needed\": {\n      \"type\": \"boolean\"\
+              \n    },\n    \"clarifying_questions\": {\n      \"type\": \"array\"\
+              ,\n      \"items\": { \"type\": \"string\" }\n    }\n  }\n}"
+            reasoning_effort: minimal
+            verbosity: low
           mode: chat
-          name: gpt-4o-mini
+          name: gpt-5-mini
           provider: langgenius/openai/openai
         prompt_template:
         - id: b14eb575-d615-41dd-aac1-00663db3a6eb
@@ -714,7 +707,7 @@ workflow:
         selected: false
         title: IF/ELSE
         type: if-else
-      height: 294
+      height: 414
       id: '1757493270484'
       position:
         x: 1002
@@ -722,7 +715,7 @@ workflow:
       positionAbsolute:
         x: 1002
         y: -321
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -747,9 +740,10 @@ workflow:
             size: 50
         model:
           completion_params:
-            temperature: 0.1
+            reasoning_effort: minimal
+            verbosity: low
           mode: chat
-          name: gpt-4o
+          name: gpt-5-mini
           provider: langgenius/openai/openai
         prompt_template:
         - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
@@ -781,11 +775,11 @@ workflow:
       id: '1757495664531'
       position:
         x: 1388
-        y: 615
+        y: 616.7720481749584
       positionAbsolute:
         x: 1388
-        y: 615
-      selected: true
+        y: 616.7720481749584
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -805,7 +799,7 @@ workflow:
       positionAbsolute:
         x: 1730
         y: 607
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -830,9 +824,11 @@ workflow:
             size: 20
         model:
           completion_params:
-            temperature: 0.1
+            enable_stream: true
+            reasoning_effort: minimal
+            verbosity: low
           mode: chat
-          name: gpt-4o
+          name: gpt-5-mini
           provider: langgenius/openai/openai
         prompt_template:
         - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
@@ -1329,7 +1325,7 @@ workflow:
       positionAbsolute:
         x: 1388
         y: 18
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1348,7 +1344,7 @@ workflow:
       positionAbsolute:
         x: 1388
         y: 186
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1368,7 +1364,7 @@ workflow:
       positionAbsolute:
         x: 1388
         y: 403
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1404,7 +1400,7 @@ workflow:
       positionAbsolute:
         x: 414
         y: -655
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1426,7 +1422,7 @@ workflow:
         selected: false
         title: IF/ELSE 2
         type: if-else
-      height: 124
+      height: 140
       id: '1760358453289'
       position:
         x: 1730
@@ -1434,7 +1430,7 @@ workflow:
       positionAbsolute:
         x: 1730
         y: 0
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1453,7 +1449,7 @@ workflow:
       positionAbsolute:
         x: 2092
         y: 142.0508392628631
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1519,7 +1515,7 @@ workflow:
       positionAbsolute:
         x: 2092
         y: -66.24690036776286
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1558,7 +1554,7 @@ workflow:
       positionAbsolute:
         x: 2445.308378071105
         y: 9.184497627950861
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1581,6 +1577,7 @@ workflow:
         x: 2505.308378071105
         y: 118.18449762795086
       selectable: false
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom-loop-start
@@ -1643,7 +1640,7 @@ workflow:
       positionAbsolute:
         x: 2629.308378071105
         y: 116.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1700,7 +1697,7 @@ workflow:
       positionAbsolute:
         x: 2951.308378071105
         y: 116.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1728,7 +1725,7 @@ workflow:
       positionAbsolute:
         x: 3937.308378071105
         y: 213.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1754,7 +1751,7 @@ workflow:
         selected: false
         title: 'Processing Status '
         type: if-else
-      height: 124
+      height: 148
       id: '1760424086059'
       parentId: '1760423058735'
       position:
@@ -1763,7 +1760,7 @@ workflow:
       positionAbsolute:
         x: 3273.308378071105
         y: 79.37108348021665
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1789,7 +1786,7 @@ workflow:
       positionAbsolute:
         x: 3615.308378071105
         y: 69.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1822,7 +1819,7 @@ workflow:
       positionAbsolute:
         x: 3615.308378071105
         y: 232.18449762795086
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1851,7 +1848,7 @@ workflow:
       positionAbsolute:
         x: 4443.347431585707
         y: 193.31705379355293
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1870,13 +1867,13 @@ workflow:
       positionAbsolute:
         x: 2454
         y: 506
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: 241.3339325899408
-      y: 390.5937301106775
-      zoom: 0.25
+      x: -259.8473355861688
+      y: 393.3989786932358
+      zoom: 0.564318743774258
   rag_pipeline_variables: []

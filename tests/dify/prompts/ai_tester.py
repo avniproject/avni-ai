@@ -24,7 +24,7 @@ class AITester:
             ] + chat_history
 
             response = openai.chat.completions.create(
-                model="gpt-4o", messages=messages, temperature=0.5, max_tokens=500
+                model="gpt-4.1-mini", messages=messages, temperature=0.5, max_tokens=500
             )
             return response.choices[0].message.content.strip()
         except Exception as e:

@@ -116,8 +116,10 @@ Return a JSON object with these fields:
 Example scenarios to consider:
 - Setting up a new maternal health program
 - Configuring form validation for patient registration
-- Creating visit scheduling rules for chronic disease management
 - Setting up location hierarchy for a new district
+- Setting up subject types and encounter types for a new program
+
+IMPORTANT: Do NOT generate scenarios about visit scheduling rules or rule writing - those are handled by a separate Dify app.
 
 Make the initial query realistic and specific. The expected behavior should clearly describe what success looks like.
 """

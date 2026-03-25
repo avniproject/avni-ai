@@ -35,8 +35,8 @@ def load_conversation_prompts():
         scenario_names = [
             "Maternal Health Program Setup",
             "Form Validation Configuration",
-            "Visit Scheduling Rules",
             "Location Hierarchy Setup",
+            "Community Health Worker Program",
         ]
 
         tester_prompts = [
@@ -45,10 +45,10 @@ def load_conversation_prompts():
             and encounter types for antenatal care visits.""",
             """You are configuring form validation for patient registration.
             Set up appropriate validation rules, form elements, and ensure data integrity.""",
-            """You are setting up visit scheduling rules for chronic disease management.
-            Configure appropriate visit frequencies, reminder schedules, and follow-up rules.""",
             """You are establishing the location hierarchy for a new district.
             Set up states, districts, blocks, and villages with proper catchment areas.""",
+            """You are a program manager setting up a community health worker tracking program.
+            Configure subject types, encounter types, and forms for tracking CHW activities.""",
         ]
 
         return scenario_names, tester_prompts
@@ -80,7 +80,7 @@ def create_conversation_test_config() -> TestConfiguration:
             "communication_quality": 75.0,
             "task_completion": 75.0,
         },
-        openai_model="gpt-4o",
+        openai_model="gpt-4.1",
         openai_temperature=0.1,
         include_detailed_analysis=True,
     )
@@ -102,9 +102,9 @@ def create_conversation_test_config() -> TestConfiguration:
 
     generation_config = TestGenerationConfig(
         static_test_cases=static_test_cases,
-        ai_generation_enabled=True,
-        ai_generation_prompt="Generate additional realistic scenarios for Avni healthcare program configuration",
-        num_ai_cases=2,  # Generate 2 additional AI test cases
+        ai_generation_enabled=False,
+        ai_generation_prompt="Generate additional realistic scenarios for Avni program setup and configuration (subject types, forms, locations, encounters). Do NOT generate scenarios about visit scheduling rules or rule writing - those are handled by a separate app.",
+        num_ai_cases=0,
     )
 
     # Main configuration
