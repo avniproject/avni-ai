@@ -1,7 +1,8 @@
 app:
   description: Avni AI Assistant
   icon: b849950f-3cae-4021-afc0-ce88c5d12035
-  icon_background: '#FFEAD5'
+  icon_background: ''
+  icon_type: image
   mode: advanced-chat
   name: Avni [Prod] Assistant [Do Not Touch]
   use_icon_as_answer_icon: true
@@ -14,10 +15,10 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/openai:0.2.8@aae2be0913b8c6f0b80cff58e08d7a8b4c214569b41778413fcaea204561ff16
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.10@7ca552fb9e48caa4deddfdef5aa71c200d06d03c26c2e8bb428b3250101b9cb3
     version: null
 kind: app
-version: 0.5.0
+version: 0.6.0
 workflow:
   conversation_variables:
   - description: ''
@@ -92,7 +93,17 @@ workflow:
     retriever_resource:
       enabled: false
     sensitive_word_avoidance:
-      enabled: false
+      config:
+        inputs_config:
+          enabled: true
+          preset_response: In-appropriate input, only designed to help with Avni implementation
+            tasks.
+        outputs_config:
+          enabled: true
+          preset_response: I apologize, but I can only provide assistance with Avni
+            implementation topics.
+      enabled: true
+      type: openai_moderation
     speech_to_text:
       enabled: false
     suggested_questions: []
@@ -450,33 +461,11 @@ workflow:
             size: 100
         model:
           completion_params:
-            json_schema: "{\n  \"name\": \"RoutingDecision\",\n  \"schema\": {\n \
-              \   \"type\": \"object\",\n    \"properties\": {\n      \"service\"\
-              : {\n        \"type\": \"string\",\n        \"enum\": [\"RAG\", \"ASSISTANT\"\
-              , \"TEMPLATE\"],\n        \"description\": \"Service to which the request\
-              \ is routed\"\n      },\n      \"confidence\": {\n        \"type\":\
-              \ \"number\",\n        \"minimum\": 0.0,\n        \"maximum\": 1.0,\n\
-              \        \"description\": \"Confidence score between 0.0 and 1.0\"\n\
-              \      },\n      \"question_type\": {\n        \"type\": \"string\"\
-              ,\n        \"enum\": [\"capability_inquiry\", \"implementation_request\"\
-              , \"novel_requirement\"],\n        \"description\": \"Categorization\
-              \ of the user's question\"\n      },\n      \"routing_reason\": {\n\
-              \        \"type\": \"string\",\n        \"description\": \"Brief explanation\
-              \ focusing on question structure, not content complexity\"\n      },\n\
-              \      \"clarification_needed\": {\n        \"type\": \"boolean\",\n\
-              \        \"description\": \"Whether clarifying questions are required\"\
-              \n      },\n      \"clarifying_questions\": {\n        \"type\": \"\
-              array\",\n        \"items\": {\n          \"type\": \"string\"\n   \
-              \     },\n        \"description\": \"Up to two clarifying questions,\
-              \ required only if clarification_needed is true\",\n        \"maxItems\"\
-              : 2\n      }\n    },\n    \"required\": [\n      \"service\",\n    \
-              \  \"confidence\",\n      \"question_type\",\n      \"routing_reason\"\
-              ,\n      \"clarification_needed\"\n    ],\n    \"additionalProperties\"\
-              : false\n  }\n}"
-            response_format: json_schema
-            temperature: 0.1
+            enable_stream: true
+            reasoning_effort: minimal
+            verbosity: low
           mode: chat
-          name: gpt-4o-mini
+          name: gpt-5-mini
           provider: langgenius/openai/openai
         prompt_template:
         - id: b14eb575-d615-41dd-aac1-00663db3a6eb
@@ -704,7 +693,7 @@ workflow:
         selected: false
         title: IF/ELSE
         type: if-else
-      height: 294
+      height: 414
       id: '1757493270484'
       position:
         x: 1002
@@ -737,9 +726,10 @@ workflow:
             size: 50
         model:
           completion_params:
-            temperature: 0.1
+            reasoning_effort: minimal
+            verbosity: low
           mode: chat
-          name: gpt-4o
+          name: gpt-5-mini
           provider: langgenius/openai/openai
         prompt_template:
         - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
@@ -771,10 +761,10 @@ workflow:
       id: '1757495664531'
       position:
         x: 1388
-        y: 615
+        y: 616.7720481749584
       positionAbsolute:
         x: 1388
-        y: 615
+        y: 616.7720481749584
       selected: true
       sourcePosition: right
       targetPosition: left
@@ -820,9 +810,11 @@ workflow:
             size: 20
         model:
           completion_params:
-            temperature: 0.1
+            enable_stream: true
+            reasoning_effort: minimal
+            verbosity: low
           mode: chat
-          name: gpt-4o
+          name: gpt-5-mini
           provider: langgenius/openai/openai
         prompt_template:
         - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
@@ -1365,7 +1357,7 @@ workflow:
       width: 242
     - data:
         dataset_ids:
-        - EcEHhfyw2lTA/pRvqDse3E7RCHi8WmJgNSgzX1pQN+8cN6n17MR+Rps3VogupFsu
+        - 9TmCqtDyQNUaJCKXT7rPGCd21br8q6JzrrUr4xib3E9uqcfMf6t6rxJkkXFK7EzL
         multiple_retrieval_config:
           reranking_enable: false
           reranking_mode: weighted_score
@@ -1383,7 +1375,7 @@ workflow:
         - '1711528708197'
         - sys.query
         retrieval_mode: multiple
-        selected: true
+        selected: false
         title: Knowledge Retrieval
         type: knowledge-retrieval
       height: 90
@@ -1416,7 +1408,7 @@ workflow:
         selected: false
         title: IF/ELSE 2
         type: if-else
-      height: 124
+      height: 140
       id: '1760358453289'
       position:
         x: 1730
@@ -1744,7 +1736,7 @@ workflow:
         selected: false
         title: 'Processing Status '
         type: if-else
-      height: 124
+      height: 148
       id: '1760424086059'
       parentId: '1760423058735'
       position:
@@ -1866,7 +1858,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -10.329002406792824
-      y: 1014.4305465736124
-      zoom: 1
+      x: -474.9020758332024
+      y: 307.38815940779915
+      zoom: 0.5817947465333346
   rag_pipeline_variables: []
