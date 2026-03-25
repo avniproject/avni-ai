@@ -2386,12 +2386,38 @@ workflow:
         - id: 51066c17-8638-4392-9c7f-9a1b479d288a
           role: system
           text: 'You are presenting a summary of parsed entities from a field workflow
-            specification file. Present the following summary and ambiguity report
-            to the user in a clear, readable format. Ask them to confirm if everything
-            looks correct, or tell you what needs to be corrected.
+            specification file. Present ALL entities in a detailed, point-wise format.
+            At the end, show the ambiguity report and ask the user to confirm or correct.
 
 
-            Entites:
+            RULES FOR PRESENTING THE SUMMARY:
+
+
+            1. Use the exact field names from Avni: "type" (not "kind"), "name", "subject",
+            "program", etc.
+
+            2. List EVERY entity individually — never summarize with "Various..."
+            or "etc."
+
+            3. For Subject Types, show: name, type (Person/Individual/Household/Group),
+            formLink, lowestAddressLevel, description (if present)
+
+            4. For Programs, show: name, target subject, enrolmentForm, exitForm,
+            description (if present)
+
+            5. For Encounter Types, list EACH ONE with: name, Scheduled/Unscheduled,
+            subject type (for general encounters) or program name (for program encounters),
+            frequency (if present), formsLinked (if present)
+
+            6. For Address Levels, show the hierarchy chain clearly: e.g. District
+            (level 3) → Block (level 2) → Village (level 1)
+
+            7. Group encounters into "General Encounters" and "Program Encounters"
+            sections.
+
+
+            Entities:
+
 
             {{#conversation.entities_jsonl#}}
 
@@ -2399,13 +2425,14 @@ workflow:
             Ambiguity Report:
 
 
+
             {{#1773908701222.output.issues_summary#}}
 
 
 
-            User''s latest message:
 
-            {{#sys.query#}}'
+            After presenting the summary, ask: "Does everything look correct? Click
+            Yes to proceed with bundle generation, or No to make corrections."'
         selected: false
         title: Summary LLM
         type: llm
@@ -2419,7 +2446,7 @@ workflow:
       positionAbsolute:
         x: 2769
         y: 1081
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -2476,7 +2503,9 @@ workflow:
       type: custom
       width: 241
     - data:
-        answer: Tell me what corrections are needed and I will update the entities.
+        answer: '
+
+          Tell me what corrections are needed and I will update the entities.'
         selected: false
         title: Ask Corrections
         type: answer
@@ -2489,7 +2518,7 @@ workflow:
       positionAbsolute:
         x: 3832
         y: 777
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3183,7 +3212,7 @@ workflow:
       type: custom
       width: 241
     viewport:
-      x: 232.8494347047356
-      y: 176.32086809799728
-      zoom: 0.27850986799446326
+      x: 243.3512817285274
+      y: 254.80732915341645
+      zoom: 0.25741748741603876
   rag_pipeline_variables: []
