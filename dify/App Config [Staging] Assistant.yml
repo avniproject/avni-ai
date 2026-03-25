@@ -2518,7 +2518,7 @@ workflow:
       positionAbsolute:
         x: 3832
         y: 777
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -2803,11 +2803,11 @@ workflow:
             type: text
             value: '{
 
-                  "entities_jsonl": {{conversation.entities_jsonl}},              
-                                                                                  
-                     
+              "entities": {{#conversation.entities_jsonl#}},
 
-                  "skip_upload": true                                            
+              "org_name": "{{#1711528708197.org_name#}}",                        
+                                                                       "skip_upload":
+              true                                            
 
                 }'
           type: json
@@ -3010,12 +3010,12 @@ workflow:
           text: "You are an entity extraction assistant for the Avni platform. You\
             \ read the content of a field workflow specification document and extract\
             \ structured entities from it.\n\nThe document content (converted from\
-            \ Excel to markdown by the Doc Extractor):\n\"\n{{#1774264909113.text#}}\
-            \ \n\"\n\nYour job: extract ALL entities from this document and output\
-            \ them as a JSON array. Each entity must be one of the following types:\n\
-            \n## Entity Types and Fields\n\n### subject_type\nRegistration/subject\
-            \ types (e.g., Individual, Beneficiary, School, Household)\n```json\n\
-            {\n  \"type\": \"subject_type\",\n  \"name\": \"...\",\n  \"subjectTypeKind\"\
+            \ Excel to markdown by the Doc Extractor):\n{{#1774264909113.text#}}\n\
+            \nYour job: extract ALL entities from this document and output them as\
+            \ a JSON array. Each entity must be one of the following types:\n\n##\
+            \ Entity Types and Fields\n\n### subject_type\nRegistration/subject types\
+            \ (e.g., Individual, Beneficiary, School, Household)\n```json\n{\n  \"\
+            type\": \"subject_type\",\n  \"name\": \"...\",\n  \"subjectTypeKind\"\
             : \"Person|Individual|Household|Group|User\",\n  \"formLink\": \"name\
             \ of the registration form (if mentioned)\",\n  \"lowestAddressLevel\"\
             : \"lowest location level for registration (e.g., Village, Hamlet)\",\n\
@@ -3059,32 +3059,49 @@ workflow:
             \ parent\n- For example: State(level=4) → District(level=3) → Block(level=2)\
             \ → Village(level=1)\n- If multiple hierarchies share levels (e.g., \"\
             District → Block → Hamlet\" and \"District → Block → School\"), extract\
-            \ each unique level only once but include all leaf levels\n\n## Rules\n\
-            \n1. Extract EVERY entity you can find. Look across all sheets/sections\
-            \ for subject types, programs, encounters/visits, and location hierarchies.\n\
-            2. Only include fields that are actually present or clearly implied in\
-            \ the document. Do not guess values.\n3. Ignore `nan` values — treat them\
-            \ as missing (omit the field).\n4. Trim whitespace from all names.\n5.\
-            \ Do NOT invent entities that are not in the document.\n6. Do NOT skip\
-            \ entities that are clearly defined, even if their formatting is unusual.\n\
-            \n## Output Format\n\nRespond with ONLY a valid JSON array. No markdown\
-            \ fences, no explanation — just the array:\n\n[\n  {\"type\": \"subject_type\"\
-            , \"name\": \"Beneficiary Registration\", \"subjectTypeKind\": \"Person\"\
-            , \"formLink\": \"Beneficiary Registration\"},\n  {\"type\": \"subject_type\"\
-            , \"name\": \"School Registration\", \"subjectTypeKind\": \"Individual\"\
-            , \"description\": \"They will provide the list of schools\"},\n  {\"\
-            type\": \"program\", \"name\": \"Maternal Health\", \"subject\": \"Beneficiary\
-            \ Registration\", \"enrolmentForm\": \"Maternal Enrolment\", \"exitForm\"\
-            : \"Maternal Exit\"},\n  {\"type\": \"encounter_type\", \"name\": \"ANC\
-            \ Visit\", \"program\": \"Maternal Health\", \"subject\": \"\", \"encounterType\"\
-            : \"Scheduled\", \"is_program_encounter\": true, \"frequency\": \"Monthly\"\
-            },\n  {\"type\": \"encounter_type\", \"name\": \"Home Visit\", \"program\"\
+            \ each unique level only once but include all leaf levels\n\n## How to\
+            \ identify each entity type from the markdown tables\n\nThe document contains\
+            \ multiple tables. Identify them by their column headers:\n\n- **Subject\
+            \ types table**: Has columns like \"Subject Type Name\", \"Type\", \"\
+            Form Link\", \"Lowest Address Level\", \"Description\"\n- **Programs table**:\
+            \ Has columns like \"Program Name\", \"Enrolment Form\", \"Exit Form\"\
+            , \"Target Subject Type\"\n- **General encounters table**: Has columns\
+            \ like \"Encounter Name\", \"Subject Type\", \"Encounter Type (Scheduled/Unscheduled)\"\
+            , \"Frequency\"\n- **Program encounters table**: Has columns like \"Encounter\
+            \ Name\", \"Program name\", \"Encounter Type\", \"Frequency\" — the key\
+            \ difference from general encounters is the \"Program name\" column\n\
+            - **Location hierarchy**: Look for arrow-separated chains like \"District\
+            \ → Block → Village\" or similar hierarchical descriptions\n\n## Rules\n\
+            \n1. Extract entities from ALL tables you can identify using the column\
+            \ header patterns above.\n2. Do NOT create subject types or programs just\
+            \ because they are referenced in encounter columns. Only extract subject\
+            \ types from the subject types table and programs from the programs table.\
+            \ For example, if an encounter references subject type \"User\" but \"\
+            User\" does not appear in the subject types table, do NOT add \"User\"\
+            \ as a subject type.\n3. Only include fields that are actually present\
+            \ in the document. Do not guess values.\n4. Ignore `nan` values — treat\
+            \ them as missing (omit the field).\n5. Trim whitespace from all names.\n\
+            6. Do NOT skip entities that are clearly defined in any table, even if\
+            \ their formatting is unusual.\n7. Boolean fields (`is_program_encounter`,\
+            \ `group`, `household`, etc.) must be actual booleans (`true`/`false`),\
+            \ NOT strings (`\"true\"`/`\"false\"`).\n\n## Output Format\n\nRespond\
+            \ with a JSON object containing four arrays — one per entity type:\n\n\
+            {\n  \"subject_types\": [\n    {\"name\": \"Beneficiary Registration\"\
+            , \"subjectTypeKind\": \"Person\", \"formLink\": \"Beneficiary Registration\"\
+            },\n    {\"name\": \"School Registration\", \"subjectTypeKind\": \"Individual\"\
+            , \"description\": \"They will provide the list of schools\"}\n  ],\n\
+            \  \"programs\": [\n    {\"name\": \"Maternal Health\", \"subject\": \"\
+            Beneficiary Registration\", \"enrolmentForm\": \"Maternal Enrolment\"\
+            , \"exitForm\": \"Maternal Exit\"}\n  ],\n  \"encounter_types\": [\n \
+            \   {\"name\": \"ANC Visit\", \"program\": \"Maternal Health\", \"subject\"\
+            : \"\", \"encounterType\": \"Scheduled\", \"is_program_encounter\": true,\
+            \ \"frequency\": \"Monthly\"},\n    {\"name\": \"Home Visit\", \"program\"\
             : \"\", \"subject\": \"Beneficiary Registration\", \"encounterType\":\
-            \ \"Unscheduled\", \"is_program_encounter\": false},\n  {\"type\": \"\
-            address_level\", \"name\": \"District\", \"level\": 3, \"parent\": null},\n\
-            \  {\"type\": \"address_level\", \"name\": \"Block\", \"level\": 2, \"\
-            parent\": \"District\"},\n  {\"type\": \"address_level\", \"name\": \"\
-            Village\", \"level\": 1, \"parent\": \"Block\"}\n]\n"
+            \ \"Unscheduled\", \"is_program_encounter\": false}\n  ],\n  \"address_levels\"\
+            : [\n    {\"name\": \"District\", \"level\": 3, \"parent\": null},\n \
+            \   {\"name\": \"Block\", \"level\": 2, \"parent\": \"District\"},\n \
+            \   {\"name\": \"Village\", \"level\": 1, \"parent\": \"Block\"}\n  ]\n\
+            }"
         selected: false
         structured_output:
           schema:
@@ -3173,7 +3190,7 @@ workflow:
             - address_levels
             type: object
         structured_output_enabled: true
-        title: Spec Parser
+        title: Entity Extractor
         type: llm
         vision:
           enabled: false
@@ -3185,7 +3202,7 @@ workflow:
       positionAbsolute:
         x: 1843.348961430316
         y: 1232.0383886433995
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3212,7 +3229,7 @@ workflow:
       type: custom
       width: 241
     viewport:
-      x: 243.3512817285274
-      y: 254.80732915341645
-      zoom: 0.25741748741603876
+      x: -944.1663854836975
+      y: -258.3796858722858
+      zoom: 0.651027811634052
   rag_pipeline_variables: []
