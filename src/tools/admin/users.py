@@ -8,7 +8,6 @@ from src.utils.result_utils import (
 )
 from src.schemas.user_contract import UserFindContract, UserUpdateContract
 from src.schemas.field_names import UserFields
-from src.services import tool_registry
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +49,3 @@ async def update_user(auth_token: str, contract: UserUpdateContract) -> str:
     return format_update_response(
         "User", contract.name, UserFields.ID.value, {"id": contract.id}
     )
-
-
-def register_user_tools() -> None:
-    tool_registry.register_tool(find_user)
-    tool_registry.register_tool(update_user)

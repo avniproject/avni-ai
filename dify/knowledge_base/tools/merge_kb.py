@@ -16,7 +16,6 @@ Usage:
 import argparse
 import os
 import re
-import sys
 
 
 SECTION_ORDER = [
@@ -45,7 +44,7 @@ def strip_yaml_frontmatter(text):
     if end == -1:
         return text
     # Skip past the closing --- and any trailing newline
-    return text[end + 4:].lstrip("\n")
+    return text[end + 4 :].lstrip("\n")
 
 
 def strip_chunk_markers(text):
@@ -117,7 +116,6 @@ def merge_kb(kb_dir, output_path, keep_metadata=False, keep_chunks=False):
 
         files = get_files_in_order(section_path)
         for filepath in files:
-            filename = os.path.basename(filepath)
             rel_path = os.path.relpath(filepath, kb_dir)
 
             with open(filepath, "r", encoding="utf-8") as f:
@@ -182,7 +180,9 @@ def main():
     )
     parser.add_argument(
         "--kb-dir",
-        default=os.path.join(os.path.dirname(__file__), "..", "AI_ASSISTANT_KNOWLEDGE_BASE"),
+        default=os.path.join(
+            os.path.dirname(__file__), "..", "AI_ASSISTANT_KNOWLEDGE_BASE"
+        ),
         help="Path to knowledge base directory",
     )
     parser.add_argument(
@@ -207,7 +207,7 @@ def main():
     output_path = args.output or os.path.join(kb_dir, "merged_kb.md")
     output_path = os.path.abspath(output_path)
 
-    print(f"Merging Knowledge Base")
+    print("Merging Knowledge Base")
     print(f"  KB dir:  {kb_dir}")
     print(f"  Output:  {output_path}")
     print(f"  Keep metadata: {args.keep_metadata}")
@@ -215,7 +215,8 @@ def main():
     print()
 
     file_count, word_count, byte_count = merge_kb(
-        kb_dir, output_path,
+        kb_dir,
+        output_path,
         keep_metadata=args.keep_metadata,
         keep_chunks=args.keep_chunks,
     )
@@ -223,7 +224,7 @@ def main():
     size_kb = byte_count / 1024
     size_mb = size_kb / 1024
 
-    print(f"Done!")
+    print("Done!")
     print(f"  Files merged: {file_count}")
     print(f"  Total words:  {word_count:,}")
     print(f"  Output size:  {size_kb:.0f} KB ({size_mb:.2f} MB)")

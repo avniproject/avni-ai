@@ -26,6 +26,5 @@ if not os.getenv("DIFY_API_KEY"):
 if not os.getenv("DIFY_API_BASE_URL"):
     os.environ["DIFY_API_BASE_URL"] = "https://api.dify.ai/v1"
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DIFY_API_KEY = os.getenv("DIFY_API_KEY")
 DIFY_API_BASE_URL = os.getenv("DIFY_API_BASE_URL", "https://api.dify.ai/v1")

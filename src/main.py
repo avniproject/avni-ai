@@ -5,24 +5,32 @@ import os
 from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from .handlers import (
-    process_config_async_request,
-    get_task_status,
-)
-from .tools.admin.addressleveltypes import register_address_level_type_tools
-from .tools.admin.catchments import register_catchment_tools
-from .tools.admin.locations import register_location_tools
-from .tools.admin.users import register_user_tools
-from .tools.app_designer.encounters import register_encounter_tools
-from .tools.app_designer.programs import register_program_tools
-from .tools.app_designer.subject_types import register_subject_type_tools
-from .tools.implementation.implementations import register_implementation_tools
-from .http import create_cors_middleware
 
-from .utils.env import OPENAI_API_KEY
+from .handlers.admin_handlers import (
+    handle_create_location_type,
+    handle_update_location_type,
+    handle_delete_location_type,
+    handle_get_locations,
+    handle_create_location,
+    handle_update_location,
+    handle_delete_location,
+    handle_get_catchments,
+    handle_create_catchment,
+    handle_update_catchment,
+    handle_delete_catchment,
+    handle_find_user,
+    handle_update_user,
+    handle_delete_implementation,
+)
+from .handlers.config_handlers import handle_get_existing_config
+from .handlers.sandbox_handlers import handle_execute_python
+from .playground.executor import PlaygroundExecutor
+from .http import create_cors_middleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+_playground_executor = PlaygroundExecutor()
 
 
 def _create_fastmcp_server() -> FastMCP:
@@ -64,41 +72,103 @@ def _run_http_server(server: FastMCP, host: str, port: int):
 async def create_server():
     server = _create_fastmcp_server()
 
-    register_address_level_type_tools()
-    register_catchment_tools()
-    register_location_tools()
-    register_user_tools()
-    register_encounter_tools()
-    register_program_tools()
-    register_subject_type_tools()
-    register_implementation_tools()
-
+    # --- Health ---
     @server.custom_route("/health", methods=["GET"])
     async def health_check(request: Request):
-        return JSONResponse({"status": "healthy", "service": "Avni MCP Server"})
+        return JSONResponse({"status": "healthy", "service": "Avni AI Server"})
 
-    @server.custom_route("/process-config-async", methods=["POST"])
-    async def process_config_async_endpoint(request: Request):
-        return await process_config_async_request(request)
+    # --- Location Types ---
+    @server.custom_route("/api/location-types", methods=["POST"])
+    async def create_location_type_endpoint(request: Request):
+        return await handle_create_location_type(request)
 
-    @server.custom_route("/process-config-status/{task_id}", methods=["GET"])
-    async def get_config_task_status(request: Request):
-        task_id = request.path_params["task_id"]
-        return await get_task_status(task_id)
+    @server.custom_route("/api/location-types/{id}", methods=["PUT"])
+    async def update_location_type_endpoint(request: Request):
+        return await handle_update_location_type(request)
+
+    @server.custom_route("/api/location-types/{id}", methods=["DELETE"])
+    async def delete_location_type_endpoint(request: Request):
+        return await handle_delete_location_type(request)
+
+    # --- Locations ---
+    @server.custom_route("/api/locations", methods=["GET"])
+    async def get_locations_endpoint(request: Request):
+        return await handle_get_locations(request)
+
+    @server.custom_route("/api/locations", methods=["POST"])
+    async def create_location_endpoint(request: Request):
+        return await handle_create_location(request)
+
+    @server.custom_route("/api/locations/{id}", methods=["PUT"])
+    async def update_location_endpoint(request: Request):
+        return await handle_update_location(request)
+
+    @server.custom_route("/api/locations/{id}", methods=["DELETE"])
+    async def delete_location_endpoint(request: Request):
+        return await handle_delete_location(request)
+
+    # --- Catchments ---
+    @server.custom_route("/api/catchments", methods=["GET"])
+    async def get_catchments_endpoint(request: Request):
+        return await handle_get_catchments(request)
+
+    @server.custom_route("/api/catchments", methods=["POST"])
+    async def create_catchment_endpoint(request: Request):
+        return await handle_create_catchment(request)
+
+    @server.custom_route("/api/catchments/{id}", methods=["PUT"])
+    async def update_catchment_endpoint(request: Request):
+        return await handle_update_catchment(request)
+
+    @server.custom_route("/api/catchments/{id}", methods=["DELETE"])
+    async def delete_catchment_endpoint(request: Request):
+        return await handle_delete_catchment(request)
+
+    # --- Users ---
+    @server.custom_route("/api/users", methods=["GET"])
+    async def find_user_endpoint(request: Request):
+        return await handle_find_user(request)
+
+    @server.custom_route("/api/users/{id}", methods=["PUT"])
+    async def update_user_endpoint(request: Request):
+        return await handle_update_user(request)
+
+    # --- Implementation ---
+    @server.custom_route("/api/implementation", methods=["DELETE"])
+    async def delete_implementation_endpoint(request: Request):
+        return await handle_delete_implementation(request)
+
+    # --- Config Fetch ---
+    @server.custom_route("/api/existing-config", methods=["GET"])
+    async def get_existing_config_endpoint(request: Request):
+        return await handle_get_existing_config(request)
+
+    # --- Python Playground ---
+    @server.custom_route("/execute-python", methods=["POST"])
+    async def execute_python_endpoint(request: Request):
+        return await handle_execute_python(request)
+
+    # Start periodic silo cleanup (every 6 hours)
+    asyncio.create_task(_periodic_silo_cleanup())
 
     return server
 
 
-if not OPENAI_API_KEY:
-    logger.error(
-        "OpenAI API key not found. Please set OPENAI_API_KEY environment variable."
-    )
-    raise ValueError("OpenAI API key is required")
+async def _periodic_silo_cleanup():
+    """Delete playground conversation silos older than TTL."""
+    while True:
+        try:
+            await asyncio.sleep(6 * 3600)
+            removed = _playground_executor.cleanup_stale_silos()
+            if removed > 0:
+                logger.info(f"Silo cleanup removed {removed} stale silo(s)")
+        except Exception as e:
+            logger.error(f"Silo cleanup error: {e}")
 
-logger.info("Initializing Avni MCP Server...")
+
+logger.info("Initializing Avni AI Server...")
 
 
-# Initialize server with DSPy training
 async def initialize_server():
     return await create_server()
 
@@ -112,7 +182,7 @@ logger.info("ASGI application created successfully")
 
 def main():
     port = int(os.getenv("PORT", 8023))
-    logger.info(f"Starting Avni MCP server on 0.0.0.0:{port}")
+    logger.info(f"Starting Avni AI server on 0.0.0.0:{port}")
 
     try:
         _run_http_server(ai_server, host="0.0.0.0", port=port)

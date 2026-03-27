@@ -15,7 +15,6 @@ from src.schemas.location_contract import (
     LocationDeleteContract,
 )
 from src.schemas.field_names import LocationFields
-from src.services import tool_registry
 
 logger = logging.getLogger(__name__)
 
@@ -109,10 +108,3 @@ async def delete_location(auth_token: str, contract: LocationDeleteContract) -> 
         return format_error_message(result, "delete location")
 
     return format_deletion_response("Location", contract.id)
-
-
-def register_location_tools() -> None:
-    tool_registry.register_tool(get_locations)
-    tool_registry.register_tool(create_location)
-    tool_registry.register_tool(update_location)
-    tool_registry.register_tool(delete_location)

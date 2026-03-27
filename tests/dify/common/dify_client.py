@@ -161,7 +161,7 @@ class DifyClient:
 
                 # SSE lines are either "event: <type>" or "data: <json>"
                 if raw_line.startswith("data: "):
-                    json_str = raw_line[len("data: "):]
+                    json_str = raw_line[len("data: ") :]
                     try:
                         data = _json.loads(json_str)
                     except _json.JSONDecodeError:

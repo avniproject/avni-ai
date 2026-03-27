@@ -2,11 +2,10 @@ import asyncio
 import logging
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional, Callable
+from typing import Any, Dict, Optional, Callable, Awaitable
 from dataclasses import dataclass
 from contextvars import ContextVar, copy_context
 from .enums import TaskStatus
-from .config_processor import ConfigProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -117,13 +116,24 @@ class TaskManager:
                 task.progress = progress
             logger.info(f"Updated task {task_id} status to {status.value}")
 
-    def start_background_task(self, task_id: str) -> None:
+    def start_background_task(
+        self,
+        task_id: str,
+        processor: Callable[..., Awaitable[Dict[str, Any]]],
+    ) -> None:
+        """Start a background task using the given async processor callable.
+
+        Args:
+            task_id: The task to process.
+            processor: An async callable that accepts (config_data, auth_token,
+                       task_id, progress_callback) and returns a result dict.
+        """
         ctx = copy_context()
 
         background_task = ctx.run(
             asyncio.create_task,
-            self._process_config_background(task_id),
-            name=f"config_task_{task_id}",
+            self._run_background(task_id, processor),
+            name=f"task_{task_id}",
         )
 
         self._background_tasks.add(background_task)
@@ -139,7 +149,11 @@ class TaskManager:
 
         return updater
 
-    async def _process_config_background(self, task_id: str) -> None:
+    async def _run_background(
+        self,
+        task_id: str,
+        processor: Callable[..., Awaitable[Dict[str, Any]]],
+    ) -> None:
         try:
             set_current_task_id(task_id)
 
@@ -148,13 +162,13 @@ class TaskManager:
             self.update_task_status(
                 task_id,
                 TaskStatus.PROCESSING,
-                progress="Starting configuration processing...",
+                progress="Starting processing...",
             )
 
             progress_updater = self._create_progress_updater(task_id)
 
-            result = await ConfigProcessor.process_config(
-                config=task.config_data,
+            result = await processor(
+                config_data=task.config_data,
                 auth_token=task.auth_token,
                 task_id=task_id,
                 progress_callback=progress_updater,
@@ -163,8 +177,8 @@ class TaskManager:
             self.update_task_status(
                 task_id,
                 TaskStatus.COMPLETED,
-                result=result.to_dict(),
-                progress="Configuration processing completed successfully",
+                result=result,
+                progress="Processing completed successfully",
             )
 
         except Exception as e:
@@ -178,7 +192,7 @@ class TaskManager:
                 task_id,
                 TaskStatus.FAILED,
                 error=error_msg,
-                progress="Configuration processing failed",
+                progress="Processing failed",
             )
 
     def cleanup_old_tasks(self) -> int:

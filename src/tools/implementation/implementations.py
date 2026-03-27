@@ -4,7 +4,6 @@ from src.utils.result_utils import (
     format_error_message,
     format_implementation_deletion_response,
 )
-from src.services import tool_registry
 from src.schemas.implementation_contract import ImplementationDeleteContract
 
 logger = logging.getLogger(__name__)
@@ -25,7 +24,3 @@ async def delete_implementation(
     return format_implementation_deletion_response(
         contract.deleteMetadata, contract.deleteAdminConfig
     )
-
-
-def register_implementation_tools() -> None:
-    tool_registry.register_tool(delete_implementation)

@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.13"
 
 [[package]]
@@ -179,7 +179,6 @@ dependencies = [
     { name = "fastmcp" },
     { name = "httpx" },
     { name = "matplotlib" },
-    { name = "openai" },
     { name = "pandas" },
     { name = "pytest-asyncio" },
     { name = "python-dotenv" },
@@ -215,7 +214,6 @@ requires-dist = [
     { name = "fastmcp", specifier = ">=2.11.3" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "matplotlib", specifier = ">=3.10.7" },
-    { name = "openai", specifier = ">=1.99.9" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "pytest-asyncio", specifier = ">=1.1.0" },
     { name = "python-dotenv", specifier = ">=1.1.1" },

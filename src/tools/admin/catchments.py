@@ -15,7 +15,6 @@ from src.schemas.catchment_contract import (
     CatchmentDeleteContract,
 )
 from src.schemas.field_names import CatchmentFields
-from src.services import tool_registry
 
 logger = logging.getLogger(__name__)
 
@@ -83,10 +82,3 @@ async def delete_catchment(auth_token: str, contract: CatchmentDeleteContract) -
         return format_error_message(result, "delete catchment")
 
     return format_deletion_response("Catchment", contract.id)
-
-
-def register_catchment_tools() -> None:
-    tool_registry.register_tool(get_catchments)
-    tool_registry.register_tool(create_catchment)
-    tool_registry.register_tool(update_catchment)
-    tool_registry.register_tool(delete_catchment)

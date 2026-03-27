@@ -24,7 +24,6 @@ import re
 import subprocess
 import sys
 from datetime import datetime
-from pathlib import Path
 
 import yaml
 
@@ -40,7 +39,9 @@ class SourceLoader:
         self._cache = {}
         self.source_map = {
             "merged.md": os.path.join(base_dir, "merged.md"),
-            "README_original.md": os.path.join(base_dir, "_archive", "README_original.md"),
+            "README_original.md": os.path.join(
+                base_dir, "_archive", "README_original.md"
+            ),
             "test-prompts.md": os.path.join(base_dir, "test-prompts.md"),
             "case-studies-faqs.md": os.path.join(base_dir, "case-studies-faqs.md"),
         }
@@ -176,7 +177,11 @@ class ContentCleaner:
                 continue
 
             # Indented YAML continuation
-            if line.startswith("  ") and not stripped.startswith("#") and not stripped.startswith("*"):
+            if (
+                line.startswith("  ")
+                and not stripped.startswith("#")
+                and not stripped.startswith("*")
+            ):
                 content_start = i + 1
                 continue
 
@@ -270,7 +275,9 @@ class ChunkGenerator:
 
         # Map sections to chunk IDs
         used_ids = {"tldr"}
-        remaining_ids = [cid for cid in chunk_ids if cid not in ("tldr", "related-topics")]
+        remaining_ids = [
+            cid for cid in chunk_ids if cid not in ("tldr", "related-topics")
+        ]
 
         for i, (heading, content) in enumerate(sections):
             # Try to match heading to a chunk ID
@@ -303,13 +310,15 @@ class ChunkGenerator:
         parts = []
         for chunk_id in chunk_ids:
             if chunk_id == "tldr":
-                content = f"## TL;DR\n\n<!-- TODO: Add 2-3 sentence summary of {title} -->"
+                content = (
+                    f"## TL;DR\n\n<!-- TODO: Add 2-3 sentence summary of {title} -->"
+                )
             elif chunk_id == "overview":
                 content = (
-                    f"## Overview\n\n"
-                    f"**What:** <!-- TODO: One-sentence description -->\n\n"
-                    f"**When to use:** <!-- TODO: Scenarios -->\n\n"
-                    f"**Prerequisites:** <!-- TODO: What to know first -->"
+                    "## Overview\n\n"
+                    "**What:** <!-- TODO: One-sentence description -->\n\n"
+                    "**When to use:** <!-- TODO: Scenarios -->\n\n"
+                    "**Prerequisites:** <!-- TODO: What to know first -->"
                 )
             elif chunk_id == "related-topics":
                 content = "## Related Topics\n\n<!-- TODO: Add links to related documentation -->"
@@ -410,11 +419,28 @@ class ChunkGenerator:
 class MetadataGenerator:
     """Generates YAML frontmatter from manifest entry."""
 
-    REQUIRED_FIELDS = ["title", "category", "audience", "difficulty", "priority", "keywords", "last_updated"]
+    REQUIRED_FIELDS = [
+        "title",
+        "category",
+        "audience",
+        "difficulty",
+        "priority",
+        "keywords",
+        "last_updated",
+    ]
     OPTIONAL_FIELDS = [
-        "task_types", "features", "technical_level", "implementation_phase",
-        "complexity", "query_patterns", "answer_types", "retrieval_boost",
-        "related_topics", "prerequisites", "estimated_reading_time", "version",
+        "task_types",
+        "features",
+        "technical_level",
+        "implementation_phase",
+        "complexity",
+        "query_patterns",
+        "answer_types",
+        "retrieval_boost",
+        "related_topics",
+        "prerequisites",
+        "estimated_reading_time",
+        "version",
     ]
 
     def generate(self, entry, word_count=0):
@@ -442,7 +468,13 @@ class MetadataGenerator:
         if "version" not in metadata:
             metadata["version"] = "1.0"
 
-        return "---\n" + yaml.dump(metadata, default_flow_style=False, sort_keys=False, allow_unicode=True) + "---"
+        return (
+            "---\n"
+            + yaml.dump(
+                metadata, default_flow_style=False, sort_keys=False, allow_unicode=True
+            )
+            + "---"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -455,7 +487,6 @@ class ReadmeGenerator:
         """Build a section README with navigation."""
         title = entry["title"]
         description = entry.get("section_description", "")
-        category = entry["category"]
 
         parts = []
         parts.append(f"# {title}\n")
@@ -501,7 +532,14 @@ class QAFormatter:
 # Main Generator
 # ---------------------------------------------------------------------------
 class KBGenerator:
-    def __init__(self, manifest_path, base_dir, output_dir=None, dry_run=False, skip_existing=False):
+    def __init__(
+        self,
+        manifest_path,
+        base_dir,
+        output_dir=None,
+        dry_run=False,
+        skip_existing=False,
+    ):
         self.manifest = self._load_manifest(manifest_path)
         self.base_dir = base_dir
         self.output_dir = output_dir or base_dir
@@ -545,11 +583,17 @@ class KBGenerator:
             if self.dry_run:
                 content_type = entry.get("content_type", "unknown")
                 sources = entry.get("sources", [])
-                source_info = ", ".join(
-                    f"{s['file']}:{s.get('start_line','?')}-{s.get('end_line','?')}"
-                    for s in sources
-                ) if sources else "none"
-                print(f"  WOULD GENERATE: {output_path} [{content_type}] from {source_info}")
+                source_info = (
+                    ", ".join(
+                        f"{s['file']}:{s.get('start_line', '?')}-{s.get('end_line', '?')}"
+                        for s in sources
+                    )
+                    if sources
+                    else "none"
+                )
+                print(
+                    f"  WOULD GENERATE: {output_path} [{content_type}] from {source_info}"
+                )
                 stats["generated"] += 1
                 continue
 
@@ -585,7 +629,8 @@ class KBGenerator:
         # Find all non-readme entries in the same section
         section_dir = os.path.dirname(entry["output_path"])
         section_entries = [
-            e for e in self.manifest
+            e
+            for e in self.manifest
             if os.path.dirname(e["output_path"]) == section_dir
             and not e.get("is_readme", False)
             and e.get("content_type") != "readme"
@@ -610,7 +655,9 @@ class KBGenerator:
         """Generate file by extracting from source line ranges."""
         sources = entry.get("sources", [])
         title = entry["title"]
-        chunk_ids = entry.get("chunks", ["tldr", "overview", "content", "related-topics"])
+        chunk_ids = entry.get(
+            "chunks", ["tldr", "overview", "content", "related-topics"]
+        )
 
         # Extract and combine all source content
         raw_parts = []
@@ -645,7 +692,9 @@ class KBGenerator:
         """Generate file by combining multiple sources and filtered Q&A pairs."""
         sources = entry.get("sources", [])
         title = entry["title"]
-        chunk_ids = entry.get("chunks", ["tldr", "overview", "content", "related-topics"])
+        chunk_ids = entry.get(
+            "chunks", ["tldr", "overview", "content", "related-topics"]
+        )
         qa_keywords = entry.get("test_prompts_filter", [])
 
         # Extract source content
@@ -714,7 +763,9 @@ def main():
     )
     parser.add_argument(
         "--base-dir",
-        default=os.path.join(os.path.dirname(__file__), "..", "AI_ASSISTANT_KNOWLEDGE_BASE"),
+        default=os.path.join(
+            os.path.dirname(__file__), "..", "AI_ASSISTANT_KNOWLEDGE_BASE"
+        ),
         help="Base directory for source and output files",
     )
     parser.add_argument(
@@ -749,7 +800,7 @@ def main():
     manifest_path = os.path.abspath(args.manifest)
     output_dir = os.path.abspath(args.output_dir) if args.output_dir else base_dir
 
-    print(f"Knowledge Base Generator")
+    print("Knowledge Base Generator")
     print(f"  Manifest: {manifest_path}")
     print(f"  Base dir: {base_dir}")
     print(f"  Output:   {output_dir}")
@@ -769,7 +820,9 @@ def main():
     stats = generator.generate(section_filter=args.section)
 
     print()
-    print(f"Results: {stats['generated']} generated, {stats['skipped']} skipped, {stats['errors']} errors")
+    print(
+        f"Results: {stats['generated']} generated, {stats['skipped']} skipped, {stats['errors']} errors"
+    )
 
     if args.validate and not args.dry_run:
         print()
@@ -778,7 +831,11 @@ def main():
 
         print("\n--- Metadata Validation ---")
         subprocess.run(
-            [sys.executable, os.path.join(tools_dir, "validate_metadata.py"), output_dir],
+            [
+                sys.executable,
+                os.path.join(tools_dir, "validate_metadata.py"),
+                output_dir,
+            ],
             cwd=tools_dir,
         )
 

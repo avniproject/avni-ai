@@ -14,7 +14,6 @@ from src.schemas.address_level_type_contract import (
     AddressLevelTypeDeleteContract,
 )
 from src.schemas.field_names import AddressLevelTypeFields
-from src.services import tool_registry
 
 logger = logging.getLogger(__name__)
 
@@ -119,9 +118,3 @@ async def delete_location_type(
         return format_error_message(result, "delete location type")
 
     return format_deletion_response("Location type", contract.id)
-
-
-def register_address_level_type_tools() -> None:
-    tool_registry.register_tool(create_location_type)
-    tool_registry.register_tool(update_location_type)
-    tool_registry.register_tool(delete_location_type)
