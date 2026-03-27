@@ -6,7 +6,6 @@ Endpoints: POST /generate-bundle, POST /validate-bundle, GET /download-bundle
 from __future__ import annotations
 
 import base64
-import json
 import logging
 
 import httpx
@@ -33,7 +32,9 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
 
     entities = body.get("entities")
     if not entities:
-        return JSONResponse({"error": "Missing 'entities' in request body"}, status_code=400)
+        return JSONResponse(
+            {"error": "Missing 'entities' in request body"}, status_code=400
+        )
 
     org_name = body.get("org_name", "Unknown Organization")
 
@@ -65,9 +66,7 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
         )
     except Exception as e:
         logger.exception("Bundle generation failed")
-        return JSONResponse(
-            {"success": False, "error": str(e)}, status_code=500
-        )
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
 
 
 async def handle_validate_bundle(request: Request) -> JSONResponse:
@@ -83,7 +82,9 @@ async def handle_validate_bundle(request: Request) -> JSONResponse:
 
     bundle = body.get("bundle")
     if not bundle:
-        return JSONResponse({"error": "Missing 'bundle' in request body"}, status_code=400)
+        return JSONResponse(
+            {"error": "Missing 'bundle' in request body"}, status_code=400
+        )
 
     try:
         validator = BundleValidator(bundle)
@@ -103,12 +104,18 @@ async def handle_download_bundle(request: Request) -> Response:
     """
     auth_token = request.headers.get("avni-auth-token")
     if not auth_token:
-        return JSONResponse({"error": "Missing avni-auth-token header"}, status_code=401)
+        return JSONResponse(
+            {"error": "Missing avni-auth-token header"}, status_code=401
+        )
 
-    include_locations = request.query_params.get("includeLocations", "false").lower() == "true"
+    include_locations = (
+        request.query_params.get("includeLocations", "false").lower() == "true"
+    )
     base_url = request.query_params.get("baseUrl", AVNI_BASE_URL)
 
-    url = f"{base_url.rstrip('/')}/implementation/export/{str(include_locations).lower()}"
+    url = (
+        f"{base_url.rstrip('/')}/implementation/export/{str(include_locations).lower()}"
+    )
 
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
@@ -132,9 +139,14 @@ async def handle_download_bundle(request: Request) -> Response:
             },
         )
     except httpx.HTTPStatusError as e:
-        logger.error(f"Avni server returned {e.response.status_code}: {e.response.text}")
+        logger.error(
+            f"Avni server returned {e.response.status_code}: {e.response.text}"
+        )
         return JSONResponse(
-            {"error": f"Avni server error: HTTP {e.response.status_code}", "detail": e.response.text[:500]},
+            {
+                "error": f"Avni server error: HTTP {e.response.status_code}",
+                "detail": e.response.text[:500],
+            },
             status_code=e.response.status_code,
         )
     except Exception as e:
@@ -151,12 +163,18 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
     """
     auth_token = request.headers.get("avni-auth-token")
     if not auth_token:
-        return JSONResponse({"error": "Missing avni-auth-token header"}, status_code=401)
+        return JSONResponse(
+            {"error": "Missing avni-auth-token header"}, status_code=401
+        )
 
-    include_locations = request.query_params.get("includeLocations", "false").lower() == "true"
+    include_locations = (
+        request.query_params.get("includeLocations", "false").lower() == "true"
+    )
     base_url = request.query_params.get("baseUrl", AVNI_BASE_URL)
 
-    url = f"{base_url.rstrip('/')}/implementation/export/{str(include_locations).lower()}"
+    url = (
+        f"{base_url.rstrip('/')}/implementation/export/{str(include_locations).lower()}"
+    )
 
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
@@ -170,14 +188,18 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
             response.raise_for_status()
 
         zip_b64 = base64.b64encode(response.content).decode("ascii")
-        return JSONResponse({
-            "success": True,
-            "bundle_zip_b64": zip_b64,
-            "size_bytes": len(response.content),
-            "include_locations": include_locations,
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "bundle_zip_b64": zip_b64,
+                "size_bytes": len(response.content),
+                "include_locations": include_locations,
+            }
+        )
     except httpx.HTTPStatusError as e:
-        logger.error(f"Avni server returned {e.response.status_code}: {e.response.text}")
+        logger.error(
+            f"Avni server returned {e.response.status_code}: {e.response.text}"
+        )
         return JSONResponse(
             {"error": f"Avni server error: HTTP {e.response.status_code}"},
             status_code=e.response.status_code,

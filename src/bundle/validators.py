@@ -99,7 +99,9 @@ class BundleValidator:
         element_uuids: set[str] = set()
         for form in self.bundle.get("forms", []):
             if form["uuid"] in form_uuids:
-                self.errors.append(f'Duplicate form UUID: "{form["uuid"]}" in "{form["name"]}"')
+                self.errors.append(
+                    f'Duplicate form UUID: "{form["uuid"]}" in "{form["name"]}"'
+                )
             form_uuids.add(form["uuid"])
 
             for group in form.get("formElementGroups", []):
@@ -155,7 +157,9 @@ class BundleValidator:
                 for m in mappings
             )
             if not has_form:
-                self.warnings.append(f'Encounter type "{et["name"]}" has no form mapping')
+                self.warnings.append(
+                    f'Encounter type "{et["name"]}" has no form mapping'
+                )
 
     # ── Required sections ───────────────────────────────────────────
 

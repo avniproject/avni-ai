@@ -148,15 +148,27 @@ class BundleGenerator:
         }
         # Resolve references
         st = next(
-            (s for s in self.bundle["subjectTypes"] if s["name"] == form_spec.get("subjectType")),
+            (
+                s
+                for s in self.bundle["subjectTypes"]
+                if s["name"] == form_spec.get("subjectType")
+            ),
             None,
         )
         prog = next(
-            (p for p in self.bundle["programs"] if p["name"] == form_spec.get("program")),
+            (
+                p
+                for p in self.bundle["programs"]
+                if p["name"] == form_spec.get("program")
+            ),
             None,
         )
         et = next(
-            (e for e in self.bundle["encounterTypes"] if e["name"] == form_spec.get("encounterType")),
+            (
+                e
+                for e in self.bundle["encounterTypes"]
+                if e["name"] == form_spec.get("encounterType")
+            ),
             None,
         )
         if st:
@@ -179,14 +191,16 @@ class BundleGenerator:
             if not m.get("subjectTypeUUID"):
                 warnings.append(f'Form mapping "{m["formName"]}" missing subject type')
             if "Program" in m.get("formType", "") and not m.get("programUUID"):
-                errors.append(f'Form mapping "{m["formName"]}" missing program reference')
+                errors.append(
+                    f'Form mapping "{m["formName"]}" missing program reference'
+                )
 
         # Duplicate concept names
         seen_names: set[str] = set()
         for c in self.bundle["concepts"]:
             lower = c["name"].lower()
             if lower in seen_names:
-                errors.append(f'Duplicate concept name: {c["name"]}')
+                errors.append(f"Duplicate concept name: {c['name']}")
             seen_names.add(lower)
 
         # Missing answer UUIDs
@@ -265,9 +279,7 @@ class BundleGenerator:
 
             # Forms in subdirectory
             for form in self.bundle["forms"]:
-                zf.writestr(
-                    f"forms/{form['name']}.json", json.dumps(form, indent=2)
-                )
+                zf.writestr(f"forms/{form['name']}.json", json.dumps(form, indent=2))
 
             # Validation report
             zf.writestr(

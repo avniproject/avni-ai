@@ -13,7 +13,6 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from ..services.task_manager import task_manager
-from ..services.enums import TaskStatus
 from ..utils.env import AVNI_BASE_URL
 
 logger = logging.getLogger(__name__)
@@ -58,7 +57,9 @@ async def handle_upload_bundle(request: Request) -> JSONResponse:
     """
     auth_token = request.headers.get("avni-auth-token")
     if not auth_token:
-        return JSONResponse({"error": "Missing avni-auth-token header"}, status_code=401)
+        return JSONResponse(
+            {"error": "Missing avni-auth-token header"}, status_code=401
+        )
 
     try:
         body = await request.json()

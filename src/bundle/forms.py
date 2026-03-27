@@ -35,7 +35,9 @@ class FormGenerator:
 
     # ── Skip logic → declarative rule ───────────────────────────────
 
-    def _build_declarative_rule(self, skip_logic: dict, scope: str = "encounter") -> list[dict] | None:
+    def _build_declarative_rule(
+        self, skip_logic: dict, scope: str = "encounter"
+    ) -> list[dict] | None:
         if not skip_logic or skip_logic.get("raw"):
             return None
         depends_on = skip_logic.get("dependsOn")
@@ -134,9 +136,7 @@ class FormGenerator:
     def _generate_form_element_group(
         self, group_name: str, fields: list[dict], display_order: int
     ) -> dict:
-        group_uuid = generate_deterministic_uuid(
-            f"group:{self.form_uuid}:{group_name}"
-        )
+        group_uuid = generate_deterministic_uuid(f"group:{self.form_uuid}:{group_name}")
         elements = []
         for idx, field in enumerate(fields):
             elem = self._generate_form_element(field, idx + 1)
