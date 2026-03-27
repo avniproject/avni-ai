@@ -16,16 +16,12 @@ Registration/subject types (e.g., Individual, Beneficiary, School, Household)
   "form_link": "name of the registration form (if mentioned)",
   "lowest_address_level": "lowest location level for registration (e.g., Village, Hamlet)",
   "description": "description if provided",
-  "allow_middle_name": true|false,
   "last_name_optional": true|false,
   "unique_name": true|false,
-  "allow_profile_picture": true|false,
-  "group": true|false,
-  "household": true|false
+  "allow_profile_picture": true|false
 }
 ```
 - `type` must be one of: Person, Individual, Household, Group, User
-- Set `group: true` and `household: true` only for Household/Group types
 - Only include fields that are explicitly mentioned or clearly implied in the document
 
 ### program
@@ -37,7 +33,6 @@ Programs that subjects can be enrolled in
   "colour": "#hex color if mentioned",
   "enrolment_form": "enrolment form name if mentioned",
   "exit_form": "exit form name if mentioned",
-  "description": "description if provided",
   "program_start_condition": "start condition if mentioned",
   "program_end_condition": "end condition if mentioned",
   "allow_multiple_enrolments": true|false,

@@ -8,6 +8,8 @@ from starlette.responses import JSONResponse
 from .handlers import (
     process_config_async_request,
     get_task_status,
+    generate_bundle_request,
+    get_bundle_status,
 )
 from .tools.admin.addressleveltypes import register_address_level_type_tools
 from .tools.admin.catchments import register_catchment_tools
@@ -85,6 +87,14 @@ async def create_server():
     async def get_config_task_status(request: Request):
         task_id = request.path_params["task_id"]
         return await get_task_status(task_id)
+
+    @server.custom_route("/generate-bundle", methods=["POST"])
+    async def generate_bundle_endpoint(request: Request):
+        return await generate_bundle_request(request)
+
+    @server.custom_route("/bundle-status/{session_id}", methods=["GET"])
+    async def get_bundle_status_endpoint(request: Request):
+        return await get_bundle_status(request)
 
     return server
 
