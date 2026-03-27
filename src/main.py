@@ -22,6 +22,13 @@ from .handlers.admin_handlers import (
     handle_update_user,
     handle_delete_implementation,
 )
+from .handlers.bundle_handlers import (
+    handle_generate_bundle,
+    handle_validate_bundle,
+    handle_download_bundle,
+    handle_download_bundle_b64,
+)
+from .handlers.upload_handlers import handle_upload_bundle, handle_upload_status
 from .handlers.config_handlers import handle_get_existing_config
 from .handlers.sandbox_handlers import handle_execute_python
 from .playground.executor import PlaygroundExecutor
@@ -142,6 +149,32 @@ async def create_server():
     @server.custom_route("/api/existing-config", methods=["GET"])
     async def get_existing_config_endpoint(request: Request):
         return await handle_get_existing_config(request)
+
+    # --- Bundle Generation ---
+    @server.custom_route("/generate-bundle", methods=["POST"])
+    async def generate_bundle_endpoint(request: Request):
+        return await handle_generate_bundle(request)
+
+    @server.custom_route("/validate-bundle", methods=["POST"])
+    async def validate_bundle_endpoint(request: Request):
+        return await handle_validate_bundle(request)
+
+    @server.custom_route("/download-bundle", methods=["GET"])
+    async def download_bundle_endpoint(request: Request):
+        return await handle_download_bundle(request)
+
+    @server.custom_route("/download-bundle-b64", methods=["GET"])
+    async def download_bundle_b64_endpoint(request: Request):
+        return await handle_download_bundle_b64(request)
+
+    # --- Bundle Upload ---
+    @server.custom_route("/upload-bundle", methods=["POST"])
+    async def upload_bundle_endpoint(request: Request):
+        return await handle_upload_bundle(request)
+
+    @server.custom_route("/upload-status/{task_id}", methods=["GET"])
+    async def upload_status_endpoint(request: Request):
+        return await handle_upload_status(request)
 
     # --- Python Playground ---
     @server.custom_route("/execute-python", methods=["POST"])

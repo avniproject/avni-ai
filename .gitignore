@@ -63,3 +63,6 @@ rules_generation_test_report.*
 form_validation_test_report.*
 *_test_report.csv
 *_test_report.json
+
+# Local reference
+ref/

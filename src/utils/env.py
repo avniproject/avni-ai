@@ -26,5 +26,6 @@ if not os.getenv("DIFY_API_KEY"):
 if not os.getenv("DIFY_API_BASE_URL"):
     os.environ["DIFY_API_BASE_URL"] = "https://api.dify.ai/v1"
 
+AVNI_BASE_URL = os.getenv("AVNI_BASE_URL", "https://staging.avniproject.org")
 DIFY_API_KEY = os.getenv("DIFY_API_KEY")
 DIFY_API_BASE_URL = os.getenv("DIFY_API_BASE_URL", "https://api.dify.ai/v1")
