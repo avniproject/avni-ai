@@ -113,7 +113,7 @@ workflow:
     - conversation
     - chitchat_count
     value: 0
-    value_type: number
+    value_type: integer
   - description: Counter for out-of-scope messages
     id: d4e5f6a7-b8c9-4012-d3e4-f5a6b7c8d9e0
     name: out_of_scope_count
@@ -121,7 +121,7 @@ workflow:
     - conversation
     - out_of_scope_count
     value: 0
-    value_type: number
+    value_type: integer
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -829,17 +829,20 @@ workflow:
             \nMax 2 clarifying questions. Each must specify expected response format.\n\
             \nNEVER ask clarification for:\n- Greetings (just route to RAG)\n- Questions\
             \ during active setup mode\n- Questions with adequate context\n\n## Routing\
-            \ Rules\nOVERRIDE RULES (check in order):\n1. NOT about Avni → OUT_OF_SCOPE\n\
-            2. File upload present (.xlsx, .xls, .csv) OR mentions uploading spec\
-            \ → FILE_SETUP\n3. entities_jsonl exists (user in setup) → FILE_SETUP\n\
-            4. Greeting → RAG (NO clarification)\n5. Capability questions (\"Is it\
-            \ possible\", \"Can Avni\", \"Does Avni support\") → RAG\n6. Implementation\
-            \ needs (\"Build/create/develop\", \"Delete everything\") → ASSISTANT\n\
-            7. \"I want to set up a program\" without file → PROGRAM_SETUP_GUIDANCE\n\
-            \n### PROGRAM_SETUP_GUIDANCE\nWhen user wants to set up a program but\
-            \ hasn't uploaded a file yet. Guide them to upload a Field Workflow Specification.\n\
-            \n## Response Format (JSON)\n{\"service\": \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|OUT_OF_SCOPE\"\
-            ,\n \"confidence\": 0.0-1.0,\n \"question_type\": \"...\",\n \"routing_reason\"\
+            \ Rules\nOVERRIDE RULES (check in order - STOP at first match):\n1. NOT\
+            \ about Avni → OUT_OF_SCOPE\n2. **CRITICAL**: sys.files is NOT EMPTY (file\
+            \ uploaded) → FILE_SETUP (ignore all other rules)\n3. entities_jsonl exists\
+            \ (user in setup) → FILE_SETUP\n4. Greeting → RAG (NO clarification)\n\
+            5. Capability questions (\"Is it possible\", \"Can Avni\", \"Does Avni\
+            \ support\") → RAG\n6. Implementation needs (\"Build/create/develop\"\
+            , \"Delete everything\") → ASSISTANT\n7. \"I want to set up\" / \"setup\
+            \ a program\" WITHOUT file upload → PROGRAM_SETUP_GUIDANCE\n\nIMPORTANT:\
+            \ If user_uploaded_files shows ANY files, ALWAYS route to FILE_SETUP regardless\
+            \ of message content.\n\n### PROGRAM_SETUP_GUIDANCE\nWhen user wants to\
+            \ set up a program but hasn't uploaded a file yet. Guide them to upload\
+            \ a Field Workflow Specification.\n\n## Response Format (JSON)\n{\"service\"\
+            : \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|OUT_OF_SCOPE\",\n\
+            \ \"confidence\": 0.0-1.0,\n \"question_type\": \"...\",\n \"routing_reason\"\
             : \"...\",\n \"clarification_needed\": true|false,\n \"clarifying_questions\"\
             : [],\n \"deviation_detected\": true|false}\n"
         - id: 3925c0a4-bbab-4189-8ba8-ac1725e2263e
@@ -908,12 +911,12 @@ workflow:
       height: 88
       id: '1757492907627'
       position:
-        x: 683
-        y: 451
+        x: 685.6158636099401
+        y: 450
       positionAbsolute:
-        x: 683
-        y: 451
-      selected: true
+        x: 685.6158636099401
+        y: 450
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1157,6 +1160,9 @@ workflow:
         prompt_template:
         - id: assistant-system
           role: system
+          text: ''
+        - id: 1c276f7a-296a-466b-9296-1d0c4024a349
+          role: user
           text: 'You are Avni Copilot, an expert assistant for the Avni data collection
             platform. Guide NGOs and implementers in designing Avni configurations.
 
@@ -1166,17 +1172,15 @@ workflow:
 
             - Ask ONE simple question at a time (guidance, not clarification) - Org
             Type is {{#1711528708197.org_type#}} - If Org Type is "Production" or
-            "UAT", tell user automatic configurations are not supported for their org
-            type. Do not proceed. - If Org Type is "Trial", proceed with configuration.
+            "UAT", tell user automatic configurations are not supported for their
+            org type. Do not proceed. - If Org Type is "Trial", proceed with configuration.
             - You are talking to {{#1711528708197.user_name#}} - When user wants to
             create config, suggest uploading a Field Workflow Specification file instead.
 
-            BEHAVIOR: - If setup_mode_active=true: stay focused on configuration, minimal
-            questions - If user deviates from setup task, gently redirect: "Let''s
-            focus on your configuration. What would you like to adjust?" - Provide
-            clear, actionable guidance
-
-            '
+            BEHAVIOR: - If setup_mode_active=true: stay focused on configuration,
+            minimal questions - If user deviates from setup task, gently redirect:
+            "Let''s focus on your configuration. What would you like to adjust?" -
+            Provide clear, actionable guidance'
         selected: false
         title: Assistant LLM
         type: llm
@@ -1360,18 +1364,15 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: '{{#17748473384490.text#}}
-
-
-          {{#17748474036620.text#}}
+        answer: '{{#17748474036620.text#}}
 
 
           Does everything look correct? Click **Yes** to proceed with configuration,
-          or **No** to make corrections."'
+          or **No** to make corrections.'
         selected: false
         title: Summary Answer
         type: answer
-      height: 169
+      height: 151
       id: '1773909436902'
       position:
         x: 3148.403767912396
@@ -1544,7 +1545,7 @@ workflow:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
-        selected: false
+        selected: true
         ssl_verify: true
         timeout:
           max_connect_timeout: 0
@@ -1561,7 +1562,7 @@ workflow:
       positionAbsolute:
         x: 3854.403767912396
         y: 1391.2489828611406
-      selected: false
+      selected: true
       type: custom
       width: 242
     - data:
@@ -2160,7 +2161,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -233.63149965283196
-      y: 130.78767521521422
-      zoom: 0.7866079014959043
+      x: -2483.4579845877006
+      y: -649.6033622751628
+      zoom: 0.7645658559567678
   rag_pipeline_variables: []
