@@ -1666,17 +1666,20 @@ workflow:
       width: 242
     - data:
         items:
-        - operation: over-write
+        - input_type: variable
+          operation: over-write
           value:
           - parse-bundle-body
           - bundle_zip_b64
           variable_selector:
           - conversation
           - bundle_zip_b64
+          write_mode: over-write
         selected: false
         title: Save Bundle B64
         type: assigner
-      height: 52
+        version: '2'
+      height: 84
       id: assign-bundle-b64
       position:
         x: 4270.714813181977
@@ -1764,17 +1767,20 @@ workflow:
       width: 242
     - data:
         items:
-        - operation: over-write
+        - input_type: variable
+          operation: over-write
           value:
           - parse-upload-body
           - task_id
           variable_selector:
           - conversation
           - upload_task_id
+          write_mode: over-write
         selected: false
         title: Save Task ID
         type: assigner
-      height: 52
+        version: '2'
+      height: 84
       id: assign-task-id
       position:
         x: 4790.593538657902
