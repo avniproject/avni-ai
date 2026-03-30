@@ -1579,12 +1579,10 @@ workflow:
         body:
           data:
           - id: upload-body
-            key: bundle_zip_b64
-            type: variable
-            value:
-            - generate-bundle-req
-            - body
-            - bundle_zip_b64
+            key: ''
+            type: text
+            value: "{\n  \"bundle_zip_b64\": \"{{#generate-bundle-req.body.bundle_zip_b64#}}\"\
+              \n}\n"
           type: json
         headers: 'Content-Type:application/json
 
