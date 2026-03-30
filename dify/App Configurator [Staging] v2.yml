@@ -425,10 +425,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: http-request
-        targetType: http-request
+        targetType: code
       id: 83131e8b-57dc-441c-8c07-c97015775b23
       selected: false
       source: generate-bundle-req
+      sourceHandle: source
+      target: parse-bundle-body
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: parse-bundle-to-upload
+      selected: false
+      source: parse-bundle-body
       sourceHandle: source
       target: upload-bundle-req
       targetHandle: target
@@ -1569,7 +1581,45 @@ workflow:
       positionAbsolute:
         x: 3854.403767912396
         y: 1391.2489828611406
-      selected: true
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        code: "import json\n\ndef main(body: str) -> dict:\n    try:\n        parsed\
+          \ = json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
+          \ TypeError):\n        parsed = {}\n    return {\n        \"bundle_zip_b64\"\
+          : parsed.get(\"bundle_zip_b64\", \"\"),\n        \"summary\": parsed.get(\"\
+          summary\", {}),\n        \"confidence\": parsed.get(\"confidence\", {})\n\
+          \    }\n"
+        code_language: python3
+        outputs:
+          bundle_zip_b64:
+            children: null
+            type: string
+          confidence:
+            children: null
+            type: object
+          summary:
+            children: null
+            type: object
+        selected: false
+        title: Parse Bundle Response
+        type: code
+        variables:
+        - value_selector:
+          - generate-bundle-req
+          - body
+          value_type: string
+          variable: body
+      height: 52
+      id: parse-bundle-body
+      position:
+        x: 4095.403767912396
+        y: 1391.2489828611406
+      positionAbsolute:
+        x: 4095.403767912396
+        y: 1391.2489828611406
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1581,7 +1631,7 @@ workflow:
           - id: upload-body
             key: ''
             type: text
-            value: "{\n  \"bundle_zip_b64\": \"{{#generate-bundle-req.body.bundle_zip_b64#}}\"\
+            value: "{\n  \"bundle_zip_b64\": \"{{#parse-bundle-body.bundle_zip_b64#}}\"\
               \n}\n"
           type: json
         headers: 'Content-Type:application/json
@@ -1897,10 +1947,10 @@ workflow:
 
           **Summary:**
 
-          {{#generate-bundle-req.body.summary#}}
+          {{#parse-bundle-body.summary#}}
 
 
-          **Confidence score:** {{#generate-bundle-req.body.confidence.overall#}}
+          **Confidence score:** {{#parse-bundle-body.confidence.overall#}}
 
 
           You can now log into Avni to review your configuration. If you need to make
