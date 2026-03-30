@@ -32,7 +32,7 @@ async def _upload_processor(
 
     progress_callback("Uploading bundle to Avni server...")
 
-    url = f"{base_url.rstrip('/')}/api/implementationBundle"
+    url = f"{base_url.rstrip('/')}/import/new"
     headers = {"AUTH-TOKEN": auth_token}
 
     async with httpx.AsyncClient(timeout=120.0) as client:
@@ -40,6 +40,13 @@ async def _upload_processor(
             url,
             headers=headers,
             files={"file": ("bundle.zip", zip_bytes, "application/zip")},
+            data={
+                "type": "metadataZip",
+                "autoApprove": "true",
+                "locationUploadMode": "usingParentLocation",
+                "locationHierarchy": "",
+                "encounterUploadMode": "CREATE_AND_UPDATE",
+            },
         )
         response.raise_for_status()
         result = response.json() if response.content else {}
