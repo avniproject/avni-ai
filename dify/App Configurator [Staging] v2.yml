@@ -5,12 +5,17 @@ app:
   icon_type: emoji
   mode: advanced-chat
   name: App Configurator [Staging] v2
-  use_icon_as_answer_icon: false
+  use_icon_as_answer_icon: true
 dependencies:
 - current_identifier: null
   type: marketplace
   value:
     marketplace_plugin_unique_identifier: agimaster/justwait:0.0.2@1cc2d5e7fbd6a829396c8a51947924f799f9566071bf8499c4e2a9f75ad3330f
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/anthropic:0.3.8@6706e34565fb2c560cc3641c888b7f4e34288928df913e92241bd6d4f830a0cf
     version: null
 - current_identifier: null
   type: marketplace
@@ -54,7 +59,7 @@ workflow:
     value: []
     value_type: array[object]
   - description: Upload task ID for polling
-    id: a1b2c3d4-e5f6-7890-abcd-upload_task_id
+    id: 79e98864-f718-4375-b980-b8e9df1fa427
     name: upload_task_id
     selector:
     - conversation
@@ -152,42 +157,9 @@ workflow:
   graph:
     edges:
     - data:
-        sourceType: start
-        targetType: assigner
-      id: 1711528708197-source-1774005484035-target
-      selected: false
-      source: '1711528708197'
-      sourceHandle: source
-      target: '1774005484035'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: start
-        targetType: assigner
-      id: 1711528708197-source-1774005428719-target
-      selected: false
-      source: '1711528708197'
-      sourceHandle: source
-      target: '1774005428719'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: start
-        targetType: knowledge-retrieval
-      id: 1711528708197-source-1758713692744-target
-      selected: false
-      source: '1711528708197'
-      sourceHandle: source
-      target: '1758713692744'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         sourceType: knowledge-retrieval
         targetType: llm
-      id: 1758713692744-source-1757492907627-target
+      id: 567b3a09-07aa-446a-af58-bb023337ea04
       selected: false
       source: '1758713692744'
       sourceHandle: source
@@ -196,20 +168,9 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        sourceType: llm
-        targetType: if-else
-      id: 1757492907627-source-1757493270484-target
-      selected: false
-      source: '1757492907627'
-      sourceHandle: source
-      target: '1757493270484'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         sourceType: if-else
         targetType: llm
-      id: 1757493270484-case-rag-1757495664531-target
+      id: 538316d7-e6df-4c85-aa8e-882da2decf95
       selected: false
       source: '1757493270484'
       sourceHandle: case-rag
@@ -220,7 +181,7 @@ workflow:
     - data:
         sourceType: llm
         targetType: answer
-      id: 1757495664531-source-1757495688732-target
+      id: d3514041-504a-4de1-bce9-63101ad5f1e4
       selected: false
       source: '1757495664531'
       sourceHandle: source
@@ -231,7 +192,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: answer
-      id: 1757493270484-case-clarify-1758608702077-target
+      id: 875c60cc-86f0-489d-9f97-a1e53966a106
       selected: false
       source: '1757493270484'
       sourceHandle: case-clarify
@@ -242,7 +203,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: answer
-      id: 1757493270484-case-oos-1758699378772-target
+      id: c501d3e4-1f59-4ac4-9cdd-55ba7b42b765
       selected: false
       source: '1757493270484'
       sourceHandle: case-oos
@@ -253,7 +214,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: llm
-      id: 1757493270484-case-assistant-17580163919060-target
+      id: fa6827a3-35fe-4bf5-9749-cb047c315329
       selected: false
       source: '1757493270484'
       sourceHandle: case-assistant
@@ -264,7 +225,7 @@ workflow:
     - data:
         sourceType: llm
         targetType: answer
-      id: 17580163919060-source-1760358474156-target
+      id: c32374c3-d160-41f0-84f9-32eeda89cd7c
       selected: false
       source: '17580163919060'
       sourceHandle: source
@@ -275,7 +236,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: if-else
-      id: 1757493270484-case-filesetup-fs-check-processed-target
+      id: 6a57cf49-c334-464d-a4f4-b9108cf4c092
       selected: false
       source: '1757493270484'
       sourceHandle: case-filesetup
@@ -286,7 +247,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: document-extractor
-      id: fs-check-processed-case-false-1774264909113-target
+      id: 2830c064-2881-4fcb-b839-384ced8a80cc
       selected: false
       source: fs-check-processed
       sourceHandle: case-false
@@ -297,7 +258,7 @@ workflow:
     - data:
         sourceType: assigner
         targetType: code
-      id: fs-save-jsonl-source-1773908701222-target
+      id: 9edcc33f-ae77-4d1d-a0a4-9b820d327bbf
       selected: false
       source: fs-save-jsonl
       sourceHandle: source
@@ -308,7 +269,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: llm
-      id: fs-check-processed-case-true-1773981975918-target
+      id: 7e25197b-7c15-4124-bb55-0fded6e2bc22
       selected: false
       source: fs-check-processed
       sourceHandle: case-true
@@ -319,7 +280,7 @@ workflow:
     - data:
         sourceType: llm
         targetType: code
-      id: 1773981975918-source-1773982043351-target
+      id: 9fee834f-d799-49f1-a1f5-83c0efc7367a
       selected: false
       source: '1773981975918'
       sourceHandle: source
@@ -330,7 +291,7 @@ workflow:
     - data:
         sourceType: code
         targetType: assigner
-      id: 1773982043351-source-1773984373385-target
+      id: 50668f44-e7c8-4b64-ab07-49f9d975505a
       selected: false
       source: '1773982043351'
       sourceHandle: source
@@ -343,7 +304,7 @@ workflow:
         isInLoop: false
         sourceType: answer
         targetType: human-input
-      id: 1773909436902-source-1774617205889-target
+      id: 0daa4d9e-549b-44e3-8b91-c890391b486c
       selected: false
       source: '1773909436902'
       sourceHandle: source
@@ -355,7 +316,7 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: http-request
-      id: 1774617205889-Yes-generate-bundle-req-target
+      id: 5c8dec84-c4d9-4f52-8371-7d194bc49e9c
       selected: false
       source: '1774617205889'
       sourceHandle: 'Yes'
@@ -369,7 +330,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: loop-start
         targetType: tool
-      id: 1774617440956start-source-1774617481433-target
+      id: 6eba93ff-953a-4d06-89aa-84731de91aa8
       selected: false
       source: 1774617440956start
       sourceHandle: source
@@ -383,7 +344,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: tool
         targetType: http-request
-      id: 1774617481433-source-1774617517718-target
+      id: 9b6ed349-cd70-432c-a3f8-90a07592d1a7
       selected: false
       source: '1774617481433'
       sourceHandle: source
@@ -397,7 +358,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: http-request
         targetType: if-else
-      id: 1774617517718-source-1774617558364-target
+      id: 519849f5-b759-4281-835e-482838d70bb1
       selected: false
       source: '1774617517718'
       sourceHandle: source
@@ -409,7 +370,7 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: 1774617205889-__timeout-fs-timeout-target
+      id: 8976fc6a-a699-4cbe-a732-28196a29717e
       selected: false
       source: '1774617205889'
       sourceHandle: __timeout
@@ -421,7 +382,7 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: 1774617205889-No-fs-ask-corrections-target
+      id: c0f04cc8-1261-47e3-9c25-0b848621f924
       selected: false
       source: '1774617205889'
       sourceHandle: 'No'
@@ -433,7 +394,7 @@ workflow:
         isInLoop: false
         sourceType: http-request
         targetType: http-request
-      id: generate-bundle-req-source-upload-bundle-req-target
+      id: 83131e8b-57dc-441c-8c07-c97015775b23
       selected: false
       source: generate-bundle-req
       sourceHandle: source
@@ -445,7 +406,7 @@ workflow:
         isInLoop: false
         sourceType: http-request
         targetType: loop
-      id: upload-bundle-req-source-1774617440956-target
+      id: b52e7621-1d82-4538-ab09-ee3c1d8dd2c4
       selected: false
       source: upload-bundle-req
       sourceHandle: source
@@ -456,7 +417,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: answer
-      id: 1757493270484-case-setup-guidance-setup-guidance-answer-target
+      id: 98938e7f-b8bd-4afb-bba6-5d0716785311
       selected: false
       source: '1757493270484'
       sourceHandle: case-setup-guidance
@@ -468,7 +429,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: document-extractor
-      id: fs-check-processed-false-1774264909113-target
+      id: d8a60d07-c768-418c-b08b-93d6ad2c5517
       selected: false
       source: fs-check-processed
       sourceHandle: 'false'
@@ -480,7 +441,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 1757493270484-false-1758699378772-target
+      id: 832726e4-72f8-4a5a-860a-1dfc3d3cfebc
       selected: false
       source: '1757493270484'
       sourceHandle: 'false'
@@ -492,7 +453,7 @@ workflow:
         isInLoop: false
         sourceType: assigner
         targetType: llm
-      id: 1773984373385-source-17748473384490-target
+      id: 4cfba0f9-6e74-4d5a-bdf1-ac49c8e3c2ed
       selected: false
       source: '1773984373385'
       sourceHandle: source
@@ -504,7 +465,7 @@ workflow:
         isInLoop: false
         sourceType: llm
         targetType: answer
-      id: 17748473384490-source-1773909436902-target
+      id: fd7dec48-cbbb-4d16-aa2e-902b021e8a5c
       selected: false
       source: '17748473384490'
       sourceHandle: source
@@ -516,7 +477,7 @@ workflow:
         isInLoop: false
         sourceType: llm
         targetType: answer
-      id: 17748474036620-source-1773909436902-target
+      id: bae904c0-f895-4c60-8b6a-593862b19932
       selected: false
       source: '17748474036620'
       sourceHandle: source
@@ -528,7 +489,7 @@ workflow:
         isInLoop: false
         sourceType: code
         targetType: llm
-      id: 1773908701222-source-17748474036620-target
+      id: f8e2032e-8140-4742-91f3-10a714a1ca1a
       selected: false
       source: '1773908701222'
       sourceHandle: source
@@ -540,7 +501,7 @@ workflow:
         isInLoop: false
         sourceType: document-extractor
         targetType: llm
-      id: 1774264909113-source-17748507380970-target
+      id: 07c5d92f-3ba3-4269-b118-ec7d91a4aa21
       selected: false
       source: '1774264909113'
       sourceHandle: source
@@ -552,7 +513,7 @@ workflow:
         isInLoop: false
         sourceType: llm
         targetType: assigner
-      id: 17748507380970-source-fs-save-jsonl-target
+      id: 6766ac12-7e02-4061-b4e3-38ee6dafb2f1
       selected: false
       source: '17748507380970'
       sourceHandle: source
@@ -566,7 +527,8 @@ workflow:
         loop_id: '1774617440956'
         sourceType: if-else
         targetType: assigner
-      id: 1774617558364-true-break-upload-loop-target
+      id: d4a7cb88-3ba7-4232-aba7-bdcb0058bf2d
+      selected: false
       source: '1774617558364'
       sourceHandle: 'true'
       target: break-upload-loop
@@ -579,7 +541,8 @@ workflow:
         loop_id: '1774617440956'
         sourceType: if-else
         targetType: answer
-      id: 1774617558364-false-upload-progress-answer-target
+      id: 80f9c75e-9348-4c4e-b3e4-5e1fc0383930
+      selected: false
       source: '1774617558364'
       sourceHandle: 'false'
       target: upload-progress-answer
@@ -592,50 +555,111 @@ workflow:
         loop_id: '1774617440956'
         sourceType: assigner
         targetType: answer
-      id: break-upload-loop-source-upload-done-answer-loop-target
+      id: 24e376ae-b1b4-4b20-aaae-449ff541bb6e
+      selected: false
       source: break-upload-loop
       sourceHandle: source
       target: upload-done-answer-loop
       targetHandle: target
       type: custom
       zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 6ffeea64-4eab-4adf-b0be-c741e6360410
+      selected: false
+      source: '1757492907627'
+      sourceHandle: source
+      target: '1757493270484'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 10d2a0a1-734b-47e0-ac78-dae4b71cc724
+      selected: false
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1758713692744'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: 3768efbc-85a1-4b13-a8b3-59be2f46bb81
+      selected: false
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1774005428719'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: 52dde296-fa85-448b-b8e3-5934d4a368c6
+      selected: false
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1774005484035'
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
+        desc: Define the initial parameters for launching a workflow
         selected: false
         title: Start
         type: start
         variables:
-        - label: user_name
-          max_length: 256
+        - hide: true
+          label: auth_token
+          max_length: 2000
           options: []
           required: false
-          type: text-input
-          variable: user_name
-        - label: auth_token
-          max_length: 512
-          options: []
-          required: true
-          type: text-input
+          type: paragraph
           variable: auth_token
-        - label: org_name
-          max_length: 256
+        - hide: true
+          label: org_name
+          max_length: 200
           options: []
           required: false
           type: text-input
           variable: org_name
-        - label: avni_mcp_server_url
-          max_length: 512
-          options: []
-          required: true
-          type: text-input
-          variable: avni_mcp_server_url
-        - label: org_type
-          max_length: 64
+        - default: trial
+          hide: true
+          label: org_type
+          max_length: 48
           options: []
           required: false
           type: text-input
           variable: org_type
-      height: 213
+        - hide: true
+          hint: ''
+          label: user_name
+          max_length: 48
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: user_name
+        - default: https://staging-mcp.avniproject.org/
+          hide: true
+          hint: ''
+          label: avni_mcp_server_url
+          max_length: 48
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: avni_mcp_server_url
+      height: 257
       id: '1711528708197'
       position:
         x: 0
@@ -704,7 +728,8 @@ workflow:
         multiple_retrieval_config:
           reranking_enable: false
           reranking_mode: weighted_score
-          top_k: 4
+          score_threshold: null
+          top_k: 6
           weights:
             keyword_setting:
               keyword_weight: 0.3
@@ -746,12 +771,12 @@ workflow:
           - result
         model:
           completion_params:
-            response_format:
-              type: json_object
+            max_tokens: 19999
+            response_format: JSON
             temperature: 0.1
           mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: orchestrator-system
           role: system
@@ -759,7 +784,7 @@ workflow:
             \ on PRIMARY INTENT.\n\n<context> {{#context#}} </context>\n<user_uploaded_files>\
             \ {{#sys.files#}} </user_uploaded_files>\n\n## Routing Rules\nOVERRIDE\
             \ RULES (check in order): 1. NOT about Avni → OUT_OF_SCOPE 2. File upload\
-            \ (.xlsx, .xls, .csv) or mentions uploading a spec/SRS/field workflow\
+            \ (.xlsx, .xls, .csv) or mentions uploading a scoping/spec/SRS/field workflow\
             \ → FILE_SETUP 3. \"I want to set up a program\" / \"How do I set up\"\
             \ / setup guidance without a file → PROGRAM_SETUP_GUIDANCE 4. Capability\
             \ questions (\"Is it possible\", \"Can Avni\", \"Does Avni support\",\
@@ -772,6 +797,9 @@ workflow:
             ,\n \"confidence\": 0.0-1.0,\n \"question_type\": \"...\",\n \"routing_reason\"\
             : \"...\",\n \"clarification_needed\": true|false,\n \"clarifying_questions\"\
             : []}\n"
+        - id: 3925c0a4-bbab-4189-8ba8-ac1725e2263e
+          role: user
+          text: '{{#sys.query#}}'
         selected: false
         structured_output:
           schema:
@@ -837,7 +865,7 @@ workflow:
       positionAbsolute:
         x: 683
         y: 451
-      selected: false
+      selected: true
       type: custom
       width: 242
     - data:
@@ -908,11 +936,11 @@ workflow:
       height: 508
       id: '1757493270484'
       position:
-        x: 1025.940472409972
-        y: 252
+        x: 1036.1956702332027
+        y: 339.1691814974598
       positionAbsolute:
-        x: 1025.940472409972
-        y: 252
+        x: 1036.1956702332027
+        y: 339.1691814974598
       selected: false
       type: custom
       width: 242
@@ -925,8 +953,8 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: rag-system
           role: system
@@ -1065,8 +1093,8 @@ workflow:
           completion_params:
             temperature: 0.3
           mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: assistant-system
           role: system
@@ -1115,8 +1143,8 @@ workflow:
         cases:
         - case_id: case-true
           conditions:
-          - comparison_operator: is not
-            value: '{}'
+          - comparison_operator: not empty
+            value: ''
             varType: object
             variable_selector:
             - conversation
@@ -1229,7 +1257,7 @@ workflow:
           ] == \"error\" else \"WARNING\"\n            lines.append(f\"[{prefix}]\
           \ {i['message']}\")\n        issues_summary = \"\\n\".join(lines)\n\n  \
           \  return {\"output\": {\"entities\": extracted_entities, \"issues_summary\"\
-          : issues_summary, \"error_count\": error_count, \"warning_count\": warning_count}}\n"
+          : issues_summary, \"error_count\": error_count, \"warning_count\": warning_count}}"
         code_language: python3
         outputs:
           output:
@@ -1246,20 +1274,27 @@ workflow:
       height: 52
       id: '1773908701222'
       position:
-        x: 2463.383099235763
+        x: 2461.3568365136653
         y: 1411.5647292093336
       positionAbsolute:
-        x: 2463.383099235763
+        x: 2461.3568365136653
         y: 1411.5647292093336
       selected: false
       type: custom
       width: 242
     - data:
-        answer: '{{#17748473384490.text#}}'
+        answer: '{{#17748473384490.text#}}
+
+
+          {{#17748474036620.text#}}
+
+
+          Does everything look correct? Click **Yes** to proceed with configuration,
+          or **No** to make corrections."'
         selected: false
         title: Summary Answer
         type: answer
-      height: 103
+      height: 169
       id: '1773909436902'
       position:
         x: 3148.403767912396
@@ -1275,10 +1310,11 @@ workflow:
           enabled: false
           variable_selector: []
         model:
-          completion_params: {}
+          completion_params:
+            response_format: JSON
           mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: corrector-system
           role: system
@@ -1448,7 +1484,7 @@ workflow:
       positionAbsolute:
         x: 3854.403767912396
         y: 1391.2489828611406
-      selected: true
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1573,6 +1609,7 @@ workflow:
         x: 4606.024318847109
         y: 1606.8554734604397
       selectable: false
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom-loop-start
@@ -1858,21 +1895,23 @@ workflow:
           variable_selector: []
         model:
           completion_params:
+            max_tokens: 64000
             temperature: 0.7
           mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: correction-summary-system
           role: system
+          text: ''
+        - id: 76872fab-b7cf-451c-ae20-86a1b86e0fce
+          role: user
           text: 'Present updated entities after corrections. Group by type, show what
             changed. Ask user to confirm or request more corrections.
 
             Updated Entities: {{#conversation.entities_jsonl#}}
 
-            User''s correction request: {{#sys.query#}}
-
-            '
+            User''s correction request: {{#sys.query#}}'
         selected: false
         title: Correction Summary LLM
         type: llm
@@ -1897,25 +1936,25 @@ workflow:
           variable_selector: []
         model:
           completion_params:
+            max_tokens: 64000
             temperature: 0.3
           mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: summary-system
           role: system
+          text: ''
+        - id: 2151dbf6-c159-451e-a23b-e1abb3537053
+          role: user
           text: 'Present a summary of parsed entities from the field workflow specification.
             List EVERY entity individually with all fields. Group by type.
 
-            Entities: {{#conversation.entities_jsonl#}}
+            Updated Entities: {{#conversation.entities_jsonl#}}
 
-            Ambiguity Report: {{#1773908701222.output.issues_summary#}}
-
-            After summary, ask: "Does everything look correct? Click **Yes** to proceed
-            with configuration, or **No** to make corrections."
-
-            '
+            Ambiguity Report: {{#1773908701222.output.issues_summary#}}'
         selected: false
+        structured_output_enabled: false
         title: Summary LLM
         type: llm
         vision:
@@ -1923,10 +1962,10 @@ workflow:
       height: 88
       id: '17748474036620'
       position:
-        x: 2776.189222870051
+        x: 2774.976019640213
         y: 1381.8617667059568
       positionAbsolute:
-        x: 2776.189222870051
+        x: 2774.976019640213
         y: 1381.8617667059568
       selected: false
       sourcePosition: right
@@ -1939,12 +1978,11 @@ workflow:
           variable_selector: []
         model:
           completion_params:
-            response_format:
-              type: json_object
+            response_format: JSON
             temperature: 0.1
           mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: entity-extractor-system
           role: system
@@ -1974,32 +2012,27 @@ workflow:
         structured_output:
           schema:
             properties:
-              structured_output:
-                properties:
-                  address_levels:
-                    items:
-                      type: string
-                    type: array
-                  encounter_types:
-                    items:
-                      type: string
-                    type: array
-                  programs:
-                    items:
-                      type: string
-                    type: array
-                  subject_types:
-                    items:
-                      type: string
-                    type: array
-                required:
-                - subject_types
-                - programs
-                - encounter_types
-                - address_levels
-                type: object
+              address_levels:
+                items:
+                  type: string
+                type: array
+              encounter_types:
+                items:
+                  type: string
+                type: array
+              programs:
+                items:
+                  type: string
+                type: array
+              subject_types:
+                items:
+                  type: string
+                type: array
             required:
-            - structured_output
+            - subject_types
+            - programs
+            - encounter_types
+            - address_levels
             type: object
         structured_output_enabled: true
         structured_output_schema:
@@ -2028,10 +2061,10 @@ workflow:
       height: 88
       id: '17748507380970'
       position:
-        x: 1943.0702085126068
+        x: 1941.7925228498102
         y: 1420.6483016343564
       positionAbsolute:
-        x: 1943.0702085126068
+        x: 1941.7925228498102
         y: 1420.6483016343564
       selected: false
       sourcePosition: right
@@ -2039,7 +2072,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -1672.943584090861
-      y: -561.1316343312329
-      zoom: 0.6061958352234105
+      x: -233.63149965283196
+      y: 130.78767521521422
+      zoom: 0.7866079014959043
   rag_pipeline_variables: []
