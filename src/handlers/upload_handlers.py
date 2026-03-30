@@ -71,7 +71,11 @@ async def handle_upload_bundle(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Missing 'bundle_zip_b64'"}, status_code=400)
 
     try:
-        zip_bytes = base64.b64decode(zip_b64)
+        zip_b64_clean = zip_b64.strip().replace(" ", "+")
+        try:
+            zip_bytes = base64.b64decode(zip_b64_clean, validate=True)
+        except Exception:
+            zip_bytes = base64.urlsafe_b64decode(zip_b64_clean + "==")
     except Exception:
         return JSONResponse({"error": "Invalid base64 encoding"}, status_code=400)
 
