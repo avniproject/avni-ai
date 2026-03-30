@@ -425,10 +425,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: http-request
-        targetType: http-request
+        targetType: code
       id: 83131e8b-57dc-441c-8c07-c97015775b23
       selected: false
       source: generate-bundle-req
+      sourceHandle: source
+      target: parse-bundle-body
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: parse-bundle-to-upload
+      selected: false
+      source: parse-bundle-body
       sourceHandle: source
       target: upload-bundle-req
       targetHandle: target
@@ -437,10 +449,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: http-request
-        targetType: loop
+        targetType: code
       id: b52e7621-1d82-4538-ab09-ee3c1d8dd2c4
       selected: false
       source: upload-bundle-req
+      sourceHandle: source
+      target: parse-upload-body
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: loop
+      id: parse-upload-to-loop
+      selected: false
+      source: parse-upload-body
       sourceHandle: source
       target: '1774617440956'
       targetHandle: target
@@ -824,8 +848,8 @@ workflow:
             \ to it even if message drifts)\n2. Greeting (hi/hello/thanks) → RAG,\
             \ clarification_needed=false\n3. Capability question (\"Can Avni\", \"\
             Is it possible\", \"Does Avni support\", \"How does\") → RAG\n4. Implementation\
-            \ request (\"build\", \"create\", \"develop\", \"set up for me\", \"\
-            delete everything\", \"clean slate\") → ASSISTANT\n5. Setup intent WITHOUT\
+            \ request (\"build\", \"create\", \"develop\", \"set up for me\", \"delete\
+            \ everything\", \"clean slate\") → ASSISTANT\n5. Setup intent WITHOUT\
             \ file (\"I want to set up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n\
             6. Unrelated to Avni → OUT_OF_SCOPE\n7. Anything else Avni-related → RAG\n\
             \n## Deviation Handling\nIf setup_mode_active=true and the message is\
@@ -1399,15 +1423,13 @@ workflow:
 
             Output a JSON with "corrections" array. Each correction MUST include:
             - "entity_type": one of "subject_type", "program", "encounter_type", "address_level"
-            - "name": the entity name
-            - all other fields to update
+            - "name": the entity name - all other fields to update
 
-            To update: include entity_type, name, and fields to change.
-            To delete: include entity_type, name, and "_delete": true.
-            To add: include entity_type and all required fields for that type.
-            To rename: output {entity_type, name: "OldName", "_delete": true} + {entity_type,
-            name: "NewName", ...all fields}.
-            Use actual booleans not strings.
+            To update: include entity_type, name, and fields to change. To delete:
+            include entity_type, name, and "_delete": true. To add: include entity_type
+            and all required fields for that type. To rename: output {entity_type,
+            name: "OldName", "_delete": true} + {entity_type, name: "NewName", ...all
+            fields}. Use actual booleans not strings.
 
             '
         selected: false
@@ -1447,23 +1469,23 @@ workflow:
       type: custom
       width: 242
     - data:
-        code: "import json\n\ndef main(entities_jsonl, corrections_str: str):\n\
-          \    # entities_jsonl is a dict with keys: subject_types, programs, encounter_types,\
+        code: "import json\n\ndef main(entities_jsonl, corrections_str: str):\n  \
+          \  # entities_jsonl is a dict with keys: subject_types, programs, encounter_types,\
           \ address_levels\n    if isinstance(entities_jsonl, str):\n        try:\n\
           \            entities_jsonl = json.loads(entities_jsonl)\n        except\
-          \ (json.JSONDecodeError, TypeError):\n            entities_jsonl = {}\n \
-          \   if not isinstance(entities_jsonl, dict):\n        entities_jsonl = {}\n\
-          \    result = dict(entities_jsonl)\n    try:\n        parsed = json.loads(corrections_str)\
+          \ (json.JSONDecodeError, TypeError):\n            entities_jsonl = {}\n\
+          \    if not isinstance(entities_jsonl, dict):\n        entities_jsonl =\
+          \ {}\n    result = dict(entities_jsonl)\n    try:\n        parsed = json.loads(corrections_str)\
           \ if isinstance(corrections_str, str) else corrections_str\n        if isinstance(parsed,\
-          \ dict):\n            corrections = parsed.get(\"corrections\", [])\n   \
-          \     elif isinstance(parsed, list):\n            corrections = parsed\n\
+          \ dict):\n            corrections = parsed.get(\"corrections\", [])\n  \
+          \      elif isinstance(parsed, list):\n            corrections = parsed\n\
           \        else:\n            corrections = []\n    except (json.JSONDecodeError,\
           \ TypeError):\n        return {\"result\": result}\n    if not corrections:\n\
           \        return {\"result\": result}\n    SECTION_MAP = {\"subject_type\"\
           : \"subject_types\", \"program\": \"programs\", \"encounter_type\": \"encounter_types\"\
           , \"address_level\": \"address_levels\"}\n    for correction in corrections:\n\
-          \        if not isinstance(correction, dict):\n            continue\n   \
-          \     section_key = SECTION_MAP.get(correction.get(\"entity_type\", \"\"\
+          \        if not isinstance(correction, dict):\n            continue\n  \
+          \      section_key = SECTION_MAP.get(correction.get(\"entity_type\", \"\"\
           ).lower(), correction.get(\"entity_type\", \"\"))\n        if not section_key\
           \ or section_key not in result:\n            continue\n        c_name =\
           \ correction.get(\"name\", \"\")\n        entities = result[section_key]\n\
@@ -1552,7 +1574,7 @@ workflow:
           max_retries: 1
           retry_enabled: true
           retry_interval: 2000
-        selected: true
+        selected: false
         ssl_verify: true
         timeout:
           max_connect_timeout: 10
@@ -1564,11 +1586,49 @@ workflow:
       height: 141
       id: generate-bundle-req
       position:
-        x: 3854.403767912396
-        y: 1391.2489828611406
+        x: 3834.7847908378453
+        y: 1335.0079152474289
       positionAbsolute:
-        x: 3854.403767912396
-        y: 1391.2489828611406
+        x: 3834.7847908378453
+        y: 1335.0079152474289
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        code: "import json\n\ndef main(body: str) -> dict:\n    try:\n        parsed\
+          \ = json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
+          \ TypeError):\n        parsed = {}\n    return {\n        \"bundle_zip_b64\"\
+          : parsed.get(\"bundle_zip_b64\", \"\"),\n        \"summary\": parsed.get(\"\
+          summary\", {}),\n        \"confidence\": parsed.get(\"confidence\", {})\n\
+          \    }\n"
+        code_language: python3
+        outputs:
+          bundle_zip_b64:
+            children: null
+            type: string
+          confidence:
+            children: null
+            type: object
+          summary:
+            children: null
+            type: object
+        selected: false
+        title: Parse Bundle Response
+        type: code
+        variables:
+        - value_selector:
+          - generate-bundle-req
+          - body
+          value_type: string
+          variable: body
+      height: 52
+      id: parse-bundle-body
+      position:
+        x: 4113.714813181977
+        y: 1266.9954613889865
+      positionAbsolute:
+        x: 4113.714813181977
+        y: 1266.9954613889865
       selected: false
       type: custom
       width: 242
@@ -1581,7 +1641,7 @@ workflow:
           - id: upload-body
             key: ''
             type: text
-            value: "{\n  \"bundle_zip_b64\": \"{{#generate-bundle-req.body.bundle_zip_b64#}}\"\
+            value: "{\n  \"bundle_zip_b64\": \"{{#parse-bundle-body.bundle_zip_b64#}}\"\
               \n}\n"
           type: json
         headers: 'Content-Type:application/json
@@ -1605,11 +1665,45 @@ workflow:
       height: 141
       id: upload-bundle-req
       position:
-        x: 4195.403767912396
-        y: 1391.2489828611406
+        x: 4391.593538657902
+        y: 1352.0110287120392
       positionAbsolute:
-        x: 4195.403767912396
-        y: 1391.2489828611406
+        x: 4391.593538657902
+        y: 1352.0110287120392
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        code: "import json\n\ndef main(body: str) -> dict:\n    try:\n        parsed\
+          \ = json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
+          \ TypeError):\n        parsed = {}\n    return {\n        \"task_id\": parsed.get(\"\
+          task_id\", \"\"),\n        \"status\": parsed.get(\"status\", \"\")\n  \
+          \  }\n"
+        code_language: python3
+        outputs:
+          status:
+            children: null
+            type: string
+          task_id:
+            children: null
+            type: string
+        selected: false
+        title: Parse Upload Response
+        type: code
+        variables:
+        - value_selector:
+          - upload-bundle-req
+          - body
+          value_type: string
+          variable: body
+      height: 52
+      id: parse-upload-body
+      position:
+        x: 4632.593538657902
+        y: 1352.0110287120392
+      positionAbsolute:
+        x: 4632.593538657902
+        y: 1352.0110287120392
       selected: false
       type: custom
       width: 242
@@ -1783,7 +1877,7 @@ workflow:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
-        selected: false
+        selected: true
         ssl_verify: true
         timeout:
           max_connect_timeout: 10
@@ -1791,7 +1885,7 @@ workflow:
           max_write_timeout: 10
         title: Check Upload Status
         type: http-request
-        url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#upload-bundle-req.body.task_id#}}'
+        url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#parse-upload-body.task_id#}}'
         variables: []
       height: 159
       id: '1774617517718'
@@ -1802,7 +1896,7 @@ workflow:
       positionAbsolute:
         x: 4976.035244630276
         y: 1658.5748670682822
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1897,10 +1991,10 @@ workflow:
 
           **Summary:**
 
-          {{#generate-bundle-req.body.summary#}}
+          {{#parse-bundle-body.summary#}}
 
 
-          **Confidence score:** {{#generate-bundle-req.body.confidence.overall#}}
+          **Confidence score:** {{#parse-bundle-body.confidence.overall#}}
 
 
           You can now log into Avni to review your configuration. If you need to make
@@ -1910,7 +2004,7 @@ workflow:
         selected: false
         title: Upload Done
         type: answer
-      height: 281
+      height: 234
       id: upload-done-answer-loop
       parentId: '1774617440956'
       position:
@@ -2168,7 +2262,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -2483.4579845877006
-      y: -649.6033622751628
-      zoom: 0.7645658559567678
+      x: -1900.6650318003349
+      y: -343.6150802653661
+      zoom: 0.4549780474597205
   rag_pipeline_variables: []

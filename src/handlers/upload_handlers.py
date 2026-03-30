@@ -70,6 +70,7 @@ async def handle_upload_bundle(request: Request) -> JSONResponse:
     if not zip_b64:
         return JSONResponse({"error": "Missing 'bundle_zip_b64'"}, status_code=400)
 
+    logger.info("upload-bundle: b64 len=%d first30=%r last10=%r", len(zip_b64), zip_b64[:30], zip_b64[-10:])
     try:
         zip_b64_clean = zip_b64.strip().replace(" ", "+")
         try:
