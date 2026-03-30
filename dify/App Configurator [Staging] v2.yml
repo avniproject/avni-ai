@@ -90,6 +90,38 @@ workflow:
     - loop
     value: true
     value_type: boolean
+  - description: Tracks if user is in active setup workflow
+    id: a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a6b7
+    name: setup_mode_active
+    selector:
+    - conversation
+    - setup_mode_active
+    value: false
+    value_type: boolean
+  - description: Stores the user's anchored intent
+    id: b2c3d4e5-f6a7-4890-b1c2-d3e4f5a6b7c8
+    name: primary_intent
+    selector:
+    - conversation
+    - primary_intent
+    value: ''
+    value_type: string
+  - description: Counter for chitchat messages
+    id: c3d4e5f6-a7b8-4901-c2d3-e4f5a6b7c8d9
+    name: chitchat_count
+    selector:
+    - conversation
+    - chitchat_count
+    value: 0
+    value_type: number
+  - description: Counter for out-of-scope messages
+    id: d4e5f6a7-b8c9-4012-d3e4-f5a6b7c8d9e0
+    name: out_of_scope_count
+    selector:
+    - conversation
+    - out_of_scope_count
+    value: 0
+    value_type: number
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -782,21 +814,34 @@ workflow:
           role: system
           text: "You are the Avni Platform Orchestrator. Route user messages based\
             \ on PRIMARY INTENT.\n\n<context> {{#context#}} </context>\n<user_uploaded_files>\
-            \ {{#sys.files#}} </user_uploaded_files>\n\n## Routing Rules\nOVERRIDE\
-            \ RULES (check in order): 1. NOT about Avni → OUT_OF_SCOPE 2. File upload\
-            \ (.xlsx, .xls, .csv) or mentions uploading a scoping/spec/SRS/field workflow\
-            \ → FILE_SETUP 3. \"I want to set up a program\" / \"How do I set up\"\
-            \ / setup guidance without a file → PROGRAM_SETUP_GUIDANCE 4. Capability\
-            \ questions (\"Is it possible\", \"Can Avni\", \"Does Avni support\",\
-            \ \"How can I\") → RAG 5. Implementation needs (\"Build/create/develop\"\
-            , \"Delete everything\", \"Clean slate\") → ASSISTANT 6. Greeting → RAG\
-            \ with clarification_needed=true\n\n### PROGRAM_SETUP_GUIDANCE (NEW) When\
-            \ user wants to set up a program but hasn't uploaded a file yet. Response\
-            \ should guide them to upload a Field Workflow Specification.\n\n## Response\
-            \ Format (JSON)\n{\"service\": \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|OUT_OF_SCOPE\"\
+            \ {{#sys.files#}} </user_uploaded_files>\n\n## Context Awareness\nCurrent\
+            \ State:\n- Setup mode active: {{#conversation.setup_mode_active#}}\n\
+            - Primary intent: {{#conversation.primary_intent#}}\n- Entities loaded:\
+            \ {{#conversation.entities_jsonl#}}\n- Chitchat count: {{#conversation.chitchat_count#}}\n\
+            - Out-of-scope count: {{#conversation.out_of_scope_count#}}\n\nINTENT\
+            \ ANCHORING:\n- If setup_mode_active=true OR entities_jsonl exists → anchor\
+            \ to FILE_SETUP intent\n- If user deviates to chitchat, allow brief deviation\
+            \ but note it\n- After 2 chitchat OR 1 OOS message during setup, note\
+            \ deviation_detected=true\n\n## Clarification Rules\nONLY set clarification_needed=true\
+            \ if ALL conditions met:\n1. Question is genuinely ambiguous (missing\
+            \ critical detail)\n2. Missing detail would materially change the answer\n\
+            3. NOT in active setup mode (setup_mode_active=false)\n4. NOT a greeting\n\
+            \nMax 2 clarifying questions. Each must specify expected response format.\n\
+            \nNEVER ask clarification for:\n- Greetings (just route to RAG)\n- Questions\
+            \ during active setup mode\n- Questions with adequate context\n\n## Routing\
+            \ Rules\nOVERRIDE RULES (check in order):\n1. NOT about Avni → OUT_OF_SCOPE\n\
+            2. File upload present (.xlsx, .xls, .csv) OR mentions uploading spec\
+            \ → FILE_SETUP\n3. entities_jsonl exists (user in setup) → FILE_SETUP\n\
+            4. Greeting → RAG (NO clarification)\n5. Capability questions (\"Is it\
+            \ possible\", \"Can Avni\", \"Does Avni support\") → RAG\n6. Implementation\
+            \ needs (\"Build/create/develop\", \"Delete everything\") → ASSISTANT\n\
+            7. \"I want to set up a program\" without file → PROGRAM_SETUP_GUIDANCE\n\
+            \n### PROGRAM_SETUP_GUIDANCE\nWhen user wants to set up a program but\
+            \ hasn't uploaded a file yet. Guide them to upload a Field Workflow Specification.\n\
+            \n## Response Format (JSON)\n{\"service\": \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|OUT_OF_SCOPE\"\
             ,\n \"confidence\": 0.0-1.0,\n \"question_type\": \"...\",\n \"routing_reason\"\
             : \"...\",\n \"clarification_needed\": true|false,\n \"clarifying_questions\"\
-            : []}\n"
+            : [],\n \"deviation_detected\": true|false}\n"
         - id: 3925c0a4-bbab-4189-8ba8-ac1725e2263e
           role: user
           text: '{{#sys.query#}}'
@@ -814,6 +859,8 @@ workflow:
                 maximum: 1
                 minimum: 0
                 type: number
+              deviation_detected:
+                type: boolean
               question_type:
                 type: string
               routing_reason:
@@ -833,6 +880,7 @@ workflow:
             - routing_reason
             - clarification_needed
             - clarifying_questions
+            - deviation_detected
             type: object
         structured_output_enabled: true
         structured_output_schema:
@@ -970,10 +1018,18 @@ workflow:
 
             Not currently capable of: 1. Helping with rules
 
+            Context State: - Setup mode active: {{#conversation.setup_mode_active#}}
+            - Entities loaded: {{#conversation.entities_jsonl#}}
+
             Rules: - If you don''t know, say so. Don''t guess or invent features.
-            - If greeting, greet by name: {{#1711528708197.user_name#}} - Do not greet
-            repeatedly. - If ambiguous, ask a clarifying question. - Answer in the
-            user''s language.
+            - If greeting, greet warmly by name: {{#1711528708197.user_name#}} - Do
+            not greet repeatedly. - Answer in the user''s language.
+
+            CLARIFICATION DISCIPLINE: - If greeting: respond warmly, do NOT ask questions
+            unless user explicitly asks for help - If question has adequate context:
+            answer directly - If ambiguous AND not in setup mode: ask ONE specific
+            question with clear expected response format - If setup_mode_active=true
+            and question relates to setup: answer directly without clarification
 
             '
         selected: false
@@ -1008,7 +1064,10 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: '{{#1757492907627.structured_output.clarifying_questions#}}'
+        answer: '{{#1757492907627.structured_output.clarifying_questions#}}
+
+
+          Note: Please provide specific details so I can help you better.'
         selected: false
         title: Clarify the question
         type: answer
@@ -1101,12 +1160,21 @@ workflow:
           text: 'You are Avni Copilot, an expert assistant for the Avni data collection
             platform. Guide NGOs and implementers in designing Avni configurations.
 
-            - Ask one simple question at a time - Org Type is {{#1711528708197.org_type#}}
-            - If Org Type is "Production" or "UAT", tell user automatic configurations
-            are not supported for their org type. Do not proceed. - If Org Type is
-            "Trial", proceed with configuration. - You are talking to {{#1711528708197.user_name#}}
-            - When user wants to create config, suggest uploading a Field Workflow
-            Specification file instead.
+            Context State: - Setup mode active: {{#conversation.setup_mode_active#}}
+            - Entities loaded: {{#conversation.entities_jsonl#}} - Primary intent:
+            {{#conversation.primary_intent#}}
+
+            - Ask ONE simple question at a time (guidance, not clarification) - Org
+            Type is {{#1711528708197.org_type#}} - If Org Type is "Production" or
+            "UAT", tell user automatic configurations are not supported for their org
+            type. Do not proceed. - If Org Type is "Trial", proceed with configuration.
+            - You are talking to {{#1711528708197.user_name#}} - When user wants to
+            create config, suggest uploading a Field Workflow Specification file instead.
+
+            BEHAVIOR: - If setup_mode_active=true: stay focused on configuration, minimal
+            questions - If user deviates from setup task, gently redirect: "Let''s
+            focus on your configuration. What would you like to adjust?" - Provide
+            clear, actionable guidance
 
             '
         selected: false
@@ -1193,6 +1261,15 @@ workflow:
           variable_selector:
           - conversation
           - entities_jsonl
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'True'
+          variable_selector:
+          - conversation
+          - setup_mode_active
           write_mode: over-write
         selected: false
         title: Save Entities JSONL
@@ -1767,12 +1844,23 @@ workflow:
     - data:
         isInLoop: true
         items:
-        - input_type: constant
+        - input_type: variable
           operation: set
-          value: false
+          value:
+          - conversation
+          - 'False'
           variable_selector:
           - conversation
           - loop
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'False'
+          variable_selector:
+          - conversation
+          - setup_mode_active
           write_mode: over-write
         loop_id: '1774617440956'
         selected: false
