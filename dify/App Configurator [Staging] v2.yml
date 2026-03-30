@@ -438,7 +438,7 @@ workflow:
       selected: false
       source: generate-bundle-req
       sourceHandle: source
-      target: parse-bundle-body
+      target: 4eb75ab2-87de-48f6-b52e-35f8646da88d
       targetHandle: target
       type: custom
       zIndex: 0
@@ -446,11 +446,11 @@ workflow:
         isInLoop: false
         sourceType: code
         targetType: assigner
-      id: parse-bundle-to-assign
+      id: f92114a2-7a0c-4edf-a350-efbaff1f2907
       selected: false
-      source: parse-bundle-body
+      source: 4eb75ab2-87de-48f6-b52e-35f8646da88d
       sourceHandle: source
-      target: assign-bundle-b64
+      target: 473230ae-fcca-4f3b-b410-fc792d8b0e88
       targetHandle: target
       type: custom
       zIndex: 0
@@ -458,9 +458,9 @@ workflow:
         isInLoop: false
         sourceType: assigner
         targetType: http-request
-      id: assign-bundle-to-upload
+      id: 59926ff2-ace9-45bc-8fd4-cc82d9b04c9e
       selected: false
-      source: assign-bundle-b64
+      source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
       sourceHandle: source
       target: upload-bundle-req
       targetHandle: target
@@ -474,7 +474,7 @@ workflow:
       selected: false
       source: upload-bundle-req
       sourceHandle: source
-      target: parse-upload-body
+      target: 6d81a37b-960b-42d3-ae88-5799cd773102
       targetHandle: target
       type: custom
       zIndex: 0
@@ -482,11 +482,11 @@ workflow:
         isInLoop: false
         sourceType: code
         targetType: assigner
-      id: parse-upload-to-assign
+      id: 27d43db2-e252-4315-95f5-65c4abb02d24
       selected: false
-      source: parse-upload-body
+      source: 6d81a37b-960b-42d3-ae88-5799cd773102
       sourceHandle: source
-      target: assign-task-id
+      target: 8e0563d0-7844-4e89-a765-cbd9647e7676
       targetHandle: target
       type: custom
       zIndex: 0
@@ -494,9 +494,9 @@ workflow:
         isInLoop: false
         sourceType: assigner
         targetType: loop
-      id: assign-task-to-loop
+      id: 533f37ce-5506-4373-ad40-3e28a5e396ab
       selected: false
-      source: assign-task-id
+      source: 8e0563d0-7844-4e89-a765-cbd9647e7676
       sourceHandle: source
       target: '1774617440956'
       targetHandle: target
@@ -1654,7 +1654,7 @@ workflow:
           value_type: string
           variable: body
       height: 52
-      id: parse-bundle-body
+      id: 4eb75ab2-87de-48f6-b52e-35f8646da88d
       position:
         x: 4113.714813181977
         y: 1266.9954613889865
@@ -1669,7 +1669,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - parse-bundle-body
+          - 4eb75ab2-87de-48f6-b52e-35f8646da88d
           - bundle_zip_b64
           variable_selector:
           - conversation
@@ -1680,7 +1680,7 @@ workflow:
         type: assigner
         version: '2'
       height: 84
-      id: assign-bundle-b64
+      id: 473230ae-fcca-4f3b-b410-fc792d8b0e88
       position:
         x: 4270.714813181977
         y: 1266.9954613889865
@@ -1755,7 +1755,7 @@ workflow:
           value_type: string
           variable: body
       height: 52
-      id: parse-upload-body
+      id: 6d81a37b-960b-42d3-ae88-5799cd773102
       position:
         x: 4632.593538657902
         y: 1352.0110287120392
@@ -1770,7 +1770,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - parse-upload-body
+          - 6d81a37b-960b-42d3-ae88-5799cd773102
           - task_id
           variable_selector:
           - conversation
@@ -1781,7 +1781,7 @@ workflow:
         type: assigner
         version: '2'
       height: 84
-      id: assign-task-id
+      id: 8e0563d0-7844-4e89-a765-cbd9647e7676
       position:
         x: 4790.593538657902
         y: 1352.0110287120392
