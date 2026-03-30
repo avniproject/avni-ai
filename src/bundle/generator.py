@@ -237,6 +237,14 @@ class BundleGenerator:
     def generate(self, entities: dict) -> dict:
         logger.info("Generating bundle for: %s", self.org_name)
 
+        # Normalise snake_case keys to camelCase (idempotent — camelCase passes through)
+        _key_map = {
+            "subject_types": "subjectTypes",
+            "encounter_types": "encounterTypes",
+            "address_levels": "addressLevels",
+        }
+        entities = {_key_map.get(k, k): v for k, v in entities.items()}
+
         if entities.get("subjectTypes"):
             self.process_subject_types(entities["subjectTypes"])
         if entities.get("programs"):

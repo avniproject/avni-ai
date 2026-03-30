@@ -36,6 +36,14 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
             {"error": "Missing 'entities' in request body"}, status_code=400
         )
 
+    # Normalise snake_case keys (sent by Dify) to camelCase (used internally)
+    _key_map = {
+        "subject_types": "subjectTypes",
+        "encounter_types": "encounterTypes",
+        "address_levels": "addressLevels",
+    }
+    entities = {_key_map.get(k, k): v for k, v in entities.items()}
+
     org_name = body.get("org_name", "Unknown Organization")
 
     try:
