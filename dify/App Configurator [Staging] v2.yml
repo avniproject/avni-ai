@@ -681,7 +681,7 @@ workflow:
           required: false
           type: text-input
           variable: user_name
-        - default: https://staging-mcp.avniproject.org/
+        - default: https://staging-ai.avniproject.org/
           hide: true
           hint: ''
           label: avni_mcp_server_url
@@ -1579,10 +1579,12 @@ workflow:
         body:
           data:
           - id: upload-body
-            key: ''
-            type: text
-            value: "{\n  \"bundle_zip_b64\": \"{{#generate-bundle-req.body.bundle_zip_b64#}}\"\
-              \n}\n"
+            key: bundle_zip_b64
+            type: variable
+            value:
+            - generate-bundle-req
+            - body
+            - bundle_zip_b64
           type: json
         headers: 'Content-Type:application/json
 
