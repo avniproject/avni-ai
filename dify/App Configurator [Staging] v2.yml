@@ -1549,15 +1549,15 @@ workflow:
         method: post
         params: ''
         retry_config:
-          max_retries: 3
+          max_retries: 1
           retry_enabled: true
-          retry_interval: 100
+          retry_interval: 2000
         selected: true
         ssl_verify: true
         timeout:
-          max_connect_timeout: 0
-          max_read_timeout: 120
-          max_write_timeout: 0
+          max_connect_timeout: 10
+          max_read_timeout: 180
+          max_write_timeout: 30
         title: Generate Bundle
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}generate-bundle'
@@ -1590,15 +1590,15 @@ workflow:
         method: post
         params: ''
         retry_config:
-          max_retries: 2
+          max_retries: 1
           retry_enabled: true
-          retry_interval: 500
+          retry_interval: 2000
         selected: false
         ssl_verify: true
         timeout:
-          max_connect_timeout: 0
+          max_connect_timeout: 10
           max_read_timeout: 120
-          max_write_timeout: 0
+          max_write_timeout: 30
         title: Upload Bundle
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}upload-bundle'
@@ -1786,9 +1786,9 @@ workflow:
         selected: false
         ssl_verify: true
         timeout:
-          max_connect_timeout: 0
-          max_read_timeout: 0
-          max_write_timeout: 0
+          max_connect_timeout: 10
+          max_read_timeout: 30
+          max_write_timeout: 10
         title: Check Upload Status
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#upload-bundle-req.body.task_id#}}'
