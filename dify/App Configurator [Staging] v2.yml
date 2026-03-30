@@ -295,28 +295,6 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        sourceType: document-extractor
-        targetType: llm
-      id: 1774264909113-source-1774264840300-target
-      selected: false
-      source: '1774264909113'
-      sourceHandle: source
-      target: '1774264840300'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: llm
-        targetType: assigner
-      id: 1774264840300-source-fs-save-jsonl-target
-      selected: false
-      source: '1774264840300'
-      sourceHandle: source
-      target: fs-save-jsonl
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         sourceType: assigner
         targetType: code
       id: fs-save-jsonl-source-1773908701222-target
@@ -324,17 +302,6 @@ workflow:
       source: fs-save-jsonl
       sourceHandle: source
       target: '1773908701222'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: code
-        targetType: llm
-      id: 1773908701222-source-1773909315118-target
-      selected: false
-      source: '1773908701222'
-      sourceHandle: source
-      target: '1773909315118'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -368,17 +335,6 @@ workflow:
       source: '1773982043351'
       sourceHandle: source
       target: '1773984373385'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: assigner
-        targetType: llm
-      id: 1773984373385-source-1774002885641-target
-      selected: false
-      source: '1773984373385'
-      sourceHandle: source
-      target: '1774002885641'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -475,30 +431,6 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: llm
-        targetType: answer
-      id: 1774002885641-source-1773909436902-target
-      selected: false
-      source: '1774002885641'
-      sourceHandle: source
-      target: '1773909436902'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: answer
-      id: 1773909315118-source-1773909436902-target
-      selected: false
-      source: '1773909315118'
-      sourceHandle: source
-      target: '1773909436902'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: http-request
         targetType: http-request
       id: generate-bundle-req-source-upload-bundle-req-target
@@ -533,43 +465,11 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        isInLoop: true
-        loop_id: '1774617440956'
-        sourceType: if-else
-        targetType: assigner
-      source: '1774617558364'
-      sourceHandle: 'true'
-      target: break-upload-loop
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1774617440956'
-        sourceType: assigner
-        targetType: answer
-      source: break-upload-loop
-      sourceHandle: source
-      target: upload-done-answer-loop
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1774617440956'
-        sourceType: if-else
-        targetType: answer
-      source: '1774617558364'
-      sourceHandle: 'false'
-      target: upload-progress-answer
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
         isInLoop: false
         sourceType: if-else
         targetType: document-extractor
       id: fs-check-processed-false-1774264909113-target
+      selected: false
       source: fs-check-processed
       sourceHandle: 'false'
       target: '1774264909113'
@@ -581,12 +481,124 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1757493270484-false-1758699378772-target
+      selected: false
       source: '1757493270484'
       sourceHandle: 'false'
       target: '1758699378772'
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: llm
+      id: 1773984373385-source-17748473384490-target
+      selected: false
+      source: '1773984373385'
+      sourceHandle: source
+      target: '17748473384490'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 17748473384490-source-1773909436902-target
+      selected: false
+      source: '17748473384490'
+      sourceHandle: source
+      target: '1773909436902'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 17748474036620-source-1773909436902-target
+      selected: false
+      source: '17748474036620'
+      sourceHandle: source
+      target: '1773909436902'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: 1773908701222-source-17748474036620-target
+      selected: false
+      source: '1773908701222'
+      sourceHandle: source
+      target: '17748474036620'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1774264909113-source-17748507380970-target
+      selected: false
+      source: '1774264909113'
+      sourceHandle: source
+      target: '17748507380970'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: assigner
+      id: 17748507380970-source-fs-save-jsonl-target
+      selected: false
+      source: '17748507380970'
+      sourceHandle: source
+      target: fs-save-jsonl
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: if-else
+        targetType: assigner
+      id: 1774617558364-true-break-upload-loop-target
+      source: '1774617558364'
+      sourceHandle: 'true'
+      target: break-upload-loop
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: if-else
+        targetType: answer
+      id: 1774617558364-false-upload-progress-answer-target
+      source: '1774617558364'
+      sourceHandle: 'false'
+      target: upload-progress-answer
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: assigner
+        targetType: answer
+      id: break-upload-loop-source-upload-done-answer-loop-target
+      source: break-upload-loop
+      sourceHandle: source
+      target: upload-done-answer-loop
+      targetHandle: target
+      type: custom
+      zIndex: 1002
     nodes:
     - data:
         selected: false
@@ -937,6 +949,7 @@ workflow:
 
             '
         selected: false
+        structured_output_enabled: false
         title: RAG LLM
         type: llm
       height: 88
@@ -947,6 +960,7 @@ workflow:
       positionAbsolute:
         x: 1385
         y: 732
+      selected: false
       type: custom
       width: 242
     - data:
@@ -962,6 +976,7 @@ workflow:
       positionAbsolute:
         x: 1726
         y: 715
+      selected: false
       type: custom
       width: 242
     - data:
@@ -977,6 +992,7 @@ workflow:
       positionAbsolute:
         x: 1385
         y: 306
+      selected: false
       type: custom
       width: 242
     - data:
@@ -997,11 +1013,11 @@ workflow:
       height: 196
       id: '1758699378772'
       position:
-        x: 1531.7510088687943
-        y: 523.9566801182506
+        x: 1920.0578477295346
+        y: 450
       positionAbsolute:
-        x: 1531.7510088687943
-        y: 523.9566801182506
+        x: 1920.0578477295346
+        y: 450
       selected: false
       type: custom
       width: 242
@@ -1033,11 +1049,11 @@ workflow:
       height: 356
       id: setup-guidance-answer
       position:
-        x: 1762.639262822364
-        y: 320.8591121954611
+        x: 2250.639262822364
+        y: 200.85911219546108
       positionAbsolute:
-        x: 1762.639262822364
-        y: 320.8591121954611
+        x: 2250.639262822364
+        y: 200.85911219546108
       selected: false
       type: custom
       width: 242
@@ -1076,6 +1092,7 @@ workflow:
       positionAbsolute:
         x: 1385
         y: 140
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1091,14 +1108,16 @@ workflow:
       positionAbsolute:
         x: 2087
         y: 0
+      selected: false
       type: custom
       width: 242
     - data:
         cases:
         - case_id: case-true
           conditions:
-          - comparison_operator: is_not
+          - comparison_operator: is not
             value: '{}'
+            varType: object
             variable_selector:
             - conversation
             - entities_jsonl
@@ -1107,14 +1126,14 @@ workflow:
         selected: false
         title: Already Processed?
         type: if-else
-      height: 164
+      height: 124
       id: fs-check-processed
       position:
-        x: 1385
-        y: 898
+        x: 1381.5473217391504
+        y: 1181.2931532693729
       positionAbsolute:
-        x: 1385
-        y: 898
+        x: 1381.5473217391504
+        y: 1181.2931532693729
       selected: false
       type: custom
       width: 242
@@ -1128,79 +1147,12 @@ workflow:
       height: 104
       id: '1774264909113'
       position:
-        x: 1633.576494682914
-        y: 1090.6127838448162
+        x: 1657.629894516043
+        y: 1381.8617667059568
       positionAbsolute:
-        x: 1633.576494682914
-        y: 1090.6127838448162
+        x: 1657.629894516043
+        y: 1381.8617667059568
       selected: false
-      type: custom
-      width: 242
-    - data:
-        model:
-          completion_params:
-            response_format:
-              type: json_object
-            temperature: 0.1
-          mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: entity-extractor-system
-          role: system
-          text: 'You are an entity extraction assistant for the Avni platform. Extract
-            ALL entities from the document content below.
-
-
-            Document content: {{#1774264909113.text#}}
-
-
-            Extract into 4 arrays: subject_types, programs, encounter_types, address_levels.
-
-            Rules: - Subject types: name, type (Person|Individual|Household|Group|User),
-            form_link, lowest_address_level - Programs: name, target_subject_type,
-            enrolment_form, exit_form - Encounter types: name, program_name, subject_type,
-            encounter_type (Scheduled|Unscheduled), is_program_encounter (bool), frequency
-            - Address levels: name, level (int), parent (name or null). Topmost has
-            highest level number. - Only extract from defined tables. Don''t create
-            entities just because they''re referenced. - Ignore nan values. Trim whitespace.
-            Use actual booleans not strings.
-
-            Output as JSON: {"subject_types": [...], "programs": [...], "encounter_types":
-            [...], "address_levels": [...]}
-
-            '
-        selected: false
-        structured_output_enabled: true
-        structured_output_schema:
-          properties:
-            address_levels:
-              items:
-                type: object
-              type: array
-            encounter_types:
-              items:
-                type: object
-              type: array
-            programs:
-              items:
-                type: object
-              type: array
-            subject_types:
-              items:
-                type: object
-              type: array
-          type: object
-        title: Entity Extractor
-        type: llm
-      height: 88
-      id: '1774264840300'
-      position:
-        x: 1843
-        y: 1232
-      positionAbsolute:
-        x: 1843
-        y: 1232
       type: custom
       width: 242
     - data:
@@ -1208,7 +1160,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - '1774264840300'
+          - '17748507380970'
           - structured_output
           variable_selector:
           - conversation
@@ -1221,11 +1173,11 @@ workflow:
       height: 84
       id: fs-save-jsonl
       position:
-        x: 2158
-        y: 1257
+        x: 2210.5200227062023
+        y: 1497.9812894884049
       positionAbsolute:
-        x: 2158
-        y: 1257
+        x: 2210.5200227062023
+        y: 1497.9812894884049
       selected: false
       type: custom
       width: 242
@@ -1294,60 +1246,27 @@ workflow:
       height: 52
       id: '1773908701222'
       position:
-        x: 2479
-        y: 1224
+        x: 2463.383099235763
+        y: 1411.5647292093336
       positionAbsolute:
-        x: 2479
-        y: 1224
+        x: 2463.383099235763
+        y: 1411.5647292093336
+      selected: false
       type: custom
       width: 242
     - data:
-        model:
-          completion_params:
-            temperature: 0.3
-          mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: summary-system
-          role: system
-          text: 'Present a summary of parsed entities from the field workflow specification.
-            List EVERY entity individually with all fields. Group by type.
-
-            Entities: {{#conversation.entities_jsonl#}}
-
-            Ambiguity Report: {{#1773908701222.output.issues_summary#}}
-
-            After summary, ask: "Does everything look correct? Click **Yes** to proceed
-            with configuration, or **No** to make corrections."
-
-            '
-        selected: false
-        title: Summary LLM
-        type: llm
-      height: 88
-      id: '1773909315118'
-      position:
-        x: 2769
-        y: 1081
-      positionAbsolute:
-        x: 2769
-        y: 1081
-      type: custom
-      width: 242
-    - data:
-        answer: '{{#1773909315118.text#}}'
+        answer: '{{#17748473384490.text#}}'
         selected: false
         title: Summary Answer
         type: answer
       height: 103
       id: '1773909436902'
       position:
-        x: 3126
-        y: 933
+        x: 3148.403767912396
+        y: 1224.2489828611406
       positionAbsolute:
-        x: 3126
-        y: 933
+        x: 3148.403767912396
+        y: 1224.2489828611406
       selected: false
       type: custom
       width: 242
@@ -1404,11 +1323,11 @@ workflow:
       height: 88
       id: '1773981975918'
       position:
-        x: 1746
-        y: 917
+        x: 1771.5594531981064
+        y: 1208.2489828611406
       positionAbsolute:
-        x: 1746
-        y: 917
+        x: 1771.5594531981064
+        y: 1208.2489828611406
       selected: false
       type: custom
       width: 242
@@ -1457,11 +1376,12 @@ workflow:
       height: 52
       id: '1773982043351'
       position:
-        x: 2087
-        y: 933
+        x: 2109.403767912396
+        y: 1224.2489828611406
       positionAbsolute:
-        x: 2087
-        y: 933
+        x: 2109.403767912396
+        y: 1224.2489828611406
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1482,42 +1402,12 @@ workflow:
       height: 84
       id: '1773984373385'
       position:
-        x: 2428
-        y: 917
+        x: 2450.403767912396
+        y: 1208.2489828611406
       positionAbsolute:
-        x: 2428
-        y: 917
-      type: custom
-      width: 242
-    - data:
-        model:
-          completion_params:
-            temperature: 0.7
-          mode: chat
-          name: gpt-4o
-          provider: langgenius/openai/openai
-        prompt_template:
-        - id: correction-summary-system
-          role: system
-          text: 'Present updated entities after corrections. Group by type, show what
-            changed. Ask user to confirm or request more corrections.
-
-            Updated Entities: {{#conversation.entities_jsonl#}}
-
-            User''s correction request: {{#sys.query#}}
-
-            '
-        selected: false
-        title: Correction Summary LLM
-        type: llm
-      height: 88
-      id: '1774002885641'
-      position:
-        x: 2769
-        y: 915
-      positionAbsolute:
-        x: 2769
-        y: 915
+        x: 2450.403767912396
+        y: 1208.2489828611406
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1536,6 +1426,7 @@ workflow:
 
           avni-auth-token:{{#conversation.auth_token#}}'
         method: post
+        params: ''
         retry_config:
           max_retries: 3
           retry_enabled: true
@@ -1552,11 +1443,12 @@ workflow:
       height: 141
       id: generate-bundle-req
       position:
-        x: 3832
-        y: 1100
+        x: 3854.403767912396
+        y: 1391.2489828611406
       positionAbsolute:
-        x: 3832
-        y: 1100
+        x: 3854.403767912396
+        y: 1391.2489828611406
+      selected: true
       type: custom
       width: 242
     - data:
@@ -1575,6 +1467,7 @@ workflow:
 
           avni-auth-token:{{#conversation.auth_token#}}'
         method: post
+        params: ''
         retry_config:
           max_retries: 2
           retry_enabled: true
@@ -1591,11 +1484,12 @@ workflow:
       height: 141
       id: upload-bundle-req
       position:
-        x: 4173
-        y: 1100
+        x: 4195.403767912396
+        y: 1391.2489828611406
       positionAbsolute:
-        x: 4173
-        y: 1100
+        x: 4195.403767912396
+        y: 1391.2489828611406
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1620,11 +1514,11 @@ workflow:
       height: 190
       id: '1774617205889'
       position:
-        x: 3486.9999999999995
-        y: 1280
+        x: 3509.4037679123953
+        y: 1571.2489828611406
       positionAbsolute:
-        x: 3486.9999999999995
-        y: 1280
+        x: 3509.4037679123953
+        y: 1571.2489828611406
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1640,27 +1534,27 @@ workflow:
           - conversation
           - loop
         error_handle_mode: terminated
-        height: 307
+        height: 490
         logical_operator: and
         loop_count: 20
         selected: false
         start_node_id: 1774617440956start
         title: Upload Poll Loop
         type: loop
-        width: 1558
-      height: 307
+        width: 1635
+      height: 490
       id: '1774617440956'
       position:
-        x: 4520.111031353054
-        y: 1100
+        x: 4582.024318847109
+        y: 1538.8554734604397
       positionAbsolute:
-        x: 4520.111031353054
-        y: 1100
+        x: 4582.024318847109
+        y: 1538.8554734604397
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 1558
+      width: 1635
       zIndex: 1
     - data:
         desc: ''
@@ -1676,8 +1570,8 @@ workflow:
         x: 24
         y: 68
       positionAbsolute:
-        x: 4544.111031353054
-        y: 1168
+        x: 4606.024318847109
+        y: 1606.8554734604397
       selectable: false
       sourcePosition: right
       targetPosition: left
@@ -1740,10 +1634,10 @@ workflow:
       parentId: '1774617440956'
       position:
         x: 128
-        y: 68
+        y: 71.73396131873233
       positionAbsolute:
-        x: 4648.111031353054
-        y: 1168
+        x: 4710.024318847109
+        y: 1610.589434779172
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1777,15 +1671,15 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#upload-bundle-req.body.task_id#}}'
         variables: []
-      height: 143
+      height: 159
       id: '1774617517718'
       parentId: '1774617440956'
       position:
         x: 394.0109257831673
-        y: 115.98543228911012
+        y: 119.71939360784245
       positionAbsolute:
-        x: 4914.121957136222
-        y: 1215.9854322891101
+        x: 4976.035244630276
+        y: 1658.5748670682822
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1796,39 +1690,37 @@ workflow:
         cases:
         - case_id: 'true'
           conditions:
-          - comparison_operator: in
-            value: completed,failed
+          - comparison_operator: is
+            value: completed
+            variable_selector:
+            - '1774617517718'
+            - body
+            - status
+          - comparison_operator: is
+            id: bb085deb-9e17-477b-8010-3d80bc018375
+            value: failed
+            varType: string
             variable_selector:
             - '1774617517718'
             - body
             - status
           id: 'true'
-          logical_operator: and
-        - case_id: 'false'
-          conditions:
-          - comparison_operator: not in
-            value: completed,failed
-            variable_selector:
-            - '1774617517718'
-            - body
-            - status
-          id: 'false'
-          logical_operator: and
+          logical_operator: or
         isInIteration: false
         isInLoop: true
         loop_id: '1774617440956'
         selected: false
         title: Upload Done?
         type: if-else
-      height: 188
+      height: 198
       id: '1774617558364'
       parentId: '1774617440956'
       position:
         x: 696.0109257831673
-        y: 92
+        y: 95.73396131873233
       positionAbsolute:
-        x: 5216.121957136222
-        y: 1192
+        x: 5278.035244630276
+        y: 1634.589434779172
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1855,10 +1747,10 @@ workflow:
       parentId: '1774617440956'
       position:
         x: 998
-        y: 60
+        y: 63.73396131873233
       positionAbsolute:
-        x: 5518.111031353054
-        y: 1160
+        x: 5580.024318847109
+        y: 1602.589434779172
       selected: false
       type: custom
       width: 242
@@ -1885,15 +1777,16 @@ workflow:
         selected: false
         title: Upload Done
         type: answer
-      height: 249
+      height: 281
       id: upload-done-answer-loop
       parentId: '1774617440956'
       position:
         x: 1300
-        y: 20
+        y: 98.3651164280941
       positionAbsolute:
-        x: 5820.111031353054
-        y: 1120
+        x: 5882.024318847109
+        y: 1637.2205898885338
+      selected: false
       type: custom
       width: 242
       zIndex: 1002
@@ -1909,10 +1802,10 @@ workflow:
       parentId: '1774617440956'
       position:
         x: 998
-        y: 180
+        y: 183.73396131873233
       positionAbsolute:
-        x: 5518.111031353054
-        y: 1280
+        x: 5580.024318847109
+        y: 1722.589434779172
       selected: false
       type: custom
       width: 242
@@ -1934,11 +1827,12 @@ workflow:
       height: 196
       id: fs-ask-corrections
       position:
-        x: 3832
-        y: 1480
+        x: 3866.414810514454
+        y: 1645.2489828611406
       positionAbsolute:
-        x: 3832
-        y: 1480
+        x: 3866.414810514454
+        y: 1645.2489828611406
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1950,15 +1844,202 @@ workflow:
       height: 148
       id: fs-timeout
       position:
-        x: 3832
-        y: 1720
+        x: 3854.403767912396
+        y: 2011.2489828611406
       positionAbsolute:
-        x: 3832
-        y: 1720
+        x: 3854.403767912396
+        y: 2011.2489828611406
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: correction-summary-system
+          role: system
+          text: 'Present updated entities after corrections. Group by type, show what
+            changed. Ask user to confirm or request more corrections.
+
+            Updated Entities: {{#conversation.entities_jsonl#}}
+
+            User''s correction request: {{#sys.query#}}
+
+            '
+        selected: false
+        title: Correction Summary LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '17748473384490'
+      position:
+        x: 2794.334590390546
+        y: 1194.2467130647453
+      positionAbsolute:
+        x: 2794.334590390546
+        y: 1194.2467130647453
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: summary-system
+          role: system
+          text: 'Present a summary of parsed entities from the field workflow specification.
+            List EVERY entity individually with all fields. Group by type.
+
+            Entities: {{#conversation.entities_jsonl#}}
+
+            Ambiguity Report: {{#1773908701222.output.issues_summary#}}
+
+            After summary, ask: "Does everything look correct? Click **Yes** to proceed
+            with configuration, or **No** to make corrections."
+
+            '
+        selected: false
+        title: Summary LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '17748474036620'
+      position:
+        x: 2776.189222870051
+        y: 1381.8617667059568
+      positionAbsolute:
+        x: 2776.189222870051
+        y: 1381.8617667059568
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            response_format:
+              type: json_object
+            temperature: 0.1
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: entity-extractor-system
+          role: system
+          text: 'You are an entity extraction assistant for the Avni platform. Extract
+            ALL entities from the document content below.
+
+
+            Document content: {{#1774264909113.text#}}
+
+
+            Extract into 4 arrays: subject_types, programs, encounter_types, address_levels.
+
+            Rules: - Subject types: name, type (Person|Individual|Household|Group|User),
+            form_link, lowest_address_level - Programs: name, target_subject_type,
+            enrolment_form, exit_form - Encounter types: name, program_name, subject_type,
+            encounter_type (Scheduled|Unscheduled), is_program_encounter (bool), frequency
+            - Address levels: name, level (int), parent (name or null). Topmost has
+            highest level number. - Only extract from defined tables. Don''t create
+            entities just because they''re referenced. - Ignore nan values. Trim whitespace.
+            Use actual booleans not strings.
+
+            Output as JSON: {"subject_types": [...], "programs": [...], "encounter_types":
+            [...], "address_levels": [...]}
+
+            '
+        selected: false
+        structured_output:
+          schema:
+            properties:
+              structured_output:
+                properties:
+                  address_levels:
+                    items:
+                      type: string
+                    type: array
+                  encounter_types:
+                    items:
+                      type: string
+                    type: array
+                  programs:
+                    items:
+                      type: string
+                    type: array
+                  subject_types:
+                    items:
+                      type: string
+                    type: array
+                required:
+                - subject_types
+                - programs
+                - encounter_types
+                - address_levels
+                type: object
+            required:
+            - structured_output
+            type: object
+        structured_output_enabled: true
+        structured_output_schema:
+          properties:
+            address_levels:
+              items:
+                type: object
+              type: array
+            encounter_types:
+              items:
+                type: object
+              type: array
+            programs:
+              items:
+                type: object
+              type: array
+            subject_types:
+              items:
+                type: object
+              type: array
+          type: object
+        title: Entity Extractor
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '17748507380970'
+      position:
+        x: 1943.0702085126068
+        y: 1420.6483016343564
+      positionAbsolute:
+        x: 1943.0702085126068
+        y: 1420.6483016343564
+      selected: false
+      sourcePosition: right
+      targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: 31.173635415682384
-      y: 59.61907185476002
-      zoom: 0.5153384273133691
+      x: -1672.943584090861
+      y: -561.1316343312329
+      zoom: 0.6061958352234105
   rag_pipeline_variables: []
