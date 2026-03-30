@@ -106,6 +106,14 @@ workflow:
     - primary_intent
     value: ''
     value_type: string
+  - description: Base64 encoded bundle ZIP for upload
+    id: e5f6a7b8-c9d0-4123-e4f5-a6b7c8d9e0f1
+    name: bundle_zip_b64
+    selector:
+    - conversation
+    - bundle_zip_b64
+    value: ''
+    value_type: string
   - description: Counter for chitchat messages
     id: c3d4e5f6-a7b8-4901-c2d3-e4f5a6b7c8d9
     name: chitchat_count
@@ -437,10 +445,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: code
-        targetType: http-request
-      id: parse-bundle-to-upload
+        targetType: assigner
+      id: parse-bundle-to-assign
       selected: false
       source: parse-bundle-body
+      sourceHandle: source
+      target: assign-bundle-b64
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: http-request
+      id: assign-bundle-to-upload
+      selected: false
+      source: assign-bundle-b64
       sourceHandle: source
       target: upload-bundle-req
       targetHandle: target
@@ -461,10 +481,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: code
-        targetType: loop
-      id: parse-upload-to-loop
+        targetType: assigner
+      id: parse-upload-to-assign
       selected: false
       source: parse-upload-body
+      sourceHandle: source
+      target: assign-task-id
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: loop
+      id: assign-task-to-loop
+      selected: false
+      source: assign-task-id
       sourceHandle: source
       target: '1774617440956'
       targetHandle: target
@@ -1633,6 +1665,29 @@ workflow:
       type: custom
       width: 242
     - data:
+        items:
+        - operation: over-write
+          value:
+          - parse-bundle-body
+          - bundle_zip_b64
+          variable_selector:
+          - conversation
+          - bundle_zip_b64
+        selected: false
+        title: Save Bundle B64
+        type: assigner
+      height: 52
+      id: assign-bundle-b64
+      position:
+        x: 4270.714813181977
+        y: 1266.9954613889865
+      positionAbsolute:
+        x: 4270.714813181977
+        y: 1266.9954613889865
+      selected: false
+      type: custom
+      width: 242
+    - data:
         authorization:
           config: null
           type: no-auth
@@ -1641,7 +1696,7 @@ workflow:
           - id: upload-body
             key: ''
             type: text
-            value: "{\n  \"bundle_zip_b64\": \"{{#parse-bundle-body.bundle_zip_b64#}}\"\
+            value: "{\n  \"bundle_zip_b64\": \"{{#conversation.bundle_zip_b64#}}\"\
               \n}\n"
           type: json
         headers: 'Content-Type:application/json
@@ -1703,6 +1758,29 @@ workflow:
         y: 1352.0110287120392
       positionAbsolute:
         x: 4632.593538657902
+        y: 1352.0110287120392
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - operation: over-write
+          value:
+          - parse-upload-body
+          - task_id
+          variable_selector:
+          - conversation
+          - upload_task_id
+        selected: false
+        title: Save Task ID
+        type: assigner
+      height: 52
+      id: assign-task-id
+      position:
+        x: 4790.593538657902
+        y: 1352.0110287120392
+      positionAbsolute:
+        x: 4790.593538657902
         y: 1352.0110287120392
       selected: false
       type: custom
@@ -1885,7 +1963,7 @@ workflow:
           max_write_timeout: 10
         title: Check Upload Status
         type: http-request
-        url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#parse-upload-body.task_id#}}'
+        url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#conversation.upload_task_id#}}'
         variables: []
       height: 159
       id: '1774617517718'
