@@ -37,6 +37,10 @@ class BundleGenerator:
             "operationalSubjectTypes": {"operationalSubjectTypes": []},
             "operationalPrograms": {"operationalPrograms": []},
             "operationalEncounterTypes": {"operationalEncounterTypes": []},
+            "organisationConfig": {},
+            "reportCards": [],
+            "reportDashboards": [],
+            "groupDashboards": [],
         }
         self.validation: dict[str, list] = {"errors": [], "warnings": []}
         self.confidence: dict[str, Any] = {}
@@ -327,6 +331,199 @@ class BundleGenerator:
 
         return forms
 
+    # ── Phase 7: Org config, reports, privileges ────────────────────
+
+    # Standard report card type UUIDs (from production bundles)
+    STANDARD_CARD_TYPES: dict[str, dict] = {
+        "scheduledVisits": {
+            "uuid": "27020b32-c21b-43a4-81bd-7b88ad3a6ef0",
+            "color": "#388e3c",
+            "label": "Scheduled visits",
+        },
+        "overdueVisits": {
+            "uuid": "9f88bee5-2ab9-4ac4-ae19-d07e9715bdb5",
+            "color": "#d32f2f",
+            "label": "Overdue visits",
+        },
+        "total": {
+            "uuid": "1fbcadf3-bf1a-439e-9e13-24adddfbf6c0",
+            "color": "#ffffff",
+            "label": "Total",
+        },
+        "recentRegistrations": {
+            "uuid": "88a7514c-48c0-4d5d-a421-d074e43bb36c",
+            "color": "#ffffff",
+            "label": "Recent registrations",
+            "recentDuration": '{"value":"1","unit":"days"}',
+        },
+        "recentEnrolments": {
+            "uuid": "a5efc04c-317a-4823-a203-e62603454a65",
+            "color": "#ffffff",
+            "label": "Recent enrolments",
+            "recentDuration": '{"value":"1","unit":"days"}',
+        },
+        "recentVisits": {
+            "uuid": "77b5b3fa-de35-4f24-996b-2842492ea6e0",
+            "color": "#ffffff",
+            "label": "Recent visits",
+            "recentDuration": '{"value":"1","unit":"days"}',
+        },
+    }
+
+    def _generate_organisation_config(self) -> None:
+        """Generate default organisationConfig."""
+        search_filters = []
+        for st in self.bundle["subjectTypes"]:
+            for filter_type in ("Name", "Age", "Address", "SearchAll"):
+                search_filters.append({
+                    "type": filter_type,
+                    "widget": "Default",
+                    "titleKey": filter_type,
+                    "subjectTypeUUID": st["uuid"],
+                })
+        self.bundle["organisationConfig"] = {
+            "uuid": generate_deterministic_uuid(f"organisationConfig:{self.org_name}"),
+            "settings": {
+                "languages": ["en"],
+                "customRegistrationLocations": [],
+                "saveDrafts": True,
+                "showHierarchicalLocation": False,
+                "lowestAddressLevelType": [],
+                "searchFilters": search_filters,
+                "myDashboardFilters": [],
+                "searchResultFields": [],
+            },
+        }
+
+    def _generate_report_cards(self) -> None:
+        """Generate standard report cards using known type UUIDs."""
+        for card_type, card_meta in self.STANDARD_CARD_TYPES.items():
+            card: dict[str, Any] = {
+                "uuid": generate_deterministic_uuid(f"reportCard:{self.org_name}:{card_type}"),
+                "name": card_meta["label"],
+                "color": card_meta["color"],
+                "nested": False,
+                "count": 1,
+                "standardReportCardType": card_meta["uuid"],
+                "standardReportCardInputSubjectTypes": [],
+                "standardReportCardInputPrograms": [],
+                "standardReportCardInputEncounterTypes": [],
+                "voided": False,
+            }
+            if "recentDuration" in card_meta:
+                card["standardReportCardInputRecentDuration"] = card_meta["recentDuration"]
+            self.bundle["reportCards"].append(card)
+
+    def _generate_report_dashboard(self) -> None:
+        """Generate a default dashboard with three sections."""
+        dashboard_uuid = generate_deterministic_uuid(
+            f"reportDashboard:{self.org_name}:Default Dashboard"
+        )
+        card_by_type = {
+            c["name"]: c["uuid"] for c in self.bundle["reportCards"]
+        }
+
+        def _section(name: str, display_order: float, card_names: list[str]) -> dict:
+            section_uuid = generate_deterministic_uuid(
+                f"dashboardSection:{self.org_name}:{name}"
+            )
+            mappings = []
+            for idx, card_name in enumerate(card_names, 1):
+                card_uuid = card_by_type.get(card_name)
+                if card_uuid:
+                    mappings.append({
+                        "uuid": generate_deterministic_uuid(
+                            f"sectionCardMapping:{self.org_name}:{name}:{card_name}"
+                        ),
+                        "displayOrder": float(idx),
+                        "dashboardSectionUUID": section_uuid,
+                        "reportCardUUID": card_uuid,
+                        "voided": False,
+                    })
+            return {
+                "uuid": section_uuid,
+                "name": name,
+                "description": "",
+                "viewType": "Tile",
+                "displayOrder": display_order,
+                "dashboardUUID": dashboard_uuid,
+                "dashboardSectionCardMappings": mappings,
+                "voided": False,
+            }
+
+        self.bundle["reportDashboards"].append({
+            "uuid": dashboard_uuid,
+            "name": "Default Dashboard",
+            "sections": [
+                _section("Visit Details", 1.0,
+                         ["Scheduled visits", "Overdue visits"]),
+                _section("Recent Statistics", 2.0,
+                         ["Recent registrations", "Recent enrolments", "Recent visits"]),
+                _section("Registration Overview", 3.0,
+                         ["Total"]),
+            ],
+            "voided": False,
+        })
+
+    def _generate_group_dashboards(self) -> None:
+        """Map each group to the default dashboard."""
+        if not self.bundle["reportDashboards"]:
+            return
+        dashboard_uuid = self.bundle["reportDashboards"][0]["uuid"]
+        dashboard_name = self.bundle["reportDashboards"][0]["name"]
+        for group in self.bundle["groups"]:
+            self.bundle["groupDashboards"].append({
+                "uuid": generate_deterministic_uuid(
+                    f"groupDashboard:{self.org_name}:{group['name']}:{dashboard_name}"
+                ),
+                "voided": False,
+                "dashboardUUID": dashboard_uuid,
+                "groupUUID": group["uuid"],
+                "groupName": group["name"],
+                "dashboardName": dashboard_name,
+                "dashboardDescription": None,
+                "groupOneOfTheDefaultGroups": group["name"].lower() == "everyone",
+                "primaryDashboard": True,
+                "secondaryDashboard": False,
+            })
+
+    # Privilege type UUIDs (from production bundles — stable across orgs)
+    PRIVILEGE_TYPES: list[tuple[str, str]] = [
+        ("View", "0fba96c6-04c8-4bd5-8fa1-4b29e0c83c4f"),
+        ("Register", "2f5ade1b-50d5-4c98-8c04-0b9f5f5b5f12"),
+        ("Edit", "5a6c8c7d-1234-4d89-a123-1234567890ab"),
+        ("Enrol", "8a7b9c8d-5678-4e89-b456-567890abcdef"),
+        ("EditEnrolment", "3c4d5e6f-9012-4f89-c789-90abcdef1234"),
+        ("ExitEnrolment", "7e8f9a0b-3456-4a89-d012-34cdef567890"),
+        ("AddVisit", "1b2c3d4e-7890-4b89-e345-78ef901234ab"),
+        ("PerformVisit", "5f6a7b8c-1234-4c89-f678-12ab345678cd"),
+        ("EditVisit", "9d0e1f2a-5678-4d89-a901-56cd789012ef"),
+        ("CancelVisit", "3a4b5c6d-9012-4e89-b234-90ef123456ab"),
+        ("Approve", "7e8f9a0b-3456-4f89-c567-34ab567890cd"),
+        ("Reject", "b2c3d4e5-7890-4a89-d890-78ef901234ab"),
+    ]
+
+    def _generate_group_privileges(self) -> None:
+        """
+        Generate privilege matrix: each group × each privilege type.
+        Groups with hasAllPrivileges=True get allow=True for all.
+        Others default to allow=False (admin can enable in UI).
+        """
+        for group in self.bundle["groups"]:
+            allow_all = group.get("hasAllPrivileges", False)
+            for priv_type, priv_uuid in self.PRIVILEGE_TYPES:
+                self.bundle["groupPrivileges"].append({
+                    "uuid": generate_deterministic_uuid(
+                        f"groupPrivilege:{self.org_name}:{group['name']}:{priv_type}"
+                    ),
+                    "groupUUID": group["uuid"],
+                    "privilegeUUID": priv_uuid,
+                    "allow": allow_all,
+                    "privilegeType": priv_type,
+                    "notEveryoneGroup": group["name"].lower() != "everyone",
+                    "voided": False,
+                })
+
     # ── Validation ──────────────────────────────────────────────────
 
     def validate(self) -> bool:
@@ -415,6 +612,13 @@ class BundleGenerator:
         if entities.get("groups"):
             self.process_groups(entities["groups"])
 
+        # Phase 7: org config, reports, privileges (deterministic, no LLM needed)
+        self._generate_organisation_config()
+        self._generate_report_cards()
+        self._generate_report_dashboard()
+        self._generate_group_dashboards()
+        self._generate_group_privileges()
+
         self.validate()
         self.calculate_confidence()
 
@@ -430,18 +634,25 @@ class BundleGenerator:
         """Create an in-memory ZIP file of the bundle."""
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-            # Follow server processing order for file layout
-            # 1. Address level types (array)
+            # Follow server processing order (BundleZipFileImporter.java)
+            # 1. organisationConfig (object)
+            if self.bundle["organisationConfig"]:
+                zf.writestr(
+                    "organisationConfig.json",
+                    json.dumps(self.bundle["organisationConfig"], indent=2),
+                )
+
+            # 2. Address level types (array)
             zf.writestr(
                 "addressLevelTypes.json",
                 json.dumps(self.bundle["addressLevelTypes"], indent=2),
             )
 
-            # 2-4. Core entity types (arrays)
+            # 3-5. Core entity types (arrays)
             for key in ("subjectTypes", "programs", "encounterTypes"):
                 zf.writestr(f"{key}.json", json.dumps(self.bundle[key], indent=2))
 
-            # 5-7. Operational configs (wrapper objects)
+            # 6-8. Operational configs (wrapper objects)
             for key in (
                 "operationalSubjectTypes",
                 "operationalPrograms",
@@ -449,22 +660,36 @@ class BundleGenerator:
             ):
                 zf.writestr(f"{key}.json", json.dumps(self.bundle[key], indent=2))
 
-            # 8. Concepts
+            # 9. Concepts
             zf.writestr("concepts.json", json.dumps(self.bundle["concepts"], indent=2))
 
-            # 9. Forms in subdirectory
+            # 10. Forms in subdirectory
             for form in self.bundle["forms"]:
                 zf.writestr(f"forms/{form['name']}.json", json.dumps(form, indent=2))
 
-            # 10. Form mappings
+            # 11. Form mappings
             zf.writestr(
                 "formMappings.json",
                 json.dumps(self.bundle["formMappings"], indent=2),
             )
 
-            # 11. Groups and privileges
+            # 12. Groups and privileges
             for key in ("groups", "groupPrivileges"):
                 zf.writestr(f"{key}.json", json.dumps(self.bundle[key], indent=2))
+
+            # 13. Report cards and dashboards
+            zf.writestr(
+                "reportCard.json",
+                json.dumps(self.bundle["reportCards"], indent=2),
+            )
+            zf.writestr(
+                "reportDashboard.json",
+                json.dumps(self.bundle["reportDashboards"], indent=2),
+            )
+            zf.writestr(
+                "groupDashboards.json",
+                json.dumps(self.bundle["groupDashboards"], indent=2),
+            )
 
             # Validation report (not imported by server, informational only)
             zf.writestr(
@@ -480,9 +705,9 @@ class BundleGenerator:
                             "programs": len(self.bundle["programs"]),
                             "encounterTypes": len(self.bundle["encounterTypes"]),
                             "formMappings": len(self.bundle["formMappings"]),
-                            "addressLevelTypes": len(
-                                self.bundle["addressLevelTypes"]
-                            ),
+                            "addressLevelTypes": len(self.bundle["addressLevelTypes"]),
+                            "reportCards": len(self.bundle["reportCards"]),
+                            "groupPrivileges": len(self.bundle["groupPrivileges"]),
                         },
                     },
                     indent=2,
