@@ -52,7 +52,10 @@ class BundleGenerator:
                     "allowEmptyLocation": False,
                     "allowMiddleName": False,
                     "lastNameOptional": True,
-                    "validFirstNameFormat": r"[A-Za-z0-9\s]+",
+                    "validFirstNameFormat": {
+                        "regex": "[A-Za-z0-9\\s]+",
+                        "descriptionKey": "alphanumericAndSpaces",
+                    },
                     "iconFileS3Key": None,
                     "settings": None,
                 }

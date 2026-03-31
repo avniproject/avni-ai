@@ -158,6 +158,17 @@ workflow:
       - remote_url
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -389,20 +400,6 @@ workflow:
       source: '1774617481433'
       sourceHandle: source
       target: '1774617517718'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1774617440956'
-        sourceType: http-request
-        targetType: if-else
-      id: 519849f5-b759-4281-835e-482838d70bb1
-      selected: false
-      source: '1774617517718'
-      sourceHandle: source
-      target: '1774617558364'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -699,6 +696,32 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: http-request
+        targetType: code
+      id: 1774617517718-source-17749417129260-target
+      source: '1774617517718'
+      sourceHandle: source
+      target: '17749417129260'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: code
+        targetType: if-else
+      id: 17749417129260-source-1774617558364-target
+      source: '17749417129260'
+      sourceHandle: source
+      target: '1774617558364'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
     nodes:
     - data:
         desc: Define the initial parameters for launching a workflow
@@ -1124,7 +1147,7 @@ workflow:
         selected: false
         title: Clarify the question
         type: answer
-      height: 103
+      height: 135
       id: '1758608702077'
       position:
         x: 1385
@@ -1329,14 +1352,14 @@ workflow:
         title: Save Entities JSONL
         type: assigner
         version: '2'
-      height: 84
+      height: 110
       id: fs-save-jsonl
       position:
-        x: 2210.5200227062023
-        y: 1497.9812894884049
+        x: 2222.1260050584306
+        y: 1484.7173096572867
       positionAbsolute:
-        x: 2210.5200227062023
-        y: 1497.9812894884049
+        x: 2222.1260050584306
+        y: 1484.7173096572867
       selected: false
       type: custom
       width: 242
@@ -1405,11 +1428,11 @@ workflow:
       height: 52
       id: '1773908701222'
       position:
-        x: 2461.3568365136653
-        y: 1411.5647292093336
+        x: 2516.070753317028
+        y: 1413.2227266882235
       positionAbsolute:
-        x: 2461.3568365136653
-        y: 1411.5647292093336
+        x: 2516.070753317028
+        y: 1413.2227266882235
       selected: false
       type: custom
       width: 242
@@ -1618,11 +1641,11 @@ workflow:
       height: 141
       id: generate-bundle-req
       position:
-        x: 3834.7847908378453
-        y: 1335.0079152474289
+        x: 3809.35695491808
+        y: 1001.5865632676173
       positionAbsolute:
-        x: 3834.7847908378453
-        y: 1335.0079152474289
+        x: 3809.35695491808
+        y: 1001.5865632676173
       selected: false
       type: custom
       width: 242
@@ -1656,11 +1679,11 @@ workflow:
       height: 52
       id: 4eb75ab2-87de-48f6-b52e-35f8646da88d
       position:
-        x: 4113.714813181977
-        y: 1266.9954613889865
+        x: 4101.696759868042
+        y: 806.1708738709174
       positionAbsolute:
-        x: 4113.714813181977
-        y: 1266.9954613889865
+        x: 4101.696759868042
+        y: 806.1708738709174
       selected: false
       type: custom
       width: 242
@@ -1682,11 +1705,11 @@ workflow:
       height: 84
       id: 473230ae-fcca-4f3b-b410-fc792d8b0e88
       position:
-        x: 4270.714813181977
-        y: 1266.9954613889865
+        x: 4368.965360997162
+        y: 943.5229067682757
       positionAbsolute:
-        x: 4270.714813181977
-        y: 1266.9954613889865
+        x: 4368.965360997162
+        y: 943.5229067682757
       selected: false
       type: custom
       width: 242
@@ -1723,11 +1746,11 @@ workflow:
       height: 141
       id: upload-bundle-req
       position:
-        x: 4391.593538657902
-        y: 1352.0110287120392
+        x: 4658.034202125513
+        y: 1139.1399812276593
       positionAbsolute:
-        x: 4391.593538657902
-        y: 1352.0110287120392
+        x: 4658.034202125513
+        y: 1139.1399812276593
       selected: false
       type: custom
       width: 242
@@ -1757,11 +1780,11 @@ workflow:
       height: 52
       id: 6d81a37b-960b-42d3-ae88-5799cd773102
       position:
-        x: 4632.593538657902
-        y: 1352.0110287120392
+        x: 4966.28503385777
+        y: 1139.1399812276593
       positionAbsolute:
-        x: 4632.593538657902
-        y: 1352.0110287120392
+        x: 4966.28503385777
+        y: 1139.1399812276593
       selected: false
       type: custom
       width: 242
@@ -1783,11 +1806,11 @@ workflow:
       height: 84
       id: 8e0563d0-7844-4e89-a765-cbd9647e7676
       position:
-        x: 4790.593538657902
-        y: 1352.0110287120392
+        x: 5235.780204251724
+        y: 1114.950089468071
       positionAbsolute:
-        x: 4790.593538657902
-        y: 1352.0110287120392
+        x: 5235.780204251724
+        y: 1114.950089468071
       selected: false
       type: custom
       width: 242
@@ -1813,11 +1836,11 @@ workflow:
       height: 190
       id: '1774617205889'
       position:
-        x: 3509.4037679123953
-        y: 1571.2489828611406
+        x: 3490.931276419303
+        y: 1449.3305390067294
       positionAbsolute:
-        x: 3509.4037679123953
-        y: 1571.2489828611406
+        x: 3490.931276419303
+        y: 1449.3305390067294
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1844,11 +1867,11 @@ workflow:
       height: 490
       id: '1774617440956'
       position:
-        x: 4582.024318847109
-        y: 1538.8554734604397
+        x: 5449.802642094133
+        y: 1326.411294168288
       positionAbsolute:
-        x: 4582.024318847109
-        y: 1538.8554734604397
+        x: 5449.802642094133
+        y: 1326.411294168288
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1869,8 +1892,8 @@ workflow:
         x: 24
         y: 68
       positionAbsolute:
-        x: 4606.024318847109
-        y: 1606.8554734604397
+        x: 5473.802642094133
+        y: 1394.411294168288
       selectable: false
       selected: false
       sourcePosition: right
@@ -1936,8 +1959,8 @@ workflow:
         x: 128
         y: 71.73396131873233
       positionAbsolute:
-        x: 4710.024318847109
-        y: 1610.589434779172
+        x: 5577.802642094133
+        y: 1398.1452554870202
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1961,7 +1984,7 @@ workflow:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
-        selected: true
+        selected: false
         ssl_verify: true
         timeout:
           max_connect_timeout: 10
@@ -1971,16 +1994,16 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#conversation.upload_task_id#}}'
         variables: []
-      height: 159
+      height: 160
       id: '1774617517718'
       parentId: '1774617440956'
       position:
-        x: 394.0109257831673
-        y: 119.71939360784245
+        x: 183.15945507352535
+        y: 225.14512896266365
       positionAbsolute:
-        x: 4976.035244630276
-        y: 1658.5748670682822
-      selected: true
+        x: 5632.962097167659
+        y: 1551.5564231309515
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1990,19 +2013,18 @@ workflow:
         cases:
         - case_id: 'true'
           conditions:
-          - comparison_operator: is
+          - comparison_operator: contains
             value: completed
+            varType: string
             variable_selector:
-            - '1774617517718'
-            - body
+            - '17749417129260'
             - status
-          - comparison_operator: is
+          - comparison_operator: contains
             id: bb085deb-9e17-477b-8010-3d80bc018375
             value: failed
             varType: string
             variable_selector:
-            - '1774617517718'
-            - body
+            - '17749417129260'
             - status
           id: 'true'
           logical_operator: or
@@ -2019,8 +2041,8 @@ workflow:
         x: 696.0109257831673
         y: 95.73396131873233
       positionAbsolute:
-        x: 5278.035244630276
-        y: 1634.589434779172
+        x: 6145.813567877301
+        y: 1422.1452554870202
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2031,7 +2053,7 @@ workflow:
         isInLoop: true
         items:
         - input_type: variable
-          operation: set
+          operation: over-write
           value:
           - conversation
           - 'False'
@@ -2053,15 +2075,15 @@ workflow:
         title: Break Upload Loop
         type: assigner
         version: '2'
-      height: 84
+      height: 110
       id: break-upload-loop
       parentId: '1774617440956'
       position:
         x: 998
         y: 63.73396131873233
       positionAbsolute:
-        x: 5580.024318847109
-        y: 1602.589434779172
+        x: 6447.802642094133
+        y: 1390.1452554870202
       selected: false
       type: custom
       width: 242
@@ -2073,31 +2095,29 @@ workflow:
           Your implementation bundle has been generated and uploaded to Avni.
 
 
-          **Summary:**
-
-          {{#parse-bundle-body.summary#}}
+          **Summary:** {{#4eb75ab2-87de-48f6-b52e-35f8646da88d.summary#}}
 
 
-          **Confidence score:** {{#parse-bundle-body.confidence.overall#}}
+          **Confidence score:** {{#4eb75ab2-87de-48f6-b52e-35f8646da88d.confidence#}}
 
 
           You can now log into Avni to review your configuration. If you need to make
           changes, just upload an updated specification or describe the corrections.'
         isInLoop: true
         loop_id: '1774617440956'
-        selected: false
+        selected: true
         title: Upload Done
         type: answer
-      height: 234
+      height: 281
       id: upload-done-answer-loop
       parentId: '1774617440956'
       position:
         x: 1300
         y: 98.3651164280941
       positionAbsolute:
-        x: 5882.024318847109
-        y: 1637.2205898885338
-      selected: false
+        x: 6749.802642094133
+        y: 1424.776410596382
+      selected: true
       type: custom
       width: 242
       zIndex: 1002
@@ -2115,8 +2135,8 @@ workflow:
         x: 998
         y: 183.73396131873233
       positionAbsolute:
-        x: 5580.024318847109
-        y: 1722.589434779172
+        x: 6447.802642094133
+        y: 1510.1452554870202
       selected: false
       type: custom
       width: 242
@@ -2236,11 +2256,11 @@ workflow:
       height: 88
       id: '17748474036620'
       position:
-        x: 2774.976019640213
-        y: 1381.8617667059568
+        x: 2869.4818759369305
+        y: 1375.2297767903976
       positionAbsolute:
-        x: 2774.976019640213
-        y: 1381.8617667059568
+        x: 2869.4818759369305
+        y: 1375.2297767903976
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2345,8 +2365,49 @@ workflow:
       targetPosition: left
       type: custom
       width: 242
+    - data:
+        code: "import json\n\ndef main(body) -> dict:\n    try:\n        parsed =\
+          \ json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
+          \ TypeError):\n        parsed = {}\n    return {\n        \"task_id\": parsed.get(\"\
+          task_id\", \"\"),\n        \"status\": parsed.get(\"status\", \"\")\n  \
+          \  }\n"
+        code_language: python3
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        outputs:
+          status:
+            children: null
+            type: string
+          task_id:
+            children: null
+            type: string
+        selected: false
+        title: Parse Upload Status Response
+        type: code
+        variables:
+        - value_selector:
+          - '1774617517718'
+          - body
+          value_type: string
+          variable: body
+      height: 52
+      id: '17749417129260'
+      parentId: '1774617440956'
+      position:
+        x: 432.07375361192044
+        y: 136.62854896494923
+      positionAbsolute:
+        x: 5881.876395706054
+        y: 1463.0398431332371
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
     viewport:
-      x: -1900.6650318003349
-      y: -343.6150802653661
-      zoom: 0.4549780474597205
+      x: -2665.3866710335533
+      y: -339.703678412739
+      zoom: 0.5139989011217067
   rag_pipeline_variables: []
