@@ -30,6 +30,10 @@ from .handlers.bundle_handlers import (
 )
 from .handlers.upload_handlers import handle_upload_bundle, handle_upload_status
 from .handlers.config_handlers import handle_get_existing_config
+from .handlers.entity_handlers import (
+    handle_validate_entities,
+    handle_apply_entity_corrections,
+)
 from .handlers.sandbox_handlers import handle_execute_python
 from .playground.executor import PlaygroundExecutor
 from .http import create_cors_middleware
@@ -149,6 +153,15 @@ async def create_server():
     @server.custom_route("/api/existing-config", methods=["GET"])
     async def get_existing_config_endpoint(request: Request):
         return await handle_get_existing_config(request)
+
+    # --- Entity Validation ---
+    @server.custom_route("/validate-entities", methods=["POST"])
+    async def validate_entities_endpoint(request: Request):
+        return await handle_validate_entities(request)
+
+    @server.custom_route("/apply-entity-corrections", methods=["POST"])
+    async def apply_entity_corrections_endpoint(request: Request):
+        return await handle_apply_entity_corrections(request)
 
     # --- Bundle Generation ---
     @server.custom_route("/generate-bundle", methods=["POST"])
