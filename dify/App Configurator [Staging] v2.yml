@@ -130,6 +130,14 @@ workflow:
     - out_of_scope_count
     value: 0
     value_type: integer
+  - description: Approved YAML spec from Spec Agent
+    id: f7a8b9c0-d1e2-4f3a-b4c5-d6e7f8a9b0c1
+    name: spec_yaml
+    selector:
+    - conversation
+    - spec_yaml
+    value: ''
+    value_type: string
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -366,12 +374,12 @@ workflow:
     - data:
         isInLoop: false
         sourceType: human-input
-        targetType: http-request
+        targetType: agent
       id: 5c8dec84-c4d9-4f52-8371-7d194bc49e9c
       selected: false
       source: '1774617205889'
       sourceHandle: 'Yes'
-      target: generate-bundle-req
+      target: spec-agent-node
       targetHandle: target
       type: custom
       zIndex: 0
@@ -417,13 +425,13 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: human-input
-        targetType: answer
-      id: c0f04cc8-1261-47e3-9c25-0b848621f924
+        sourceType: agent
+        targetType: http-request
+      id: spec-agent-to-generate-bundle
       selected: false
-      source: '1774617205889'
-      sourceHandle: 'No'
-      target: fs-ask-corrections
+      source: spec-agent-node
+      sourceHandle: source
+      target: generate-bundle-req
       targetHandle: target
       type: custom
       zIndex: 0
@@ -454,10 +462,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: assigner
-        targetType: http-request
+        targetType: agent
       id: 59926ff2-ace9-45bc-8fd4-cc82d9b04c9e
       selected: false
       source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
+      sourceHandle: source
+      target: review-agent-node
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: http-request
+      id: review-agent-to-upload
+      selected: false
+      source: review-agent-node
       sourceHandle: source
       target: upload-bundle-req
       targetHandle: target
@@ -490,10 +510,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: assigner
-        targetType: loop
-      id: 533f37ce-5506-4373-ad40-3e28a5e396ab
+        targetType: agent
+      id: save-task-to-error-agent
       selected: false
       source: 8e0563d0-7844-4e89-a765-cbd9647e7676
+      sourceHandle: source
+      target: error-agent-node
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: loop
+      id: error-agent-to-loop
+      selected: false
+      source: error-agent-node
       sourceHandle: source
       target: '1774617440956'
       targetHandle: target
@@ -2377,6 +2409,276 @@ workflow:
       type: custom
       width: 242
       zIndex: 1002
+    - data:
+        agent_strategy: function_call
+        description: Iteratively refines entities with user corrections, generates and
+          validates YAML spec, then stores approved spec in conversation.
+        max_iterations: 5
+        model:
+          completion_params:
+            max_tokens: 16384
+            temperature: 0.3
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt: "You are the Spec Agent for the Avni App Configurator. Your task is\
+          \ to help the user refine their program configuration and produce an approved\
+          \ YAML spec.\n\nYou have access to these tools:\n- POST\
+          \ {{#conversation.avni_mcp_server_url#}}validate-entities \u2014 check entities\
+          \ for issues\n- POST {{#conversation.avni_mcp_server_url#}}apply-entity-corrections\
+          \ \u2014 apply user corrections to entities\n- POST {{#conversation.avni_mcp_server_url#}}generate-spec\
+          \ \u2014 convert entities to YAML spec\n- POST {{#conversation.avni_mcp_server_url#}}validate-spec\
+          \ \u2014 validate the YAML spec\n- POST {{#conversation.avni_mcp_server_url#}}bundle-to-spec\
+          \ \u2014 convert existing bundle to spec\n\nCurrent entities: {{#conversation.entities_jsonl#}}\n\
+          User message: {{#sys.query#}}\n\nWorkflow:\n1. If user said Yes (confirmed)\
+          \ \u2192 call generate-spec, then validate-spec, then store spec and proceed.\n\
+          2. If user said No (wants corrections) \u2192 apply-entity-corrections with\
+          \ their requested changes, re-validate, show updated summary, ask for confirmation.\n\
+          3. Once spec is valid and user approves, output: SPEC_APPROVED and the final\
+          \ spec_yaml.\n\nAlways use auth header: avni-auth-token={{#conversation.auth_token#}}"
+        selected: false
+        title: Spec Agent
+        tools:
+        - api_bundle_as_tool: null
+          enabled: true
+          extra:
+            python:
+              source: ''
+          identity:
+            author: avni-ai
+            description: Validate entities for structural issues
+            icon: ''
+            label: Validate Entities
+            name: validate_entities
+            tags: []
+          parameters:
+            required:
+            - entities
+            schema: '{"type":"object","properties":{"entities":{"type":"object","description":"entities
+              dict to validate"}},"required":["entities"]}'
+          type: api
+          workflow_tool_id: null
+        - api_bundle_as_tool: null
+          enabled: true
+          extra:
+            python:
+              source: ''
+          identity:
+            author: avni-ai
+            description: Apply corrections to entities
+            icon: ''
+            label: Apply Entity Corrections
+            name: apply_entity_corrections
+            tags: []
+          parameters:
+            required:
+            - entities
+            - corrections
+            schema: '{"type":"object","properties":{"entities":{"type":"object"},"corrections":{"type":"array","items":{"type":"object"}}},"required":["entities","corrections"]}'
+          type: api
+          workflow_tool_id: null
+        - api_bundle_as_tool: null
+          enabled: true
+          extra:
+            python:
+              source: ''
+          identity:
+            author: avni-ai
+            description: Generate YAML spec from entities
+            icon: ''
+            label: Generate Spec
+            name: generate_spec
+            tags: []
+          parameters:
+            required:
+            - entities
+            schema: '{"type":"object","properties":{"entities":{"type":"object"},"org_name":{"type":"string"}},"required":["entities"]}'
+          type: api
+          workflow_tool_id: null
+        - api_bundle_as_tool: null
+          enabled: true
+          extra:
+            python:
+              source: ''
+          identity:
+            author: avni-ai
+            description: Validate YAML spec
+            icon: ''
+            label: Validate Spec
+            name: validate_spec
+            tags: []
+          parameters:
+            required:
+            - spec_yaml
+            schema: '{"type":"object","properties":{"spec_yaml":{"type":"string"}},"required":["spec_yaml"]}'
+          type: api
+          workflow_tool_id: null
+        type: agent
+        vision:
+          enabled: false
+      height: 88
+      id: spec-agent-node
+      position:
+        x: 3600
+        y: 1460
+      positionAbsolute:
+        x: 3600
+        y: 1460
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        agent_strategy: function_call
+        description: Inspects generated bundle before upload. Validates bundle, optionally
+          converts to spec for diff, then proceeds to upload.
+        max_iterations: 3
+        model:
+          completion_params:
+            max_tokens: 8192
+            temperature: 0.2
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt: "You are the Review Agent for the Avni App Configurator. Your task\
+          \ is to inspect the generated bundle before uploading to Avni.\n\nBundle\
+          \ (base64): {{#conversation.bundle_zip_b64#}}\n\nTools available:\n- POST\
+          \ {{#conversation.avni_mcp_server_url#}}validate-bundle \u2014 validate bundle\
+          \ contents\n- POST {{#conversation.avni_mcp_server_url#}}bundle-to-spec \u2014\
+          \ convert bundle to readable YAML spec\n\nWorkflow:\n1. Call validate-bundle\
+          \ to check for structural issues.\n2. If there are errors, report them and\
+          \ stop (do not upload).\n3. If validation passes, call bundle-to-spec to\
+          \ show a human-readable summary.\n4. Output: BUNDLE_APPROVED to proceed with\
+          \ upload, or BUNDLE_REJECTED with error details.\n\nAuth header: avni-auth-token={{#conversation.auth_token#}}"
+        selected: false
+        title: Review Agent
+        tools:
+        - api_bundle_as_tool: null
+          enabled: true
+          extra:
+            python:
+              source: ''
+          identity:
+            author: avni-ai
+            description: Validate bundle contents
+            icon: ''
+            label: Validate Bundle
+            name: validate_bundle
+            tags: []
+          parameters:
+            required:
+            - bundle_zip_b64
+            schema: '{"type":"object","properties":{"bundle_zip_b64":{"type":"string"}},"required":["bundle_zip_b64"]}'
+          type: api
+          workflow_tool_id: null
+        - api_bundle_as_tool: null
+          enabled: true
+          extra:
+            python:
+              source: ''
+          identity:
+            author: avni-ai
+            description: Convert bundle to YAML spec
+            icon: ''
+            label: Bundle To Spec
+            name: bundle_to_spec
+            tags: []
+          parameters:
+            required:
+            - bundle
+            schema: '{"type":"object","properties":{"bundle":{"type":"object"},"org_name":{"type":"string"}},"required":["bundle"]}'
+          type: api
+          workflow_tool_id: null
+        type: agent
+        vision:
+          enabled: false
+      height: 88
+      id: review-agent-node
+      position:
+        x: 4500
+        y: 950
+      positionAbsolute:
+        x: 4500
+        y: 950
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        agent_strategy: function_call
+        description: Diagnoses upload failures, analyzes server errors, and attempts
+          recovery or reports clearly to the user.
+        max_iterations: 3
+        model:
+          completion_params:
+            max_tokens: 8192
+            temperature: 0.2
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt: "You are the Error Agent for the Avni App Configurator. An upload was\
+          \ initiated and you need to monitor or diagnose any issues.\n\nUpload Task\
+          \ ID: {{#conversation.upload_task_id#}}\nServer URL: {{#conversation.avni_mcp_server_url#}}\n\
+          \nTools available:\n- GET {{#conversation.avni_mcp_server_url#}}upload-status?task_id={{#conversation.upload_task_id#}}\
+          \ \u2014 check upload status\n- POST {{#conversation.avni_mcp_server_url#}}validate-bundle\
+          \ \u2014 re-validate bundle\n- POST {{#conversation.avni_mcp_server_url#}}generate-bundle\
+          \ \u2014 regenerate bundle if needed\n\nWorkflow:\n1. Check upload status.\n\
+          2. If completed successfully, report success to user.\n3. If failed, analyze\
+          \ error message, diagnose root cause.\n4. If fixable (e.g. missing field,\
+          \ wrong format), attempt fix and output RETRY_BUNDLE with corrected entities.\n\
+          5. If not fixable, output clear ERROR_REPORT explaining what failed and why.\n\
+          \nAuth header: avni-auth-token={{#conversation.auth_token#}}"
+        selected: false
+        title: Error Agent
+        tools:
+        - api_bundle_as_tool: null
+          enabled: true
+          extra:
+            python:
+              source: ''
+          identity:
+            author: avni-ai
+            description: Check upload status
+            icon: ''
+            label: Upload Status
+            name: upload_status
+            tags: []
+          parameters:
+            required:
+            - task_id
+            schema: '{"type":"object","properties":{"task_id":{"type":"string"}},"required":["task_id"]}'
+          type: api
+          workflow_tool_id: null
+        - api_bundle_as_tool: null
+          enabled: true
+          extra:
+            python:
+              source: ''
+          identity:
+            author: avni-ai
+            description: Validate bundle contents
+            icon: ''
+            label: Validate Bundle
+            name: validate_bundle_error
+            tags: []
+          parameters:
+            required:
+            - bundle_zip_b64
+            schema: '{"type":"object","properties":{"bundle_zip_b64":{"type":"string"}},"required":["bundle_zip_b64"]}'
+          type: api
+          workflow_tool_id: null
+        type: agent
+        vision:
+          enabled: false
+      height: 88
+      id: error-agent-node
+      position:
+        x: 5400
+        y: 1115
+      positionAbsolute:
+        x: 5400
+        y: 1115
+      selected: false
+      type: custom
+      width: 242
     viewport:
       x: -2665.3866710335533
       y: -339.703678412739
