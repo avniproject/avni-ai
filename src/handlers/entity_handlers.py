@@ -121,6 +121,45 @@ def _validate(entities: dict) -> dict:
         issues.append({"severity": "warning", "entity_type": "location_hierarchy",
                        "message": "No location hierarchy found. A default hierarchy will be generated."})
 
+    # Forms cross-reference checks (Phase 5: when forms are explicitly extracted)
+    form_rows = entities.get("forms", [])
+    if form_rows:
+        valid_form_types = {
+            "IndividualProfile", "ProgramEnrolment", "ProgramExit",
+            "ProgramEncounter", "Encounter", "ProgramEncounterCancellation",
+        }
+        valid_data_types = {
+            "Text", "Numeric", "Coded", "Date", "DateTime", "Duration",
+            "PhoneNumber", "Audio", "Image", "Video", "File", "Location",
+            "Subject", "GroupAffiliation",
+        }
+        for form in form_rows:
+            if not isinstance(form, dict):
+                continue
+            ft = form.get("formType", "")
+            if ft and ft not in valid_form_types:
+                issues.append({"severity": "warning", "entity_type": "form",
+                               "message": f"Form '{form.get('name', '?')}' has unrecognised formType '{ft}'"})
+            st_ref = form.get("subjectType", "")
+            if st_ref and not _fuzzy_match(st_ref, subject_type_names):
+                issues.append({"severity": "warning", "entity_type": "form",
+                               "message": f"Form '{form.get('name', '?')}' references unknown subjectType '{st_ref}'"})
+            prog_ref = form.get("program", "")
+            prog_names = {r["name"] for r in prog_rows if r.get("name")}
+            if prog_ref and not _fuzzy_match(prog_ref, prog_names):
+                issues.append({"severity": "warning", "entity_type": "form",
+                               "message": f"Form '{form.get('name', '?')}' references unknown program '{prog_ref}'"})
+            for field in form.get("fields", []):
+                if not isinstance(field, dict):
+                    continue
+                dt = field.get("dataType", "")
+                if dt and dt not in valid_data_types:
+                    issues.append({"severity": "warning", "entity_type": "form_field",
+                                   "message": f"Field '{field.get('name', '?')}' in form '{form.get('name', '?')}' has unrecognised dataType '{dt}'"})
+                if dt == "Coded" and not field.get("options"):
+                    issues.append({"severity": "warning", "entity_type": "form_field",
+                                   "message": f"Coded field '{field.get('name', '?')}' in form '{form.get('name', '?')}' has no options"})
+
     error_count = sum(1 for i in issues if i["severity"] == "error")
     warning_count = sum(1 for i in issues if i["severity"] == "warning")
 

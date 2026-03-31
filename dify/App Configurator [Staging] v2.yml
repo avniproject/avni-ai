@@ -2236,19 +2236,32 @@ workflow:
             Document content: {{#1774264909113.text#}}
 
 
-            Extract into 4 arrays: subject_types, programs, encounter_types, address_levels.
+            Extract into 5 arrays: subject_types, programs, encounter_types, address_levels,
+            forms.
 
-            Rules: - Subject types: name, type (Person|Individual|Household|Group|User),
-            form_link, lowest_address_level - Programs: name, target_subject_type,
-            enrolment_form, exit_form - Encounter types: name, program_name, subject_type,
-            encounter_type (Scheduled|Unscheduled), is_program_encounter (bool), frequency
-            - Address levels: name, level (int), parent (name or null). Topmost has
-            highest level number. - Only extract from defined tables. Don''t create
-            entities just because they''re referenced. - Ignore nan values. Trim whitespace.
-            Use actual booleans not strings.
+            Rules:
 
-            Output as JSON: {"subject_types": [...], "programs": [...], "encounter_types":
-            [...], "address_levels": [...]}
+            subject_types: name, type (Person|Individual|Household|Group|User), lowest_address_level
+
+            programs: name, target_subject_type, colour (hex or null)
+
+            encounter_types: name, program_name (or null), subject_type, is_program_encounter
+            (bool), is_scheduled (bool)
+
+            address_levels: name, level (int), parent (name or null). Topmost has highest
+            level number.
+
+            forms: Extract form fields where explicitly defined in the document.
+            Each form: name, formType (IndividualProfile|ProgramEnrolment|ProgramExit|ProgramEncounter|Encounter|ProgramEncounterCancellation),
+            subjectType (or null), program (or null), encounterType (or null), fields
+            (array of: name, dataType (Text|Numeric|Coded|Date|DateTime|Duration|PhoneNumber|Audio|Image|Video|File|Location),
+            mandatory (bool), unit (or null), min (number or null), max (number or
+            null), options (array of strings for Coded fields, else null)).
+
+            Only extract from explicitly defined tables/sections. Do not invent entities.
+            Ignore nan values. Trim whitespace. Use actual booleans not strings. If
+            no form fields are defined in the document, return forms as empty array
+            (auto-derive will run as fallback).
 
             '
         selected: false
@@ -2257,25 +2270,30 @@ workflow:
             properties:
               address_levels:
                 items:
-                  type: string
+                  type: object
                 type: array
               encounter_types:
                 items:
-                  type: string
+                  type: object
+                type: array
+              forms:
+                items:
+                  type: object
                 type: array
               programs:
                 items:
-                  type: string
+                  type: object
                 type: array
               subject_types:
                 items:
-                  type: string
+                  type: object
                 type: array
             required:
             - subject_types
             - programs
             - encounter_types
             - address_levels
+            - forms
             type: object
         structured_output_enabled: true
         structured_output_schema:
@@ -2285,6 +2303,10 @@ workflow:
                 type: object
               type: array
             encounter_types:
+              items:
+                type: object
+              type: array
+            forms:
               items:
                 type: object
               type: array
