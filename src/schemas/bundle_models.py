@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field, model_validator
 
 # ── Field-level ────────────────────────────────────────────────────────────────
 
+
 class SkipLogicSpec(BaseModel):
     dependsOn: str
     condition: str = "="
@@ -34,6 +35,7 @@ class FieldSpec(BaseModel):
 
 # ── Form-level ─────────────────────────────────────────────────────────────────
 
+
 class SectionSpec(BaseModel):
     name: str = "Details"
     fields: list[FieldSpec] = Field(default_factory=list)
@@ -50,6 +52,7 @@ class FormSpec(BaseModel):
 
 
 # ── Entity-level ───────────────────────────────────────────────────────────────
+
 
 class AddressLevelSpec(BaseModel):
     name: str
@@ -87,6 +90,7 @@ class GroupSpec(BaseModel):
 
 # ── Top-level entity bundle ────────────────────────────────────────────────────
 
+
 class EntitySpec(BaseModel):
     subject_types: list[SubjectTypeSpec] = Field(default_factory=list)
     programs: list[ProgramSpec] = Field(default_factory=list)
@@ -101,6 +105,7 @@ class EntitySpec(BaseModel):
 
 
 # ── Request bodies ─────────────────────────────────────────────────────────────
+
 
 class GenerateBundleRequest(BaseModel):
     entities: dict[str, Any]
@@ -135,6 +140,7 @@ class BundleToSpecRequest(BaseModel):
 
 
 # ── Response shapes ────────────────────────────────────────────────────────────
+
 
 class ValidationIssue(BaseModel):
     severity: str

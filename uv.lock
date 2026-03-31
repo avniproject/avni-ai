@@ -182,6 +182,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pytest-asyncio" },
     { name = "python-dotenv" },
+    { name = "pyyaml" },
     { name = "requests" },
     { name = "seaborn" },
 ]
@@ -217,6 +218,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "pytest-asyncio", specifier = ">=1.1.0" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
+    { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "requests", specifier = ">=2.32.4" },
     { name = "seaborn", specifier = ">=0.13.2" },
 ]

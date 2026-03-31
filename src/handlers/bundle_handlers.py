@@ -1,6 +1,7 @@
 """
-HTTP handlers for bundle generation, validation, and download.
-Endpoints: POST /generate-bundle, POST /validate-bundle, GET /download-bundle
+HTTP handlers for bundle generation, validation, download, and patching.
+Endpoints: POST /generate-bundle, POST /validate-bundle, GET /download-bundle,
+           GET /download-bundle-b64, POST /patch-bundle
 """
 
 from __future__ import annotations
@@ -12,7 +13,9 @@ import httpx
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
+from ..bundle.canonical_zip import patch_bundle_zip
 from ..bundle.generator import BundleGenerator
+from ..bundle.spec_parser import spec_to_entities
 from ..bundle.validators import BundleValidator
 from ..utils.env import AVNI_BASE_URL
 
@@ -213,5 +216,120 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
             status_code=e.response.status_code,
         )
     except Exception as e:
-        logger.exception("Bundle download failed")
+        logger.exception("Bundle b64 download failed")
         return JSONResponse({"error": str(e)}, status_code=500)
+
+
+async def handle_patch_bundle(request: Request) -> JSONResponse:
+    """
+    POST /patch-bundle
+    Body: { "existing_bundle_b64": "...", "spec_yaml": "..." }
+    No auth needed — deterministic local processing.
+
+    Flow:
+      1. Decode existing bundle ZIP from base64
+      2. Unzip into memory (dict of filename → bytes)
+      3. Parse spec_yaml into entities via spec_parser
+      4. Generate a fresh bundle from those entities
+      5. Merge: overwrite only the files that the spec touches
+      6. Re-zip using canonical order
+      7. Return patched ZIP as base64
+    """
+    import json
+
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    existing_b64 = body.get("existing_bundle_b64")
+    spec_yaml = body.get("spec_yaml")
+
+    if not existing_b64:
+        return JSONResponse(
+            {"error": "Missing 'existing_bundle_b64' in request body"},
+            status_code=400,
+        )
+    if not spec_yaml:
+        return JSONResponse(
+            {"error": "Missing 'spec_yaml' in request body"}, status_code=400
+        )
+
+    try:
+        # 1. Decode existing bundle
+        existing_zip_bytes = base64.b64decode(existing_b64)
+
+        # 2. Parse spec into entities
+        entities = spec_to_entities(spec_yaml)
+        org_name = entities.get("org_name", "Unknown Organization")
+
+        # Normalise keys for BundleGenerator
+        _key_map = {
+            "subject_types": "subjectTypes",
+            "encounter_types": "encounterTypes",
+            "address_levels": "addressLevels",
+        }
+        gen_entities = {_key_map.get(k, k): v for k, v in entities.items()}
+
+        # 3. Generate fresh bundle from spec entities
+        generator = BundleGenerator(org_name)
+        result = generator.generate(gen_entities)
+        fresh_bundle = result["bundle"]
+
+        # 4. Build patches dict: only files that the spec produces
+        patches: dict[str, bytes] = {}
+
+        # Core entity files
+        _file_mapping = {
+            "subjectTypes": "subjectTypes.json",
+            "operationalSubjectTypes": "operationalSubjectTypes.json",
+            "programs": "programs.json",
+            "operationalPrograms": "operationalPrograms.json",
+            "encounterTypes": "encounterTypes.json",
+            "operationalEncounterTypes": "operationalEncounterTypes.json",
+            "concepts": "concepts.json",
+            "formMappings": "formMappings.json",
+            "addressLevelTypes": "addressLevelTypes.json",
+            "organisationConfig": "organisationConfig.json",
+            "groups": "groups.json",
+            "groupPrivileges": "groupPrivilege.json",
+            "reportCards": "reportCard.json",
+            "reportDashboards": "reportDashboard.json",
+            "groupDashboards": "groupDashboards.json",
+        }
+
+        for bundle_key, zip_name in _file_mapping.items():
+            if bundle_key in fresh_bundle and fresh_bundle[bundle_key]:
+                patches[zip_name] = json.dumps(
+                    fresh_bundle[bundle_key], indent=2
+                ).encode("utf-8")
+
+        # Forms (in forms/ subdirectory)
+        for form in fresh_bundle.get("forms", []):
+            form_name = form.get("name", "UnknownForm")
+            patches[f"forms/{form_name}.json"] = json.dumps(form, indent=2).encode(
+                "utf-8"
+            )
+
+        # 5. Apply patches to existing ZIP
+        patched_zip = patch_bundle_zip(existing_zip_bytes, patches)
+
+        # 6. Return result
+        patched_b64 = base64.b64encode(patched_zip).decode("ascii")
+
+        return JSONResponse(
+            {
+                "success": True,
+                "patched_bundle_b64": patched_b64,
+                "size_bytes": len(patched_zip),
+                "files_patched": len(patches),
+                "validation": result.get("validation"),
+                "confidence": result.get("confidence"),
+            }
+        )
+    except ValueError as e:
+        logger.warning(f"Patch bundle validation error: {e}")
+        return JSONResponse({"error": str(e)}, status_code=400)
+    except Exception as e:
+        logger.exception("Bundle patching failed")
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)

@@ -47,21 +47,25 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
 
     # Address levels
     for row in spec.get("addressLevels", []):
-        entities["address_levels"].append({
-            "name": row["name"],
-            "level": row.get("level", 1),
-            "parent": row.get("parent"),
-        })
+        entities["address_levels"].append(
+            {
+                "name": row["name"],
+                "level": row.get("level", 1),
+                "parent": row.get("parent"),
+            }
+        )
 
     # Subject types
     for st in spec.get("subjectTypes", []):
-        entities["subject_types"].append({
-            "name": st["name"],
-            "type": st.get("type", "Person"),
-            "allowProfilePicture": st.get("allowProfilePicture", False),
-            "uniqueName": st.get("uniqueName", False),
-            "lastNameOptional": st.get("lastNameOptional", True),
-        })
+        entities["subject_types"].append(
+            {
+                "name": st["name"],
+                "type": st.get("type", "Person"),
+                "allowProfilePicture": st.get("allowProfilePicture", False),
+                "uniqueName": st.get("uniqueName", False),
+                "lastNameOptional": st.get("lastNameOptional", True),
+            }
+        )
         if "registrationForm" in st:
             entities["forms"].append(
                 _parse_form(st["registrationForm"], "IndividualProfile", st["name"])
@@ -69,15 +73,19 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
 
     # Programs
     for prog in spec.get("programs", []):
-        entities["programs"].append({
-            "name": prog["name"],
-            "target_subject_type": prog.get("targetSubjectType", ""),
-            "colour": prog.get("colour", "#4A148C"),
-            "allow_multiple_enrolments": prog.get("allowMultipleEnrolments", False),
-        })
+        entities["programs"].append(
+            {
+                "name": prog["name"],
+                "target_subject_type": prog.get("targetSubjectType", ""),
+                "colour": prog.get("colour", "#4A148C"),
+                "allow_multiple_enrolments": prog.get("allowMultipleEnrolments", False),
+            }
+        )
         if "enrolmentForm" in prog:
             entities["forms"].append(
-                _parse_form(prog["enrolmentForm"], "ProgramEnrolment", program=prog["name"])
+                _parse_form(
+                    prog["enrolmentForm"], "ProgramEnrolment", program=prog["name"]
+                )
             )
         if "exitForm" in prog:
             entities["forms"].append(
@@ -87,18 +95,21 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
     # Encounter types
     for enc in spec.get("encounterTypes", []):
         is_program_enc = bool(enc.get("program"))
-        entities["encounter_types"].append({
-            "name": enc["name"],
-            "program_name": enc.get("program", ""),
-            "subject_type": enc.get("subjectType", ""),
-            "is_program_encounter": is_program_enc,
-            "is_scheduled": enc.get("scheduled", True),
-        })
+        entities["encounter_types"].append(
+            {
+                "name": enc["name"],
+                "program_name": enc.get("program", ""),
+                "subject_type": enc.get("subjectType", ""),
+                "is_program_encounter": is_program_enc,
+                "is_scheduled": enc.get("scheduled", True),
+            }
+        )
         form_type = "ProgramEncounter" if is_program_enc else "Encounter"
         if "form" in enc:
             entities["forms"].append(
                 _parse_form(
-                    enc["form"], form_type,
+                    enc["form"],
+                    form_type,
                     subject_type=enc.get("subjectType"),
                     program=enc.get("program"),
                     encounter_type=enc["name"],
@@ -107,7 +118,8 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
         if "cancellationForm" in enc:
             entities["forms"].append(
                 _parse_form(
-                    enc["cancellationForm"], "ProgramEncounterCancellation",
+                    enc["cancellationForm"],
+                    "ProgramEncounterCancellation",
                     subject_type=enc.get("subjectType"),
                     program=enc.get("program"),
                     encounter_type=enc["name"],
@@ -116,10 +128,12 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
 
     # Groups
     for grp in spec.get("groups", []):
-        entities["groups"].append({
-            "name": grp["name"],
-            "has_all_privileges": grp.get("hasAllPrivileges", False),
-        })
+        entities["groups"].append(
+            {
+                "name": grp["name"],
+                "has_all_privileges": grp.get("hasAllPrivileges", False),
+            }
+        )
     if not entities["groups"]:
         entities["groups"] = [{"name": "Everyone", "has_all_privileges": False}]
 
@@ -139,11 +153,15 @@ def _parse_form(
         elements = []
         for fidx, field in enumerate(section.get("fields", []), 1):
             field_name = field["name"] if isinstance(field, dict) else field
-            data_type = field.get("dataType", "Text") if isinstance(field, dict) else "Text"
+            data_type = (
+                field.get("dataType", "Text") if isinstance(field, dict) else "Text"
+            )
             elem: dict[str, Any] = {
                 "name": field_name,
                 "displayOrder": float(fidx),
-                "mandatory": field.get("mandatory", False) if isinstance(field, dict) else False,
+                "mandatory": field.get("mandatory", False)
+                if isinstance(field, dict)
+                else False,
                 "dataType": data_type,
                 "concept": _build_concept(field if isinstance(field, dict) else {}),
             }
@@ -153,11 +171,13 @@ def _parse_form(
                 elem["skipLogic"] = field["skipLogic"]
             elements.append(elem)
 
-        groups.append({
-            "name": section.get("name", f"Section {idx}"),
-            "displayOrder": float(idx),
-            "formElements": elements,
-        })
+        groups.append(
+            {
+                "name": section.get("name", f"Section {idx}"),
+                "displayOrder": float(idx),
+                "formElements": elements,
+            }
+        )
 
     form_name_parts = filter(None, [form_type, subject_type, program, encounter_type])
     form_name = " - ".join(form_name_parts)

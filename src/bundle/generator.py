@@ -309,7 +309,9 @@ class BundleGenerator:
 
         # Form for each encounter type
         for et in encounter_types:
-            is_program = et.get("is_program_encounter", et.get("programEncounter", False))
+            is_program = et.get(
+                "is_program_encounter", et.get("programEncounter", False)
+            )
             program_name = et.get("program_name", et.get("program", ""))
             st_name = et.get("subject_type", et.get("subjectType", ""))
 
@@ -375,12 +377,14 @@ class BundleGenerator:
         search_filters = []
         for st in self.bundle["subjectTypes"]:
             for filter_type in ("Name", "Age", "Address", "SearchAll"):
-                search_filters.append({
-                    "type": filter_type,
-                    "widget": "Default",
-                    "titleKey": filter_type,
-                    "subjectTypeUUID": st["uuid"],
-                })
+                search_filters.append(
+                    {
+                        "type": filter_type,
+                        "widget": "Default",
+                        "titleKey": filter_type,
+                        "subjectTypeUUID": st["uuid"],
+                    }
+                )
         self.bundle["organisationConfig"] = {
             "uuid": generate_deterministic_uuid(f"organisationConfig:{self.org_name}"),
             "settings": {
@@ -399,7 +403,9 @@ class BundleGenerator:
         """Generate standard report cards using known type UUIDs."""
         for card_type, card_meta in self.STANDARD_CARD_TYPES.items():
             card: dict[str, Any] = {
-                "uuid": generate_deterministic_uuid(f"reportCard:{self.org_name}:{card_type}"),
+                "uuid": generate_deterministic_uuid(
+                    f"reportCard:{self.org_name}:{card_type}"
+                ),
                 "name": card_meta["label"],
                 "color": card_meta["color"],
                 "nested": False,
@@ -411,7 +417,9 @@ class BundleGenerator:
                 "voided": False,
             }
             if "recentDuration" in card_meta:
-                card["standardReportCardInputRecentDuration"] = card_meta["recentDuration"]
+                card["standardReportCardInputRecentDuration"] = card_meta[
+                    "recentDuration"
+                ]
             self.bundle["reportCards"].append(card)
 
     def _generate_report_dashboard(self) -> None:
@@ -419,9 +427,7 @@ class BundleGenerator:
         dashboard_uuid = generate_deterministic_uuid(
             f"reportDashboard:{self.org_name}:Default Dashboard"
         )
-        card_by_type = {
-            c["name"]: c["uuid"] for c in self.bundle["reportCards"]
-        }
+        card_by_type = {c["name"]: c["uuid"] for c in self.bundle["reportCards"]}
 
         def _section(name: str, display_order: float, card_names: list[str]) -> dict:
             section_uuid = generate_deterministic_uuid(
@@ -431,15 +437,17 @@ class BundleGenerator:
             for idx, card_name in enumerate(card_names, 1):
                 card_uuid = card_by_type.get(card_name)
                 if card_uuid:
-                    mappings.append({
-                        "uuid": generate_deterministic_uuid(
-                            f"sectionCardMapping:{self.org_name}:{name}:{card_name}"
-                        ),
-                        "displayOrder": float(idx),
-                        "dashboardSectionUUID": section_uuid,
-                        "reportCardUUID": card_uuid,
-                        "voided": False,
-                    })
+                    mappings.append(
+                        {
+                            "uuid": generate_deterministic_uuid(
+                                f"sectionCardMapping:{self.org_name}:{name}:{card_name}"
+                            ),
+                            "displayOrder": float(idx),
+                            "dashboardSectionUUID": section_uuid,
+                            "reportCardUUID": card_uuid,
+                            "voided": False,
+                        }
+                    )
             return {
                 "uuid": section_uuid,
                 "name": name,
@@ -451,19 +459,24 @@ class BundleGenerator:
                 "voided": False,
             }
 
-        self.bundle["reportDashboards"].append({
-            "uuid": dashboard_uuid,
-            "name": "Default Dashboard",
-            "sections": [
-                _section("Visit Details", 1.0,
-                         ["Scheduled visits", "Overdue visits"]),
-                _section("Recent Statistics", 2.0,
-                         ["Recent registrations", "Recent enrolments", "Recent visits"]),
-                _section("Registration Overview", 3.0,
-                         ["Total"]),
-            ],
-            "voided": False,
-        })
+        self.bundle["reportDashboards"].append(
+            {
+                "uuid": dashboard_uuid,
+                "name": "Default Dashboard",
+                "sections": [
+                    _section(
+                        "Visit Details", 1.0, ["Scheduled visits", "Overdue visits"]
+                    ),
+                    _section(
+                        "Recent Statistics",
+                        2.0,
+                        ["Recent registrations", "Recent enrolments", "Recent visits"],
+                    ),
+                    _section("Registration Overview", 3.0, ["Total"]),
+                ],
+                "voided": False,
+            }
+        )
 
     def _generate_group_dashboards(self) -> None:
         """Map each group to the default dashboard."""
@@ -472,20 +485,22 @@ class BundleGenerator:
         dashboard_uuid = self.bundle["reportDashboards"][0]["uuid"]
         dashboard_name = self.bundle["reportDashboards"][0]["name"]
         for group in self.bundle["groups"]:
-            self.bundle["groupDashboards"].append({
-                "uuid": generate_deterministic_uuid(
-                    f"groupDashboard:{self.org_name}:{group['name']}:{dashboard_name}"
-                ),
-                "voided": False,
-                "dashboardUUID": dashboard_uuid,
-                "groupUUID": group["uuid"],
-                "groupName": group["name"],
-                "dashboardName": dashboard_name,
-                "dashboardDescription": None,
-                "groupOneOfTheDefaultGroups": group["name"].lower() == "everyone",
-                "primaryDashboard": True,
-                "secondaryDashboard": False,
-            })
+            self.bundle["groupDashboards"].append(
+                {
+                    "uuid": generate_deterministic_uuid(
+                        f"groupDashboard:{self.org_name}:{group['name']}:{dashboard_name}"
+                    ),
+                    "voided": False,
+                    "dashboardUUID": dashboard_uuid,
+                    "groupUUID": group["uuid"],
+                    "groupName": group["name"],
+                    "dashboardName": dashboard_name,
+                    "dashboardDescription": None,
+                    "groupOneOfTheDefaultGroups": group["name"].lower() == "everyone",
+                    "primaryDashboard": True,
+                    "secondaryDashboard": False,
+                }
+            )
 
     # Privilege type UUIDs (from production bundles — stable across orgs)
     PRIVILEGE_TYPES: list[tuple[str, str]] = [
@@ -512,17 +527,19 @@ class BundleGenerator:
         for group in self.bundle["groups"]:
             allow_all = group.get("hasAllPrivileges", False)
             for priv_type, priv_uuid in self.PRIVILEGE_TYPES:
-                self.bundle["groupPrivileges"].append({
-                    "uuid": generate_deterministic_uuid(
-                        f"groupPrivilege:{self.org_name}:{group['name']}:{priv_type}"
-                    ),
-                    "groupUUID": group["uuid"],
-                    "privilegeUUID": priv_uuid,
-                    "allow": allow_all,
-                    "privilegeType": priv_type,
-                    "notEveryoneGroup": group["name"].lower() != "everyone",
-                    "voided": False,
-                })
+                self.bundle["groupPrivileges"].append(
+                    {
+                        "uuid": generate_deterministic_uuid(
+                            f"groupPrivilege:{self.org_name}:{group['name']}:{priv_type}"
+                        ),
+                        "groupUUID": group["uuid"],
+                        "privilegeUUID": priv_uuid,
+                        "allow": allow_all,
+                        "privilegeType": priv_type,
+                        "notEveryoneGroup": group["name"].lower() != "everyone",
+                        "voided": False,
+                    }
+                )
 
     # ── Validation ──────────────────────────────────────────────────
 

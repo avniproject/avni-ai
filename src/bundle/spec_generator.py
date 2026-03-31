@@ -75,12 +75,18 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
             if prog.get("allow_multiple_enrolments") is not None:
                 prog_spec["allowMultipleEnrolments"] = prog["allow_multiple_enrolments"]
             enrolment_form = _find_form(
-                entities.get("forms", []), "ProgramEnrolment", subject_type=None, program=prog["name"]
+                entities.get("forms", []),
+                "ProgramEnrolment",
+                subject_type=None,
+                program=prog["name"],
             )
             if enrolment_form:
                 prog_spec["enrolmentForm"] = _form_to_spec(enrolment_form)
             exit_form = _find_form(
-                entities.get("forms", []), "ProgramExit", subject_type=None, program=prog["name"]
+                entities.get("forms", []),
+                "ProgramExit",
+                subject_type=None,
+                program=prog["name"],
             )
             if exit_form:
                 prog_spec["exitForm"] = _form_to_spec(exit_form)
@@ -97,14 +103,24 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
             if enc.get("subject_type"):
                 enc_spec["subjectType"] = enc["subject_type"]
             enc_spec["scheduled"] = bool(enc.get("is_scheduled", True))
-            form_type = "ProgramEncounter" if enc.get("is_program_encounter") else "Encounter"
+            form_type = (
+                "ProgramEncounter" if enc.get("is_program_encounter") else "Encounter"
+            )
             enc_form = _find_form(
-                entities.get("forms", []), form_type, enc.get("subject_type"), enc.get("program_name"), enc["name"]
+                entities.get("forms", []),
+                form_type,
+                enc.get("subject_type"),
+                enc.get("program_name"),
+                enc["name"],
             )
             if enc_form:
                 enc_spec["form"] = _form_to_spec(enc_form)
             cancel_form = _find_form(
-                entities.get("forms", []), "ProgramEncounterCancellation", enc.get("subject_type"), enc.get("program_name"), enc["name"]
+                entities.get("forms", []),
+                "ProgramEncounterCancellation",
+                enc.get("subject_type"),
+                enc.get("program_name"),
+                enc["name"],
             )
             if cancel_form:
                 enc_spec["cancellationForm"] = _form_to_spec(cancel_form)
@@ -123,7 +139,9 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
     else:
         spec["groups"] = [{"name": "Everyone", "hasAllPrivileges": False}]
 
-    return yaml.dump(spec, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    return yaml.dump(
+        spec, allow_unicode=True, default_flow_style=False, sort_keys=False
+    )
 
 
 def _find_form(

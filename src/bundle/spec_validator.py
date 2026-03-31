@@ -16,13 +16,28 @@ import yaml
 
 VALID_SUBJECT_TYPES = {"Person", "Household", "Individual", "Group"}
 VALID_DATA_TYPES = {
-    "Text", "Numeric", "Coded", "Date", "DateTime", "Duration",
-    "PhoneNumber", "Audio", "Image", "Video", "File", "Location",
-    "Subject", "GroupAffiliation",
+    "Text",
+    "Numeric",
+    "Coded",
+    "Date",
+    "DateTime",
+    "Duration",
+    "PhoneNumber",
+    "Audio",
+    "Image",
+    "Video",
+    "File",
+    "Location",
+    "Subject",
+    "GroupAffiliation",
 }
 VALID_STANDARD_CARD_TYPES = {
-    "scheduledVisits", "overdueVisits", "total",
-    "recentRegistrations", "recentEnrolments", "recentVisits",
+    "scheduledVisits",
+    "overdueVisits",
+    "total",
+    "recentRegistrations",
+    "recentEnrolments",
+    "recentVisits",
 }
 
 
@@ -55,22 +70,48 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
         }
 
     # Build name sets for cross-reference
-    st_names = {s["name"] for s in spec.get("subjectTypes", []) if isinstance(s, dict) and s.get("name")}
-    prog_names = {p["name"] for p in spec.get("programs", []) if isinstance(p, dict) and p.get("name")}
-    enc_names = {e["name"] for e in spec.get("encounterTypes", []) if isinstance(e, dict) and e.get("name")}
-    group_names = {g["name"] for g in spec.get("groups", []) if isinstance(g, dict) and g.get("name")}
-    card_names = {c["name"] for c in spec.get("reportCards", []) if isinstance(c, dict) and c.get("name")}
+    st_names = {
+        s["name"]
+        for s in spec.get("subjectTypes", [])
+        if isinstance(s, dict) and s.get("name")
+    }
+    prog_names = {
+        p["name"]
+        for p in spec.get("programs", [])
+        if isinstance(p, dict) and p.get("name")
+    }
+    enc_names = {
+        e["name"]
+        for e in spec.get("encounterTypes", [])
+        if isinstance(e, dict) and e.get("name")
+    }
+    group_names = {
+        g["name"]
+        for g in spec.get("groups", [])
+        if isinstance(g, dict) and g.get("name")
+    }
+    card_names = {
+        c["name"]
+        for c in spec.get("reportCards", [])
+        if isinstance(c, dict) and c.get("name")
+    }
 
     # ── Completeness ───────────────────────────────────────────────
     if not st_names:
-        errors.append("No subject types defined — at least one subject type is required")
+        errors.append(
+            "No subject types defined — at least one subject type is required"
+        )
 
     if not group_names:
-        warnings.append("No groups defined — an 'Everyone' group will be auto-generated")
+        warnings.append(
+            "No groups defined — an 'Everyone' group will be auto-generated"
+        )
 
     addr_levels = spec.get("addressLevels", [])
     if not addr_levels:
-        warnings.append("No address levels defined — a default hierarchy will be generated")
+        warnings.append(
+            "No address levels defined — a default hierarchy will be generated"
+        )
 
     # ── Address levels ─────────────────────────────────────────────
     seen_level_names: set[str] = set()
@@ -88,8 +129,14 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
         level_name_map[name] = row.get("level", 0)
 
         parent = row.get("parent")
-        if parent and parent not in seen_level_names and parent not in {r.get("name") for r in addr_levels}:
-            errors.append(f"Address level '{name}' references unknown parent '{parent}'")
+        if (
+            parent
+            and parent not in seen_level_names
+            and parent not in {r.get("name") for r in addr_levels}
+        ):
+            errors.append(
+                f"Address level '{name}' references unknown parent '{parent}'"
+            )
 
     # ── Subject types ──────────────────────────────────────────────
     seen_st: set[str] = set()
@@ -112,7 +159,12 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
             )
 
         if "registrationForm" in st:
-            _validate_form_spec(st["registrationForm"], f"registrationForm of '{name}'", errors, warnings)
+            _validate_form_spec(
+                st["registrationForm"],
+                f"registrationForm of '{name}'",
+                errors,
+                warnings,
+            )
 
     # ── Programs ───────────────────────────────────────────────────
     seen_prog: set[str] = set()
@@ -138,10 +190,14 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
         if "enrolmentForm" not in prog:
             warnings.append(f"Program '{name}' has no enrolmentForm")
         else:
-            _validate_form_spec(prog["enrolmentForm"], f"enrolmentForm of '{name}'", errors, warnings)
+            _validate_form_spec(
+                prog["enrolmentForm"], f"enrolmentForm of '{name}'", errors, warnings
+            )
 
         if "exitForm" in prog:
-            _validate_form_spec(prog["exitForm"], f"exitForm of '{name}'", errors, warnings)
+            _validate_form_spec(
+                prog["exitForm"], f"exitForm of '{name}'", errors, warnings
+            )
 
     # ── Encounter types ────────────────────────────────────────────
     seen_enc: set[str] = set()
@@ -175,10 +231,17 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
         if "form" not in enc:
             warnings.append(f"Encounter type '{name}' has no form")
         else:
-            _validate_form_spec(enc["form"], f"form of encounter '{name}'", errors, warnings)
+            _validate_form_spec(
+                enc["form"], f"form of encounter '{name}'", errors, warnings
+            )
 
         if "cancellationForm" in enc:
-            _validate_form_spec(enc["cancellationForm"], f"cancellationForm of '{name}'", errors, warnings)
+            _validate_form_spec(
+                enc["cancellationForm"],
+                f"cancellationForm of '{name}'",
+                errors,
+                warnings,
+            )
 
     # ── Report cards ───────────────────────────────────────────────
     seen_cards: set[str] = set()
@@ -194,7 +257,11 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
         seen_cards.add(cname)
 
         std_type = card.get("standardType", "")
-        if card.get("type") == "standard" and std_type and std_type not in VALID_STANDARD_CARD_TYPES:
+        if (
+            card.get("type") == "standard"
+            and std_type
+            and std_type not in VALID_STANDARD_CARD_TYPES
+        ):
             errors.append(
                 f"Report card '{cname}' has unknown standardType '{std_type}' "
                 f"(valid: {sorted(VALID_STANDARD_CARD_TYPES)})"
@@ -224,7 +291,9 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
             "Programs defined but no encounter types — add encounter types for data collection"
         )
     if not spec.get("reportCards"):
-        suggestions.append("No report cards defined — standard report cards will be auto-generated")
+        suggestions.append(
+            "No report cards defined — standard report cards will be auto-generated"
+        )
 
     return {
         "valid": len(errors) == 0,
@@ -258,7 +327,9 @@ def _validate_form_spec(form: dict, label: str, errors: list, warnings: list) ->
             continue
         fields = section.get("fields", [])
         if not fields:
-            warnings.append(f"{label} section {sidx} ('{section.get('name', '?')}') has no fields")
+            warnings.append(
+                f"{label} section {sidx} ('{section.get('name', '?')}') has no fields"
+            )
             continue
 
         all_field_names: list[str] = []
@@ -267,7 +338,9 @@ def _validate_form_spec(form: dict, label: str, errors: list, warnings: list) ->
                 continue
             fname = field.get("name", "")
             if not fname:
-                errors.append(f"{label}: field missing 'name' in section '{section.get('name', '?')}'")
+                errors.append(
+                    f"{label}: field missing 'name' in section '{section.get('name', '?')}'"
+                )
             all_field_names.append(fname)
 
             data_type = field.get("dataType", "")

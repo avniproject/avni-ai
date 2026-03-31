@@ -166,42 +166,56 @@ def _bundle_to_entities(bundle: dict) -> dict:
 
     # Address level types → address_levels
     for alt in bundle.get("addressLevelTypes", []):
-        entities["address_levels"].append({
-            "name": alt.get("name", ""),
-            "level": alt.get("level", 1),
-            "parent": alt.get("parent", {}).get("name") if isinstance(alt.get("parent"), dict) else alt.get("parent"),
-        })
+        entities["address_levels"].append(
+            {
+                "name": alt.get("name", ""),
+                "level": alt.get("level", 1),
+                "parent": alt.get("parent", {}).get("name")
+                if isinstance(alt.get("parent"), dict)
+                else alt.get("parent"),
+            }
+        )
 
     # Subject types
     for st in bundle.get("subjectTypes", []):
-        entities["subject_types"].append({
-            "name": st.get("name", ""),
-            "type": st.get("type", "Person"),
-            "allowProfilePicture": st.get("allowProfilePicture", False),
-            "uniqueName": st.get("uniqueName", False),
-        })
+        entities["subject_types"].append(
+            {
+                "name": st.get("name", ""),
+                "type": st.get("type", "Person"),
+                "allowProfilePicture": st.get("allowProfilePicture", False),
+                "uniqueName": st.get("uniqueName", False),
+            }
+        )
 
     # Programs
     for prog in bundle.get("programs", []):
-        entities["programs"].append({
-            "name": prog.get("name", ""),
-            "target_subject_type": prog.get("operationalPrograms", {}).get("subjectType", ""),
-            "colour": prog.get("colour", "#4A148C"),
-            "allow_multiple_enrolments": prog.get("allowMultipleEnrolments", False),
-        })
+        entities["programs"].append(
+            {
+                "name": prog.get("name", ""),
+                "target_subject_type": prog.get("operationalPrograms", {}).get(
+                    "subjectType", ""
+                ),
+                "colour": prog.get("colour", "#4A148C"),
+                "allow_multiple_enrolments": prog.get("allowMultipleEnrolments", False),
+            }
+        )
 
     # Encounter types — derive from operational encounter types for cross-refs
-    op_enc = bundle.get("operationalEncounterTypes", {}).get("operationalEncounterTypes", [])
+    op_enc = bundle.get("operationalEncounterTypes", {}).get(
+        "operationalEncounterTypes", []
+    )
     op_enc_by_uuid = {e.get("encounterTypeUUID"): e for e in op_enc}
     for enc in bundle.get("encounterTypes", []):
         op = op_enc_by_uuid.get(enc.get("uuid"), {})
-        entities["encounter_types"].append({
-            "name": enc.get("name", ""),
-            "program_name": op.get("programName", ""),
-            "subject_type": op.get("subjectTypeName", ""),
-            "is_program_encounter": bool(op.get("programName")),
-            "is_scheduled": True,
-        })
+        entities["encounter_types"].append(
+            {
+                "name": enc.get("name", ""),
+                "program_name": op.get("programName", ""),
+                "subject_type": op.get("subjectTypeName", ""),
+                "is_program_encounter": bool(op.get("programName")),
+                "is_scheduled": True,
+            }
+        )
 
     # Forms — iterate forms subdirectory contents
     for form in bundle.get("forms", []):
@@ -210,9 +224,11 @@ def _bundle_to_entities(bundle: dict) -> dict:
 
     # Groups
     for grp in bundle.get("groups", []):
-        entities["groups"].append({
-            "name": grp.get("name", ""),
-            "has_all_privileges": grp.get("hasAllPrivileges", False),
-        })
+        entities["groups"].append(
+            {
+                "name": grp.get("name", ""),
+                "has_all_privileges": grp.get("hasAllPrivileges", False),
+            }
+        )
 
     return entities

@@ -55,16 +55,26 @@ def _validate(entities: dict) -> dict:
         if not key:
             continue
         if key in seen:
-            issues.append({"severity": "error", "entity_type": "subject_type",
-                           "message": f"Duplicate subject type: '{r['name']}'"})
+            issues.append(
+                {
+                    "severity": "error",
+                    "entity_type": "subject_type",
+                    "message": f"Duplicate subject type: '{r['name']}'",
+                }
+            )
         else:
             seen[key] = r["name"]
 
     # Subject type missing 'type' field
     for r in st_rows:
         if not r.get("type"):
-            issues.append({"severity": "warning", "entity_type": "subject_type",
-                           "message": f"Subject type '{r.get('name', '?')}' is missing 'type'"})
+            issues.append(
+                {
+                    "severity": "warning",
+                    "entity_type": "subject_type",
+                    "message": f"Subject type '{r.get('name', '?')}' is missing 'type'",
+                }
+            )
 
     # Duplicate programs
     seen = {}
@@ -73,8 +83,13 @@ def _validate(entities: dict) -> dict:
         if not key:
             continue
         if key in seen:
-            issues.append({"severity": "error", "entity_type": "program",
-                           "message": f"Duplicate program: '{r['name']}'"})
+            issues.append(
+                {
+                    "severity": "error",
+                    "entity_type": "program",
+                    "message": f"Duplicate program: '{r['name']}'",
+                }
+            )
         else:
             seen[key] = r["name"]
 
@@ -82,12 +97,24 @@ def _validate(entities: dict) -> dict:
     for r in prog_rows:
         target = r.get("target_subject_type", "")
         if not target:
-            issues.append({"severity": "warning", "entity_type": "program",
-                           "message": f"Program '{r['name']}' is missing target subject type"})
+            issues.append(
+                {
+                    "severity": "warning",
+                    "entity_type": "program",
+                    "message": f"Program '{r['name']}' is missing target subject type",
+                }
+            )
         elif not _fuzzy_match(target, subject_type_names):
-            issues.append({"severity": "warning", "entity_type": "program",
-                           "message": (f"Program '{r['name']}' references subject type "
-                                       f"'{target}' which doesn't match any defined subject type")})
+            issues.append(
+                {
+                    "severity": "warning",
+                    "entity_type": "program",
+                    "message": (
+                        f"Program '{r['name']}' references subject type "
+                        f"'{target}' which doesn't match any defined subject type"
+                    ),
+                }
+            )
 
     # Duplicate encounter types
     seen = {}
@@ -96,8 +123,13 @@ def _validate(entities: dict) -> dict:
         if not key:
             continue
         if key in seen:
-            issues.append({"severity": "error", "entity_type": "encounter_type",
-                           "message": f"Duplicate encounter type: '{r['name']}'"})
+            issues.append(
+                {
+                    "severity": "error",
+                    "entity_type": "encounter_type",
+                    "message": f"Duplicate encounter type: '{r['name']}'",
+                }
+            )
         else:
             seen[key] = r["name"]
 
@@ -106,59 +138,118 @@ def _validate(entities: dict) -> dict:
         if r.get("is_program_encounter"):
             program = r.get("program_name", "")
             if program and not _fuzzy_match(program, program_names):
-                issues.append({"severity": "warning", "entity_type": "program_encounter",
-                               "message": (f"Program encounter '{r['name']}' references "
-                                           f"program '{program}' which doesn't match any defined program")})
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "entity_type": "program_encounter",
+                        "message": (
+                            f"Program encounter '{r['name']}' references "
+                            f"program '{program}' which doesn't match any defined program"
+                        ),
+                    }
+                )
         else:
             subject = r.get("subject_type", "")
             if subject and not _fuzzy_match(subject, subject_type_names):
-                issues.append({"severity": "warning", "entity_type": "encounter",
-                               "message": (f"Encounter '{r['name']}' references subject type "
-                                           f"'{subject}' which doesn't match any defined subject type")})
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "entity_type": "encounter",
+                        "message": (
+                            f"Encounter '{r['name']}' references subject type "
+                            f"'{subject}' which doesn't match any defined subject type"
+                        ),
+                    }
+                )
 
     # Address levels
     if not addr_rows:
-        issues.append({"severity": "warning", "entity_type": "location_hierarchy",
-                       "message": "No location hierarchy found. A default hierarchy will be generated."})
+        issues.append(
+            {
+                "severity": "warning",
+                "entity_type": "location_hierarchy",
+                "message": "No location hierarchy found. A default hierarchy will be generated.",
+            }
+        )
 
     # Forms cross-reference checks (Phase 5: when forms are explicitly extracted)
     form_rows = entities.get("forms", [])
     if form_rows:
         valid_form_types = {
-            "IndividualProfile", "ProgramEnrolment", "ProgramExit",
-            "ProgramEncounter", "Encounter", "ProgramEncounterCancellation",
+            "IndividualProfile",
+            "ProgramEnrolment",
+            "ProgramExit",
+            "ProgramEncounter",
+            "Encounter",
+            "ProgramEncounterCancellation",
         }
         valid_data_types = {
-            "Text", "Numeric", "Coded", "Date", "DateTime", "Duration",
-            "PhoneNumber", "Audio", "Image", "Video", "File", "Location",
-            "Subject", "GroupAffiliation",
+            "Text",
+            "Numeric",
+            "Coded",
+            "Date",
+            "DateTime",
+            "Duration",
+            "PhoneNumber",
+            "Audio",
+            "Image",
+            "Video",
+            "File",
+            "Location",
+            "Subject",
+            "GroupAffiliation",
         }
         for form in form_rows:
             if not isinstance(form, dict):
                 continue
             ft = form.get("formType", "")
             if ft and ft not in valid_form_types:
-                issues.append({"severity": "warning", "entity_type": "form",
-                               "message": f"Form '{form.get('name', '?')}' has unrecognised formType '{ft}'"})
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "entity_type": "form",
+                        "message": f"Form '{form.get('name', '?')}' has unrecognised formType '{ft}'",
+                    }
+                )
             st_ref = form.get("subjectType", "")
             if st_ref and not _fuzzy_match(st_ref, subject_type_names):
-                issues.append({"severity": "warning", "entity_type": "form",
-                               "message": f"Form '{form.get('name', '?')}' references unknown subjectType '{st_ref}'"})
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "entity_type": "form",
+                        "message": f"Form '{form.get('name', '?')}' references unknown subjectType '{st_ref}'",
+                    }
+                )
             prog_ref = form.get("program", "")
             prog_names = {r["name"] for r in prog_rows if r.get("name")}
             if prog_ref and not _fuzzy_match(prog_ref, prog_names):
-                issues.append({"severity": "warning", "entity_type": "form",
-                               "message": f"Form '{form.get('name', '?')}' references unknown program '{prog_ref}'"})
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "entity_type": "form",
+                        "message": f"Form '{form.get('name', '?')}' references unknown program '{prog_ref}'",
+                    }
+                )
             for field in form.get("fields", []):
                 if not isinstance(field, dict):
                     continue
                 dt = field.get("dataType", "")
                 if dt and dt not in valid_data_types:
-                    issues.append({"severity": "warning", "entity_type": "form_field",
-                                   "message": f"Field '{field.get('name', '?')}' in form '{form.get('name', '?')}' has unrecognised dataType '{dt}'"})
+                    issues.append(
+                        {
+                            "severity": "warning",
+                            "entity_type": "form_field",
+                            "message": f"Field '{field.get('name', '?')}' in form '{form.get('name', '?')}' has unrecognised dataType '{dt}'",
+                        }
+                    )
                 if dt == "Coded" and not field.get("options"):
-                    issues.append({"severity": "warning", "entity_type": "form_field",
-                                   "message": f"Coded field '{field.get('name', '?')}' in form '{form.get('name', '?')}' has no options"})
+                    issues.append(
+                        {
+                            "severity": "warning",
+                            "entity_type": "form_field",
+                            "message": f"Coded field '{field.get('name', '?')}' in form '{form.get('name', '?')}' has no options",
+                        }
+                    )
 
     error_count = sum(1 for i in issues if i["severity"] == "error")
     warning_count = sum(1 for i in issues if i["severity"] == "warning")
@@ -209,10 +300,14 @@ def _apply_corrections(entities: dict, corrections: list[dict]) -> dict:
         c_name = correction.get("name", "")
 
         if correction.get("_delete"):
-            result[section_key] = [e for e in result[section_key] if e.get("name") != c_name]
+            result[section_key] = [
+                e for e in result[section_key] if e.get("name") != c_name
+            ]
             continue
 
-        payload = {k: v for k, v in correction.items() if k not in ("entity_type", "_delete")}
+        payload = {
+            k: v for k, v in correction.items() if k not in ("entity_type", "_delete")
+        }
         matched_idx = next(
             (i for i, e in enumerate(result[section_key]) if e.get("name") == c_name),
             None,
@@ -273,7 +368,9 @@ async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
     if not isinstance(entities, dict):
         return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
     if not isinstance(corrections, list):
-        return JSONResponse({"error": "'corrections' must be an array"}, status_code=400)
+        return JSONResponse(
+            {"error": "'corrections' must be an array"}, status_code=400
+        )
 
     updated = _apply_corrections(entities, corrections)
 
