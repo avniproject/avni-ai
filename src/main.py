@@ -34,6 +34,12 @@ from .handlers.entity_handlers import (
     handle_validate_entities,
     handle_apply_entity_corrections,
 )
+from .handlers.spec_handlers import (
+    handle_generate_spec,
+    handle_validate_spec,
+    handle_spec_to_entities,
+    handle_bundle_to_spec,
+)
 from .handlers.sandbox_handlers import handle_execute_python
 from .playground.executor import PlaygroundExecutor
 from .http import create_cors_middleware
@@ -162,6 +168,23 @@ async def create_server():
     @server.custom_route("/apply-entity-corrections", methods=["POST"])
     async def apply_entity_corrections_endpoint(request: Request):
         return await handle_apply_entity_corrections(request)
+
+    # --- Spec Stage ---
+    @server.custom_route("/generate-spec", methods=["POST"])
+    async def generate_spec_endpoint(request: Request):
+        return await handle_generate_spec(request)
+
+    @server.custom_route("/validate-spec", methods=["POST"])
+    async def validate_spec_endpoint(request: Request):
+        return await handle_validate_spec(request)
+
+    @server.custom_route("/spec-to-entities", methods=["POST"])
+    async def spec_to_entities_endpoint(request: Request):
+        return await handle_spec_to_entities(request)
+
+    @server.custom_route("/bundle-to-spec", methods=["POST"])
+    async def bundle_to_spec_endpoint(request: Request):
+        return await handle_bundle_to_spec(request)
 
     # --- Bundle Generation ---
     @server.custom_route("/generate-bundle", methods=["POST"])
