@@ -24,7 +24,7 @@ class BundleGenerator:
         self.org_name = org_name
         self.concept_generator = ConceptGenerator()
         self.form_generator = FormGenerator()
-        self.bundle: dict[str, list] = {
+        self.bundle: dict[str, Any] = {
             "concepts": [],
             "forms": [],
             "subjectTypes": [],
@@ -33,6 +33,10 @@ class BundleGenerator:
             "formMappings": [],
             "groups": [],
             "groupPrivileges": [],
+            "addressLevelTypes": [],
+            "operationalSubjectTypes": {"operationalSubjectTypes": []},
+            "operationalPrograms": {"operationalPrograms": []},
+            "operationalEncounterTypes": {"operationalEncounterTypes": []},
         }
         self.validation: dict[str, list] = {"errors": [], "warnings": []}
         self.confidence: dict[str, Any] = {}
@@ -98,6 +102,70 @@ class BundleGenerator:
                     "name": group["name"],
                     "uuid": generate_deterministic_uuid(f"group:{group['name']}"),
                     "hasAllPrivileges": group.get("admin", False),
+                }
+            )
+
+    def process_address_levels(self, address_levels: list[dict]) -> None:
+        # Sort by level descending (topmost = highest number)
+        sorted_levels = sorted(
+            address_levels, key=lambda a: a.get("level", 0), reverse=True
+        )
+        # Build name→uuid map for parent resolution
+        name_to_uuid: dict[str, str] = {}
+        for al in sorted_levels:
+            al_uuid = generate_deterministic_uuid(f"addressLevelType:{al['name']}")
+            name_to_uuid[al["name"]] = al_uuid
+
+        for al in sorted_levels:
+            al_uuid = name_to_uuid[al["name"]]
+            entry: dict[str, Any] = {
+                "name": al["name"],
+                "uuid": al_uuid,
+                "level": float(al.get("level", 1)),
+            }
+            parent_name = al.get("parent")
+            if parent_name and parent_name in name_to_uuid:
+                entry["parent"] = {"uuid": name_to_uuid[parent_name]}
+            self.bundle["addressLevelTypes"].append(entry)
+
+    # ── Operational configs ────────────────────────────────────────
+
+    def _generate_operational_configs(self) -> None:
+        """Generate operational wrappers for subject types, programs, encounter types."""
+        for st in self.bundle["subjectTypes"]:
+            self.bundle["operationalSubjectTypes"]["operationalSubjectTypes"].append(
+                {
+                    "uuid": generate_deterministic_uuid(
+                        f"operationalSubjectType:{st['name']}"
+                    ),
+                    "name": st["name"],
+                    "subjectType": {"uuid": st["uuid"], "voided": False},
+                    "voided": False,
+                }
+            )
+        for prog in self.bundle["programs"]:
+            self.bundle["operationalPrograms"]["operationalPrograms"].append(
+                {
+                    "uuid": generate_deterministic_uuid(
+                        f"operationalProgram:{prog['name']}"
+                    ),
+                    "name": prog["name"],
+                    "program": {"uuid": prog["uuid"], "voided": False},
+                    "programSubjectLabel": prog.get("programSubjectLabel", ""),
+                    "voided": False,
+                }
+            )
+        for et in self.bundle["encounterTypes"]:
+            self.bundle["operationalEncounterTypes"][
+                "operationalEncounterTypes"
+            ].append(
+                {
+                    "uuid": generate_deterministic_uuid(
+                        f"operationalEncounterType:{et['name']}"
+                    ),
+                    "name": et["name"],
+                    "encounterType": {"uuid": et["uuid"], "voided": False},
+                    "voided": False,
                 }
             )
 
@@ -183,6 +251,82 @@ class BundleGenerator:
 
         self.bundle["formMappings"].append(mapping)
 
+    # ── Auto-derive forms ─────────────────────────────────────────
+
+    def _auto_derive_forms(self, entities: dict) -> list[dict]:
+        """
+        When no explicit forms are provided, derive form specs from
+        subject types, programs, and encounter types so the bundle
+        has valid form structures and form mappings.
+        """
+        forms: list[dict] = []
+        encounter_types = entities.get("encounterTypes", [])
+        programs = entities.get("programs", [])
+
+        # Build lookup: program name → target subject type
+        prog_to_st: dict[str, str] = {}
+        for p in programs:
+            target = p.get("target_subject_type") or p.get("targetSubjectType", "")
+            if target:
+                prog_to_st[p["name"]] = target
+
+        # Registration form for each subject type
+        for st in entities.get("subjectTypes", []):
+            forms.append(
+                {
+                    "name": f"{st['name']} Registration",
+                    "formType": "IndividualProfile",
+                    "subjectType": st["name"],
+                    "fields": [],
+                }
+            )
+
+        # Enrolment + exit forms for each program
+        for prog in programs:
+            st_name = prog_to_st.get(prog["name"], "")
+            forms.append(
+                {
+                    "name": f"{prog['name']} Enrolment",
+                    "formType": "ProgramEnrolment",
+                    "subjectType": st_name,
+                    "program": prog["name"],
+                    "fields": [],
+                }
+            )
+            forms.append(
+                {
+                    "name": f"{prog['name']} Exit",
+                    "formType": "ProgramExit",
+                    "subjectType": st_name,
+                    "program": prog["name"],
+                    "fields": [],
+                }
+            )
+
+        # Form for each encounter type
+        for et in encounter_types:
+            is_program = et.get("is_program_encounter", et.get("programEncounter", False))
+            program_name = et.get("program_name", et.get("program", ""))
+            st_name = et.get("subject_type", et.get("subjectType", ""))
+
+            # If program encounter, resolve subject type from program
+            if is_program and program_name and not st_name:
+                st_name = prog_to_st.get(program_name, "")
+
+            form_type = "ProgramEncounter" if is_program else "Encounter"
+            forms.append(
+                {
+                    "name": f"{et['name']}",
+                    "formType": form_type,
+                    "subjectType": st_name,
+                    "program": program_name if is_program else None,
+                    "encounterType": et["name"],
+                    "fields": [],
+                }
+            )
+
+        return forms
+
     # ── Validation ──────────────────────────────────────────────────
 
     def validate(self) -> bool:
@@ -248,14 +392,26 @@ class BundleGenerator:
         }
         entities = {_key_map.get(k, k): v for k, v in entities.items()}
 
+        # Process in server-expected order
+        if entities.get("addressLevels"):
+            self.process_address_levels(entities["addressLevels"])
         if entities.get("subjectTypes"):
             self.process_subject_types(entities["subjectTypes"])
         if entities.get("programs"):
             self.process_programs(entities["programs"])
         if entities.get("encounterTypes"):
             self.process_encounter_types(entities["encounterTypes"])
-        if entities.get("forms"):
-            self.process_forms(entities["forms"])
+
+        # Generate operational configs (must come after core entity processing)
+        self._generate_operational_configs()
+
+        # Auto-derive forms if none provided
+        forms = entities.get("forms", [])
+        if not forms:
+            forms = self._auto_derive_forms(entities)
+            logger.info("Auto-derived %d forms from entities", len(forms))
+        self.process_forms(forms)
+
         if entities.get("groups"):
             self.process_groups(entities["groups"])
 
@@ -274,25 +430,43 @@ class BundleGenerator:
         """Create an in-memory ZIP file of the bundle."""
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-            # Top-level JSON files
+            # Follow server processing order for file layout
+            # 1. Address level types (array)
+            zf.writestr(
+                "addressLevelTypes.json",
+                json.dumps(self.bundle["addressLevelTypes"], indent=2),
+            )
+
+            # 2-4. Core entity types (arrays)
+            for key in ("subjectTypes", "programs", "encounterTypes"):
+                zf.writestr(f"{key}.json", json.dumps(self.bundle[key], indent=2))
+
+            # 5-7. Operational configs (wrapper objects)
             for key in (
-                "subjectTypes",
-                "programs",
-                "encounterTypes",
-                "formMappings",
-                "groups",
-                "groupPrivileges",
+                "operationalSubjectTypes",
+                "operationalPrograms",
+                "operationalEncounterTypes",
             ):
                 zf.writestr(f"{key}.json", json.dumps(self.bundle[key], indent=2))
 
-            # Concepts
+            # 8. Concepts
             zf.writestr("concepts.json", json.dumps(self.bundle["concepts"], indent=2))
 
-            # Forms in subdirectory
+            # 9. Forms in subdirectory
             for form in self.bundle["forms"]:
                 zf.writestr(f"forms/{form['name']}.json", json.dumps(form, indent=2))
 
-            # Validation report
+            # 10. Form mappings
+            zf.writestr(
+                "formMappings.json",
+                json.dumps(self.bundle["formMappings"], indent=2),
+            )
+
+            # 11. Groups and privileges
+            for key in ("groups", "groupPrivileges"):
+                zf.writestr(f"{key}.json", json.dumps(self.bundle[key], indent=2))
+
+            # Validation report (not imported by server, informational only)
             zf.writestr(
                 "validation_report.json",
                 json.dumps(
@@ -306,6 +480,9 @@ class BundleGenerator:
                             "programs": len(self.bundle["programs"]),
                             "encounterTypes": len(self.bundle["encounterTypes"]),
                             "formMappings": len(self.bundle["formMappings"]),
+                            "addressLevelTypes": len(
+                                self.bundle["addressLevelTypes"]
+                            ),
                         },
                     },
                     indent=2,
