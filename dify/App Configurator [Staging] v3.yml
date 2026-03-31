@@ -174,17 +174,6 @@ workflow:
       - remote_url
       - local_file
       enabled: true
-      fileUploadConfig:
-        attachment_image_file_size_limit: 2
-        audio_file_size_limit: 50
-        batch_count_limit: 5
-        file_size_limit: 15
-        file_upload_limit: 50
-        image_file_batch_limit: 10
-        image_file_size_limit: 10
-        single_chunk_attachment_limit: 10
-        video_file_size_limit: 100
-        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -376,6 +365,18 @@ workflow:
       selected: false
       source: '1774617205889'
       sourceHandle: 'Yes'
+      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: agent
+      id: confirm-no-to-spec-agent
+      selected: false
+      source: '1774617205889'
+      sourceHandle: 'No'
       target: 3b1db8bf-6e79-4646-9103-077a6ca90299
       targetHandle: target
       type: custom
@@ -1311,12 +1312,18 @@ workflow:
             variable_selector:
             - conversation
             - entities_jsonl
+          - comparison_operator: empty
+            value: ''
+            varType: array
+            variable_selector:
+            - sys
+            - files
           id: case-true
           logical_operator: and
         selected: false
         title: Already Processed?
         type: if-else
-      height: 124
+      height: 150
       id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
       position:
         x: 1388
@@ -2324,9 +2331,9 @@ workflow:
               and the final spec_yaml.
 
               2. If user said No (wants corrections) → call apply_entity_corrections
-              with {conversation_id, corrections: [...]}, then call generate_spec with
-              {conversation_id}, then validate_spec, show updated summary, ask for
-              confirmation.
+              with {conversation_id, corrections: [...]}, then call generate_spec
+              with {conversation_id}, then validate_spec, show updated summary, ask
+              for confirmation.
 
               3. Once spec is valid and user approves, output: SPEC_APPROVED and the
               final spec_yaml.'
@@ -2460,6 +2467,25 @@ workflow:
               tool_label: upload_status
               tool_name: upload_status
               type: api
+            - enabled: true
+              extra:
+                description: Call this once after entity extraction. Agent tools can
+                  then pass only conversation_id instead of the full entities payload.
+              parameters:
+                conversation_id:
+                  auto: 1
+                  value: null
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Call this once after entity extraction. Agent tools
+                can then pass only conversation_id instead of the full entities payload.
+              tool_label: store_entities
+              tool_name: store_entities
+              type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
         agent_strategy_provider_name: langgenius/agent/agent
@@ -2479,7 +2505,7 @@ workflow:
       positionAbsolute:
         x: 4164
         y: 448
-      selected: false
+      selected: true
       type: custom
       width: 242
     - data:
@@ -2831,11 +2857,11 @@ workflow:
       positionAbsolute:
         x: 7242
         y: 456
-      selected: true
+      selected: false
       type: custom
       width: 242
     viewport:
-      x: -3840.1626815814006
-      y: 91.19268253974042
+      x: 489.61605963329066
+      y: 177.51171747405434
       zoom: 0.544495374931482
   rag_pipeline_variables: []
