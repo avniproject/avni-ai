@@ -18,6 +18,7 @@ from starlette.responses import JSONResponse
 from ..bundle.spec_generator import entities_to_spec
 from ..bundle.spec_parser import spec_to_entities
 from ..bundle.spec_validator import validate_spec
+from .entity_handlers import _entity_store
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ async def handle_generate_spec(request: Request) -> JSONResponse:
     """
     POST /generate-spec
     Body: { "entities": {...}, "org_name": "..." }
+      OR: { "conversation_id": "...", "org_name": "..." }  — looks up entities from store
     Returns: { "spec_yaml": "..." }
     """
     try:
@@ -34,8 +36,22 @@ async def handle_generate_spec(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
     entities = body.get("entities")
-    if entities is None:
-        return JSONResponse({"error": "Missing 'entities' key"}, status_code=400)
+    conversation_id = body.get("conversation_id")
+
+    if entities is None and conversation_id:
+        entities = _entity_store.get(conversation_id)
+        if entities is None:
+            return JSONResponse(
+                {
+                    "error": f"No entities found for conversation_id={conversation_id}. Call /store-entities first."
+                },
+                status_code=404,
+            )
+    elif entities is None:
+        return JSONResponse(
+            {"error": "Provide 'entities' or 'conversation_id'"}, status_code=400
+        )
+
     if not isinstance(entities, dict):
         return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
 

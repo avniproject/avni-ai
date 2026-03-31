@@ -1,0 +1,2841 @@
+app:
+  description: Avni AI Assistant — App Configurator (Refactored)
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: advanced-chat
+  name: App Configurator [Staging] v3
+  use_icon_as_answer_icon: true
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: agimaster/justwait:0.0.2@1cc2d5e7fbd6a829396c8a51947924f799f9566071bf8499c4e2a9f75ad3330f
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/anthropic:0.3.8@6706e34565fb2c560cc3641c888b7f4e34288928df913e92241bd6d4f830a0cf
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.10@7ca552fb9e48caa4deddfdef5aa71c200d06d03c26c2e8bb428b3250101b9cb3
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables:
+  - description: Avni auth token for API calls
+    id: f3337c5a-b833-47a7-8eeb-1d29182542f9
+    name: auth_token
+    selector:
+    - conversation
+    - auth_token
+    value: ''
+    value_type: string
+  - description: Avni AI server base URL
+    id: 4c1c713d-15fd-4a91-904b-20ef56e53cd0
+    name: avni_mcp_server_url
+    selector:
+    - conversation
+    - avni_mcp_server_url
+    value: ''
+    value_type: string
+  - description: Extracted entities from specification file
+    id: dada7c31-e9c4-4b37-838c-00f71b67c54a
+    name: entities_jsonl
+    selector:
+    - conversation
+    - entities_jsonl
+    value: {}
+    value_type: object
+  - description: Uploaded specification files
+    id: ee0fbd12-9867-4b7c-95d5-4b74e03475be
+    name: uploaded_files
+    selector:
+    - conversation
+    - uploaded_files
+    value: []
+    value_type: array[object]
+  - description: Upload task ID for polling
+    id: 79e98864-f718-4375-b980-b8e9df1fa427
+    name: upload_task_id
+    selector:
+    - conversation
+    - upload_task_id
+    value: ''
+    value_type: string
+  - description: Boolean constant true
+    id: 80e10fd7-a4a9-4300-ad77-fd31a27bb86b
+    name: 'True'
+    selector:
+    - conversation
+    - 'True'
+    value: true
+    value_type: boolean
+  - description: Boolean constant false
+    id: 0873be68-c224-4e79-8cf8-ce2f583d6509
+    name: 'False'
+    selector:
+    - conversation
+    - 'False'
+    value: false
+    value_type: boolean
+  - description: Controls upload polling loop
+    id: ebacfa4e-342c-455e-a4ba-b70851015711
+    name: loop
+    selector:
+    - conversation
+    - loop
+    value: true
+    value_type: boolean
+  - description: Tracks if user is in active setup workflow
+    id: a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a6b7
+    name: setup_mode_active
+    selector:
+    - conversation
+    - setup_mode_active
+    value: false
+    value_type: boolean
+  - description: Stores the user's anchored intent
+    id: b2c3d4e5-f6a7-4890-b1c2-d3e4f5a6b7c8
+    name: primary_intent
+    selector:
+    - conversation
+    - primary_intent
+    value: ''
+    value_type: string
+  - description: Base64 encoded bundle ZIP for upload
+    id: e5f6a7b8-c9d0-4123-e4f5-a6b7c8d9e0f1
+    name: bundle_zip_b64
+    selector:
+    - conversation
+    - bundle_zip_b64
+    value: ''
+    value_type: string
+  - description: Counter for chitchat messages
+    id: c3d4e5f6-a7b8-4901-c2d3-e4f5a6b7c8d9
+    name: chitchat_count
+    selector:
+    - conversation
+    - chitchat_count
+    value: 0
+    value_type: integer
+  - description: Counter for out-of-scope messages
+    id: d4e5f6a7-b8c9-4012-d3e4-f5a6b7c8d9e0
+    name: out_of_scope_count
+    selector:
+    - conversation
+    - out_of_scope_count
+    value: 0
+    value_type: integer
+  - description: Approved YAML spec from Spec Agent
+    id: f7a8b9c0-d1e2-4f3a-b4c5-d6e7f8a9b0c1
+    name: spec_yaml
+    selector:
+    - conversation
+    - spec_yaml
+    value: ''
+    value_type: string
+  - description: Base64 encoded existing org bundle ZIP downloaded from Avni
+    id: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+    name: existing_bundle_b64
+    selector:
+    - conversation
+    - existing_bundle_b64
+    value: ''
+    value_type: string
+  environment_variables:
+  - description: ''
+    id: 16bf6bae-2ad7-483e-a226-add93e02d738
+    name: CODE_MAX_DEPTH
+    selector:
+    - env
+    - CODE_MAX_DEPTH
+    value: '100'
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      - .XLSX
+      - .XLS
+      - .CSV
+      allowed_file_types:
+      - document
+      - image
+      allowed_file_upload_methods:
+      - remote_url
+      - local_file
+      enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 5
+    opening_statement: 'Hey {{user_name}}! I’m your Avni AI assistant. I can help
+      you with:
+
+
+      📚 **Learn about Avni** — Ask me anything about the platform
+
+      📄 **Set up your program** — Upload a Field Workflow Specification and I’ll configure
+      everything
+
+      🔧 **Custom configuration** — Build something unique
+
+
+      How can I help you today?'
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - I want to set up a new program
+    - What is Avni?
+    - Upload my field workflow specification
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 567b3a09-07aa-446a-af58-bb023337ea04
+      selected: false
+      source: '1758713692744'
+      sourceHandle: source
+      target: '1757492907627'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: if-else
+        targetType: llm
+      id: 538316d7-e6df-4c85-aa8e-882da2decf95
+      selected: false
+      source: '1757493270484'
+      sourceHandle: case-rag
+      target: '1757495664531'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: llm
+        targetType: answer
+      id: d3514041-504a-4de1-bce9-63101ad5f1e4
+      selected: false
+      source: '1757495664531'
+      sourceHandle: source
+      target: '1757495688732'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: if-else
+        targetType: answer
+      id: 875c60cc-86f0-489d-9f97-a1e53966a106
+      selected: false
+      source: '1757493270484'
+      sourceHandle: case-clarify
+      target: '1758608702077'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: if-else
+        targetType: answer
+      id: c501d3e4-1f59-4ac4-9cdd-55ba7b42b765
+      selected: false
+      source: '1757493270484'
+      sourceHandle: case-oos
+      target: '1758699378772'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: if-else
+        targetType: llm
+      id: fa6827a3-35fe-4bf5-9749-cb047c315329
+      selected: false
+      source: '1757493270484'
+      sourceHandle: case-assistant
+      target: '17580163919060'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: llm
+        targetType: answer
+      id: c32374c3-d160-41f0-84f9-32eeda89cd7c
+      selected: false
+      source: '17580163919060'
+      sourceHandle: source
+      target: '1760358474156'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: if-else
+        targetType: if-else
+      id: 6a57cf49-c334-464d-a4f4-b9108cf4c092
+      selected: false
+      source: '1757493270484'
+      sourceHandle: case-filesetup
+      target: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: if-else
+        targetType: document-extractor
+      id: 2830c064-2881-4fcb-b839-384ced8a80cc
+      selected: false
+      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      sourceHandle: case-false
+      target: '1774264909113'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: assigner
+        targetType: http-request
+      id: 9edcc33f-ae77-4d1d-a0a4-9b820d327bbf
+      selected: false
+      source: 9c0103c2-e377-4925-8f4a-501ff5b34379
+      sourceHandle: source
+      target: store-entities-node
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: http-request
+        targetType: http-request
+      id: store-entities-to-ambiguity-edge
+      selected: false
+      source: store-entities-node
+      sourceHandle: source
+      target: '1773908701222'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: if-else
+        targetType: agent
+      id: 7e25197b-7c15-4124-bb55-0fded6e2bc22
+      selected: false
+      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      sourceHandle: case-true
+      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: answer
+        targetType: human-input
+      id: 0daa4d9e-549b-44e3-8b91-c890391b486c
+      selected: false
+      source: '1773909436902'
+      sourceHandle: source
+      target: '1774617205889'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: agent
+      id: 5c8dec84-c4d9-4f52-8371-7d194bc49e9c
+      selected: false
+      source: '1774617205889'
+      sourceHandle: 'Yes'
+      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: loop-start
+        targetType: tool
+      id: 6eba93ff-953a-4d06-89aa-84731de91aa8
+      selected: false
+      source: 1774617440956start
+      sourceHandle: source
+      target: '1774617481433'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: tool
+        targetType: http-request
+      id: 9b6ed349-cd70-432c-a3f8-90a07592d1a7
+      selected: false
+      source: '1774617481433'
+      sourceHandle: source
+      target: '1774617517718'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: 8976fc6a-a699-4cbe-a732-28196a29717e
+      selected: false
+      source: '1774617205889'
+      sourceHandle: __timeout
+      target: ef812954-180c-4672-9c41-4d2e8058fdb5
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: http-request
+      id: fc0d2097-6030-4105-b02c-86352d24d9b5
+      selected: false
+      source: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      sourceHandle: source
+      target: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: http-request
+      id: a0b1c2d3-e4f5-4a6b-7c8d-9e0f1a2b3c4d
+      selected: false
+      source: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+      sourceHandle: source
+      target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 83131e8b-57dc-441c-8c07-c97015775b23
+      selected: false
+      source: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
+      sourceHandle: source
+      target: 4eb75ab2-87de-48f6-b52e-35f8646da88d
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: f92114a2-7a0c-4edf-a350-efbaff1f2907
+      selected: false
+      source: 4eb75ab2-87de-48f6-b52e-35f8646da88d
+      sourceHandle: source
+      target: 473230ae-fcca-4f3b-b410-fc792d8b0e88
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: agent
+      id: 59926ff2-ace9-45bc-8fd4-cc82d9b04c9e
+      selected: false
+      source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
+      sourceHandle: source
+      target: 264d37e7-9580-4d26-be76-4ecdbf32803a
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: http-request
+      id: c88fda86-0a85-4272-bdb5-f710f0430bf7
+      selected: false
+      source: 264d37e7-9580-4d26-be76-4ecdbf32803a
+      sourceHandle: source
+      target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: b52e7621-1d82-4538-ab09-ee3c1d8dd2c4
+      selected: false
+      source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
+      sourceHandle: source
+      target: 6d81a37b-960b-42d3-ae88-5799cd773102
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 27d43db2-e252-4315-95f5-65c4abb02d24
+      selected: false
+      source: 6d81a37b-960b-42d3-ae88-5799cd773102
+      sourceHandle: source
+      target: 8e0563d0-7844-4e89-a765-cbd9647e7676
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: agent
+      id: 7cf7a8a2-2bd5-4031-a5f3-cef94b23dafc
+      selected: false
+      source: 8e0563d0-7844-4e89-a765-cbd9647e7676
+      sourceHandle: source
+      target: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: loop
+      id: 4f771046-2c04-491d-89b6-16bf6d444b9a
+      selected: false
+      source: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+      sourceHandle: source
+      target: '1774617440956'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: if-else
+        targetType: answer
+      id: 98938e7f-b8bd-4afb-bba6-5d0716785311
+      selected: false
+      source: '1757493270484'
+      sourceHandle: case-setup-guidance
+      target: d9ccc273-d1c4-44d1-8894-177b64b92bfa
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: d8a60d07-c768-418c-b08b-93d6ad2c5517
+      selected: false
+      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      sourceHandle: 'false'
+      target: '1774264909113'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 832726e4-72f8-4a5a-860a-1dfc3d3cfebc
+      selected: false
+      source: '1757493270484'
+      sourceHandle: 'false'
+      target: '1758699378772'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: bae904c0-f895-4c60-8b6a-593862b19932
+      selected: false
+      source: '17748474036620'
+      sourceHandle: source
+      target: '1773909436902'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: f8e2032e-8140-4742-91f3-10a714a1ca1a
+      selected: false
+      source: '1773908701222'
+      sourceHandle: source
+      target: '17748474036620'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 07c5d92f-3ba3-4269-b118-ec7d91a4aa21
+      selected: false
+      source: '1774264909113'
+      sourceHandle: source
+      target: '17748507380970'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: assigner
+      id: 6766ac12-7e02-4061-b4e3-38ee6dafb2f1
+      selected: false
+      source: '17748507380970'
+      sourceHandle: source
+      target: 9c0103c2-e377-4925-8f4a-501ff5b34379
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: if-else
+        targetType: assigner
+      id: d4a7cb88-3ba7-4232-aba7-bdcb0058bf2d
+      selected: false
+      source: '1774617558364'
+      sourceHandle: 'true'
+      target: ff6d33df-8310-4f7f-85a6-491645d8b5fe
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: if-else
+        targetType: answer
+      id: 80f9c75e-9348-4c4e-b3e4-5e1fc0383930
+      selected: false
+      source: '1774617558364'
+      sourceHandle: 'false'
+      target: abe6cb3a-769a-4f59-b705-fef4884fdb5e
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: assigner
+        targetType: answer
+      id: 24e376ae-b1b4-4b20-aaae-449ff541bb6e
+      selected: false
+      source: ff6d33df-8310-4f7f-85a6-491645d8b5fe
+      sourceHandle: source
+      target: 48d1cfc7-02ef-457e-8e39-bff34b4fb91e
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 6ffeea64-4eab-4adf-b0be-c741e6360410
+      selected: false
+      source: '1757492907627'
+      sourceHandle: source
+      target: '1757493270484'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 10d2a0a1-734b-47e0-ac78-dae4b71cc724
+      selected: false
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1758713692744'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: 3768efbc-85a1-4b13-a8b3-59be2f46bb81
+      selected: false
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1774005428719'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: 52dde296-fa85-448b-b8e3-5934d4a368c6
+      selected: false
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1774005484035'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: http-request
+        targetType: code
+      id: 1774617517718-source-17749417129260-target
+      source: '1774617517718'
+      sourceHandle: source
+      target: '17749417129260'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        sourceType: code
+        targetType: if-else
+      id: 17749417129260-source-1774617558364-target
+      source: '17749417129260'
+      sourceHandle: source
+      target: '1774617558364'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    nodes:
+    - data:
+        desc: Define the initial parameters for launching a workflow
+        selected: false
+        title: Start
+        type: start
+        variables:
+        - hide: true
+          label: auth_token
+          max_length: 2000
+          options: []
+          required: false
+          type: paragraph
+          variable: auth_token
+        - hide: true
+          label: org_name
+          max_length: 200
+          options: []
+          required: false
+          type: text-input
+          variable: org_name
+        - default: trial
+          hide: true
+          label: org_type
+          max_length: 48
+          options: []
+          required: false
+          type: text-input
+          variable: org_type
+        - hide: true
+          hint: ''
+          label: user_name
+          max_length: 48
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: user_name
+        - default: https://staging-ai.avniproject.org/
+          hide: true
+          hint: ''
+          label: avni_mcp_server_url
+          max_length: 48
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: avni_mcp_server_url
+      height: 257
+      id: '1711528708197'
+      position:
+        x: 0
+        y: 405
+      positionAbsolute:
+        x: 0
+        y: 405
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1711528708197'
+          - avni_mcp_server_url
+          variable_selector:
+          - conversation
+          - avni_mcp_server_url
+          write_mode: over-write
+        selected: false
+        title: AI Server url assigner
+        type: assigner
+        version: '2'
+      height: 84
+      id: '1774005428719'
+      position:
+        x: 362
+        y: 594
+      positionAbsolute:
+        x: 362
+        y: 594
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1711528708197'
+          - auth_token
+          variable_selector:
+          - conversation
+          - auth_token
+          write_mode: over-write
+        selected: false
+        title: Auth token var assigner
+        type: assigner
+        version: '2'
+      height: 84
+      id: '1774005484035'
+      position:
+        x: 362
+        y: 758
+      positionAbsolute:
+        x: 362
+        y: 758
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        dataset_ids:
+        - 9TmCqtDyQNUaJCKXT7rPGCd21br8q6JzrrUr4xib3E9uqcfMf6t6rxJkkXFK7EzL
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: weighted_score
+          score_threshold: null
+          top_k: 6
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: text-embedding-3-large
+              embedding_provider_name: langgenius/openai/openai
+              vector_weight: 0.7
+            weight_type: customized
+        query_attachment_selector: []
+        query_variable_selector:
+        - sys
+        - query
+        retrieval_mode: multiple
+        selected: false
+        single_retrieval_config:
+          model:
+            completion_params: {}
+            mode: chat
+            name: gpt-4o
+            provider: langgenius/openai/openai
+        title: Knowledge Retrieval
+        type: knowledge-retrieval
+      height: 90
+      id: '1758713692744'
+      position:
+        x: 342
+        y: 424
+      positionAbsolute:
+        x: 342
+        y: 424
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1758713692744'
+          - result
+        model:
+          completion_params:
+            max_tokens: 19999
+            response_format: JSON
+            temperature: 0.1
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 8a1b2c3d-e4f5-4678-9a0b-1c2d3e4f5a6b
+          role: system
+          text: "You are the Avni Platform Orchestrator. Your sole job is to classify\
+            \ the user's message into one service and decide if clarification is needed.\n\
+            \n<context> {{#context#}} </context>\n<user_uploaded_files> {{#sys.files#}}\
+            \ </user_uploaded_files>\n\n## GOLDEN RULE — check this before anything\
+            \ else\nIf sys.files is NOT empty → service = FILE_SETUP. Stop. Do not\
+            \ evaluate any other rule.\n\n## Session State\n- setup_mode_active: {{#conversation.setup_mode_active#}}\n\
+            - entities_jsonl: {{#conversation.entities_jsonl#}}\n\n## Routing (evaluate\
+            \ in order, stop at first match)\n1. setup_mode_active=true OR entities_jsonl\
+            \ non-empty → FILE_SETUP (user is mid-setup; anchor to it even if message\
+            \ drifts)\n2. Greeting (hi/hello/thanks) → RAG, clarification_needed=false\n\
+            3. Capability question (\"Can Avni\", \"Is it possible\", \"Does Avni\
+            \ support\", \"How does\") → RAG\n4. Implementation request (\"build\"\
+            , \"create\", \"develop\", \"set up for me\", \"delete everything\", \"\
+            clean slate\") → ASSISTANT\n5. Setup intent WITHOUT file (\"I want to\
+            \ set up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n6. Unrelated\
+            \ to Avni → OUT_OF_SCOPE\n7. Anything else Avni-related → RAG\n\n## Deviation\
+            \ Handling\nIf setup_mode_active=true and the message is chitchat or out-of-scope,\
+            \ still return FILE_SETUP with deviation_detected=true. Do NOT abandon\
+            \ the session.\n\n## Clarification Policy\nSet clarification_needed=true\
+            \ ONLY when ALL three are true:\n- The question cannot be answered without\
+            \ one specific missing detail\n- That detail materially changes the answer\n\
+            - The session is NOT in setup mode\nMax 2 questions. Each question must\
+            \ name exactly what information is expected.\n\n## Response Format\n{\"\
+            service\": \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|OUT_OF_SCOPE\"\
+            ,\n \"confidence\": 0.0-1.0,\n \"question_type\": \"...\",\n \"routing_reason\"\
+            : \"...\",\n \"clarification_needed\": false,\n \"clarifying_questions\"\
+            : [],\n \"deviation_detected\": false}\n"
+        - id: 3925c0a4-bbab-4189-8ba8-ac1725e2263e
+          role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        structured_output:
+          schema:
+            properties:
+              clarification_needed:
+                type: boolean
+              clarifying_questions:
+                items:
+                  type: string
+                type: array
+              confidence:
+                maximum: 1
+                minimum: 0
+                type: number
+              deviation_detected:
+                type: boolean
+              question_type:
+                type: string
+              routing_reason:
+                type: string
+              service:
+                enum:
+                - RAG
+                - ASSISTANT
+                - FILE_SETUP
+                - PROGRAM_SETUP_GUIDANCE
+                - OUT_OF_SCOPE
+                type: string
+            required:
+            - service
+            - confidence
+            - question_type
+            - routing_reason
+            - clarification_needed
+            - clarifying_questions
+            - deviation_detected
+            type: object
+        structured_output_enabled: true
+        structured_output_schema:
+          properties:
+            clarification_needed:
+              type: boolean
+            clarifying_questions:
+              items:
+                type: string
+              type: array
+            confidence:
+              type: number
+            question_type:
+              type: string
+            routing_reason:
+              type: string
+            service:
+              type: string
+          required:
+          - service
+          - confidence
+          type: object
+        title: Orchestrator
+        type: llm
+      height: 88
+      id: '1757492907627'
+      position:
+        x: 684
+        y: 425
+      positionAbsolute:
+        x: 684
+        y: 425
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: case-clarify
+          conditions:
+          - comparison_operator: is
+            value: 'true'
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - clarification_needed
+          id: case-clarify
+          logical_operator: and
+        - case_id: case-rag
+          conditions:
+          - comparison_operator: is
+            value: RAG
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: case-rag
+          logical_operator: and
+        - case_id: case-assistant
+          conditions:
+          - comparison_operator: is
+            value: ASSISTANT
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: case-assistant
+          logical_operator: and
+        - case_id: case-filesetup
+          conditions:
+          - comparison_operator: is
+            value: FILE_SETUP
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: case-filesetup
+          logical_operator: and
+        - case_id: case-setup-guidance
+          conditions:
+          - comparison_operator: is
+            value: PROGRAM_SETUP_GUIDANCE
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: case-setup-guidance
+          logical_operator: and
+        - case_id: case-oos
+          conditions:
+          - comparison_operator: is
+            value: OUT_OF_SCOPE
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: case-oos
+          logical_operator: and
+        selected: false
+        title: Main Router
+        type: if-else
+      height: 508
+      id: '1757493270484'
+      position:
+        x: 1026
+        y: 215
+      positionAbsolute:
+        x: 1026
+        y: 215
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1758713692744'
+          - result
+        model:
+          completion_params: {}
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 9b2c3d4e-f5a6-4789-0b1c-2d3e4f5a6b7c
+          role: system
+          text: 'Use the context inside <context></context> tags as your knowledge.
+
+            <context> {{#context#}} </context>
+
+            You are talking to {{#1711528708197.user_name#}} from {{#1711528708197.org_name#}}.
+            You are part of the Avni AI Assistant.
+
+            Currently capable of: 1. Answering questions about the Avni system 2.
+            Assistance with designing workflows, forms etc on Avni
+
+            Not currently capable of: 1. Helping with rules
+
+            Context State: - Setup mode active: {{#conversation.setup_mode_active#}}
+            - Entities loaded: {{#conversation.entities_jsonl#}}
+
+            Rules: - If you don''t know, say so. Don''t guess or invent features.
+            - If greeting, greet warmly by name: {{#1711528708197.user_name#}} - Do
+            not greet repeatedly. - Answer in the user''s language.
+
+            CLARIFICATION DISCIPLINE: - If greeting: respond warmly, do NOT ask questions
+            unless user explicitly asks for help - If question has adequate context:
+            answer directly - If ambiguous AND not in setup mode: ask ONE specific
+            question with clear expected response format - If setup_mode_active=true
+            and question relates to setup: answer directly without clarification
+
+            '
+        selected: false
+        structured_output_enabled: false
+        title: RAG LLM
+        type: llm
+      height: 88
+      id: '1757495664531'
+      position:
+        x: 1388
+        y: 8
+      positionAbsolute:
+        x: 1388
+        y: 8
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1757495664531.text#}}'
+        selected: false
+        title: RAG Answer
+        type: answer
+      height: 103
+      id: '1757495688732'
+      position:
+        x: 1730
+        y: 0
+      positionAbsolute:
+        x: 1730
+        y: 0
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1757492907627.structured_output.clarifying_questions#}}
+
+
+          Note: Please provide specific details so I can help you better.'
+        selected: false
+        title: Clarify the question
+        type: answer
+      height: 135
+      id: '1758608702077'
+      position:
+        x: 1388
+        y: 176
+      positionAbsolute:
+        x: 1388
+        y: 176
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: 'I''m sorry, that question doesn''t seem to be related to Avni. I
+          can help you with:
+
+          - Learning about Avni''s features
+
+          - Setting up programs and forms
+
+          - Configuring your Avni implementation
+
+
+          How can I help you with Avni today?'
+        selected: false
+        title: Unrelated Question
+        type: answer
+      height: 196
+      id: '1758699378772'
+      position:
+        x: 1388
+        y: 763
+      positionAbsolute:
+        x: 1388
+        y: 763
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: 'You can set up your program by uploading a **Field Workflow Specification**.
+          Here is a [sample field workflow specification document](https://docs.google.com/spreadsheets/d/1cEod2MbMtRvAcupArC4nZaHIYB2HHUrIIbOZR0uGRz8/edit?gid=262841117#gid=262841117)
+          that you can use as a template.
+
+
+          Once you fill it out, click the **+** icon below to upload your file and
+          I''ll automatically create:
+
+          - Location hierarchy
+
+          - Subject types
+
+          - Programs
+
+          - Encounter types
+
+          - Forms and form mappings
+
+
+          I can also clarify any questions you have about filling the document. What
+          would you like to know?'
+        selected: false
+        title: Program Setup Guidance
+        type: answer
+      height: 356
+      id: d9ccc273-d1c4-44d1-8894-177b64b92bfa
+      position:
+        x: 1388
+        y: 1039
+      positionAbsolute:
+        x: 1388
+        y: 1039
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 0c3d4e5f-a6b7-4890-1c2d-3e4f5a6b7c8d
+          role: system
+          text: ''
+        - id: 1c276f7a-296a-466b-9296-1d0c4024a349
+          role: user
+          text: 'You are Avni Copilot, an expert assistant for the Avni data collection
+            platform. Guide NGOs and implementers in designing Avni configurations.
+
+            Context State: - Setup mode active: {{#conversation.setup_mode_active#}}
+            - Entities loaded: {{#conversation.entities_jsonl#}} - Primary intent:
+            {{#conversation.primary_intent#}}
+
+            - Ask ONE simple question at a time (guidance, not clarification) - Org
+            Type is {{#1711528708197.org_type#}} - If Org Type is "Production" or
+            "UAT", tell user automatic configurations are not supported for their
+            org type. Do not proceed. - If Org Type is "Trial", proceed with configuration.
+            - You are talking to {{#1711528708197.user_name#}} - When user wants to
+            create config, suggest uploading a Field Workflow Specification file instead.
+
+            BEHAVIOR: - If setup_mode_active=true: stay focused on configuration,
+            minimal questions - If user deviates from setup task, gently redirect:
+            "Let''s focus on your configuration. What would you like to adjust?" -
+            Provide clear, actionable guidance'
+        selected: false
+        title: Assistant LLM
+        type: llm
+      height: 88
+      id: '17580163919060'
+      position:
+        x: 1388
+        y: 391
+      positionAbsolute:
+        x: 1388
+        y: 391
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#17580163919060.text#}}'
+        selected: false
+        title: Assistant Answer
+        type: answer
+      height: 103
+      id: '1760358474156'
+      position:
+        x: 1730
+        y: 383
+      positionAbsolute:
+        x: 1730
+        y: 383
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: case-true
+          conditions:
+          - comparison_operator: not empty
+            value: ''
+            varType: object
+            variable_selector:
+            - conversation
+            - entities_jsonl
+          id: case-true
+          logical_operator: and
+        selected: false
+        title: Already Processed?
+        type: if-else
+      height: 124
+      id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      position:
+        x: 1388
+        y: 559
+      positionAbsolute:
+        x: 1388
+        y: 559
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        selected: false
+        title: Doc Extractor
+        type: document-extractor
+        variable_selector:
+        - sys
+        - files
+      height: 104
+      id: '1774264909113'
+      position:
+        x: 1750
+        y: 630
+      positionAbsolute:
+        x: 1750
+        y: 630
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '17748507380970'
+          - structured_output
+          variable_selector:
+          - conversation
+          - entities_jsonl
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'True'
+          variable_selector:
+          - conversation
+          - setup_mode_active
+          write_mode: over-write
+        selected: false
+        title: Save Entities JSONL
+        type: assigner
+        version: '2'
+      height: 110
+      id: 9c0103c2-e377-4925-8f4a-501ff5b34379
+      position:
+        x: 2434
+        y: 627
+      positionAbsolute:
+        x: 2434
+        y: 627
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: store-entities-body
+            key: ''
+            type: text
+            value: "{\n  \"conversation_id\": \"{{#sys.conversation_id#}}\",\n  \"\
+              entities\": {{#conversation.entities_jsonl#}}\n}\n"
+          type: json
+        headers: 'Content-Type:application/json
+
+          avni-auth-token:{{#conversation.auth_token#}}'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 2000
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 60
+          max_write_timeout: 10
+        title: Store Entities
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}store-entities'
+      height: 141
+      id: store-entities-node
+      position:
+        x: 2434
+        y: 750
+      positionAbsolute:
+        x: 2434
+        y: 750
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: 7b3e4f5a-c6d7-4e89-a0b1-c2d3e4f5a6b7
+            key: ''
+            type: text
+            value: "{\n  \"entities\": {{#conversation.entities_jsonl#}}\n}\n"
+          type: json
+        headers: 'Content-Type:application/json
+
+          avni-auth-token:{{#conversation.auth_token#}}'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 2000
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 60
+          max_write_timeout: 10
+        title: Ambiguity Checker
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}validate-entities'
+      height: 141
+      id: '1773908701222'
+      position:
+        x: 2776
+        y: 611
+      positionAbsolute:
+        x: 2776
+        y: 611
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#17748474036620.text#}}
+
+
+          Does everything look correct? Click **Yes** to proceed with configuration,
+          or **No** to make corrections.'
+        selected: false
+        title: Summary Answer
+        type: answer
+      height: 151
+      id: '1773909436902'
+      position:
+        x: 3460
+        y: 606
+      positionAbsolute:
+        x: 3460
+        y: 606
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: ''
+          type: none
+        headers: avni-auth-token:{{#conversation.auth_token#}}
+        method: get
+        params: includeLocations:false
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 2000
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 120
+          max_write_timeout: 10
+        title: Download Existing Bundle
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}download-bundle-b64'
+      height: 141
+      id: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+      position:
+        x: 4506
+        y: 509
+      positionAbsolute:
+        x: 4506
+        y: 509
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac691
+            key: ''
+            type: text
+            value: "{\n  \"existing_bundle_b64\": \"{{#d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1.body.bundle_zip_b64#}}\"\
+              ,\n  \"spec_yaml\": {{#conversation.spec_yaml#}}\n}\n"
+          type: json
+        headers: Content-Type:application/json
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 2000
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 180
+          max_write_timeout: 30
+        title: Patch Bundle
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}patch-bundle'
+      height: 141
+      id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
+      position:
+        x: 4848
+        y: 509
+      positionAbsolute:
+        x: 4848
+        y: 509
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        code: "import json\n\ndef main(body: str) -> dict:\n    try:\n        parsed\
+          \ = json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
+          \ TypeError):\n        parsed = {}\n    return {\n        \"bundle_zip_b64\"\
+          : parsed.get(\"patched_bundle_b64\", parsed.get(\"bundle_zip_b64\", \"\"\
+          )),\n        \"files_patched\": parsed.get(\"files_patched\", 0),\n    \
+          \    \"confidence\": parsed.get(\"confidence\", {})\n    }\n"
+        code_language: python3
+        outputs:
+          bundle_zip_b64:
+            children: null
+            type: string
+          confidence:
+            children: null
+            type: object
+          files_patched:
+            children: null
+            type: number
+        selected: false
+        title: Parse Bundle Response
+        type: code
+        variables:
+        - value_selector:
+          - e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
+          - body
+          value_type: string
+          variable: body
+      height: 52
+      id: 4eb75ab2-87de-48f6-b52e-35f8646da88d
+      position:
+        x: 5190
+        y: 554
+      positionAbsolute:
+        x: 5190
+        y: 554
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - 4eb75ab2-87de-48f6-b52e-35f8646da88d
+          - bundle_zip_b64
+          variable_selector:
+          - conversation
+          - bundle_zip_b64
+          write_mode: over-write
+        selected: false
+        title: Save Bundle B64
+        type: assigner
+        version: '2'
+      height: 84
+      id: 473230ae-fcca-4f3b-b410-fc792d8b0e88
+      position:
+        x: 5532
+        y: 538
+      positionAbsolute:
+        x: 5532
+        y: 538
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: 94a48a21-1e24-4f35-93d1-920d93afe268
+            key: ''
+            type: text
+            value: "{\n  \"bundle_zip_b64\": \"{{#conversation.bundle_zip_b64#}}\"\
+              \n}\n"
+          type: json
+        headers: 'Content-Type:application/json
+
+          avni-auth-token:{{#conversation.auth_token#}}'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 2000
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 120
+          max_write_timeout: 30
+        title: Upload Bundle
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}upload-bundle'
+      height: 141
+      id: 959d2ca3-2445-4375-ac9e-f68f47724a2f
+      position:
+        x: 6216
+        y: 509
+      positionAbsolute:
+        x: 6216
+        y: 509
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        code: "import json\n\ndef main(body: str) -> dict:\n    try:\n        parsed\
+          \ = json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
+          \ TypeError):\n        parsed = {}\n    return {\n        \"task_id\": parsed.get(\"\
+          task_id\", \"\"),\n        \"status\": parsed.get(\"status\", \"\")\n  \
+          \  }\n"
+        code_language: python3
+        outputs:
+          status:
+            children: null
+            type: string
+          task_id:
+            children: null
+            type: string
+        selected: false
+        title: Parse Upload Response
+        type: code
+        variables:
+        - value_selector:
+          - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+          - body
+          value_type: string
+          variable: body
+      height: 52
+      id: 6d81a37b-960b-42d3-ae88-5799cd773102
+      position:
+        x: 6558
+        y: 554
+      positionAbsolute:
+        x: 6558
+        y: 554
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - 6d81a37b-960b-42d3-ae88-5799cd773102
+          - task_id
+          variable_selector:
+          - conversation
+          - upload_task_id
+          write_mode: over-write
+        selected: false
+        title: Save Task ID
+        type: assigner
+        version: '2'
+      height: 84
+      id: 8e0563d0-7844-4e89-a765-cbd9647e7676
+      position:
+        x: 6900
+        y: 538
+      positionAbsolute:
+        x: 6900
+        y: 538
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        delivery_methods:
+        - enabled: true
+          id: fa93dae0-de3e-4354-80b6-279549abcae0
+          type: webapp
+        form_content: ''
+        inputs: []
+        selected: false
+        timeout: 1
+        timeout_unit: hour
+        title: Confirm Entities
+        type: human-input
+        user_actions:
+        - button_style: primary
+          id: 'Yes'
+          title: 'Yes'
+        - button_style: default
+          id: 'No'
+          title: 'No'
+      height: 190
+      id: '1774617205889'
+      position:
+        x: 3802
+        y: 587
+      positionAbsolute:
+        x: 3802
+        y: 587
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        break_conditions:
+        - comparison_operator: is
+          id: 60dfd905-4978-4518-b4c6-943941b7f125
+          value: false
+          varType: boolean
+          variable_selector:
+          - conversation
+          - loop
+        error_handle_mode: terminated
+        height: 490
+        logical_operator: and
+        loop_count: 20
+        selected: false
+        start_node_id: 1774617440956start
+        title: Upload Poll Loop
+        type: loop
+        width: 2116
+      height: 490
+      id: '1774617440956'
+      position:
+        x: 7584
+        y: 335
+      positionAbsolute:
+        x: 7584
+        y: 335
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 2116
+      zIndex: 1
+    - data:
+        desc: ''
+        isInLoop: true
+        selected: false
+        title: ''
+        type: loop-start
+      draggable: false
+      height: 48
+      id: 1774617440956start
+      parentId: '1774617440956'
+      position:
+        x: 60
+        y: 135
+      positionAbsolute:
+        x: 7644
+        y: 470
+      selectable: false
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-loop-start
+      width: 44
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        is_team_authorization: true
+        loop_id: '1774617440956'
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The number of seconds to wait
+            ja_JP: The number of seconds to wait
+            pt_BR: The number of seconds to wait
+            zh_Hans: 等待的秒数
+          label:
+            en_US: Seconds
+            ja_JP: Seconds
+            pt_BR: Seconds
+            zh_Hans: 秒数
+          llm_description: The number of seconds to pause execution
+          max: null
+          min: null
+          name: seconds
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: number
+        params:
+          seconds: '3'
+        plugin_id: agimaster/justwait
+        plugin_unique_identifier: agimaster/justwait:0.0.2@1cc2d5e7fbd6a829396c8a51947924f799f9566071bf8499c4e2a9f75ad3330f
+        provider_icon: https://cloud.dify.ai/console/api/workspaces/current/plugin/icon?tenant_id=d6ae5ab1-753e-4a2e-9183-eff6f9ec2d00&filename=a260a47b34be7b6bca428d8e8617d3ad9389cde761097b839c16a4e3ff378fbc.svg
+        provider_id: agimaster/justwait/justwait
+        provider_name: agimaster/justwait/justwait
+        provider_type: builtin
+        selected: false
+        title: Wait
+        tool_configurations: {}
+        tool_description: Wait for a specified number of seconds, similar to Python's
+          time.sleep() function
+        tool_label: Wait
+        tool_name: wait
+        tool_node_version: '2'
+        tool_parameters:
+          seconds:
+            type: constant
+            value: 3
+        type: tool
+      height: 52
+      id: '1774617481433'
+      parentId: '1774617440956'
+      position:
+        x: 184
+        y: 133
+      positionAbsolute:
+        x: 7768
+        y: 468
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        headers: avni-auth-token:{{#conversation.auth_token#}}
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        method: get
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 30
+          max_write_timeout: 10
+        title: Check Upload Status
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#conversation.upload_task_id#}}'
+        variables: []
+      height: 160
+      id: '1774617517718'
+      parentId: '1774617440956'
+      position:
+        x: 506
+        y: 79
+      positionAbsolute:
+        x: 8090
+        y: 414
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            value: completed
+            varType: string
+            variable_selector:
+            - '17749417129260'
+            - status
+          - comparison_operator: contains
+            id: bb085deb-9e17-477b-8010-3d80bc018375
+            value: failed
+            varType: string
+            variable_selector:
+            - '17749417129260'
+            - status
+          id: 'true'
+          logical_operator: or
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        selected: false
+        title: Upload Done?
+        type: if-else
+      height: 198
+      id: '1774617558364'
+      parentId: '1774617440956'
+      position:
+        x: 1150
+        y: 60
+      positionAbsolute:
+        x: 8734
+        y: 395
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'False'
+          variable_selector:
+          - conversation
+          - loop
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'False'
+          variable_selector:
+          - conversation
+          - setup_mode_active
+          write_mode: over-write
+        loop_id: '1774617440956'
+        selected: false
+        title: Break Upload Loop
+        type: assigner
+        version: '2'
+      height: 110
+      id: ff6d33df-8310-4f7f-85a6-491645d8b5fe
+      parentId: '1774617440956'
+      position:
+        x: 1492
+        y: 244
+      positionAbsolute:
+        x: 9076
+        y: 579
+      selected: false
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        answer: '✅ **Configuration complete!**
+
+
+          Your implementation bundle has been generated and uploaded to Avni.
+
+
+          **Confidence score:**  {{#4eb75ab2-87de-48f6-b52e-35f8646da88d.confidence#}}
+
+
+          You can now log into Avni to review your configuration. If you need to make
+          changes, just upload an updated specification or describe the corrections.'
+        isInLoop: true
+        loop_id: '1774617440956'
+        selected: false
+        title: Upload Done
+        type: answer
+      height: 247
+      id: 48d1cfc7-02ef-457e-8e39-bff34b4fb91e
+      parentId: '1774617440956'
+      position:
+        x: 1814
+        y: 181
+      positionAbsolute:
+        x: 9398
+        y: 516
+      selected: false
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        answer: ⏳ Uploading bundle to Avni server... Please wait.
+        isInLoop: true
+        loop_id: '1774617440956'
+        selected: false
+        title: Upload Progress
+        type: answer
+      height: 116
+      id: abe6cb3a-769a-4f59-b705-fef4884fdb5e
+      parentId: '1774617440956'
+      position:
+        x: 1492
+        y: 68
+      positionAbsolute:
+        x: 9076
+        y: 403
+      selected: false
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        answer: The confirmation timed out. Your extracted entities have been saved.
+          You can continue the setup by sending another message.
+        selected: false
+        title: Timeout
+        type: answer
+      height: 148
+      id: ef812954-180c-4672-9c41-4d2e8058fdb5
+      position:
+        x: 4164
+        y: 792
+      positionAbsolute:
+        x: 4164
+        y: 792
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            max_tokens: 64000
+            temperature: 0.3
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: b58fc3ce-f0ed-4ddc-811f-2cd4d84d881d
+          role: system
+          text: 'You are an Avni platform configuration assistant. Your job is to
+            present a clear, structured summary of the extracted app configuration
+            entities and highlight any issues that need the user''s attention before
+            proceeding.
+
+
+            Format your response in three sections in markdown format:
+
+
+            ## Extracted Configuration
+
+            List every extracted entity grouped by type (Subject Types, Programs,
+            Encounter Types, Address Levels, Forms). For each entity, show all key
+            fields.
+
+
+            ## Issues & Warnings
+
+            If the ambiguity report contains warnings or errors, clearly list each
+            one and explain what needs to be fixed. If there are no issues, say "No
+            issues found".
+
+
+            ## Next Steps
+
+            If there are errors: explain what corrections are needed before we can
+            proceed.
+
+            If warnings only: note them and ask the user to confirm they want to proceed
+            or make corrections.
+
+            If no issues: confirm the configuration looks good and ask for approval
+            to proceed.'
+        - id: 2151dbf6-c159-451e-a23b-e1abb3537053
+          role: user
+          text: 'Extracted Entities:
+
+            {{#conversation.entities_jsonl#}}
+
+
+            Validation Report:
+
+            {{#1773908701222.body#}}'
+        selected: false
+        structured_output_enabled: false
+        title: Summary LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '17748474036620'
+      position:
+        x: 3116.1634371088535
+        y: 638
+      positionAbsolute:
+        x: 3116.1634371088535
+        y: 638
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            response_format: JSON
+            temperature: 0.1
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 41cb4e1b-4c4e-4513-a2e1-d7c4eca5864e
+          role: system
+          text: 'You are an entity extraction assistant for the Avni platform. Extract
+            ALL entities from the document content below.
+
+
+            Document content: {{#1774264909113.text#}}
+
+
+            Extract into 5 arrays: subject_types, programs, encounter_types, address_levels,
+            forms.
+
+            Rules:
+
+            subject_types: name, type (Person|Individual|Household|Group|User), lowest_address_level
+
+            programs: name, target_subject_type, colour (hex or null)
+
+            encounter_types: name, program_name (or null), subject_type, is_program_encounter
+            (bool), is_scheduled (bool)
+
+            address_levels: name, level (int), parent (name or null). Topmost has
+            highest level number.
+
+            forms: Extract form fields where explicitly defined in the document. Each
+            form: name, formType (IndividualProfile|ProgramEnrolment|ProgramExit|ProgramEncounter|Encounter|ProgramEncounterCancellation),
+            subjectType (or null), program (or null), encounterType (or null), fields
+            (array of: name, dataType (Text|Numeric|Coded|Date|DateTime|Duration|PhoneNumber|Audio|Image|Video|File|Location),
+            mandatory (bool). Only include unit/min/max when present. Only include
+            options for Coded fields. Omit all null/empty optional fields entirely.
+
+            Only extract from explicitly defined tables/sections. Do not invent entities.
+            Ignore nan values. Trim whitespace. Use actual booleans not strings. If
+            no form fields are defined in the document, return forms as empty array
+            (auto-derive will run as fallback).
+
+            '
+        selected: false
+        structured_output:
+          schema:
+            properties:
+              address_levels:
+                items:
+                  type: object
+                type: array
+              encounter_types:
+                items:
+                  type: object
+                type: array
+              forms:
+                items:
+                  type: object
+                type: array
+              programs:
+                items:
+                  type: object
+                type: array
+              subject_types:
+                items:
+                  type: object
+                type: array
+            required:
+            - subject_types
+            - programs
+            - encounter_types
+            - address_levels
+            - forms
+            type: object
+        structured_output_enabled: true
+        structured_output_schema:
+          properties:
+            address_levels:
+              items:
+                type: object
+              type: array
+            encounter_types:
+              items:
+                type: object
+              type: array
+            forms:
+              items:
+                type: object
+              type: array
+            programs:
+              items:
+                type: object
+              type: array
+            subject_types:
+              items:
+                type: object
+              type: array
+          type: object
+        title: Entity Extractor
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '17748507380970'
+      position:
+        x: 2092
+        y: 638
+      positionAbsolute:
+        x: 2092
+        y: 638
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import json\n\ndef main(body) -> dict:\n    try:\n        parsed =\
+          \ json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
+          \ TypeError):\n        parsed = {}\n    return {\n        \"task_id\": parsed.get(\"\
+          task_id\", \"\"),\n        \"status\": parsed.get(\"status\", \"\")\n  \
+          \  }\n"
+        code_language: python3
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1774617440956'
+        outputs:
+          status:
+            children: null
+            type: string
+          task_id:
+            children: null
+            type: string
+        selected: false
+        title: Parse Upload Status Response
+        type: code
+        variables:
+        - value_selector:
+          - '1774617517718'
+          - body
+          value_type: string
+          variable: body
+      height: 52
+      id: '17749417129260'
+      parentId: '1774617440956'
+      position:
+        x: 828
+        y: 133
+      positionAbsolute:
+        x: 8412
+        y: 468
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: 'You are the Spec Agent for the Avni App Configurator. Your task
+              is to help the user refine their program configuration and produce an
+              approved YAML spec.
+
+
+              Current entities summary: {{#conversation.entities_jsonl#}}
+
+              Conversation ID: {{#sys.conversation_id#}}
+
+              User message: {{#sys.query#}}
+
+
+              IMPORTANT — use conversation_id for all tool calls, NOT the full entities
+              object. The server has the full entities cached by conversation_id.
+
+              Workflow:
+
+              1. If user said Yes (confirmed) → call generate_spec with {conversation_id},
+              then validate_spec with the returned spec_yaml, then output: SPEC_APPROVED
+              and the final spec_yaml.
+
+              2. If user said No (wants corrections) → call apply_entity_corrections
+              with {conversation_id, corrections: [...]}, then call generate_spec with
+              {conversation_id}, then validate_spec, show updated summary, ask for
+              confirmation.
+
+              3. Once spec is valid and user approves, output: SPEC_APPROVED and the
+              final spec_yaml.'
+          maximum_iterations:
+            type: constant
+            value: 5
+          model:
+            type: constant
+            value:
+              completion_params:
+                max_tokens: 16384
+                temperature: 0.3
+              mode: chat
+              model: claude-haiku-4-5-20251001
+              model_type: llm
+              provider: langgenius/anthropic/anthropic
+              type: model-selector
+          query:
+            type: constant
+            value: '{{#sys.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: Validate extracted entities for structural issues
+              parameters:
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate extracted entities for structural issues
+              tool_label: validate_entities
+              tool_name: validate_entities
+              type: api
+            - enabled: true
+              extra:
+                description: Apply corrections to extracted entities
+              parameters:
+                corrections:
+                  auto: 1
+                  value: null
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Apply corrections to extracted entities
+              tool_label: apply_entity_corrections
+              tool_name: apply_entity_corrections
+              type: api
+            - enabled: true
+              extra:
+                description: Generate YAML spec from entities
+              parameters:
+                entities:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Generate YAML spec from entities
+              tool_label: generate_spec
+              tool_name: generate_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Validate a YAML spec for structural and cross-reference
+                  errors
+              parameters:
+                spec_yaml:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate a YAML spec for structural and cross-reference
+                errors
+              tool_label: validate_spec
+              tool_name: validate_spec
+              type: api
+            - enabled: false
+              extra:
+                description: Validate a generated bundle ZIP
+              parameters:
+                bundle_zip_b64:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate a generated bundle ZIP
+              tool_label: validate_bundle
+              tool_name: validate_bundle
+              type: api
+            - enabled: false
+              extra:
+                description: Convert an existing bundle to human-readable YAML spec
+              parameters:
+                bundle:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Convert an existing bundle to human-readable YAML
+                spec
+              tool_label: bundle_to_spec
+              tool_name: bundle_to_spec
+              type: api
+            - enabled: false
+              extra:
+                description: Check bundle upload status
+              parameters:
+                task_id:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Check bundle upload status
+              tool_label: upload_status
+              tool_name: upload_status
+              type: api
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: Iteratively refines entities with user corrections, generates and validates
+          YAML spec, then stores approved spec in conversation.
+        output_schema: null
+        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Spec Agent
+        tool_node_version: '2'
+        type: agent
+      height: 264
+      id: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      position:
+        x: 4164
+        y: 448
+      positionAbsolute:
+        x: 4164
+        y: 448
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: 'You are the Review Agent for the Avni App Configurator. Your task
+              is to inspect the generated bundle before uploading to Avni.
+
+
+              Bundle (base64): {{#conversation.bundle_zip_b64#}}
+
+
+              Workflow:
+
+              1. Call validate-bundle to check for structural issues.
+
+              2. If there are errors, report them and stop (do not upload).
+
+              3. If validation passes, call bundle-to-spec to show a human-readable
+              summary.
+
+              4. Output: BUNDLE_APPROVED to proceed with upload, or BUNDLE_REJECTED
+              with error details.'
+          maximum_iterations:
+            type: constant
+            value: 3
+          model:
+            type: constant
+            value:
+              completion_params:
+                max_tokens: 8192
+                temperature: 0.2
+              mode: chat
+              model: claude-haiku-4-5-20251001
+              model_type: llm
+              provider: langgenius/anthropic/anthropic
+              type: model-selector
+          query:
+            type: constant
+            value: '{{#sys.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: false
+              extra:
+                description: Validate extracted entities for structural issues
+              parameters:
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate extracted entities for structural issues
+              tool_label: validate_entities
+              tool_name: validate_entities
+              type: api
+            - enabled: false
+              extra:
+                description: Apply corrections to extracted entities
+              parameters:
+                corrections:
+                  auto: 1
+                  value: null
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Apply corrections to extracted entities
+              tool_label: apply_entity_corrections
+              tool_name: apply_entity_corrections
+              type: api
+            - enabled: false
+              extra:
+                description: Generate YAML spec from entities
+              parameters:
+                entities:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Generate YAML spec from entities
+              tool_label: generate_spec
+              tool_name: generate_spec
+              type: api
+            - enabled: false
+              extra:
+                description: Validate a YAML spec for structural and cross-reference
+                  errors
+              parameters:
+                spec_yaml:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate a YAML spec for structural and cross-reference
+                errors
+              tool_label: validate_spec
+              tool_name: validate_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Validate a generated bundle ZIP
+              parameters:
+                bundle_zip_b64:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate a generated bundle ZIP
+              tool_label: validate_bundle
+              tool_name: validate_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: Convert an existing bundle to human-readable YAML spec
+              parameters:
+                bundle:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Convert an existing bundle to human-readable YAML
+                spec
+              tool_label: bundle_to_spec
+              tool_name: bundle_to_spec
+              type: api
+            - enabled: false
+              extra:
+                description: Check bundle upload status
+              parameters:
+                task_id:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Check bundle upload status
+              tool_label: upload_status
+              tool_name: upload_status
+              type: api
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: Inspects generated bundle before upload. Validates bundle, optionally
+          converts to spec for diff, then proceeds to upload.
+        output_schema: null
+        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Review Agent
+        tool_node_version: '2'
+        type: agent
+      height: 264
+      id: 264d37e7-9580-4d26-be76-4ecdbf32803a
+      position:
+        x: 5874
+        y: 448
+      positionAbsolute:
+        x: 5874
+        y: 448
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: 'You are the Error Agent for the Avni App Configurator. An upload
+              was initiated and you need to monitor or diagnose any issues.
+
+
+              Upload Task ID: {{#conversation.upload_task_id#}}
+
+              Server URL: {{#conversation.avni_mcp_server_url#}}
+
+
+              Workflow:
+
+              1. Check upload status.
+
+              2. If completed successfully, report success to user.
+
+              3. If failed, analyze error message, diagnose root cause.
+
+              4. If fixable (e.g. missing field, wrong format), attempt fix and output
+              RETRY_BUNDLE with corrected entities.
+
+              5. If not fixable, output clear ERROR_REPORT explaining what failed
+              and why.'
+          maximum_iterations:
+            type: constant
+            value: 3
+          model:
+            type: constant
+            value:
+              completion_params:
+                max_tokens: 8192
+                temperature: 0.2
+              mode: chat
+              model: claude-haiku-4-5-20251001
+              model_type: llm
+              provider: langgenius/anthropic/anthropic
+              type: model-selector
+          query:
+            type: constant
+            value: '{{#sys.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: false
+              extra:
+                description: Validate extracted entities for structural issues
+              parameters:
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate extracted entities for structural issues
+              tool_label: validate_entities
+              tool_name: validate_entities
+              type: api
+            - enabled: false
+              extra:
+                description: Apply corrections to extracted entities
+              parameters:
+                corrections:
+                  auto: 1
+                  value: null
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Apply corrections to extracted entities
+              tool_label: apply_entity_corrections
+              tool_name: apply_entity_corrections
+              type: api
+            - enabled: false
+              extra:
+                description: Generate YAML spec from entities
+              parameters:
+                entities:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Generate YAML spec from entities
+              tool_label: generate_spec
+              tool_name: generate_spec
+              type: api
+            - enabled: false
+              extra:
+                description: Validate a YAML spec for structural and cross-reference
+                  errors
+              parameters:
+                spec_yaml:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate a YAML spec for structural and cross-reference
+                errors
+              tool_label: validate_spec
+              tool_name: validate_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Validate a generated bundle ZIP
+              parameters:
+                bundle_zip_b64:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate a generated bundle ZIP
+              tool_label: validate_bundle
+              tool_name: validate_bundle
+              type: api
+            - enabled: false
+              extra:
+                description: Convert an existing bundle to human-readable YAML spec
+              parameters:
+                bundle:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Convert an existing bundle to human-readable YAML
+                spec
+              tool_label: bundle_to_spec
+              tool_name: bundle_to_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Check bundle upload status
+              parameters:
+                task_id:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Check bundle upload status
+              tool_label: upload_status
+              tool_name: upload_status
+              type: api
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: Diagnoses upload failures, analyzes server errors, and attempts recovery
+          or reports clearly to the user.
+        output_schema: null
+        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Error Agent
+        tool_node_version: '2'
+        type: agent
+      height: 248
+      id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+      position:
+        x: 7242
+        y: 456
+      positionAbsolute:
+        x: 7242
+        y: 456
+      selected: true
+      type: custom
+      width: 242
+    viewport:
+      x: -3840.1626815814006
+      y: 91.19268253974042
+      zoom: 0.544495374931482
+  rag_pipeline_variables: []

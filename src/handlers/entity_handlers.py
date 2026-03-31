@@ -3,19 +3,55 @@ Entity validation and correction handlers.
 Replaces Dify code nodes: Ambiguity Checker + Entities Corrector.
 
 Endpoints:
-  POST /validate-entities   — structural validation of extracted entities
+  POST /store-entities       — cache entities by conversation_id (TTL 6h)
+  POST /validate-entities    — structural validation of extracted entities
   POST /apply-entity-corrections — apply LLM-generated corrections to entities
 """
 
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any
 
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# In-memory entity store keyed by conversation_id (TTL = 6 hours)
+# Allows agent tool calls to pass only conversation_id instead of full entities
+# ---------------------------------------------------------------------------
+_ENTITY_STORE_TTL = 6 * 3600  # seconds
+
+
+class _EntityStore:
+    def __init__(self) -> None:
+        self._store: dict[str, tuple[dict, float]] = {}  # id -> (entities, expiry)
+
+    def put(self, conversation_id: str, entities: dict) -> None:
+        self._store[conversation_id] = (entities, time.time() + _ENTITY_STORE_TTL)
+
+    def get(self, conversation_id: str) -> dict | None:
+        entry = self._store.get(conversation_id)
+        if entry is None:
+            return None
+        entities, expiry = entry
+        if time.time() > expiry:
+            del self._store[conversation_id]
+            return None
+        return entities
+
+    def cleanup(self) -> int:
+        now = time.time()
+        expired = [k for k, (_, exp) in self._store.items() if now > exp]
+        for k in expired:
+            del self._store[k]
+        return len(expired)
+
+
+_entity_store = _EntityStore()
 
 SECTION_MAP = {
     "subject_type": "subject_types",
@@ -320,10 +356,38 @@ def _apply_corrections(entities: dict, corrections: list[dict]) -> dict:
     return result
 
 
+async def handle_store_entities(request: Request) -> JSONResponse:
+    """
+    POST /store-entities
+    Body: { "conversation_id": "...", "entities": {...} }
+    Caches entities server-side so agent tools can pass only conversation_id.
+    Returns: { "ok": true }
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    conversation_id = body.get("conversation_id")
+    entities = body.get("entities")
+
+    if not conversation_id:
+        return JSONResponse({"error": "Missing 'conversation_id'"}, status_code=400)
+    if not isinstance(entities, dict):
+        return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
+
+    _entity_store.put(conversation_id, entities)
+    logger.info(
+        "store-entities: cached entities for conversation_id=%s", conversation_id
+    )
+    return JSONResponse({"ok": True})
+
+
 async def handle_validate_entities(request: Request) -> JSONResponse:
     """
     POST /validate-entities
     Body: { "entities": { subject_types, programs, encounter_types, address_levels } }
+      OR: { "conversation_id": "..." }  — looks up entities from store
     Returns: { entities, issues, error_count, warning_count, issues_summary, has_errors, has_warnings }
     """
     try:
@@ -332,8 +396,21 @@ async def handle_validate_entities(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
     entities = body.get("entities")
-    if entities is None:
-        return JSONResponse({"error": "Missing 'entities' key"}, status_code=400)
+    conversation_id = body.get("conversation_id")
+
+    if entities is None and conversation_id:
+        entities = _entity_store.get(conversation_id)
+        if entities is None:
+            return JSONResponse(
+                {
+                    "error": f"No entities found for conversation_id={conversation_id}. Call /store-entities first."
+                },
+                status_code=404,
+            )
+    elif entities is None:
+        return JSONResponse(
+            {"error": "Provide 'entities' or 'conversation_id'"}, status_code=400
+        )
 
     if not isinstance(entities, dict):
         return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
@@ -352,7 +429,8 @@ async def handle_validate_entities(request: Request) -> JSONResponse:
 async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
     """
     POST /apply-entity-corrections
-    Body: { "entities": {...}, "corrections": [{entity_type, name, ...fields, _delete?}] }
+    Body: { "entities": {...}, "corrections": [...] }
+      OR: { "conversation_id": "...", "corrections": [...] }  — looks up + updates store
     Returns: { "result": updated_entities }
     """
     try:
@@ -361,10 +439,23 @@ async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
     entities = body.get("entities")
+    conversation_id = body.get("conversation_id")
     corrections = body.get("corrections", [])
 
-    if entities is None:
-        return JSONResponse({"error": "Missing 'entities' key"}, status_code=400)
+    if entities is None and conversation_id:
+        entities = _entity_store.get(conversation_id)
+        if entities is None:
+            return JSONResponse(
+                {
+                    "error": f"No entities found for conversation_id={conversation_id}. Call /store-entities first."
+                },
+                status_code=404,
+            )
+    elif entities is None:
+        return JSONResponse(
+            {"error": "Provide 'entities' or 'conversation_id'"}, status_code=400
+        )
+
     if not isinstance(entities, dict):
         return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
     if not isinstance(corrections, list):
@@ -373,6 +464,10 @@ async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
         )
 
     updated = _apply_corrections(entities, corrections)
+
+    # Write back to store so subsequent calls see the updated entities
+    if conversation_id:
+        _entity_store.put(conversation_id, updated)
 
     logger.info("apply-entity-corrections: applied %d corrections", len(corrections))
     return JSONResponse({"result": updated})

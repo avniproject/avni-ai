@@ -1,0 +1,2290 @@
+app:
+  description: ''
+  icon: dizzy
+  icon_background: '#D5D9EB'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 'research agent process flow '
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.12@37699cc3d1ea9e006348a7273a514f3ddf60ffb0649dc735c594c8da6a80934b
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.7.20@de0063a630a6d1b2c025fb84f3462ba5151fb60618309cd595c3f4711b1df847
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.3.4@3345b596ee5117d9304097feaee866f05ffaf0d76a790fb07acd8b99f6c87cb3
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/x:0.0.17@ddc2e2f0bb86581516bbd04ea0047d8079066866aed87f6e54acd2e9054950c4
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: yevanchen/exa:0.0.5@08c5312eae480639682313b2350b54050308605a6f0e4292bb78807e71fa6128
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: llm
+      id: 1742797155272-source-1742796656647-target
+      selected: false
+      source: '1742797155272'
+      sourceHandle: source
+      target: '1742796656647'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1742796656647-source-1742799131414-target
+      selected: false
+      source: '1742796656647'
+      sourceHandle: source
+      target: '1742799131414'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: answer
+      id: 1742799131414-source-1742796603242-target
+      selected: false
+      source: '1742799131414'
+      sourceHandle: source
+      target: '1742796603242'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: loop
+      id: 1742796603242-source-1742819137183-target
+      selected: false
+      source: '1742796603242'
+      sourceHandle: source
+      target: '1742819137183'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1744720209717-source-1744722384159-target
+      selected: false
+      source: '1744720209717'
+      sourceHandle: source
+      target: '1744722384159'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        sourceType: llm
+        targetType: answer
+      id: 1744719065863-source-1744739584366-target
+      selected: false
+      source: '1744719065863'
+      sourceHandle: source
+      target: '1744739584366'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        sourceType: answer
+        targetType: agent
+      id: 1744739584366-source-1744718432075-target
+      selected: false
+      source: '1744739584366'
+      sourceHandle: source
+      target: '1744718432075'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        sourceType: llm
+        targetType: assigner
+      id: 1744742949280-source-1744719657666-target
+      selected: false
+      source: '1744742949280'
+      sourceHandle: source
+      target: '1744719657666'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        sourceType: agent
+        targetType: llm
+      id: 1744718432075-source-1744742949280-target
+      selected: false
+      source: '1744718432075'
+      sourceHandle: source
+      target: '1744742949280'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: tool
+      id: 1742554928243-source-1742797155272-target
+      source: '1742554928243'
+      sourceHandle: source
+      target: '1742797155272'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: llm
+      id: 1747905298621-source-1744720209717-target
+      selected: false
+      source: '1747905298621'
+      sourceHandle: source
+      target: '1744720209717'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        sourceType: loop-start
+        targetType: llm
+      id: 1742819137183start-source-1744719065863-target
+      source: 1742819137183start
+      sourceHandle: source
+      target: '1744719065863'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: tool
+      id: 1742796603242-source-1747905298621-target
+      selected: false
+      source: '1742796603242'
+      sourceHandle: source
+      target: '1747905298621'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: loop
+        targetType: llm
+      id: 1742819137183-source-1744720209717-target
+      selected: false
+      source: '1742819137183'
+      sourceHandle: source
+      target: '1744720209717'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: start
+        type: start
+        variables:
+        - label: research_topic
+          max_length: 256
+          options: []
+          required: true
+          type: text-input
+          variable: research_topic
+        - label: max_loop
+          max_length: 48
+          options: []
+          required: true
+          type: number
+          variable: max_loop
+      height: 135
+      id: '1742554928243'
+      position:
+        x: -634.3693812078288
+        y: 720.5722752425266
+      positionAbsolute:
+        x: -634.3693812078288
+        y: 720.5722752425266
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'User''s intention:：{{#1742796656647.text#}}
+
+          <hr style="height: 1px; border: none; background-image: linear-gradient(to
+          right, rgba(0,0,0,0), rgba(0,0,0,0.3), rgba(0,0,0,0));">
+
+          '
+        desc: ''
+        selected: false
+        title: 'Intent analysis stream output '
+        type: answer
+        variables: []
+      height: 183
+      id: '1742796603242'
+      position:
+        x: -333.93275647136835
+        y: 720.5722752425266
+      positionAbsolute:
+        x: -333.93275647136835
+        y: 720.5722752425266
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: grok-2-1212
+          provider: langgenius/x/x
+        prompt_template:
+        - id: 2dbee8f8-e806-4407-8d76-cfd0f2d5e09e
+          role: system
+          text: 'topic：{{#1742554928243.research_topic#}}
+
+
+            <intent-mining>
+
+            To uncover the deepest user intent behind every query, analyze through
+            these progressive layers:
+
+
+            1. Surface Intent: The literal interpretation of what they''re asking
+            for
+
+            2. Practical Intent: The tangible goal or problem they''re trying to solve
+
+            3. Shadow Intent: The unconscious motivations they themselves may not
+            recognize
+
+
+            Map each query through ALL these layers, especially focusing on uncovering
+            Shadow Intent.
+
+            </intent-mining>
+
+            Then, based on the above speculation, take a step back and think to explore
+            the user''s intention behind the question.'
+        - id: d85d2978-e316-4070-9b42-794ba8941bb0
+          role: user
+          text: context：{{#1742797155272.text#}}
+        selected: false
+        title: Intent analysis
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 94
+      id: '1742796656647'
+      position:
+        x: -634.3693812078288
+        y: 1049.8444906754723
+      positionAbsolute:
+        x: -634.3693812078288
+        y: 1049.8444906754723
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        desc: ''
+        is_team_authorization: false
+        output_schema: null
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The question you want answered with cited sources.
+            ja_JP: 引用元を含めて回答してほしい質問。
+            pt_BR: A pergunta que você deseja respondida com fontes citadas.
+            zh_Hans: 您想要获得引用源的问题。
+          label:
+            en_US: Query
+            ja_JP: クエリ
+            pt_BR: Consulta
+            zh_Hans: 查询
+          llm_description: The question to be answered with supporting evidence from
+            the web.
+          max: null
+          min: null
+          name: query
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: Whether to include full text of the source articles.
+            ja_JP: ソース記事の全文を含めるかどうか。
+            pt_BR: Se deve incluir o texto completo dos artigos de origem.
+            zh_Hans: 是否包含源文章的完整文本。
+          label:
+            en_US: Include Source Text
+            ja_JP: ソーステキストを含む
+            pt_BR: Incluir Texto Fonte
+            zh_Hans: 包含源文本
+          llm_description: Include the full text content of each source in the results.
+          max: null
+          min: null
+          name: text
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: exa
+          form: form
+          human_description:
+            en_US: The model to use for answering the question.
+            ja_JP: 質問に答えるために使用するモデル。
+            pt_BR: O modelo a ser usado para responder à pergunta.
+            zh_Hans: 用于回答问题的模型。
+          label:
+            en_US: Model
+            ja_JP: モデル
+            pt_BR: Modelo
+            zh_Hans: 模型
+          llm_description: Specify which model should process the query and generate
+            the answer.
+          max: null
+          min: null
+          name: model
+          options:
+          - label:
+              en_US: Exa
+              ja_JP: Exa
+              pt_BR: Exa
+              zh_Hans: Exa
+            value: exa
+          - label:
+              en_US: Exa Pro
+              ja_JP: Exa Pro
+              pt_BR: Exa Pro
+              zh_Hans: Exa Pro
+            value: exa-pro
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        params:
+          model: ''
+          query: ''
+          text: ''
+        provider_id: yevanchen/exa/exa
+        provider_name: yevanchen/exa/exa
+        provider_type: builtin
+        selected: false
+        title: Exa Answer
+        tool_configurations:
+          model:
+            type: constant
+            value: exa
+          text:
+            type: constant
+            value: 0
+        tool_label: Exa Answer
+        tool_name: exa_answer
+        tool_node_version: '2'
+        tool_parameters:
+          query:
+            type: mixed
+            value: '{{#1742554928243.research_topic#}}'
+        type: tool
+      height: 114
+      id: '1742797155272'
+      position:
+        x: -627.2271344730241
+        y: 866.8376753063778
+      positionAbsolute:
+        x: -627.2271344730241
+        y: 866.8376753063778
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Fetching context：{{#1742797155272.text#}}
+
+          <hr style="height: 1px; border: none; background-image: linear-gradient(to
+          right, rgba(0,0,0,0), rgba(0,0,0,0.3), rgba(0,0,0,0));">'
+        desc: ''
+        selected: false
+        title: Get context
+        type: answer
+        variables: []
+      height: 183
+      id: '1742799131414'
+      position:
+        x: -342.59709394212314
+        y: 962.6371820272118
+      positionAbsolute:
+        x: -342.59709394212314
+        y: 962.6371820272118
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        break_conditions:
+        - comparison_operator: '>'
+          id: f0e6a5ac-37ea-45a7-9273-b660296c0cb0
+          numberVarType: variable
+          value: '{{#1742554928243.max_loop#}}'
+          varType: number
+          variable_selector:
+          - '1742819137183'
+          - current_loop
+        desc: ''
+        error_handle_mode: terminated
+        height: 478
+        logical_operator: and
+        loop_count: 100
+        loop_variables:
+        - id: 571b3fa9-99b9-481f-9355-8a95618394e9
+          label: findings
+          value_type: constant
+          var_type: array[string]
+        - id: be149194-f806-4fa4-8a6e-a546c1b65941
+          label: executed_queries
+          value_type: constant
+          var_type: array[string]
+        - id: 61f9a683-99a9-491d-8705-2c5e84e8191b
+          label: current_loop
+          value: '1'
+          value_type: constant
+          var_type: number
+        - id: dfb571e3-dfe2-47af-bf3e-36e0b3747f16
+          label: knowledge_gap
+          value:
+          - '1742554928243'
+          - research_topic
+          value_type: variable
+          var_type: string
+        - id: 4b5be6c3-90df-4dc1-bf98-732e9b589054
+          label: visitedURLs
+          value_type: constant
+          var_type: array[string]
+        selected: false
+        start_node_id: 1742819137183start
+        title: loop
+        type: loop
+        width: 1046
+      height: 478
+      id: '1742819137183'
+      position:
+        x: -33.847706332119856
+        y: 696.1225538058086
+      positionAbsolute:
+        x: -33.847706332119856
+        y: 696.1225538058086
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 1046
+      zIndex: 1
+    - data:
+        desc: ''
+        isInLoop: true
+        selected: false
+        title: ''
+        type: loop-start
+      draggable: false
+      height: 48
+      id: 1742819137183start
+      parentId: '1742819137183'
+      position:
+        x: 24
+        y: 68
+      positionAbsolute:
+        x: -9.847706332119856
+        y: 764.1225538058086
+      selectable: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-loop-start
+      width: 44
+      zIndex: 1002
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: "You can use exa_search to obtain URLs, exa_contents to access\
+              \ specific URLs, and think to reflect based on them.\nYou need to output\
+              \ the complete image URL returned by exa search.\nPlease first use exa_search,\
+              \ then use exa url_contents, and when outputting the response, please\
+              \ include the urls returned by exa_search as well as the image urls.\
+              \ \noutput json ：\n“finding：string，\n  url：array[string],\n”"
+          maximum_iterations:
+            type: constant
+            value: 7
+          model:
+            type: constant
+            value:
+              completion_params:
+                temperature: 0
+              mode: chat
+              model: grok-3-fast-beta
+              model_type: llm
+              provider: langgenius/x/x
+              type: model-selector
+          query:
+            type: constant
+            value: You are a researcher that can be targeted {{#1744719065863.structured_output.search_query#}}
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: First, you need to use the exa_search search engine to
+                  look for relevant webpages.
+              parameters:
+                end_published_date:
+                  auto: 1
+                  value: null
+                excludeText:
+                  auto: 1
+                  value: null
+                exclude_domains:
+                  auto: 1
+                  value: null
+                includeText:
+                  auto: 1
+                  value: null
+                include_domains:
+                  auto: 1
+                  value: null
+                query:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#1744719065863.structured_output.search_query#}}'
+                start_published_date:
+                  auto: 1
+                  value: null
+              provider_name: yevanchen/exa/exa
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: The search query you want to perform using Exa's search engine.
+                  ja_JP: Exa の検索エンジンを使用して実行したい検索クエリ。
+                  pt_BR: A consulta de pesquisa que você deseja realizar usando o
+                    mecanismo de busca da Exa.
+                  zh_Hans: 您想使用 Exa 搜索引擎执行的搜索查询。
+                label:
+                  en_US: Search query
+                  ja_JP: 検索クエリ
+                  pt_BR: Consulta de pesquisa
+                  zh_Hans: 搜索查询
+                llm_description: The search query to find relevant information on
+                  the web.
+                max: null
+                min: null
+                name: query
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: neural
+                form: form
+                human_description:
+                  en_US: The type of search to perform - neural (semantic), keyword
+                    (traditional), or auto.
+                  ja_JP: 実行する検索のタイプ - ニューラル（意味的），キーワード（従来型），または自動。
+                  pt_BR: O tipo de pesquisa a ser realizada - neural (semântica),
+                    por palavra-chave (tradicional), ou auto.
+                  zh_Hans: 要执行的搜索类型 - 神经（语义），关键词（传统），或自动。
+                label:
+                  en_US: Search Type
+                  ja_JP: 検索タイプ
+                  pt_BR: Tipo de pesquisa
+                  zh_Hans: 搜索类型
+                llm_description: The type of search to perform - neural uses advanced
+                  AI for semantic understanding, keyword uses traditional search techniques,
+                  and auto dynamically selects the best approach.
+                max: null
+                min: null
+                name: search_type
+                options:
+                - label:
+                    en_US: Neural
+                    ja_JP: ニューラル
+                    pt_BR: Neural
+                    zh_Hans: 神经
+                  value: neural
+                - label:
+                    en_US: Keyword
+                    ja_JP: キーワード
+                    pt_BR: Palavra-chave
+                    zh_Hans: 关键词
+                  value: keyword
+                - label:
+                    en_US: Auto
+                    ja_JP: 自動
+                    pt_BR: Auto
+                    zh_Hans: 自动
+                  value: auto
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: select
+              - auto_generate: null
+                default: 10
+                form: form
+                human_description:
+                  en_US: The maximum number of search results to return (from 1 to
+                    100).
+                  ja_JP: 返す検索結果の最大数（1〜100）。
+                  pt_BR: O número máximo de resultados de pesquisa a serem retornados
+                    (de 1 a 100).
+                  zh_Hans: 要返回的最大搜索结果数（从1到100）。
+                label:
+                  en_US: Number of Results
+                  ja_JP: 結果数
+                  pt_BR: Número de resultados
+                  zh_Hans: 结果数量
+                llm_description: The maximum number of search results to return, ranging
+                  from 1 to 100.
+                max: 100
+                min: 1
+                name: num_results
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: A comma-separated list of domains to specifically include
+                    in the search results.
+                  ja_JP: 検索結果に特に含めるドメインのカンマ区切りリスト。
+                  pt_BR: Uma lista separada por vírgulas de domínios para incluir
+                    especificamente nos resultados da pesquisa.
+                  zh_Hans: 要在搜索结果中特别包含的域名的逗号分隔列表。
+                label:
+                  en_US: Include Domains
+                  ja_JP: 含めるドメイン
+                  pt_BR: Incluir domínios
+                  zh_Hans: 包含域名
+                llm_description: A comma-separated list of domains to specifically
+                  include in the search results.
+                max: null
+                min: null
+                name: include_domains
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: A comma-separated list of domains to specifically exclude
+                    from the search results.
+                  ja_JP: 検索結果から特に除外するドメインのカンマ区切りリスト。
+                  pt_BR: Uma lista separada por vírgulas de domínios para excluir
+                    especificamente dos resultados da pesquisa.
+                  zh_Hans: 要从搜索结果中特别排除的域名的逗号分隔列表。
+                label:
+                  en_US: Exclude Domains
+                  ja_JP: 除外するドメイン
+                  pt_BR: Excluir domínios
+                  zh_Hans: 排除域名
+                llm_description: A comma-separated list of domains to specifically
+                  exclude from the search results.
+                max: null
+                min: null
+                name: exclude_domains
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: Only include results published after this date (YYYY-MM-DD
+                    format).
+                  ja_JP: この日付以降に公開された結果のみを含める（YYYY-MM-DD形式）。
+                  pt_BR: Incluir apenas resultados publicados após esta data (formato
+                    AAAA-MM-DD).
+                  zh_Hans: 仅包含在此日期之后发布的结果（YYYY-MM-DD 格式）。
+                label:
+                  en_US: Start Published Date
+                  ja_JP: 公開開始日
+                  pt_BR: Data de publicação inicial
+                  zh_Hans: 开始发布日期
+                llm_description: Only include results published after this date in
+                  YYYY-MM-DD format.
+                max: null
+                min: null
+                name: start_published_date
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: Only include results published before this date (YYYY-MM-DD
+                    format).
+                  ja_JP: この日付以前に公開された結果のみを含める（YYYY-MM-DD形式）。
+                  pt_BR: Incluir apenas resultados publicados antes desta data (formato
+                    AAAA-MM-DD).
+                  zh_Hans: 仅包含在此日期之前发布的结果（YYYY-MM-DD 格式）。
+                label:
+                  en_US: End Published Date
+                  ja_JP: 公開終了日
+                  pt_BR: Data de publicação final
+                  zh_Hans: 结束发布日期
+                llm_description: Only include results published before this date in
+                  YYYY-MM-DD format.
+                max: null
+                min: null
+                name: end_published_date
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: 1
+                form: form
+                human_description:
+                  en_US: Whether to use Exa's prompt engineering to improve the query.
+                  ja_JP: Exaのプロンプトエンジニングを使用してクエリを改善するかどうか。
+                  pt_BR: Se deve usar a engenharia de prompt da Exa para melhorar
+                    a consulta.
+                  zh_Hans: 是否使用 Exa 的提示工程来改进查询。
+                label:
+                  en_US: Use Autoprompt
+                  ja_JP: 自動プロンプトを使用
+                  pt_BR: Usar Autoprompt
+                  zh_Hans: 使用自动提示
+                llm_description: Whether to use Exa's prompt engineering to improve
+                  the query. When true, Exa will automatically rewrite the query to
+                  improve search results.
+                max: null
+                min: null
+                name: use_autoprompt
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: 0
+                form: form
+                human_description:
+                  en_US: Whether to include the text contents from each search result.
+                  ja_JP: 各検索結果からテキスト内容を含めるかどうか。
+                  pt_BR: Se deve incluir o conteúdo de texto de cada resultado da
+                    pesquisa.
+                  zh_Hans: 是否包含每个搜索结果的文本内容。
+                label:
+                  en_US: Include Text Contents
+                  ja_JP: テキスト内容を含める
+                  pt_BR: Incluir conteúdo de texto
+                  zh_Hans: 包含文本内容
+                llm_description: Whether to include the text contents from each search
+                  result. When true, the response will include the text content of
+                  each webpage.
+                max: null
+                min: null
+                name: text_contents
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: 0
+                form: form
+                human_description:
+                  en_US: Whether to highlight relevant text snippets in the search
+                    results.
+                  ja_JP: 検索結果内の関連テキスト部分をハイライトするかどうか。
+                  pt_BR: Se deve destacar trechos de texto relevantes nos resultados
+                    da pesquisa.
+                  zh_Hans: 是否在搜索结果中高亮显示相关文本片段。
+                label:
+                  en_US: Highlight Results
+                  ja_JP: 結果をハイライト
+                  pt_BR: Destacar resultados
+                  zh_Hans: 高亮结果
+                llm_description: Whether to highlight relevant text snippets in the
+                  search results. When true, relevant sections of text will be highlighted.
+                max: null
+                min: null
+                name: highlight_results
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: null
+                form: form
+                human_description:
+                  en_US: A data category to focus on.
+                  ja_JP: 集中するデータのカテゴリ。
+                  pt_BR: Uma categoria de dados para se concentrar.
+                  zh_Hans: 要集中的数据类别。
+                label:
+                  en_US: Category
+                  ja_JP: カテゴリ
+                  pt_BR: Categoria
+                  zh_Hans: 类别
+                llm_description: A data category to focus on.
+                max: null
+                min: null
+                name: category
+                options:
+                - label:
+                    en_US: Company
+                    ja_JP: 会社
+                    pt_BR: Empresa
+                    zh_Hans: 公司
+                  value: company
+                - label:
+                    en_US: Research Paper
+                    ja_JP: 研究論文
+                    pt_BR: Artigo de Pesquisa
+                    zh_Hans: 研究论文
+                  value: research paper
+                - label:
+                    en_US: News
+                    ja_JP: ニュース
+                    pt_BR: Notícias
+                    zh_Hans: 新闻
+                  value: news
+                - label:
+                    en_US: PDF
+                    ja_JP: PDF
+                    pt_BR: PDF
+                    zh_Hans: PDF
+                  value: pdf
+                - label:
+                    en_US: GitHub
+                    ja_JP: GitHub
+                    pt_BR: GitHub
+                    zh_Hans: GitHub
+                  value: github
+                - label:
+                    en_US: Tweet
+                    ja_JP: ツイート
+                    pt_BR: Tuite
+                    zh_Hans: 推文
+                  value: tweet
+                - label:
+                    en_US: Personal Site
+                    ja_JP: 個人サイト
+                    pt_BR: Site Pessoal
+                    zh_Hans: 个人网站
+                  value: personal site
+                - label:
+                    en_US: LinkedIn Profile
+                    ja_JP: LinkedInプロファイル
+                    pt_BR: Perfil do LinkedIn
+                    zh_Hans: LinkedIn 个人主页
+                  value: linkedin profile
+                - label:
+                    en_US: Financial Report
+                    ja_JP: 財務報告
+                    pt_BR: Relatório Financeiro
+                    zh_Hans: 财务报告
+                  value: financial report
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: select
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: List of strings that must be present in webpage text of results.
+                    Currently, only 1 string is supported, of up to 5 words.
+                  ja_JP: 結果のウェブページテキストに存在する必要がある文字列のリスト。現在、最大5単語の1つの文字列のみがサポートされています。
+                  pt_BR: Lista de strings que devem estar presentes no texto da página
+                    dos resultados. Atualmente, apenas 1 string é suportada, de até
+                    5 palavras.
+                  zh_Hans: 必须出现在结果的网页文本中的字符串列表。目前，只支持1个字符串，最多5个单词。
+                label:
+                  en_US: Include Text
+                  ja_JP: テキストを含める
+                  pt_BR: Incluir Texto
+                  zh_Hans: 包含文本
+                llm_description: List of strings that must be present in webpage text
+                  of results. Currently, only 1 string is supported, of up to 5 words.
+                max: null
+                min: null
+                name: includeText
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: List of strings that must not be present in webpage text
+                    of results. Currently, only 1 string is supported, of up to 5
+                    words.
+                  ja_JP: 結果のウェブページテキストに存在してはならない文字列のリスト。現在、最大5単語の1つの文字列のみがサポートされています。
+                  pt_BR: Lista de strings que não devem estar presentes no texto da
+                    página dos resultados. Atualmente, apenas 1 string é suportada,
+                    de até 5 palavras.
+                  zh_Hans: 不能出现在结果的网页文本中的字符串列表。目前，只支持1个字符串，最多5个单词。
+                label:
+                  en_US: Exclude Text
+                  ja_JP: テキストを除外
+                  pt_BR: Excluir Texto
+                  zh_Hans: 排除文本
+                llm_description: List of strings that must not be present in webpage
+                  text of results. Currently, only 1 string is supported, of up to
+                  5 words.
+                max: null
+                min: null
+                name: excludeText
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              settings:
+                category:
+                  value:
+                    type: constant
+                    value: null
+                highlight_results:
+                  value:
+                    type: constant
+                    value: 0
+                num_results:
+                  value:
+                    type: constant
+                    value: 10
+                search_type:
+                  value:
+                    type: constant
+                    value: keyword
+                text_contents:
+                  value:
+                    type: constant
+                    value: true
+                use_autoprompt:
+                  value:
+                    type: constant
+                    value: false
+              tool_label: Exa Search
+              tool_name: exa_search
+              type: builtin
+            - enabled: true
+              extra:
+                description: After using exa_search, you need to use exa_contents
+                  to extract content from the search result URLs. If the page contains
+                  images, return the image links in markdown format.
+              parameters:
+                urls:
+                  auto: 1
+                  value: null
+              provider_name: yevanchen/exa/exa
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: Comma-separated list of URLs to fetch content from.
+                  ja_JP: コンテンツを取得するためのカンマ区切りのURLリスト。
+                  pt_BR: Lista de URLs separadas por vírgulas para buscar conteúdo.
+                  zh_Hans: 用逗号分隔的URL列表，用于获取内容。
+                label:
+                  en_US: URLs
+                  ja_JP: URL
+                  pt_BR: URLs
+                  zh_Hans: URL列表
+                llm_description: A list of URLs to extract content from, separated
+                  by commas.
+                max: null
+                min: null
+                name: urls
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: never
+                form: form
+                human_description:
+                  en_US: Specify the live crawling behavior.
+                  ja_JP: 実時間のクロールの動作を指定します。
+                  pt_BR: Especifique o comportamento de crawl em tempo real.
+                  zh_Hans: 指定实时爬取行为。
+                label:
+                  en_US: Live Crawling
+                  ja_JP: リアルタイムクロール
+                  pt_BR: Crawl em Tempo Real
+                  zh_Hans: 实时爬取
+                llm_description: Choose the live crawling strategy for content retrieval.
+                max: null
+                min: null
+                name: livecrawl
+                options:
+                - label:
+                    en_US: Never
+                    ja_JP: なし
+                    pt_BR: Nunca
+                    zh_Hans: 从不
+                  value: never
+                - label:
+                    en_US: Fallback
+                    ja_JP: フォールバック
+                    pt_BR: Redundância
+                    zh_Hans: 回退
+                  value: fallback
+                - label:
+                    en_US: Always
+                    ja_JP: いつも
+                    pt_BR: Sempre
+                    zh_Hans: 总是
+                  value: always
+                - label:
+                    en_US: Auto
+                    ja_JP: 自動
+                    pt_BR: Auto
+                    zh_Hans: 自动
+                  value: auto
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: select
+              - auto_generate: null
+                default: 0
+                form: form
+                human_description:
+                  en_US: Return full webpage text for every result, including for
+                    subpages.
+                  ja_JP: 各結果の完全なウェブページテキストを返し、サブページも含む。
+                  pt_BR: Retorna o texto completo da página web para cada resultado,
+                    incluindo para subpáginas.
+                  zh_Hans: 返回每个结果的完整网页文本，包括子页面。
+                label:
+                  en_US: Full Page Text
+                  ja_JP: 完全ページテキスト
+                  pt_BR: Texto Completo da Página
+                  zh_Hans: 完整页面文本
+                llm_description: Include the full text of each webpage, including
+                  subpages.
+                max: null
+                min: null
+                name: full_page_text
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: 0
+                form: form
+                human_description:
+                  en_US: Return an LLM-generated summary of each webpage.
+                  ja_JP: 各ウェブページのLLM生成の要約を返します。
+                  pt_BR: Retorna um resumo gerado pelo LLM de cada página web.
+                  zh_Hans: 返回每个网页的LLM生成的摘要。
+                label:
+                  en_US: AI Page Summary
+                  ja_JP: AIページ要約
+                  pt_BR: Resumo AI da Página
+                  zh_Hans: AI页面摘要
+                llm_description: Generate a summary for each webpage using LLM.
+                max: null
+                min: null
+                name: ai_page_summary
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: 1
+                form: form
+                human_description:
+                  en_US: Number of subpages to include within each result.
+                  ja_JP: 各結果中に含めるサブページの数。
+                  pt_BR: Número de subpáginas a incluir dentro de cada resultado.
+                  zh_Hans: 每个结果中要包括的子页面数量。
+                label:
+                  en_US: Number of Subpages
+                  ja_JP: サブページ数
+                  pt_BR: Número de Subpáginas
+                  zh_Hans: 子页面数量
+                llm_description: Specify the number of subpages to include in the
+                  content extraction.
+                max: null
+                min: null
+                name: number_of_subpages
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: 1
+                form: form
+                human_description:
+                  en_US: Number of links to return from each webpage.
+                  ja_JP: 各ウェブページから返すリンクの数。
+                  pt_BR: Número de links a retornar de cada página web.
+                  zh_Hans: 从每个网页返回的链接数量。
+                label:
+                  en_US: Return Links
+                  ja_JP: リンクを返す
+                  pt_BR: Retornar Links
+                  zh_Hans: 返回链接
+                llm_description: Include links found on each webpage.
+                max: null
+                min: null
+                name: return_links
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              settings:
+                ai_page_summary:
+                  value:
+                    type: constant
+                    value: 0
+                full_page_text:
+                  value:
+                    type: constant
+                    value: 0
+                livecrawl:
+                  value:
+                    type: constant
+                    value: never
+                number_of_subpages:
+                  value:
+                    type: constant
+                    value: 3
+                return_links:
+                  value:
+                    type: constant
+                    value: 3
+              tool_label: Exa URL Contents
+              tool_name: exa_contents
+              type: builtin
+            - enabled: true
+              extra:
+                description: The tool should be used after using the exa URL contents
+                  or at the beginning of the task. I hope to return the "think" tool
+                  as a draft to the user with the visited URLs, each corresponding
+                  description, and findings from this investigation before taking
+                  any action or replying to the user upon receiving the tool results.
+              parameters:
+                thought:
+                  auto: 1
+                  value: null
+              provider_name: kalochin/think/think
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: A thought to think about.
+                  ja_JP: A thought to think about.
+                  pt_BR: A thought to think about.
+                  zh_Hans: 需要思考的内容。
+                label:
+                  en_US: Thought
+                  ja_JP: Thought
+                  pt_BR: Thought
+                  zh_Hans: 思考内容
+                llm_description: A thought to think about.
+                max: null
+                min: null
+                name: thought
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_label: Think
+              tool_name: think
+              type: builtin
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        output_schema: null
+        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Act
+        tool_node_version: '2'
+        type: agent
+      height: 194
+      id: '1744718432075'
+      parentId: '1742819137183'
+      position:
+        x: 390.13081644666875
+        y: 65
+      positionAbsolute:
+        x: 356.2831101145489
+        y: 761.1225538058086
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 44840411-088b-473d-8186-d0d815707e30
+          role: system
+          text: "You are a research agent investigating the following topic:{{#1742554928243.research_topic#}}\n\
+            Current status:\nknowledge_gap:{{#1742819137183.knowledge_gap#}}\nfingdings:{{#1742819137183.findings#}}\n\
+            excuted_querys:{{#1742819137183.executed_queries#}}\n\nKnown information:\n\
+            Background information:{{#1742797155272.text#}}\nBackground information:{{#1742796656647.text#}}\n\
+            \n\n\n\n{\n    \"reasoning\": \"Provide a detailed explanation of why\
+            \ you chose this action...\",\n    \"search_query\": \"Follow-up questions\
+            \ for further research on the topic\",\n    \"knowledge_gaps\": \"Information\
+            \ needed to answer the original question that has not yet been obtained\"\
+            \n}"
+        - id: 2885c5e4-79b9-4292-9a36-f512bd28384c
+          role: user
+          text: Please ensure that the search_query is concise and that the SERPs
+            can return results. Too many attributes or conditions may cause the query
+            to fail.
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              knowledge_gaps:
+                description: Information that is needed to answer the original question,
+                  but not yet obtained
+                type: string
+              reasoning:
+                description: Detail why you chose this search_query
+                type: string
+              search_query:
+                description: 'Further research into the follow-up question on the
+                  topic, which is the only one that is a good query keyword for getting
+                  SERPs '
+                type: string
+            required:
+            - reasoning
+            - search_query
+            - knowledge_gaps
+            type: object
+        structured_output_enabled: true
+        title: reasoning
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1744719065863'
+      parentId: '1742819137183'
+      position:
+        x: 105.9590437121758
+        y: 65
+      positionAbsolute:
+        x: 72.11133738005594
+        y: 761.1225538058086
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1744719065863'
+          - structured_output
+          - search_query
+          variable_selector:
+          - '1742819137183'
+          - executed_queries
+          write_mode: over-write
+        - input_type: variable
+          operation: append
+          value:
+          - '1744718432075'
+          - text
+          variable_selector:
+          - '1742819137183'
+          - findings
+          write_mode: over-write
+        - input_type: variable
+          operation: extend
+          value:
+          - '1744742949280'
+          - structured_output
+          - urls
+          variable_selector:
+          - '1742819137183'
+          - visitedURLs
+          write_mode: over-write
+        - input_type: constant
+          operation: +=
+          value: 1
+          variable_selector:
+          - '1742819137183'
+          - current_loop
+          write_mode: over-write
+        loop_id: '1742819137183'
+        selected: false
+        title: Variable Assigner
+        type: assigner
+        version: '2'
+      height: 162
+      id: '1744719657666'
+      parentId: '1742819137183'
+      position:
+        x: 671.0846975112179
+        y: 65
+      positionAbsolute:
+        x: 637.236991179098
+        y: 761.1225538058086
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 8192
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 5374ac10-9e1e-4f6a-830c-0eb5cecbc6fc
+          role: system
+          text: " Based on the investigation results, create a comprehensive analysis\
+            \ of the topic.\\nProvide important insights, conclusions, and remaining\
+            \ uncertainties. Cite sources where appropriate. This analysis should\
+            \ be very comprehensive and detailed. It is expected to be a long text.\
+            \ \n\nsource：{{#1742819137183.visitedURLs#}}\n"
+        - id: 9c86a54a-9f54-4b52-9a23-720d42b520a7
+          role: user
+          text: 'fingdings:{{#1742819137183.findings#}}
+
+
+            excuted_query:{{#1742819137183.executed_queries#}}
+
+
+            topic:{{#1742554928243.research_topic#}}
+
+
+            image urls：{{#1747905298621.images#}}
+
+
+            Output the images in the form of Markdown links. You need to ensure that
+            the output text can be correctly parsed by the front - end. Return a final
+            report with both text and images to me.
+
+
+
+            '
+        selected: false
+        structured_output_enabled: false
+        title: finalize_summary
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 94
+      id: '1744720209717'
+      position:
+        x: 1437.5767471603258
+        y: 1049.8444906754723
+      positionAbsolute:
+        x: 1437.5767471603258
+        y: 1049.8444906754723
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1744720209717.text#}}'
+        desc: ''
+        selected: false
+        title: 'Answer '
+        type: answer
+        variables: []
+      height: 103
+      id: '1744722384159'
+      position:
+        x: 1437.5767471603258
+        y: 848.0195378783319
+      positionAbsolute:
+        x: 1437.5767471603258
+        y: 848.0195378783319
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '### according to {{#1744719065863.structured_output.reasoning#}}
+
+          <hr style="height: 1px; background-color: #ddd; border: none; margin: 15px
+          0;">
+
+          ### The current knowledge gap is ：                           {{#1744719065863.structured_output.knowledge_gaps#}}
+
+          <hr style="height: 1px; background-color: #ddd; border: none; margin: 15px
+          0;">
+
+          ### So the next query is:{{#1744719065863.structured_output.search_query#}}'
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        selected: false
+        title: Answer 4
+        type: answer
+        variables: []
+      height: 268
+      id: '1744739584366'
+      parentId: '1742819137183'
+      position:
+        x: 114.79021529370044
+        y: 179
+      positionAbsolute:
+        x: 80.94250896158059
+        y: 875.1225538058086
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1742819137183'
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.5-flash-preview-04-17
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: 089698dc-cf56-4180-9232-ba55e7228c65
+          role: system
+          text: You can extract the http URLs from the {{#1744718432075.text#}}
+        - id: 606298e5-db6a-4713-9ce6-557ef593710b
+          role: user
+          text: 'Please help me extract links from text '
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              urls:
+                description: Please extract the general source link into this variable
+                items:
+                  type: string
+                type: array
+            required:
+            - urls
+            type: object
+        structured_output_enabled: true
+        title: url extract
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 94
+      id: '1744742949280'
+      parentId: '1742819137183'
+      position:
+        x: 388.02009879492573
+        y: 277.69648593397017
+      positionAbsolute:
+        x: 354.1723924628059
+        y: 973.8190397397788
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        author: Dify
+        desc: ''
+        height: 587
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Deep
+          research is a typical scenario for agentic workflow, where the user''s intent
+          can be understood through a series of steps and formalized","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Supplemental
+          background information before starting the study Avoid long user waits with
+          Anwser node streaming output","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 583
+      height: 587
+      id: '1744806191843'
+      position:
+        x: -653.1898695352812
+        y: 607.3388861908143
+      positionAbsolute:
+        x: -653.1898695352812
+        y: 607.3388861908143
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 583
+    - data:
+        author: Dify
+        desc: ''
+        height: 606
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"    const
+          knowleage gaps = \"\";       // knowleage gap","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"    const
+          fingdings = [];       // Collected knowledge","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"    nextSearchTopic:
+          \"\",          // next search topic       ","type":"text","version":1},{"type":"linebreak","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"   ","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: pink
+        title: ''
+        type: ''
+        width: 1158
+      height: 606
+      id: '1744806460601'
+      position:
+        x: -57.35891343953665
+        y: 607.3388861908143
+      positionAbsolute:
+        x: -57.35891343953665
+        y: 607.3388861908143
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 1158
+    - data:
+        author: Dify
+        desc: ''
+        height: 612
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"The
+          outer layer is the reflection loop, and the inner layer is the execution
+          loop where agents carry out research work on specific subtopics. Answers
+          are obtained in the execution loop through function calls of search/visit/think
+          tools.","type":"text","version":1},{"type":"linebreak","version":1},{"type":"linebreak","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"This
+          process is very similar to the \"reflection\" stage in human research -
+          thinking about \"what I already know\", \"what I still need to know\", and
+          \"what should I query next\". The innovation of the entire system lies in
+          this iterative approach: collect information; analyze the \"gap\" between
+          existing information and the original problem; generate new queries to fill
+          these gaps; repeat this process until the gaps are filled.","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 667
+      height: 612
+      id: '1744806907836'
+      position:
+        x: 1126.2571245943782
+        y: 607.3388861908143
+      positionAbsolute:
+        x: 1126.2571245943782
+        y: 607.3388861908143
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 667
+    - data:
+        desc: ''
+        is_team_authorization: true
+        output_schema:
+          description: The JSON response containing the search results, simplified
+            to include only URLs and image URLs.
+          properties:
+            images:
+              description: An array of image URLs from the search results
+              items:
+                type: string
+              type: array
+            urls:
+              description: An array of URLs from the search results
+              items:
+                type: string
+              type: array
+          type: object
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The search query you want to perform using Exa's search engine.
+            ja_JP: Exa の検索エンジンを使用して実行したい検索クエリ。
+            pt_BR: A consulta de pesquisa que você deseja realizar usando o mecanismo
+              de busca da Exa.
+            zh_Hans: 您想使用 Exa 搜索引擎执行的搜索查询。
+          label:
+            en_US: Search query
+            ja_JP: 検索クエリ
+            pt_BR: Consulta de pesquisa
+            zh_Hans: 搜索查询
+          llm_description: The search query to find relevant information on the web.
+          max: null
+          min: null
+          name: query
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: neural
+          form: form
+          human_description:
+            en_US: The type of search to perform - neural (semantic), keyword (traditional),
+              or auto.
+            ja_JP: 実行する検索のタイプ - ニューラル（意味的），キーワード（従来型），または自動。
+            pt_BR: O tipo de pesquisa a ser realizada - neural (semântica), por palavra-chave
+              (tradicional), ou auto.
+            zh_Hans: 要执行的搜索类型 - 神经（语义），关键词（传统），或自动。
+          label:
+            en_US: Search Type
+            ja_JP: 検索タイプ
+            pt_BR: Tipo de pesquisa
+            zh_Hans: 搜索类型
+          llm_description: The type of search to perform - neural uses advanced AI
+            for semantic understanding, keyword uses traditional search techniques,
+            and auto dynamically selects the best approach.
+          max: null
+          min: null
+          name: search_type
+          options:
+          - label:
+              en_US: Neural
+              ja_JP: ニューラル
+              pt_BR: Neural
+              zh_Hans: 神经
+            value: neural
+          - label:
+              en_US: Keyword
+              ja_JP: キーワード
+              pt_BR: Palavra-chave
+              zh_Hans: 关键词
+            value: keyword
+          - label:
+              en_US: Auto
+              ja_JP: 自動
+              pt_BR: Auto
+              zh_Hans: 自动
+            value: auto
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        - auto_generate: null
+          default: 10
+          form: form
+          human_description:
+            en_US: The maximum number of search results to return (from 1 to 100).
+            ja_JP: 返す検索結果の最大数（1〜100）。
+            pt_BR: O número máximo de resultados de pesquisa a serem retornados (de
+              1 a 100).
+            zh_Hans: 要返回的最大搜索结果数（从1到100）。
+          label:
+            en_US: Number of Results
+            ja_JP: 結果数
+            pt_BR: Número de resultados
+            zh_Hans: 结果数量
+          llm_description: The maximum number of search results to return, ranging
+            from 1 to 100.
+          max: 100
+          min: 1
+          name: num_results
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: number
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: A comma-separated list of domains to specifically include in the
+              search results.
+            ja_JP: 検索結果に特に含めるドメインのカンマ区切りリスト。
+            pt_BR: Uma lista separada por vírgulas de domínios para incluir especificamente
+              nos resultados da pesquisa.
+            zh_Hans: 要在搜索结果中特别包含的域名的逗号分隔列表。
+          label:
+            en_US: Include Domains
+            ja_JP: 含めるドメイン
+            pt_BR: Incluir domínios
+            zh_Hans: 包含域名
+          llm_description: A comma-separated list of domains to specifically include
+            in the search results.
+          max: null
+          min: null
+          name: include_domains
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: A comma-separated list of domains to specifically exclude from
+              the search results.
+            ja_JP: 検索結果から特に除外するドメインのカンマ区切りリスト。
+            pt_BR: Uma lista separada por vírgulas de domínios para excluir especificamente
+              dos resultados da pesquisa.
+            zh_Hans: 要从搜索结果中特别排除的域名的逗号分隔列表。
+          label:
+            en_US: Exclude Domains
+            ja_JP: 除外するドメイン
+            pt_BR: Excluir domínios
+            zh_Hans: 排除域名
+          llm_description: A comma-separated list of domains to specifically exclude
+            from the search results.
+          max: null
+          min: null
+          name: exclude_domains
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Only include results published after this date (YYYY-MM-DD format).
+            ja_JP: この日付以降に公開された結果のみを含める（YYYY-MM-DD形式）。
+            pt_BR: Incluir apenas resultados publicados após esta data (formato AAAA-MM-DD).
+            zh_Hans: 仅包含在此日期之后发布的结果（YYYY-MM-DD 格式）。
+          label:
+            en_US: Start Published Date
+            ja_JP: 公開開始日
+            pt_BR: Data de publicação inicial
+            zh_Hans: 开始发布日期
+          llm_description: Only include results published after this date in YYYY-MM-DD
+            format.
+          max: null
+          min: null
+          name: start_published_date
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Only include results published before this date (YYYY-MM-DD format).
+            ja_JP: この日付以前に公開された結果のみを含める（YYYY-MM-DD形式）。
+            pt_BR: Incluir apenas resultados publicados antes desta data (formato
+              AAAA-MM-DD).
+            zh_Hans: 仅包含在此日期之前发布的结果（YYYY-MM-DD 格式）。
+          label:
+            en_US: End Published Date
+            ja_JP: 公開終了日
+            pt_BR: Data de publicação final
+            zh_Hans: 结束发布日期
+          llm_description: Only include results published before this date in YYYY-MM-DD
+            format.
+          max: null
+          min: null
+          name: end_published_date
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: 1
+          form: form
+          human_description:
+            en_US: Whether to use Exa's prompt engineering to improve the query.
+            ja_JP: Exaのプロンプトエンジニングを使用してクエリを改善するかどうか。
+            pt_BR: Se deve usar a engenharia de prompt da Exa para melhorar a consulta.
+            zh_Hans: 是否使用 Exa 的提示工程来改进查询。
+          label:
+            en_US: Use Autoprompt
+            ja_JP: 自動プロンプトを使用
+            pt_BR: Usar Autoprompt
+            zh_Hans: 使用自动提示
+          llm_description: Whether to use Exa's prompt engineering to improve the
+            query. When true, Exa will automatically rewrite the query to improve
+            search results.
+          max: null
+          min: null
+          name: use_autoprompt
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: Whether to include the text contents from each search result.
+            ja_JP: 各検索結果からテキスト内容を含めるかどうか。
+            pt_BR: Se deve incluir o conteúdo de texto de cada resultado da pesquisa.
+            zh_Hans: 是否包含每个搜索结果的文本内容。
+          label:
+            en_US: Include Text Contents
+            ja_JP: テキスト内容を含める
+            pt_BR: Incluir conteúdo de texto
+            zh_Hans: 包含文本内容
+          llm_description: Whether to include the text contents from each search result.
+            When true, the response will include the text content of each webpage.
+          max: null
+          min: null
+          name: text_contents
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: 0
+          form: form
+          human_description:
+            en_US: Whether to highlight relevant text snippets in the search results.
+            ja_JP: 検索結果内の関連テキスト部分をハイライトするかどうか。
+            pt_BR: Se deve destacar trechos de texto relevantes nos resultados da
+              pesquisa.
+            zh_Hans: 是否在搜索结果中高亮显示相关文本片段。
+          label:
+            en_US: Highlight Results
+            ja_JP: 結果をハイライト
+            pt_BR: Destacar resultados
+            zh_Hans: 高亮结果
+          llm_description: Whether to highlight relevant text snippets in the search
+            results. When true, relevant sections of text will be highlighted.
+          max: null
+          min: null
+          name: highlight_results
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: boolean
+        - auto_generate: null
+          default: null
+          form: form
+          human_description:
+            en_US: A data category to focus on.
+            ja_JP: 集中するデータのカテゴリ。
+            pt_BR: Uma categoria de dados para se concentrar.
+            zh_Hans: 要集中的数据类别。
+          label:
+            en_US: Category
+            ja_JP: カテゴリ
+            pt_BR: Categoria
+            zh_Hans: 类别
+          llm_description: A data category to focus on.
+          max: null
+          min: null
+          name: category
+          options:
+          - label:
+              en_US: Company
+              ja_JP: 会社
+              pt_BR: Empresa
+              zh_Hans: 公司
+            value: company
+          - label:
+              en_US: Research Paper
+              ja_JP: 研究論文
+              pt_BR: Artigo de Pesquisa
+              zh_Hans: 研究论文
+            value: research paper
+          - label:
+              en_US: News
+              ja_JP: ニュース
+              pt_BR: Notícias
+              zh_Hans: 新闻
+            value: news
+          - label:
+              en_US: PDF
+              ja_JP: PDF
+              pt_BR: PDF
+              zh_Hans: PDF
+            value: pdf
+          - label:
+              en_US: GitHub
+              ja_JP: GitHub
+              pt_BR: GitHub
+              zh_Hans: GitHub
+            value: github
+          - label:
+              en_US: Tweet
+              ja_JP: ツイート
+              pt_BR: Tuite
+              zh_Hans: 推文
+            value: tweet
+          - label:
+              en_US: Personal Site
+              ja_JP: 個人サイト
+              pt_BR: Site Pessoal
+              zh_Hans: 个人网站
+            value: personal site
+          - label:
+              en_US: LinkedIn Profile
+              ja_JP: LinkedInプロファイル
+              pt_BR: Perfil do LinkedIn
+              zh_Hans: LinkedIn 个人主页
+            value: linkedin profile
+          - label:
+              en_US: Financial Report
+              ja_JP: 財務報告
+              pt_BR: Relatório Financeiro
+              zh_Hans: 财务报告
+            value: financial report
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: List of strings that must be present in webpage text of results.
+              Currently, only 1 string is supported, of up to 5 words.
+            ja_JP: 結果のウェブページテキストに存在する必要がある文字列のリスト。現在、最大5単語の1つの文字列のみがサポートされています。
+            pt_BR: Lista de strings que devem estar presentes no texto da página dos
+              resultados. Atualmente, apenas 1 string é suportada, de até 5 palavras.
+            zh_Hans: 必须出现在结果的网页文本中的字符串列表。目前，只支持1个字符串，最多5个单词。
+          label:
+            en_US: Include Text
+            ja_JP: テキストを含める
+            pt_BR: Incluir Texto
+            zh_Hans: 包含文本
+          llm_description: List of strings that must be present in webpage text of
+            results. Currently, only 1 string is supported, of up to 5 words.
+          max: null
+          min: null
+          name: includeText
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: List of strings that must not be present in webpage text of results.
+              Currently, only 1 string is supported, of up to 5 words.
+            ja_JP: 結果のウェブページテキストに存在してはならない文字列のリスト。現在、最大5単語の1つの文字列のみがサポートされています。
+            pt_BR: Lista de strings que não devem estar presentes no texto da página
+              dos resultados. Atualmente, apenas 1 string é suportada, de até 5 palavras.
+            zh_Hans: 不能出现在结果的网页文本中的字符串列表。目前，只支持1个字符串，最多5个单词。
+          label:
+            en_US: Exclude Text
+            ja_JP: テキストを除外
+            pt_BR: Excluir Texto
+            zh_Hans: 排除文本
+          llm_description: List of strings that must not be present in webpage text
+            of results. Currently, only 1 string is supported, of up to 5 words.
+          max: null
+          min: null
+          name: excludeText
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        params:
+          category: ''
+          end_published_date: ''
+          excludeText: ''
+          exclude_domains: ''
+          highlight_results: ''
+          includeText: ''
+          include_domains: ''
+          num_results: ''
+          query: ''
+          search_type: ''
+          start_published_date: ''
+          text_contents: ''
+          use_autoprompt: ''
+        provider_id: yevanchen/exa/exa
+        provider_name: yevanchen/exa/exa
+        provider_type: builtin
+        selected: false
+        title: Exa Search
+        tool_configurations:
+          category:
+            type: constant
+            value: null
+          highlight_results:
+            type: constant
+            value: 0
+          num_results:
+            type: constant
+            value: 10
+          search_type:
+            type: constant
+            value: neural
+          text_contents:
+            type: constant
+            value: 1
+          use_autoprompt:
+            type: constant
+            value: 1
+        tool_description: Perform semantic search on the web using Exa's AI-powered
+          search engine to find relevant web content and documents.
+        tool_label: Exa Search
+        tool_name: exa_search
+        tool_node_version: '2'
+        tool_parameters:
+          query:
+            type: mixed
+            value: '{{#1742554928243.research_topic#}}'
+        type: tool
+      height: 218
+      id: '1747905298621'
+      position:
+        x: 1162.5041398266746
+        y: 866.8376753063778
+      positionAbsolute:
+        x: 1162.5041398266746
+        y: 866.8376753063778
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 887.7885765965477
+      y: -423.7654544910969
+      zoom: 1.3905417210208892
+  rag_pipeline_variables: []

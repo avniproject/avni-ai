@@ -32,6 +32,7 @@ from .handlers.bundle_handlers import (
 from .handlers.upload_handlers import handle_upload_bundle, handle_upload_status
 from .handlers.config_handlers import handle_get_existing_config
 from .handlers.entity_handlers import (
+    handle_store_entities,
     handle_validate_entities,
     handle_apply_entity_corrections,
 )
@@ -162,6 +163,10 @@ async def create_server():
         return await handle_get_existing_config(request)
 
     # --- Entity Validation ---
+    @server.custom_route("/store-entities", methods=["POST"])
+    async def store_entities_endpoint(request: Request):
+        return await handle_store_entities(request)
+
     @server.custom_route("/validate-entities", methods=["POST"])
     async def validate_entities_endpoint(request: Request):
         return await handle_validate_entities(request)

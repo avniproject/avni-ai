@@ -1,0 +1,468 @@
+openapi: 3.0.0
+info:
+  title: Avni AI Tools
+  version: 1.0.0
+  description: Avni app configurator tools for entity validation, spec generation, and bundle management
+servers:
+  - url: https://staging-ai.avniproject.org
+paths:
+  /store-entities:
+    post:
+      operationId: store_entities
+      summary: Cache entities server-side by conversation_id (TTL 6h)
+      description: Call this once after entity extraction. Agent tools can then pass only conversation_id instead of the full entities payload.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID (sys.conversation_id)
+                entities:
+                  type: object
+                  description: Full extracted entities dict
+              required:
+                - conversation_id
+                - entities
+      responses:
+        '200':
+          description: Entities cached
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+
+  /validate-entities:
+    post:
+      operationId: validate_entities
+      summary: Validate extracted entities for structural issues
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entities:
+                  type: object
+                  description: Entities dict (pass this OR conversation_id)
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID — server looks up entities from store
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                  error_count:
+                    type: integer
+                  warning_count:
+                    type: integer
+                  issues_summary:
+                    type: string
+                  has_errors:
+                    type: boolean
+                  has_warnings:
+                    type: boolean
+                  entities:
+                    type: object
+
+  /apply-entity-corrections:
+    post:
+      operationId: apply_entity_corrections
+      summary: Apply corrections to extracted entities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entities:
+                  type: object
+                  description: Current entities object (pass this OR conversation_id)
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID — server looks up and updates stored entities
+                corrections:
+                  type: array
+                  description: Array of correction objects specifying changes to apply
+                  items:
+                    type: object
+              required:
+                - corrections
+      responses:
+        '200':
+          description: Corrected entities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /generate-spec:
+    post:
+      operationId: generate_spec
+      summary: Generate a human-readable YAML spec from entities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entities:
+                  type: object
+                  description: Entities dict to generate spec from (pass this OR conversation_id)
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID — server looks up entities from store
+                org_name:
+                  type: string
+                  description: Organisation name
+      responses:
+        '200':
+          description: Generated YAML spec
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  spec_yaml:
+                    type: string
+
+  /validate-spec:
+    post:
+      operationId: validate_spec
+      summary: Validate a YAML spec for structural and cross-reference errors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                spec_yaml:
+                  type: string
+                  description: YAML spec string to validate
+              required:
+                - spec_yaml
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+
+  /spec-to-entities:
+    post:
+      operationId: spec_to_entities
+      summary: Convert a YAML spec to a full entities dict for bundle generation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                spec_yaml:
+                  type: string
+                  description: Approved YAML spec string
+              required:
+                - spec_yaml
+      responses:
+        '200':
+          description: Full entities dict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entities:
+                    type: object
+
+  /bundle-to-spec:
+    post:
+      operationId: bundle_to_spec
+      summary: Convert an existing bundle to a human-readable YAML spec
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bundle:
+                  type: object
+                  description: Bundle object to convert
+                org_name:
+                  type: string
+                  description: Organisation name
+      responses:
+        '200':
+          description: YAML spec derived from bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  spec_yaml:
+                    type: string
+
+  /generate-bundle:
+    post:
+      operationId: generate_bundle
+      summary: Generate a complete Avni bundle ZIP from entities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entities:
+                  type: object
+                  description: Full entities dict
+                org_name:
+                  type: string
+                  description: Organisation name
+              required:
+                - entities
+      responses:
+        '200':
+          description: Generated bundle as base64 ZIP
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bundle_zip_b64:
+                    type: string
+
+  /validate-bundle:
+    post:
+      operationId: validate_bundle
+      summary: Validate a generated bundle ZIP for structural correctness
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bundle_zip_b64:
+                  type: string
+                  description: Base64 encoded bundle ZIP to validate
+              required:
+                - bundle_zip_b64
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+
+  /patch-bundle:
+    post:
+      operationId: patch_bundle
+      summary: Patch an existing bundle with corrections
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                existing_bundle_b64:
+                  type: string
+                  description: Base64 encoded existing bundle ZIP
+                corrections:
+                  type: object
+                  description: Corrections to apply to the bundle
+              required:
+                - existing_bundle_b64
+      responses:
+        '200':
+          description: Patched bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  patched_bundle_b64:
+                    type: string
+                  files_patched:
+                    type: integer
+
+  /upload-bundle:
+    post:
+      operationId: upload_bundle
+      summary: Upload a bundle ZIP to Avni server for import
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bundle_zip_b64:
+                  type: string
+                  description: Base64 encoded bundle ZIP to upload
+              required:
+                - bundle_zip_b64
+      responses:
+        '200':
+          description: Upload task ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task_id:
+                    type: string
+
+  /upload-status/{task_id}:
+    get:
+      operationId: upload_status
+      summary: Check the status of a bundle upload task
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The upload task ID returned by upload-bundle
+      responses:
+        '200':
+          description: Upload status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [pending, processing, completed, failed]
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+  /api/existing-config:
+    get:
+      operationId: get_existing_config
+      summary: Download the current organisation configuration from Avni
+      parameters:
+        - name: includeLocations
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Whether to include location data
+      responses:
+        '200':
+          description: Current organisation bundle
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /download-bundle-b64:
+    get:
+      operationId: download_bundle_b64
+      summary: Download existing org bundle as base64 encoded ZIP
+      parameters:
+        - name: includeLocations
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Bundle as base64
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bundle_zip_b64:
+                    type: string
+
+  /execute-python:
+    post:
+      operationId: execute_python
+      summary: Execute Python code in a sandboxed environment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: Python code to execute
+                context:
+                  type: object
+                  description: Variables available in the execution context
+              required:
+                - code
+      responses:
+        '200':
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  output:
+                    type: string
+                  result:
+                    type: object
+                  error:
+                    type: string
