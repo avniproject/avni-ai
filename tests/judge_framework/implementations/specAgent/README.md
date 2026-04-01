@@ -18,7 +18,7 @@ This implementation tests the Spec Agent's ability to:
 ```bash
 export DIFY_API_KEY="your_dify_api_key"
 export DIFY_API_BASE_URL="https://api.dify.ai/v1"
-export AVNI_MCP_SERVER_URL="http://localhost:8023"
+export AVNI_MCP_SERVER_URL="https://staging-ai.avniproject.org/"
 export AVNI_AUTH_TOKEN="your_avni_token"  # Optional for some tests
 ```
 
@@ -44,13 +44,13 @@ The framework automatically monitors conversation state on the avni-ai server. Y
 
 ```bash
 # Get conversation state
-curl http://localhost:8023/debug/conversation/{conversation_id}
+curl https://staging-ai.avniproject.org/debug/conversation/{conversation_id}
 
 # List all conversations
-curl http://localhost:8023/debug/conversations
+curl https://staging-ai.avniproject.org/debug/conversations
 
 # Clear conversation state
-curl -X DELETE http://localhost:8023/debug/conversation/{conversation_id}
+curl -X DELETE https://staging-ai.avniproject.org/debug/conversation/{conversation_id}
 ```
 
 ## Architecture

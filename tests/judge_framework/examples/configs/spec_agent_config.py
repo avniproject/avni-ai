@@ -14,7 +14,7 @@ from tests.judge_framework.interfaces.result_models import (
 )
 
 
-def get_spec_agent_config(workflow_version: str = "v3") -> TestConfiguration:
+def get_spec_agent_config() -> TestConfiguration:
     """
     Get default Spec Agent test configuration.
 
@@ -22,26 +22,17 @@ def get_spec_agent_config(workflow_version: str = "v3") -> TestConfiguration:
 
     Required environment variables:
     - DIFY_API_KEY: Dify API key for workflow execution
-    - AVNI_MCP_SERVER_URL: URL of avni-ai MCP server (e.g., http://localhost:8023)
+    - AVNI_MCP_SERVER_URL: URL of staging avni-ai server (default: https://staging-ai.avniproject.org/)
     - AVNI_AUTH_TOKEN: Avni authentication token (optional for some tests)
-
-    Args:
-        workflow_version: Which workflow version to use ("v2" or "v3", default "v3")
 
     Returns:
         TestConfiguration instance
     """
-    workflow_name = (
-        "App Configurator [Staging] v3"
-        if workflow_version == "v3"
-        else "App Configurator [Staging] v2"
-    )
-
-    return TestConfiguration(
+    config = TestConfiguration(
         dify_config=DifyConfig(
             api_key=os.getenv("DIFY_API_KEY", ""),
             base_url=os.getenv("DIFY_API_BASE_URL", "https://api.dify.ai/v1"),
-            workflow_name=workflow_name,
+            workflow_name="App Configurator [Staging] v3",
         ),
         evaluation_config=EvaluationConfig(
             evaluation_metrics=[
@@ -61,10 +52,13 @@ def get_spec_agent_config(workflow_version: str = "v3") -> TestConfiguration:
             static_test_cases=[],  # Load from JSON file
             ai_generation_enabled=False,  # Use static scenarios only
         ),
-        openai_model="gpt-4",  # For any AI-based evaluation (future)
-        avni_auth_token=os.getenv("AVNI_AUTH_TOKEN", ""),
-        avni_mcp_server_url=os.getenv("AVNI_MCP_SERVER_URL", ""),
     )
+    # Add custom attributes for Avni integration
+    config.avni_auth_token = os.getenv("AVNI_AUTH_TOKEN", "")
+    config.avni_mcp_server_url = os.getenv(
+        "AVNI_MCP_SERVER_URL", "https://staging-ai.avniproject.org/"
+    )
+    return config
 
 
 def get_strict_config() -> TestConfiguration:

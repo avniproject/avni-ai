@@ -50,19 +50,13 @@ def load_test_scenarios(scenarios_file: str) -> list:
     return data.get("test_scenarios", [])
 
 
-def create_test_configuration(workflow_version: str = "v3") -> TestConfiguration:
+def create_test_configuration() -> TestConfiguration:
     """Create test configuration from environment variables."""
-    workflow_name = (
-        "App Configurator [Staging] v3"
-        if workflow_version == "v3"
-        else "App Configurator [Staging] v2"
-    )
-
-    return TestConfiguration(
+    config = TestConfiguration(
         dify_config=DifyConfig(
             api_key=os.getenv("DIFY_API_KEY", ""),
             base_url=os.getenv("DIFY_API_BASE_URL", "https://api.dify.ai/v1"),
-            workflow_name=workflow_name,
+            workflow_name="App Configurator [Staging] v3",
         ),
         evaluation_config=EvaluationConfig(
             evaluation_metrics=[
@@ -82,10 +76,13 @@ def create_test_configuration(workflow_version: str = "v3") -> TestConfiguration
             static_test_cases=[],  # Loaded separately
             ai_generation_enabled=False,
         ),
-        openai_model="gpt-4",
-        avni_auth_token=os.getenv("AVNI_AUTH_TOKEN", ""),
-        avni_mcp_server_url=os.getenv("AVNI_MCP_SERVER_URL", ""),
     )
+    # Add custom attributes for Avni integration
+    config.avni_auth_token = os.getenv("AVNI_AUTH_TOKEN", "")
+    config.avni_mcp_server_url = os.getenv(
+        "AVNI_MCP_SERVER_URL", "https://staging-ai.avniproject.org/"
+    )
+    return config
 
 
 def run_spec_agent_tests(
@@ -94,7 +91,6 @@ def run_spec_agent_tests(
     fail_fast: bool = False,
     output_format: str = "console",
     monitor_conversations: bool = True,
-    workflow_version: str = "v3",
 ) -> int:
     """
     Run Spec Agent tests.
@@ -105,15 +101,14 @@ def run_spec_agent_tests(
         fail_fast: Stop on first failure
         output_format: Output format (console, json, csv)
         monitor_conversations: Whether to monitor conversation state
-        workflow_version: Workflow version to test (v2 or v3)
 
     Returns:
         Exit code (0 for success, 1 for failure)
     """
-    logger.info(f"Starting Spec Agent tests with workflow {workflow_version}")
+    logger.info("Starting Spec Agent tests with v3 workflow")
 
     # Load configuration
-    config = create_test_configuration(workflow_version)
+    config = create_test_configuration()
 
     # Validate environment
     if not config.dify_config.api_key:
@@ -233,12 +228,6 @@ def main():
         action="store_true",
         help="Disable conversation monitoring",
     )
-    parser.add_argument(
-        "--workflow-version",
-        choices=["v2", "v3"],
-        default="v3",
-        help="Workflow version to test (default: v3)",
-    )
 
     args = parser.parse_args()
 
@@ -261,7 +250,6 @@ def main():
         fail_fast=args.fail_fast,
         output_format=args.output_format,
         monitor_conversations=not args.no_monitor,
-        workflow_version=args.workflow_version,
     )
 
     return exit_code

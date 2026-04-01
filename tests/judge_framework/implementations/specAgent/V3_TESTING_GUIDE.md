@@ -2,27 +2,19 @@
 
 ## Quick Start
 
-The v3 workflow is now fully compatible with the Spec Agent test framework. All critical issues have been fixed.
+The v3 workflow is fully compatible with the Spec Agent test framework and runs against the staging environment.
 
-### Run Tests with v3 Workflow (Default)
+### Run Tests
 
 ```bash
 # Set environment variables
 export DIFY_API_KEY="your_dify_api_key"
-export AVNI_MCP_SERVER_URL="http://localhost:8023"
+export DIFY_API_BASE_URL="https://api.dify.ai/v1"
+export AVNI_MCP_SERVER_URL="https://staging-ai.avniproject.org/"
+export AVNI_AUTH_TOKEN="your_auth_token"
 
-# Start avni-ai server (Terminal 1)
-cd /Users/himeshr/IdeaProjects/avni-ai
-uv run python -m src.main
-
-# Run tests with v3 workflow (Terminal 2)
+# Run tests
 uv run python tests/judge_framework/examples/run_spec_agent_tests.py
-```
-
-### Run Tests with v2 Workflow
-
-```bash
-uv run python tests/judge_framework/examples/run_spec_agent_tests.py --workflow-version v2
 ```
 
 ## What Was Fixed in v3
@@ -54,7 +46,7 @@ uv run python tests/judge_framework/examples/run_spec_agent_tests.py --workflow-
 
 ## Test Scenarios
 
-All 6 test scenarios work with v3:
+The framework includes 6 comprehensive test scenarios:
 
 1. **happy_path_full_entities** - Full entities → generate spec → approve
 2. **empty_entities_should_ask_for_docs** - No entities → ask for docs
@@ -93,13 +85,13 @@ uv run python tests/judge_framework/examples/run_spec_agent_tests.py \
 
 ```bash
 # List all conversations
-curl http://localhost:8023/debug/conversations
+curl https://staging-ai.avniproject.org/debug/conversations
 
 # Get specific conversation
-curl http://localhost:8023/debug/conversation/{conversation_id} | jq
+curl https://staging-ai.avniproject.org/debug/conversation/{conversation_id} | jq
 ```
 
-### Expected in v3 Conversation State
+### Expected Conversation State
 
 ```json
 {
@@ -123,7 +115,7 @@ curl http://localhost:8023/debug/conversation/{conversation_id} | jq
 }
 ```
 
-**Key difference from v2:** `spec_yaml` is now populated!
+**Important:** `spec_yaml` is properly populated in the conversation state.
 
 ## Validation Checklist
 
@@ -141,7 +133,7 @@ After running tests, verify:
 
 Check:
 1. Spec Agent output contains "SPEC_APPROVED"
-2. Extract Spec YAML node is in the flow
+2. Extract Spec YAML node is in the v3 workflow
 3. Edge connections are correct
 4. No errors in Dify workflow logs
 
@@ -157,22 +149,22 @@ Check:
 Check:
 1. Workflow name is correct: "App Configurator [Staging] v3"
 2. DIFY_API_KEY is valid
-3. avni-ai server is running on port 8023
+3. Staging server (staging-ai.avniproject.org) is accessible
 4. Entities file exists and is valid JSON
+5. AVNI_AUTH_TOKEN is valid and not expired
 
-## Differences Between v2 and v3
+## Key Features of v3
 
-| Feature | v2 | v3 |
-|---------|----|----|
-| spec_yaml extraction | Manual/Missing | Automated via code node |
-| JSON body | May have issues | Fixed with quotes |
-| Duplicate edges | Present | Removed |
-| Spec Agent instruction | Basic | Enhanced with format |
-| Test compatibility | Partial | Full |
+| Feature | Status |
+| spec_yaml extraction | ✅ Automated via code node |
+| JSON body | ✅ Fixed with proper quotes |
+| Duplicate edges | ✅ Removed |
+| Spec Agent instruction | ✅ Enhanced with explicit format |
+| Test compatibility | ✅ Full compatibility |
 
 ## Performance
 
-v3 workflow adds 2 nodes to the flow:
+The v3 workflow includes optimized nodes:
 - Extract Spec YAML (code node) - ~50ms
 - Save Spec YAML (variable assigner) - ~10ms
 
@@ -180,26 +172,27 @@ v3 workflow adds 2 nodes to the flow:
 
 ## Next Steps
 
-1. **Upload v3 to Dify** - Import the updated YAML file
-2. **Run manual test** - Verify workflow works in Dify UI
-3. **Run automated tests** - Execute full test suite
-4. **Monitor results** - Check debug endpoints
+1. **Verify environment** - Ensure staging server is accessible
+2. **Set credentials** - Export required environment variables
+3. **Run tests** - Execute full test suite
+4. **Monitor results** - Check debug endpoints on staging
 5. **Iterate if needed** - Adjust based on findings
 
-## Files Modified
+## Key Files
 
 - `dify/App Configurator [Staging] v3.yml` - Main workflow file
-- `tests/judge_framework/examples/run_spec_agent_tests.py` - Added v3 support
-- `tests/judge_framework/examples/configs/spec_agent_config.py` - Added v3 config
+- `tests/judge_framework/examples/run_spec_agent_tests.py` - Test runner
+- `tests/judge_framework/examples/configs/spec_agent_config.py` - Configuration
+- `tests/judge_framework/test_suites/specAgent/spec_agent_test_scenarios.json` - Test scenarios
 
 ## Documentation
 
-- **Implementation Summary:** `dify/V3_WORKFLOW_FIXES_SUMMARY.md`
-- **Test Framework:** `tests/judge_framework/implementations/specAgent/IMPLEMENTATION_SUMMARY.md`
 - **Quick Start:** `tests/judge_framework/implementations/specAgent/QUICK_START.md`
+- **Full README:** `tests/judge_framework/implementations/specAgent/README.md`
+- **Test Scenarios:** `tests/judge_framework/test_suites/specAgent/spec_agent_test_scenarios.json`
 
 ---
 
 **Status:** ✅ Ready for Testing  
-**Default Workflow:** v3  
-**Backward Compatible:** Yes (use --workflow-version v2)
+**Workflow:** App Configurator [Staging] v3  
+**Environment:** Staging (staging-ai.avniproject.org)

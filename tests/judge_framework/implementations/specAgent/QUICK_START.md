@@ -11,26 +11,16 @@ export AVNI_MCP_SERVER_URL="http://localhost:8023"
 export AVNI_AUTH_TOKEN="your_avni_auth_token"  # Optional
 ```
 
-### Step 2: Start the avni-ai Server
+### Step 2: Run Component Validation (Optional)
 
 ```bash
-# Terminal 1: Start the server with debug endpoints
-cd /Users/himeshr/IdeaProjects/avni-ai
-uv run python -m src.main
-```
-
-Wait for: `Starting Avni AI server on 0.0.0.0:8023`
-
-### Step 3: Run Component Validation (Optional)
-
-```bash
-# Terminal 2: Verify all components work
+# Verify all components work
 uv run python tests/judge_framework/implementations/specAgent/test_components.py
 ```
 
 Expected output: `✅ All component tests passed!`
 
-### Step 4: Run Spec Agent Tests
+### Step 3: Run Spec Agent Tests
 
 ```bash
 # Run all 6 test scenarios
@@ -130,7 +120,7 @@ uv run python tests/judge_framework/examples/run_spec_agent_tests.py --no-monito
 
 ```bash
 # Get conversation ID from test output, then:
-curl http://localhost:8023/debug/conversation/{conversation_id} | jq
+curl https://staging-ai.avniproject.org/debug/conversation/{conversation_id} | jq
 ```
 
 ### 2. Export Debug Snapshot
@@ -138,7 +128,7 @@ curl http://localhost:8023/debug/conversation/{conversation_id} | jq
 ```python
 from tests.judge_framework.implementations.specAgent.monitoring import ConversationMonitor
 
-monitor = ConversationMonitor("http://localhost:8023")
+monitor = ConversationMonitor("https://staging-ai.avniproject.org/")
 monitor.export_debug_snapshot("conversation_id", "debug_snapshot.json")
 ```
 
@@ -192,11 +182,8 @@ config.evaluation_config.success_thresholds = {
 export DIFY_API_KEY="your_key"
 ```
 
-### "Connection refused to localhost:8023"
-Start the avni-ai server first:
-```bash
-uv run python -m src.main
-```
+### "Connection refused to staging-ai.avniproject.org"
+Check that the staging server is running and accessible. Contact the team if the staging environment is down.
 
 ### "No module named 'requests'"
 Install dependencies:
@@ -226,7 +213,7 @@ uv run python tests/judge_framework/examples/run_spec_agent_tests.py --no-monito
 ## 🔗 Useful Links
 
 - **Full Documentation**: `tests/judge_framework/implementations/specAgent/README.md`
-- **Implementation Summary**: `tests/judge_framework/implementations/specAgent/IMPLEMENTATION_SUMMARY.md`
+- **V3 Testing Guide**: `tests/judge_framework/implementations/specAgent/V3_TESTING_GUIDE.md`
 - **Test Scenarios**: `tests/judge_framework/test_suites/specAgent/spec_agent_test_scenarios.json`
 - **Configuration**: `tests/judge_framework/examples/configs/spec_agent_config.py`
 
