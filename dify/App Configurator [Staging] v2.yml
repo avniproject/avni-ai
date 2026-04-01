@@ -424,10 +424,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: http-request
-        targetType: http-request
+        targetType: code
       id: a0b1c2d3-e4f5-4a6b-7c8d-9e0f1a2b3c4d
       selected: false
       source: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+      sourceHandle: source
+      target: b2c3d4e5-f6a7-4b89-0c1d-2e3f4a5b6c7d
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: c3d4e5f6-a7b8-4c90-1d2e-3f4a5b6c7d8e
+      selected: false
+      source: b2c3d4e5-f6a7-4b89-0c1d-2e3f4a5b6c7d
       sourceHandle: source
       target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
       targetHandle: target
@@ -1464,6 +1476,43 @@ workflow:
       type: custom
       width: 242
     - data:
+        code: "import json\n\ndef main(download_body: str, spec_yaml: str) -> dict:\n\
+          \    try:\n        parsed = json.loads(download_body) if isinstance(download_body,\
+          \ str) else download_body\n    except (json.JSONDecodeError, TypeError):\n\
+          \        parsed = {}\n    bundle_b64 = parsed.get(\"bundle_zip_b64\", \"\"\
+          )\n    payload = json.dumps({\n        \"existing_bundle_b64\": bundle_b64,\n\
+          \        \"spec_yaml\": spec_yaml\n    })\n    return {\"patch_body\": payload}\n"
+        code_language: python3
+        outputs:
+          patch_body:
+            children: null
+            type: string
+        selected: false
+        title: Build Patch Body
+        type: code
+        variables:
+        - value_selector:
+          - d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+          - body
+          value_type: string
+          variable: download_body
+        - value_selector:
+          - conversation
+          - spec_yaml
+          value_type: string
+          variable: spec_yaml
+      height: 52
+      id: b2c3d4e5-f6a7-4b89-0c1d-2e3f4a5b6c7d
+      position:
+        x: 3809.35695491808
+        y: 1001.5865632676173
+      positionAbsolute:
+        x: 3809.35695491808
+        y: 1001.5865632676173
+      selected: false
+      type: custom
+      width: 242
+    - data:
         authorization:
           config: null
           type: no-auth
@@ -1472,8 +1521,7 @@ workflow:
           - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac691
             key: ''
             type: text
-            value: "{\n  \"existing_bundle_b64\": \"{{#d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1.body.bundle_zip_b64#}}\"\
-              ,\n  \"spec_yaml\": {{#conversation.spec_yaml#}}\n}\n"
+            value: '{{#b2c3d4e5-f6a7-4b89-0c1d-2e3f4a5b6c7d.patch_body#}}'
           type: json
         headers: 'Content-Type:application/json'
         method: post
@@ -1495,10 +1543,10 @@ workflow:
       id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
       position:
         x: 3809.35695491808
-        y: 1101.5865632676173
+        y: 1121.5865632676173
       positionAbsolute:
         x: 3809.35695491808
-        y: 1101.5865632676173
+        y: 1121.5865632676173
       selected: false
       type: custom
       width: 242
@@ -2220,14 +2268,24 @@ workflow:
           instruction:
             type: constant
             value: "You are the Spec Agent for the Avni App Configurator. Your task\
-              \ is to help the user refine their program configuration and produce an\
-              \ approved YAML spec.\n\nCurrent entities: {{#conversation.entities_jsonl#}}\n\
-              User message: {{#sys.query#}}\n\nWorkflow:\n1. If user said Yes (confirmed)\
-              \ \u2192 call generate-spec, then validate-spec, then store spec and proceed.\n\
-              2. If user said No (wants corrections) \u2192 apply-entity-corrections\
-              \ with their requested changes, re-validate, show updated summary, ask\
-              \ for confirmation.\n3. Once spec is valid and user approves, output: SPEC_APPROVED\
-              \ and the final spec_yaml."
+              \ is to generate and validate a YAML spec from extracted entities.\n\n\
+              **Context:**\n- Conversation ID: {{#sys.conversation_id#}}\n- Entities\
+              \ loaded: {{#conversation.entities_jsonl#}}\n- User message: {{#sys.query#}}\n\
+              \n**CRITICAL: Use conversation_id for ALL tool calls, NOT the entities\
+              \ object. The server caches entities by conversation_id.**\n\n**Workflow:**\n\
+              \n**FIRST INVOCATION (entities already loaded):**\n1. Immediately call\
+              \ `generate_spec` with `{\"conversation_id\": \"{{#sys.conversation_id#}}\"\
+              }`\n2. Call `validate_spec` with the returned `spec_yaml`\n3. If valid,\
+              \ show user a summary and ask: \"Does this configuration look correct?\
+              \ (Yes/No)\"\n4. Wait for user response\n\n**USER SAYS YES:**\n1. Output:\
+              \ \"SPEC_APPROVED\" followed by the spec_yaml\n2. The workflow will automatically\
+              \ store this in conversation.spec_yaml and proceed to bundle generation\n\
+              \n**USER SAYS NO (wants changes):**\n1. Ask what corrections are needed\n\
+              2. Call `apply_entity_corrections` with `{\"conversation_id\": \"{{#sys.conversation_id#}}\"\
+              , \"corrections\": [...]}`\n3. Call `generate_spec` again with conversation_id\n\
+              4. Call `validate_spec`\n5. Show updated summary, ask for confirmation\
+              \ again\n\n**Remember:** Always pass `conversation_id`, never the full\
+              \ entities object."
           maximum_iterations:
             type: constant
             value: 5

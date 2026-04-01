@@ -1,0 +1,1460 @@
+{
+  "conditions": [
+    {
+      "actual_value": {
+        "subject_types": [
+          {
+            "name": "Cohort",
+            "type": "Group",
+            "lowest_address_level": "City"
+          },
+          {
+            "name": "Participant",
+            "type": "Individual",
+            "lowest_address_level": "City"
+          }
+        ],
+        "programs": [
+          {
+            "name": "Work With Men",
+            "target_subject_type": "Cohort"
+          },
+          {
+            "name": "Work With Women",
+            "target_subject_type": "Cohort"
+          }
+        ],
+        "encounter_types": [
+          {
+            "name": "Session",
+            "subject_type": "Cohort",
+            "is_program_encounter": true,
+            "is_scheduled": true
+          },
+          {
+            "name": "Baseline for Women",
+            "subject_type": "Participant",
+            "is_program_encounter": true,
+            "is_scheduled": false
+          },
+          {
+            "name": "Endline for Women",
+            "subject_type": "Participant",
+            "is_program_encounter": true,
+            "is_scheduled": true
+          },
+          {
+            "name": "Baseline for Men",
+            "subject_type": "Participant",
+            "is_program_encounter": true,
+            "is_scheduled": false
+          },
+          {
+            "name": "Endline for Men",
+            "subject_type": "Participant",
+            "is_program_encounter": true,
+            "is_scheduled": true
+          },
+          {
+            "name": "Cohort Endline WWM",
+            "subject_type": "Cohort",
+            "is_program_encounter": true,
+            "is_scheduled": false
+          },
+          {
+            "name": "Cohort Endline WWW",
+            "subject_type": "Cohort",
+            "is_program_encounter": true,
+            "is_scheduled": false
+          }
+        ],
+        "address_levels": [
+          {
+            "name": "State",
+            "level": 2,
+            "parent": null
+          },
+          {
+            "name": "City",
+            "level": 1,
+            "parent": "State"
+          }
+        ],
+        "forms": [
+          {
+            "name": "Cohort Details",
+            "formType": "ProgramEncounter",
+            "subjectType": "Cohort",
+            "encounterType": "Session",
+            "fields": [
+              {
+                "name": "Cohort Type",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "School",
+                  "College",
+                  "Shelter Home",
+                  "Observation Home",
+                  "Corporate",
+                  "Traffic police",
+                  "Anganwadi workers",
+                  "Street Vendors",
+                  "BBMP Worker",
+                  "Teaching Staff",
+                  "Auto Drivers",
+                  "BMTC",
+                  "Domestic Help",
+                  "Unorganised Sector",
+                  "Underprivileged Sector",
+                  "Organised Sector",
+                  "Others"
+                ]
+              },
+              {
+                "name": "Other Cohort Type, please specify",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Engagement Type",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Session",
+                  "Meeting",
+                  "Workshop",
+                  "Active Bystander Program"
+                ]
+              },
+              {
+                "name": "Meeting Type",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Offline",
+                  "Online"
+                ]
+              },
+              {
+                "name": "Coordinator",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Thejaswini H",
+                  "Namitha",
+                  "Tresa",
+                  "Sumathi",
+                  "Raj",
+                  "Priya",
+                  "Vardarajan"
+                ]
+              },
+              {
+                "name": "Donor",
+                "dataType": "Text",
+                "mandatory": true
+              }
+            ]
+          },
+          {
+            "name": "Participant Details",
+            "formType": "IndividualProfile",
+            "subjectType": "Participant",
+            "fields": [
+              {
+                "name": "Name",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Gender",
+                "dataType": "Coded",
+                "mandatory": false,
+                "options": [
+                  "Male",
+                  "Female",
+                  "Others"
+                ]
+              },
+              {
+                "name": "Birth year",
+                "dataType": "Date",
+                "mandatory": false
+              },
+              {
+                "name": "Age",
+                "dataType": "Numeric",
+                "mandatory": false
+              },
+              {
+                "name": "Occupation/Designation",
+                "dataType": "Text",
+                "mandatory": false
+              },
+              {
+                "name": "Marital Status",
+                "dataType": "Coded",
+                "mandatory": false,
+                "options": [
+                  "Married",
+                  "Single"
+                ]
+              },
+              {
+                "name": "Contact Number",
+                "dataType": "PhoneNumber",
+                "mandatory": false
+              },
+              {
+                "name": "Is this is you WhatsApp number",
+                "dataType": "Coded",
+                "mandatory": false,
+                "options": [
+                  "Yes",
+                  "No"
+                ]
+              },
+              {
+                "name": "Provide WhatsApp Number",
+                "dataType": "PhoneNumber",
+                "mandatory": false
+              },
+              {
+                "name": "Religion",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Hindu",
+                  "Muslim",
+                  "Christian",
+                  "Jain",
+                  "Buddhism",
+                  "other"
+                ]
+              },
+              {
+                "name": "Active bystander",
+                "dataType": "Coded",
+                "mandatory": true
+              },
+              {
+                "name": "Person with Disabilities (PWD)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No"
+                ]
+              },
+              {
+                "name": "Education",
+                "dataType": "Text",
+                "mandatory": false
+              },
+              {
+                "name": "Is this your first session with Durga?",
+                "dataType": "Coded",
+                "mandatory": false,
+                "options": [
+                  "Yes",
+                  "No"
+                ]
+              },
+              {
+                "name": "Status",
+                "dataType": "Coded",
+                "mandatory": false,
+                "options": [
+                  "Active",
+                  "Inactive"
+                ]
+              },
+              {
+                "name": "Donor",
+                "dataType": "Coded",
+                "mandatory": false
+              }
+            ]
+          },
+          {
+            "name": "Session",
+            "formType": "ProgramEncounter",
+            "subjectType": "Cohort",
+            "encounterType": "Session",
+            "fields": [
+              {
+                "name": "Participants",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "No of partipants attended the session",
+                "dataType": "Numeric",
+                "mandatory": true
+              },
+              {
+                "name": "Coordinator",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Thejaswini H",
+                  "Namitha",
+                  "Tresa",
+                  "Sumathi",
+                  "Raj",
+                  "Priya",
+                  "Vardarajan"
+                ]
+              },
+              {
+                "name": "Facilitator",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Thejaswini H",
+                  "Namitha",
+                  "Tresa",
+                  "Sumathi",
+                  "Raj",
+                  "Priya",
+                  "Vardarajan"
+                ]
+              },
+              {
+                "name": "Co-Facilitator",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Topic",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Power and Control",
+                  "Consent goes on",
+                  "Endline",
+                  "Baseline",
+                  "Graduation",
+                  "DARE",
+                  "Others, pl specify"
+                ]
+              },
+              {
+                "name": "Importance",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "High",
+                  "Medium",
+                  "Low"
+                ]
+              },
+              {
+                "name": "Session Duration",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Session Notes",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Testimonials",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Stories of Change",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Video",
+                "dataType": "Video",
+                "mandatory": true
+              },
+              {
+                "name": "Photo",
+                "dataType": "Image",
+                "mandatory": true
+              },
+              {
+                "name": "Observations",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Challenges (if there is any)",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Remarks",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Upload Doc",
+                "dataType": "File",
+                "mandatory": true
+              },
+              {
+                "name": "Request for counselling",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No"
+                ]
+              },
+              {
+                "name": "Participant requiring counselling",
+                "dataType": "Text",
+                "mandatory": true
+              },
+              {
+                "name": "Status",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Ongoing",
+                  "Dropped",
+                  "Completed"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Baseline for Women",
+            "formType": "ProgramEncounter",
+            "subjectType": "Participant",
+            "encounterType": "Baseline for Women",
+            "fields": [
+              {
+                "name": "Why do you want to work?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "I can support my family",
+                  "It gives me financial independence",
+                  "It makes me feel more confident and independent"
+                ]
+              },
+              {
+                "name": "Goal/plan rank - Save for my marriage / my children's future",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Goal/plan rank - Educate my children/ Support my parents.",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Goal/plan rank - Increase my skills and knowledge (ex, tailoring, beauty parlour) for better growth",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Goal/plan rank - Purchase property/gold for my family's security",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Spending rank - Household expenditure",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Spending rank - Invest in my career/business/skill development",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Spending rank - Invest for children's / family's future",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Spending rank - Personal spending (e.g., clothes, jewellery, hobbies)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Sleep time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Care of children/family elders (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Household work time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Work/business/learning time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Leisure/TV/friends/resting time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Travel time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "How often do you alter your decisions because of family responsibilities or for being a woman ?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Often",
+                  "Sometimes",
+                  "Rarely"
+                ]
+              },
+              {
+                "name": "Agree with statement: When a son is born, we usually save for his education, and when a daughter is born, we usually save for her wedding",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not Sure"
+                ]
+              },
+              {
+                "name": "It's okay for men to cry",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not Sure"
+                ]
+              },
+              {
+                "name": "Response to salary control by husband/father (select all that applies)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "It's ok, because that's how she will be able to work",
+                  "He's the head of the family, and if she is unable to work later, he'll be the one supporting her",
+                  "This is a private matter—they should resolve it without outside help.",
+                  "Encourage her to express her thoughts and point of view to her family"
+                ]
+              },
+              {
+                "name": "Do you think consent is required between husband and wife?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not Sure"
+                ]
+              },
+              {
+                "name": "If a girl's boyfriend is holding the girl's hand but it is making her uncomfortable, is that considered sexual harrassment?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Witnessing harassment rank - Ensure your safety before you react",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Witnessing harassment rank - Distract the offender and divert their attention",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Witnessing harassment rank - Call the support helpline/police",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Witnessing harassment rank - Seek help from others nearby",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "How do you think sexual harassment can be reduced in our society? (select all that apply)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Women should avoid working or going out after 7 p.m.",
+                  "Listen to them when she shares her feelings/needs with you.",
+                  "Families should avoid women wearing dresses like skirts, short dresses",
+                  "Understand how you as a person can help the women in distress",
+                  "Don't Know"
+                ]
+              },
+              {
+                "name": "What is the main purpose of the PoSH Act?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "To prevent and address sexual harassment of women at the workplace only in private companies",
+                  "To prevent and address sexual harassment of women at the workplace only in government companies",
+                  "To prevent and address sexual harassment of women at the workplace only for full-time employees",
+                  "To prevent and address sexual harassment of women at the workplace including those in the unorganised sector (ex domestic workers, beauty parlors )",
+                  "I don't know"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Endline for Women",
+            "formType": "ProgramEncounter",
+            "subjectType": "Participant",
+            "encounterType": "Endline for Women",
+            "fields": [
+              {
+                "name": "Which of these statements treats people equally, without using gender stereotypes?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Because men are busy with outside work",
+                  "Because that's how it has always been in society",
+                  "Because women are better at managing household work",
+                  "Because not everyone in the family believes household work should be shared"
+                ]
+              },
+              {
+                "name": "In many families, women wake up early to cook, clean, wash clothes, and take care of children, even if they also go out to work. Meanwhile, men in the family usually help only when asked or after finishing their office work. Why do you think women usually end up doing most of the household chores at home?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Because men are busy with outside work",
+                  "Because that's how it has always been in society",
+                  "Because women are better at managing household work",
+                  "Because not everyone in the family believes household work should be shared"
+                ]
+              },
+              {
+                "name": "A woman says that her husband or father controls how she uses her salary. She's scolded if she spends money without asking, and he tells her that she's working only because he gave her permission.",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "It's okay, that's how she can work",
+                  "He's the head so he can control her salary",
+                  "Encourage her to express her thoughts and point of view to her family",
+                  "It's private, they'll resolve it"
+                ]
+              },
+              {
+                "name": "Which of the statements violates/crosses the personal boundary of a person",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Sending messages after work hours",
+                  "Commenting on dressing",
+                  "Asking personal life questions",
+                  "Asking consent before posting photo",
+                  "Asking consent to stand close",
+                  "None of the above"
+                ]
+              },
+              {
+                "name": "How can sexual harassment be reduced",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Teaching children to respect women",
+                  "Supporting women facing harassment",
+                  "Women avoid going out after 7pm",
+                  "Women avoid short clothes",
+                  "I don't know"
+                ]
+              },
+              {
+                "name": "Husband expects wife to serve him food",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "Father shouts at daughter for refusing marriage",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "You're making this issue bigger than it is",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "After all I've done for you, this is how you treat me",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "Husband not allowing wife to meet family",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "It's not my fault, you made me do this",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "Meaning of gender justice (feminism)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Giving special privileges to women",
+                  "Believing in equal rights and opportunities for everyone",
+                  "Supporting women and opposing men",
+                  "I don't know"
+                ]
+              },
+              {
+                "name": "How can gender equality benefit men in their personal or professional lives?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Helps men understand and respect relationships",
+                  "Pressures men",
+                  "Doesn't affect men",
+                  "Takes away men's opportunities"
+                ]
+              },
+              {
+                "name": "Which of the following statements do you agree with the most?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Women lead only in schools/hospitals",
+                  "Women lead only inside family",
+                  "Women don't know leadership",
+                  "Leadership suits men",
+                  "Women can lead in all spaces"
+                ]
+              },
+              {
+                "name": "Purpose of POSH Act",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Only private companies",
+                  "Govt & private companies",
+                  "Including unorganized sector",
+                  "I don't know"
+                ]
+              },
+              {
+                "name": "Response to harassment on bus",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Advise her not to go alone",
+                  "Listen and ensure safety",
+                  "Ask her to calm down",
+                  "Wait for police"
+                ]
+              },
+              {
+                "name": "Can bystander intervention prevent harm",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not sure"
+                ]
+              },
+              {
+                "name": "Would you intervene without being asked",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not sure"
+                ]
+              },
+              {
+                "name": "Who should intervene first",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Woman herself",
+                  "Staff on vehicle",
+                  "Nearby passengers",
+                  "Police",
+                  "Everyone together"
+                ]
+              },
+              {
+                "name": "Why gender concepts are hard to apply",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Traditional beliefs",
+                  "Don't know how to apply",
+                  "Fear judgement",
+                  "Think it's only for women",
+                  "Not important"
+                ]
+              },
+              {
+                "name": "Why women don't speak up",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Fear no support",
+                  "Fear judgement",
+                  "Don't know who to approach",
+                  "Feels no difference",
+                  "Prefer silence"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Baseline for Men",
+            "formType": "ProgramEncounter",
+            "subjectType": "Participant",
+            "encounterType": "Baseline for Men",
+            "fields": [
+              {
+                "name": "Why do you want to work?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "I can support my family",
+                  "It gives me financial independence",
+                  "It makes me feel more confident and independent"
+                ]
+              },
+              {
+                "name": "Goal/plan rank - Save for my marriage / my children's future",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Goal/plan rank - Educate my children/ Support my parents.",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Goal/plan rank - Increase my skills and knowledge (ex, tailoring, beauty parlour) for better growth",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Goal/plan rank - Purchase property/gold for my family's security",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Spending rank - Household expenditure",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Spending rank - Invest in my career/business/skill development",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Spending rank - Invest for children's / family's future",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Spending rank - Personal spending (e.g., clothes, jewellery, hobbies)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Sleep time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Care of children/family elders (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Household work time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Work/business/learning time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Leisure/TV/friends/resting time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "Travel time (hours)",
+                "dataType": "Duration",
+                "mandatory": true
+              },
+              {
+                "name": "How often do you alter your decisions because of family responsibilities or for being a woman ?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Often",
+                  "Sometimes",
+                  "Rarely"
+                ]
+              },
+              {
+                "name": "Agree with statement: When a son is born, we usually save for his education, and when a daughter is born, we usually save for her wedding",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not Sure"
+                ]
+              },
+              {
+                "name": "It's okay for men to cry",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not Sure"
+                ]
+              },
+              {
+                "name": "Response to salary control by husband/father (select all that applies)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "It's ok, because that's how she will be able to work",
+                  "He's the head of the family, and if she is unable to work later, he'll be the one supporting her",
+                  "This is a private matter—they should resolve it without outside help.",
+                  "Encourage her to express her thoughts and point of view to her family"
+                ]
+              },
+              {
+                "name": "Do you think consent is required between husband and wife?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not Sure"
+                ]
+              },
+              {
+                "name": "If a girl's boyfriend is holding the girl's hand but it is making her uncomfortable, is that considered sexual harrassment?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Witnessing harassment rank - Ensure your safety before you react",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Witnessing harassment rank - Distract the offender and divert their attention",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Witnessing harassment rank - Call the support helpline/police",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "Witnessing harassment rank - Seek help from others nearby",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ]
+              },
+              {
+                "name": "How do you think sexual harassment can be reduced in our society? (select all that apply)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Women should avoid working or going out after 7 p.m.",
+                  "Listen to them when she shares her feelings/needs with you.",
+                  "Families should avoid women wearing dresses like skirts, short dresses",
+                  "Understand how you as a person can help the women in distress",
+                  "Don't Know"
+                ]
+              },
+              {
+                "name": "What is the main purpose of the PoSH Act?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "To prevent and address sexual harassment of women at the workplace only in private companies",
+                  "To prevent and address sexual harassment of women at the workplace only in government companies",
+                  "To prevent and address sexual harassment of women at the workplace only for full-time employees",
+                  "To prevent and address sexual harassment of women at the workplace including those in the unorganised sector (ex domestic workers, beauty parlors )",
+                  "I don't know"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Endline for Men",
+            "formType": "ProgramEncounter",
+            "subjectType": "Participant",
+            "encounterType": "Endline for Men",
+            "fields": [
+              {
+                "name": "Which of these statements treats people equally, without using gender stereotypes?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Because men are busy with outside work",
+                  "Because that's how it has always been in society",
+                  "Because women are better at managing household work",
+                  "Because not everyone in the family believes household work should be shared"
+                ]
+              },
+              {
+                "name": "In many families, women wake up early to cook, clean, wash clothes, and take care of children, even if they also go out to work. Meanwhile, men in the family usually help only when asked or after finishing their office work. Why do you think women usually end up doing most of the household chores at home?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Because men are busy with outside work",
+                  "Because that's how it has always been in society",
+                  "Because women are better at managing household work",
+                  "Because not everyone in the family believes household work should be shared"
+                ]
+              },
+              {
+                "name": "A woman says that her husband or father controls how she uses her salary. She's scolded if she spends money without asking, and he tells her that she's working only because he gave her permission.",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "It's okay, that's how she can work",
+                  "He's the head so he can control her salary",
+                  "Encourage her to express her thoughts and point of view to her family",
+                  "It's private, they'll resolve it"
+                ]
+              },
+              {
+                "name": "Which of the statements violates/crosses the personal boundary of a person",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Sending messages after work hours",
+                  "Commenting on dressing",
+                  "Asking personal life questions",
+                  "Asking consent before posting photo",
+                  "Asking consent to stand close",
+                  "None of the above"
+                ]
+              },
+              {
+                "name": "How can sexual harassment be reduced",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Teaching children to respect women",
+                  "Supporting women facing harassment",
+                  "Women avoid going out after 7pm",
+                  "Women avoid short clothes",
+                  "I don't know"
+                ]
+              },
+              {
+                "name": "Husband expects wife to serve him food",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "Father shouts at daughter for refusing marriage",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "You're making this issue bigger than it is",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "After all I've done for you, this is how you treat me",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "Husband not allowing wife to meet family",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "It's not my fault, you made me do this",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Maybe"
+                ]
+              },
+              {
+                "name": "Meaning of gender justice (feminism)",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Giving special privileges to women",
+                  "Believing in equal rights and opportunities for everyone",
+                  "Supporting women and opposing men",
+                  "I don't know"
+                ]
+              },
+              {
+                "name": "How can gender equality benefit men in their personal or professional lives?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Helps men understand and respect relationships",
+                  "Pressures men",
+                  "Doesn't affect men",
+                  "Takes away men's opportunities"
+                ]
+              },
+              {
+                "name": "Which of the following statements do you agree with the most?",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Women lead only in schools/hospitals",
+                  "Women lead only inside family",
+                  "Women don't know leadership",
+                  "Leadership suits men",
+                  "Women can lead in all spaces"
+                ]
+              },
+              {
+                "name": "Purpose of POSH Act",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Only private companies",
+                  "Govt & private companies",
+                  "Including unorganized sector",
+                  "I don't know"
+                ]
+              },
+              {
+                "name": "Response to harassment on bus",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Advise her not to go alone",
+                  "Listen and ensure safety",
+                  "Ask her to calm down",
+                  "Wait for police"
+                ]
+              },
+              {
+                "name": "Can bystander intervention prevent harm",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not sure"
+                ]
+              },
+              {
+                "name": "Would you intervene without being asked",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Yes",
+                  "No",
+                  "Not sure"
+                ]
+              },
+              {
+                "name": "Who should intervene first",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Woman herself",
+                  "Staff on vehicle",
+                  "Nearby passengers",
+                  "Police",
+                  "Everyone together"
+                ]
+              },
+              {
+                "name": "Why gender concepts are hard to apply",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Traditional beliefs",
+                  "Don't know how to apply",
+                  "Fear judgement",
+                  "Think it's only for women",
+                  "Not important"
+                ]
+              },
+              {
+                "name": "Why women don't speak up",
+                "dataType": "Coded",
+                "mandatory": true,
+                "options": [
+                  "Fear no support",
+                  "Fear judgement",
+                  "Don't know who to approach",
+                  "Feels no difference",
+                  "Prefer silence"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Cohort Endline WWM",
+            "formType": "ProgramEncounter",
+            "subjectType": "Cohort",
+            "encounterType": "Cohort Endline WWM"
+          },
+          {
+            "name": "Cohort Endline WWW",
+            "formType": "ProgramEncounter",
+            "subjectType": "Cohort",
+            "encounterType": "Cohort Endline WWW"
+          }
+        ]
+      },
+      "expected_value": "",
+      "comparison_operator": "not empty"
+    },
+    {
+      "actual_value": [],
+      "expected_value": "",
+      "comparison_operator": "empty"
+    }
+  ]
+}
