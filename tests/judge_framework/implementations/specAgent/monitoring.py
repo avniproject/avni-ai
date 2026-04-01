@@ -8,7 +8,7 @@ inspect cached entities, and export debug snapshots.
 import json
 import logging
 import requests
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -117,9 +117,7 @@ class ConversationMonitor:
 
         return state.get("tool_calls", [])
 
-    def export_debug_snapshot(
-        self, conversation_id: str, output_path: str
-    ) -> bool:
+    def export_debug_snapshot(self, conversation_id: str, output_path: str) -> bool:
         """
         Export complete conversation state to a JSON file.
 
@@ -169,9 +167,9 @@ class ConversationMonitor:
             print(f"❌ No state found for conversation: {conversation_id}")
             return
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Conversation: {conversation_id}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         # Entities summary
         entities_summary = state.get("entities_summary", {})
@@ -199,7 +197,7 @@ class ConversationMonitor:
         # Timestamps
         print(f"\n⏰ Created: {state.get('created_at', 'N/A')}")
         print(f"   Updated: {state.get('updated_at', 'N/A')}")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
 
 def monitor_test_execution(

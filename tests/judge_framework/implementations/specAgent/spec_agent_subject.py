@@ -8,7 +8,10 @@ with different entity combinations and conversation variable states.
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional
-from tests.judge_framework.interfaces.test_subject import TestSubject, TestSubjectFactory
+from tests.judge_framework.interfaces.test_subject import (
+    TestSubject,
+    TestSubjectFactory,
+)
 from tests.judge_framework.interfaces.result_models import TestConfiguration
 
 

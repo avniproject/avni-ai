@@ -6,9 +6,8 @@ called appropriate tools, and followed the expected workflow.
 """
 
 import yaml
-import json
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any
 from tests.judge_framework.interfaces.judge_strategy import JudgeStrategy
 from tests.judge_framework.interfaces.result_models import (
     EvaluationResult,
@@ -76,8 +75,8 @@ class SpecAgentJudge(JudgeStrategy):
         spec_validity_score, spec_validity_feedback = self._evaluate_spec_validity(
             test_output
         )
-        entity_coverage_score, entity_coverage_feedback = self._evaluate_entity_coverage(
-            test_output, entities
+        entity_coverage_score, entity_coverage_feedback = (
+            self._evaluate_entity_coverage(test_output, entities)
         )
         conversation_flow_score, conversation_flow_feedback = (
             self._evaluate_conversation_flow(test_output, entities, expected_behavior)
@@ -189,7 +188,10 @@ class SpecAgentJudge(JudgeStrategy):
                 )
         else:
             # Check if agent at least mentioned generating spec
-            if "generate" in agent_response.lower() and "spec" in agent_response.lower():
+            if (
+                "generate" in agent_response.lower()
+                and "spec" in agent_response.lower()
+            ):
                 return (
                     40.0,
                     f"Mentioned spec generation but didn't call tool. Tools called: {[t['tool'] for t in tool_calls]}",
@@ -337,7 +339,13 @@ class SpecAgentJudge(JudgeStrategy):
             "spec_approved": "SPEC_APPROVED" in agent_response,
             "asks_confirmation": any(
                 keyword in agent_response.lower()
-                for keyword in ["confirm", "correct", "approve", "yes/no", "look correct"]
+                for keyword in [
+                    "confirm",
+                    "correct",
+                    "approve",
+                    "yes/no",
+                    "look correct",
+                ]
             ),
             "shows_summary": len(agent_response) > 100,  # Reasonable length response
         }

@@ -7,7 +7,7 @@ and extracting generated specs from responses.
 
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from tests.judge_framework.interfaces.test_executor import TestExecutor
 from tests.judge_framework.interfaces.result_models import TestConfiguration
 from tests.dify.common.dify_client import DifyClient

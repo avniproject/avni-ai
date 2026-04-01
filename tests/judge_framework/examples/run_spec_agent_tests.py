@@ -16,22 +16,24 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from tests.judge_framework.orchestrator import JudgeOrchestrator, ConsoleProgressReporter
-from tests.judge_framework.implementations.specAgent import (
-    SpecAgentTestSubject,
+from tests.judge_framework.orchestrator import (  # noqa: E402
+    JudgeOrchestrator,
+    ConsoleProgressReporter,
+)
+from tests.judge_framework.implementations.specAgent import (  # noqa: E402
     SpecAgentTestSubjectFactory,
     SpecAgentExecutor,
     SpecAgentJudge,
 )
-from tests.judge_framework.interfaces.result_models import (
+from tests.judge_framework.interfaces.result_models import (  # noqa: E402
     TestConfiguration,
     DifyConfig,
     EvaluationConfig,
     TestGenerationConfig,
 )
-from tests.judge_framework.analytics.statistics import StatisticsCalculator
-from tests.judge_framework.analytics.reporting import ReportGenerator
-from tests.judge_framework.implementations.specAgent.monitoring import (
+from tests.judge_framework.analytics.statistics import StatisticsCalculator  # noqa: E402
+from tests.judge_framework.analytics.reporting import ReportGenerator  # noqa: E402
+from tests.judge_framework.implementations.specAgent.monitoring import (  # noqa: E402
     ConversationMonitor,
 )
 
@@ -48,13 +50,19 @@ def load_test_scenarios(scenarios_file: str) -> list:
     return data.get("test_scenarios", [])
 
 
-def create_test_configuration() -> TestConfiguration:
+def create_test_configuration(workflow_version: str = "v3") -> TestConfiguration:
     """Create test configuration from environment variables."""
+    workflow_name = (
+        "App Configurator [Staging] v3"
+        if workflow_version == "v3"
+        else "App Configurator [Staging] v2"
+    )
+
     return TestConfiguration(
         dify_config=DifyConfig(
             api_key=os.getenv("DIFY_API_KEY", ""),
             base_url=os.getenv("DIFY_API_BASE_URL", "https://api.dify.ai/v1"),
-            workflow_name="App Configurator [Staging] v2",
+            workflow_name=workflow_name,
         ),
         evaluation_config=EvaluationConfig(
             evaluation_metrics=[
@@ -86,6 +94,7 @@ def run_spec_agent_tests(
     fail_fast: bool = False,
     output_format: str = "console",
     monitor_conversations: bool = True,
+    workflow_version: str = "v3",
 ) -> int:
     """
     Run Spec Agent tests.
@@ -96,14 +105,15 @@ def run_spec_agent_tests(
         fail_fast: Stop on first failure
         output_format: Output format (console, json, csv)
         monitor_conversations: Whether to monitor conversation state
+        workflow_version: Workflow version to test (v2 or v3)
 
     Returns:
         Exit code (0 for success, 1 for failure)
     """
-    logger.info("Starting Spec Agent tests")
+    logger.info(f"Starting Spec Agent tests with workflow {workflow_version}")
 
     # Load configuration
-    config = create_test_configuration()
+    config = create_test_configuration(workflow_version)
 
     # Validate environment
     if not config.dify_config.api_key:
@@ -128,7 +138,9 @@ def run_spec_agent_tests(
             subject = factory.create_from_static_data(scenario, config)
             test_subjects.append(subject)
         except Exception as e:
-            logger.error(f"Failed to create test subject for {scenario.get('scenario')}: {e}")
+            logger.error(
+                f"Failed to create test subject for {scenario.get('scenario')}: {e}"
+            )
             if fail_fast:
                 return 1
 
@@ -154,10 +166,10 @@ def run_spec_agent_tests(
     # Monitor conversations if enabled
     if monitor_conversations and config.avni_mcp_server_url:
         monitor = ConversationMonitor(config.avni_mcp_server_url)
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("Conversation Monitoring Summary")
-        logger.info("="*60)
-        
+        logger.info("=" * 60)
+
         for result in suite_result.results:
             conv_id = result.evaluation_details.get("conversation_id", "")
             if conv_id:
@@ -170,9 +182,9 @@ def run_spec_agent_tests(
     # Generate report
     if output_format == "console":
         report = ReportGenerator.generate_report(statistics, suite_result.results)
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("SPEC AGENT TEST REPORT")
-        print("="*60)
+        print("=" * 60)
         print(report)
     elif output_format == "json":
         report = ReportGenerator.generate_json_report(statistics, suite_result.results)
@@ -182,9 +194,13 @@ def run_spec_agent_tests(
         print(csv_report)
 
     # Return exit code based on success
-    success_rate = (statistics.success_count / statistics.total_tests * 100) if statistics.total_tests > 0 else 0
+    success_rate = (
+        (statistics.success_count / statistics.total_tests * 100)
+        if statistics.total_tests > 0
+        else 0
+    )
     logger.info(f"\nOverall Success Rate: {success_rate:.1f}%")
-    
+
     return 0 if success_rate >= 70.0 else 1
 
 
@@ -217,6 +233,12 @@ def main():
         action="store_true",
         help="Disable conversation monitoring",
     )
+    parser.add_argument(
+        "--workflow-version",
+        choices=["v2", "v3"],
+        default="v3",
+        help="Workflow version to test (default: v3)",
+    )
 
     args = parser.parse_args()
 
@@ -239,6 +261,7 @@ def main():
         fail_fast=args.fail_fast,
         output_format=args.output_format,
         monitor_conversations=not args.no_monitor,
+        workflow_version=args.workflow_version,
     )
 
     return exit_code

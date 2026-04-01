@@ -14,7 +14,7 @@ from tests.judge_framework.interfaces.result_models import (
 )
 
 
-def get_spec_agent_config() -> TestConfiguration:
+def get_spec_agent_config(workflow_version: str = "v3") -> TestConfiguration:
     """
     Get default Spec Agent test configuration.
 
@@ -25,14 +25,23 @@ def get_spec_agent_config() -> TestConfiguration:
     - AVNI_MCP_SERVER_URL: URL of avni-ai MCP server (e.g., http://localhost:8023)
     - AVNI_AUTH_TOKEN: Avni authentication token (optional for some tests)
 
+    Args:
+        workflow_version: Which workflow version to use ("v2" or "v3", default "v3")
+
     Returns:
         TestConfiguration instance
     """
+    workflow_name = (
+        "App Configurator [Staging] v3"
+        if workflow_version == "v3"
+        else "App Configurator [Staging] v2"
+    )
+
     return TestConfiguration(
         dify_config=DifyConfig(
             api_key=os.getenv("DIFY_API_KEY", ""),
             base_url=os.getenv("DIFY_API_BASE_URL", "https://api.dify.ai/v1"),
-            workflow_name="App Configurator [Staging] v2",
+            workflow_name=workflow_name,
         ),
         evaluation_config=EvaluationConfig(
             evaluation_metrics=[

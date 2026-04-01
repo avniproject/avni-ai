@@ -157,9 +157,7 @@ async def handle_debug_list_conversations(request: Request) -> JSONResponse:
             }
         )
 
-    return JSONResponse(
-        {"total": len(conversations), "conversations": conversations}
-    )
+    return JSONResponse({"total": len(conversations), "conversations": conversations})
 
 
 async def handle_debug_clear_conversation(request: Request) -> JSONResponse:

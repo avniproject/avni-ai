@@ -429,10 +429,28 @@ workflow:
       selected: false
       source: 3b1db8bf-6e79-4646-9103-077a6ca90299
       sourceHandle: source
+      target: spec-extractor-001
+      targetHandle: target
+      targetType: code
+      type: custom
+    - data: {}
+      id: edge-extractor-to-saver
+      selected: false
+      source: spec-extractor-001
+      sourceHandle: source
+      target: spec-saver-001
+      targetHandle: target
+      targetType: variable-assigner
+      type: custom
+    - data: {}
+      id: edge-saver-to-download
+      selected: false
+      source: spec-saver-001
+      sourceHandle: source
       target: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
       targetHandle: target
+      targetType: http-request
       type: custom
-      zIndex: 0
     - data:
         isInLoop: false
         sourceType: http-request
@@ -549,18 +567,6 @@ workflow:
       source: '1757493270484'
       sourceHandle: case-setup-guidance
       target: d9ccc273-d1c4-44d1-8894-177b64b92bfa
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: document-extractor
-      id: d8a60d07-c768-418c-b08b-93d6ad2c5517
-      selected: false
-      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      sourceHandle: 'false'
-      target: '1774264909113'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -1532,7 +1538,7 @@ workflow:
             key: ''
             type: text
             value: "{\n  \"existing_bundle_b64\": \"{{#d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1.body.bundle_zip_b64#}}\"\
-              ,\n  \"spec_yaml\": {{#conversation.spec_yaml#}}\n}\n"
+              ,\n  \"spec_yaml\": \"{{#conversation.spec_yaml#}}\"\n}\n"
           type: json
         headers: Content-Type:application/json
         method: post
@@ -2326,17 +2332,44 @@ workflow:
 
               Workflow:
 
-              1. If user said Yes (confirmed) → call generate_spec with {conversation_id},
-              then validate_spec with the returned spec_yaml, then output: SPEC_APPROVED
-              and the final spec_yaml.
+              1. If entities are already loaded (conversation.entities_jsonl is not empty):
 
-              2. If user said No (wants corrections) → call apply_entity_corrections
-              with {conversation_id, corrections: [...]}, then call generate_spec
-              with {conversation_id}, then validate_spec, show updated summary, ask
-              for confirmation.
+              - Immediately call generate_spec with {"conversation_id": "{{#sys.conversation_id#}}"}
 
-              3. Once spec is valid and user approves, output: SPEC_APPROVED and the
-              final spec_yaml.'
+              - Call validate_spec with the returned spec_yaml
+
+              - Show user a summary and ask: "Does this configuration look correct?
+              (Yes/No)"
+
+              2. If user said Yes (confirmed):
+
+              - Output exactly: SPEC_APPROVED
+
+              - Then output the complete YAML spec on the following lines
+
+              3. If user said No (wants corrections):
+
+              - Call apply_entity_corrections with {conversation_id, corrections: [...]}
+
+              - Call generate_spec with {conversation_id}
+
+              - Call validate_spec
+
+              - Show updated summary and ask for confirmation
+
+              4. If no entities are loaded:
+
+              - Ask user to upload scoping documents
+
+
+              CRITICAL: When outputting the approved spec, use this exact format:
+
+              SPEC_APPROVED
+
+              <complete YAML spec here>
+
+
+              Do not wrap the YAML in markdown code blocks.'
           maximum_iterations:
             type: constant
             value: 5
@@ -2505,7 +2538,62 @@ workflow:
       positionAbsolute:
         x: 4164
         y: 448
-      selected: true
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        code: "import re\n\ndef main(agent_response: str) -> dict:\n    # Extract spec_yaml from agent response\n    # Look for SPEC_APPROVED marker followed by YAML content\n    if \"SPEC_APPROVED\" not in agent_response:\n        return {\"spec_yaml\": \"\", \"approved\": False}\n    \n    # Extract everything after SPEC_APPROVED\n    parts = agent_response.split(\"SPEC_APPROVED\", 1)\n    if len(parts) < 2:\n        return {\"spec_yaml\": \"\", \"approved\": False}\n    \n    spec_content = parts[1].strip()\n    \n    # Remove markdown code blocks if present\n    spec_content = re.sub(r'^```ya?ml\\s*\\n', '', spec_content, flags=re.MULTILINE)\n    spec_content = re.sub(r'\\n```\\s*$', '', spec_content, flags=re.MULTILINE)\n    \n    return {\n        \"spec_yaml\": spec_content.strip(),\n        \"approved\": True\n    }\n"
+        code_language: python3
+        outputs:
+          spec_yaml:
+            children: null
+            type: string
+          approved:
+            children: null
+            type: boolean
+        selected: false
+        title: Extract Spec YAML
+        type: code
+        variables:
+        - value_selector:
+          - 3b1db8bf-6e79-4646-9103-077a6ca90299
+          - text
+          value_type: string
+          variable: agent_response
+      height: 52
+      id: spec-extractor-001
+      position:
+        x: 4400
+        y: 509
+      positionAbsolute:
+        x: 4400
+        y: 509
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - spec_yaml
+        input_variable_selector:
+        - spec-extractor-001
+        - spec_yaml
+        selected: false
+        title: Save Spec YAML
+        type: variable-assigner
+        variables:
+        - - spec-extractor-001
+          - spec_yaml
+        write_mode: over-write
+      height: 52
+      id: spec-saver-001
+      position:
+        x: 4650
+        y: 509
+      positionAbsolute:
+        x: 4650
+        y: 509
+      selected: false
       type: custom
       width: 242
     - data:
