@@ -1,0 +1,104 @@
+{
+  "test_scenarios": [
+    {
+      "scenario": "happy_path_full_entities",
+      "description": "Full entities loaded, agent generates spec, user approves",
+      "entities_filter": "full",
+      "conversation_vars": {
+        "org_name": "Durga India",
+        "user_name": "Test User",
+        "setup_mode_active": true,
+        "spec_yaml": "",
+        "query": "I've uploaded the scoping documents. Please generate the spec."
+      },
+      "expected_behavior": {
+        "should_call_generate_spec": true,
+        "should_call_validate_spec": true,
+        "should_ask_confirmation": true,
+        "should_output_spec_approved": true
+      }
+    },
+    {
+      "scenario": "empty_entities_should_ask_for_docs",
+      "description": "No entities loaded, agent should ask for documents",
+      "entities_filter": "empty",
+      "conversation_vars": {
+        "org_name": "Durga India",
+        "user_name": "Test User",
+        "setup_mode_active": false,
+        "spec_yaml": "",
+        "query": "I want to set up Avni using the scoping SRS docs."
+      },
+      "expected_behavior": {
+        "should_call_generate_spec": false,
+        "should_ask_for_documents": true,
+        "should_output_spec_approved": false
+      }
+    },
+    {
+      "scenario": "partial_entities_subject_types_only",
+      "description": "Only subject types loaded, no programs/encounters",
+      "entities_filter": "partial_subject_types",
+      "conversation_vars": {
+        "org_name": "Durga India",
+        "user_name": "Test User",
+        "setup_mode_active": true,
+        "spec_yaml": "",
+        "query": "Generate the spec from the entities."
+      },
+      "expected_behavior": {
+        "should_call_generate_spec": true,
+        "should_handle_partial_entities": true
+      }
+    },
+    {
+      "scenario": "partial_entities_no_forms",
+      "description": "All entities except forms",
+      "entities_filter": "partial_no_forms",
+      "conversation_vars": {
+        "org_name": "Durga India",
+        "user_name": "Test User",
+        "setup_mode_active": true,
+        "spec_yaml": "",
+        "query": "Please generate the configuration spec."
+      },
+      "expected_behavior": {
+        "should_call_generate_spec": true,
+        "should_call_validate_spec": true
+      }
+    },
+    {
+      "scenario": "user_confirmation_yes",
+      "description": "User approves the generated spec",
+      "entities_filter": "full",
+      "conversation_vars": {
+        "org_name": "Durga India",
+        "user_name": "Test User",
+        "setup_mode_active": true,
+        "spec_yaml": "",
+        "query": "Yes, the configuration looks correct."
+      },
+      "expected_behavior": {
+        "should_output_spec_approved": true,
+        "is_follow_up": true
+      }
+    },
+    {
+      "scenario": "user_requests_corrections",
+      "description": "User requests changes to the spec",
+      "entities_filter": "full",
+      "conversation_vars": {
+        "org_name": "Durga India",
+        "user_name": "Test User",
+        "setup_mode_active": true,
+        "spec_yaml": "",
+        "query": "No, please change the Cohort subject type to be at District level instead of City."
+      },
+      "expected_behavior": {
+        "should_call_apply_entity_corrections": true,
+        "should_regenerate_spec": true,
+        "is_follow_up": true
+      }
+    }
+  ]
+}

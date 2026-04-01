@@ -43,6 +43,11 @@ from .handlers.spec_handlers import (
     handle_bundle_to_spec,
 )
 from .handlers.sandbox_handlers import handle_execute_python
+from .handlers.debug_handlers import (
+    handle_debug_conversation,
+    handle_debug_list_conversations,
+    handle_debug_clear_conversation,
+)
 from .playground.executor import PlaygroundExecutor
 from .http import create_cors_middleware
 
@@ -226,6 +231,19 @@ async def create_server():
     @server.custom_route("/execute-python", methods=["POST"])
     async def execute_python_endpoint(request: Request):
         return await handle_execute_python(request)
+
+    # --- Debug Endpoints ---
+    @server.custom_route("/debug/conversation/{conversation_id}", methods=["GET"])
+    async def debug_conversation_endpoint(request: Request):
+        return await handle_debug_conversation(request)
+
+    @server.custom_route("/debug/conversations", methods=["GET"])
+    async def debug_list_conversations_endpoint(request: Request):
+        return await handle_debug_list_conversations(request)
+
+    @server.custom_route("/debug/conversation/{conversation_id}", methods=["DELETE"])
+    async def debug_clear_conversation_endpoint(request: Request):
+        return await handle_debug_clear_conversation(request)
 
     # Start periodic silo cleanup (every 6 hours)
     asyncio.create_task(_periodic_silo_cleanup())

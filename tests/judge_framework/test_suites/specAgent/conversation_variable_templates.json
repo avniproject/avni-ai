@@ -1,0 +1,42 @@
+{
+  "templates": {
+    "default": {
+      "org_name": "Durga India",
+      "user_name": "Test User",
+      "setup_mode_active": true,
+      "spec_yaml": "",
+      "entities_jsonl": "{}"
+    },
+    "with_full_entities": {
+      "org_name": "Durga India",
+      "user_name": "Test User",
+      "setup_mode_active": true,
+      "spec_yaml": "",
+      "entities_jsonl": "<<LOAD_FROM_FILE>>",
+      "entities_file": "tests/resources/scoping/entities_summary.json"
+    },
+    "spec_already_generated": {
+      "org_name": "Durga India",
+      "user_name": "Test User",
+      "setup_mode_active": true,
+      "spec_yaml": "<<PREVIOUS_SPEC>>",
+      "entities_jsonl": "<<LOAD_FROM_FILE>>",
+      "entities_file": "tests/resources/scoping/entities_summary.json"
+    },
+    "empty_state": {
+      "org_name": "Durga India",
+      "user_name": "Test User",
+      "setup_mode_active": false,
+      "spec_yaml": "",
+      "entities_jsonl": "{}"
+    }
+  },
+  "query_templates": {
+    "initial_request": "I've uploaded the scoping documents. Please generate the spec.",
+    "approve_spec": "Yes, the configuration looks correct.",
+    "request_changes": "No, please make the following changes: {changes}",
+    "ask_for_help": "I want to set up Avni using the scoping SRS docs.",
+    "generate_spec": "Generate the spec from the entities.",
+    "validate_spec": "Please validate the generated spec."
+  }
+}
