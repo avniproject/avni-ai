@@ -4,7 +4,7 @@ app:
   icon_background: '#FFEAD5'
   icon_type: emoji
   mode: advanced-chat
-  name: App Configurator [Staging] v3
+  name: 'Siddharth V3 '
   use_icon_as_answer_icon: true
 dependencies:
 - current_identifier: null
@@ -174,6 +174,17 @@ workflow:
       - remote_url
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -306,7 +317,7 @@ workflow:
       id: 2830c064-2881-4fcb-b839-384ced8a80cc
       selected: false
       source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      sourceHandle: case-false
+      sourceHandle: 'false'
       target: '1774264909113'
       targetHandle: target
       type: custom
@@ -433,16 +444,20 @@ workflow:
       targetHandle: target
       targetType: code
       type: custom
-    - data: {}
+    - data:
+        sourceType: code
+        targetType: assigner
       id: edge-extractor-to-saver
       selected: false
       source: spec-extractor-001
       sourceHandle: source
       target: spec-saver-001
       targetHandle: target
-      targetType: variable-assigner
+      targetType: assigner
       type: custom
-    - data: {}
+    - data:
+        sourceType: assigner
+        targetType: http-request
       id: edge-saver-to-download
       selected: false
       source: spec-saver-001
@@ -454,10 +469,22 @@ workflow:
     - data:
         isInLoop: false
         sourceType: http-request
-        targetType: http-request
-      id: a0b1c2d3-e4f5-4a6b-7c8d-9e0f1a2b3c4d
+        targetType: code
+      id: download-to-build-body
       selected: false
       source: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+      sourceHandle: source
+      target: build-patch-body-node
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: build-body-to-patch
+      selected: false
+      source: build-patch-body-node
       sourceHandle: source
       target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
       targetHandle: target
@@ -798,10 +825,10 @@ workflow:
       id: '1711528708197'
       position:
         x: 0
-        y: 405
+        y: 418
       positionAbsolute:
         x: 0
-        y: 405
+        y: 418
       selected: false
       type: custom
       width: 242
@@ -824,10 +851,10 @@ workflow:
       id: '1774005428719'
       position:
         x: 362
-        y: 594
+        y: 607
       positionAbsolute:
         x: 362
-        y: 594
+        y: 607
       selected: false
       type: custom
       width: 242
@@ -850,10 +877,10 @@ workflow:
       id: '1774005484035'
       position:
         x: 362
-        y: 758
+        y: 771
       positionAbsolute:
         x: 362
-        y: 758
+        y: 771
       selected: false
       type: custom
       width: 242
@@ -891,10 +918,10 @@ workflow:
       id: '1758713692744'
       position:
         x: 342
-        y: 424
+        y: 437
       positionAbsolute:
         x: 342
-        y: 424
+        y: 437
       selected: false
       type: custom
       width: 242
@@ -1009,15 +1036,25 @@ workflow:
       id: '1757492907627'
       position:
         x: 684
-        y: 425
+        y: 438
       positionAbsolute:
         x: 684
-        y: 425
+        y: 438
       selected: false
       type: custom
       width: 242
     - data:
         cases:
+        - case_id: case-filesetup
+          conditions:
+          - comparison_operator: is
+            value: FILE_SETUP
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: case-filesetup
+          logical_operator: and
         - case_id: case-clarify
           conditions:
           - comparison_operator: is
@@ -1048,16 +1085,6 @@ workflow:
             - service
           id: case-assistant
           logical_operator: and
-        - case_id: case-filesetup
-          conditions:
-          - comparison_operator: is
-            value: FILE_SETUP
-            variable_selector:
-            - '1757492907627'
-            - structured_output
-            - service
-          id: case-filesetup
-          logical_operator: and
         - case_id: case-setup-guidance
           conditions:
           - comparison_operator: is
@@ -1085,10 +1112,10 @@ workflow:
       id: '1757493270484'
       position:
         x: 1026
-        y: 215
+        y: 228
       positionAbsolute:
         x: 1026
-        y: 215
+        y: 228
       selected: false
       type: custom
       width: 242
@@ -1132,6 +1159,9 @@ workflow:
             and question relates to setup: answer directly without clarification
 
             '
+        - id: rag-user-msg-001
+          role: user
+          text: '{{#sys.query#}}'
         selected: false
         structured_output_enabled: false
         title: RAG LLM
@@ -1201,10 +1231,10 @@ workflow:
       id: '1758699378772'
       position:
         x: 1388
-        y: 763
+        y: 789
       positionAbsolute:
         x: 1388
-        y: 763
+        y: 789
       selected: false
       type: custom
       width: 242
@@ -1237,10 +1267,10 @@ workflow:
       id: d9ccc273-d1c4-44d1-8894-177b64b92bfa
       position:
         x: 1388
-        y: 1039
+        y: 1065
       positionAbsolute:
         x: 1388
-        y: 1039
+        y: 1065
       selected: false
       type: custom
       width: 242
@@ -1351,10 +1381,10 @@ workflow:
       id: '1774264909113'
       position:
         x: 1750
-        y: 630
+        y: 597
       positionAbsolute:
         x: 1750
-        y: 630
+        y: 597
       selected: false
       type: custom
       width: 242
@@ -1385,11 +1415,11 @@ workflow:
       height: 110
       id: 9c0103c2-e377-4925-8f4a-501ff5b34379
       position:
-        x: 2434
-        y: 627
+        x: 2450
+        y: 738
       positionAbsolute:
-        x: 2434
-        y: 627
+        x: 2450
+        y: 738
       selected: false
       type: custom
       width: 242
@@ -1426,11 +1456,11 @@ workflow:
       height: 141
       id: store-entities-node
       position:
-        x: 2434
-        y: 750
+        x: 2784
+        y: 686
       positionAbsolute:
-        x: 2434
-        y: 750
+        x: 2784
+        y: 686
       selected: false
       type: custom
       width: 242
@@ -1466,11 +1496,11 @@ workflow:
       height: 141
       id: '1773908701222'
       position:
-        x: 2776
-        y: 611
+        x: 3118
+        y: 702
       positionAbsolute:
-        x: 2776
-        y: 611
+        x: 3118
+        y: 702
       selected: false
       type: custom
       width: 242
@@ -1486,11 +1516,11 @@ workflow:
       height: 151
       id: '1773909436902'
       position:
-        x: 3460
-        y: 606
+        x: 3790
+        y: 697
       positionAbsolute:
-        x: 3460
-        y: 606
+        x: 3790
+        y: 697
       selected: false
       type: custom
       width: 242
@@ -1520,11 +1550,47 @@ workflow:
       height: 141
       id: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
       position:
-        x: 4506
-        y: 509
+        x: 5532
+        y: 657
       positionAbsolute:
-        x: 4506
-        y: 509
+        x: 5532
+        y: 657
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        code: "import json\n\ndef main(bundle_b64: str, spec_yaml: str) -> dict:\n\
+          \    body = {\n        \"existing_bundle_b64\": bundle_b64 or \"\",\n   \
+          \     \"spec_yaml\": spec_yaml or \"\"\n    }\n    return {\"json_body\"\
+          : json.dumps(body)}\n"
+        code_language: python3
+        outputs:
+          json_body:
+            children: null
+            type: string
+        selected: false
+        title: Build Patch Body
+        type: code
+        variables:
+        - value_selector:
+          - d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+          - body
+          - bundle_zip_b64
+          value_type: string
+          variable: bundle_b64
+        - value_selector:
+          - conversation
+          - spec_yaml
+          value_type: string
+          variable: spec_yaml
+      height: 52
+      id: build-patch-body-node
+      position:
+        x: 5874
+        y: 700
+      positionAbsolute:
+        x: 5874
+        y: 700
       selected: false
       type: custom
       width: 242
@@ -1537,9 +1603,8 @@ workflow:
           - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac691
             key: ''
             type: text
-            value: "{\n  \"existing_bundle_b64\": \"{{#d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1.body.bundle_zip_b64#}}\"\
-              ,\n  \"spec_yaml\": \"{{#conversation.spec_yaml#}}\"\n}\n"
-          type: json
+            value: '{{#build-patch-body-node.json_body#}}'
+          type: raw-text
         headers: Content-Type:application/json
         method: post
         params: ''
@@ -1559,11 +1624,11 @@ workflow:
       height: 141
       id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
       position:
-        x: 4848
-        y: 509
+        x: 5874
+        y: 657
       positionAbsolute:
-        x: 4848
-        y: 509
+        x: 5874
+        y: 657
       selected: false
       type: custom
       width: 242
@@ -1597,11 +1662,11 @@ workflow:
       height: 52
       id: 4eb75ab2-87de-48f6-b52e-35f8646da88d
       position:
-        x: 5190
-        y: 554
+        x: 6216
+        y: 702
       positionAbsolute:
-        x: 5190
-        y: 554
+        x: 6216
+        y: 702
       selected: false
       type: custom
       width: 242
@@ -1623,11 +1688,11 @@ workflow:
       height: 84
       id: 473230ae-fcca-4f3b-b410-fc792d8b0e88
       position:
-        x: 5532
-        y: 538
+        x: 6558
+        y: 686
       positionAbsolute:
-        x: 5532
-        y: 538
+        x: 6558
+        y: 686
       selected: false
       type: custom
       width: 242
@@ -1664,11 +1729,11 @@ workflow:
       height: 141
       id: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       position:
-        x: 6216
-        y: 509
+        x: 7242
+        y: 657
       positionAbsolute:
-        x: 6216
-        y: 509
+        x: 7242
+        y: 657
       selected: false
       type: custom
       width: 242
@@ -1698,11 +1763,11 @@ workflow:
       height: 52
       id: 6d81a37b-960b-42d3-ae88-5799cd773102
       position:
-        x: 6558
-        y: 554
+        x: 7584
+        y: 702
       positionAbsolute:
-        x: 6558
-        y: 554
+        x: 7584
+        y: 702
       selected: false
       type: custom
       width: 242
@@ -1724,11 +1789,11 @@ workflow:
       height: 84
       id: 8e0563d0-7844-4e89-a765-cbd9647e7676
       position:
-        x: 6900
-        y: 538
+        x: 7926
+        y: 686
       positionAbsolute:
-        x: 6900
-        y: 538
+        x: 7926
+        y: 686
       selected: false
       type: custom
       width: 242
@@ -1739,7 +1804,7 @@ workflow:
           type: webapp
         form_content: ''
         inputs: []
-        selected: false
+        selected: true
         timeout: 1
         timeout_unit: hour
         title: Confirm Entities
@@ -1754,12 +1819,12 @@ workflow:
       height: 190
       id: '1774617205889'
       position:
-        x: 3802
-        y: 587
+        x: 4144
+        y: 667
       positionAbsolute:
-        x: 3802
-        y: 587
-      selected: false
+        x: 4144
+        y: 667
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1785,11 +1850,11 @@ workflow:
       height: 490
       id: '1774617440956'
       position:
-        x: 7584
-        y: 335
+        x: 8610
+        y: 483
       positionAbsolute:
-        x: 7584
-        y: 335
+        x: 8610
+        y: 483
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1810,8 +1875,8 @@ workflow:
         x: 60
         y: 135
       positionAbsolute:
-        x: 7644
-        y: 470
+        x: 8670
+        y: 618
       selectable: false
       selected: false
       sourcePosition: right
@@ -1877,8 +1942,8 @@ workflow:
         x: 184
         y: 133
       positionAbsolute:
-        x: 7768
-        y: 468
+        x: 8794
+        y: 616
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1919,8 +1984,8 @@ workflow:
         x: 506
         y: 79
       positionAbsolute:
-        x: 8090
-        y: 414
+        x: 9116
+        y: 562
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1959,8 +2024,8 @@ workflow:
         x: 1150
         y: 60
       positionAbsolute:
-        x: 8734
-        y: 395
+        x: 9760
+        y: 543
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2000,8 +2065,8 @@ workflow:
         x: 1492
         y: 244
       positionAbsolute:
-        x: 9076
-        y: 579
+        x: 10102
+        y: 727
       selected: false
       type: custom
       width: 242
@@ -2028,10 +2093,10 @@ workflow:
       parentId: '1774617440956'
       position:
         x: 1814
-        y: 181
+        y: 175
       positionAbsolute:
-        x: 9398
-        y: 516
+        x: 10424
+        y: 658
       selected: false
       type: custom
       width: 242
@@ -2050,8 +2115,8 @@ workflow:
         x: 1492
         y: 68
       positionAbsolute:
-        x: 9076
-        y: 403
+        x: 10102
+        y: 551
       selected: false
       type: custom
       width: 242
@@ -2065,11 +2130,11 @@ workflow:
       height: 148
       id: ef812954-180c-4672-9c41-4d2e8058fdb5
       position:
-        x: 4164
-        y: 792
+        x: 4506
+        y: 940
       positionAbsolute:
-        x: 4164
-        y: 792
+        x: 4506
+        y: 940
       selected: false
       type: custom
       width: 242
@@ -2139,11 +2204,11 @@ workflow:
       height: 88
       id: '17748474036620'
       position:
-        x: 3116.1634371088535
-        y: 638
+        x: 3460
+        y: 738
       positionAbsolute:
-        x: 3116.1634371088535
-        y: 638
+        x: 3460
+        y: 738
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2260,11 +2325,11 @@ workflow:
       height: 88
       id: '17748507380970'
       position:
-        x: 2092
-        y: 638
+        x: 2096
+        y: 729
       positionAbsolute:
-        x: 2092
-        y: 638
+        x: 2096
+        y: 729
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2303,8 +2368,8 @@ workflow:
         x: 828
         y: 133
       positionAbsolute:
-        x: 8412
-        y: 468
+        x: 9438
+        y: 616
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2315,61 +2380,42 @@ workflow:
         agent_parameters:
           instruction:
             type: constant
-            value: 'You are the Spec Agent for the Avni App Configurator. Your task
-              is to help the user refine their program configuration and produce an
-              approved YAML spec.
+            value: 'You are the Spec Agent. The user has ALREADY confirmed their
+              entities. Generate the YAML spec and output it immediately.
 
-
-              Current entities summary: {{#conversation.entities_jsonl#}}
 
               Conversation ID: {{#sys.conversation_id#}}
 
-              User message: {{#sys.query#}}
 
+              IMPORTANT: use conversation_id for all tool calls.
 
-              IMPORTANT — use conversation_id for all tool calls, NOT the full entities
-              object. The server has the full entities cached by conversation_id.
+              Steps — do ALL in order, do NOT ask the user anything:
 
-              Workflow:
+              1. Call generate_spec with {"conversation_id": "{{#sys.conversation_id#}}"}
 
-              1. If entities are already loaded (conversation.entities_jsonl is not empty):
+              2. Call validate_spec with the returned spec_yaml
 
-              - Immediately call generate_spec with {"conversation_id": "{{#sys.conversation_id#}}"}
+              3. If validation has errors, call apply_entity_corrections then
+              regenerate.
 
-              - Call validate_spec with the returned spec_yaml
+              4. Output your final message in EXACTLY this format:
 
-              - Show user a summary and ask: "Does this configuration look correct?
-              (Yes/No)"
-
-              2. If user said Yes (confirmed):
-
-              - Output exactly: SPEC_APPROVED
-
-              - Then output the complete YAML spec on the following lines
-
-              3. If user said No (wants corrections):
-
-              - Call apply_entity_corrections with {conversation_id, corrections: [...]}
-
-              - Call generate_spec with {conversation_id}
-
-              - Call validate_spec
-
-              - Show updated summary and ask for confirmation
-
-              4. If no entities are loaded:
-
-              - Ask user to upload scoping documents
-
-
-              CRITICAL: When outputting the approved spec, use this exact format:
 
               SPEC_APPROVED
 
-              <complete YAML spec here>
+              (paste the complete YAML spec here)
 
 
-              Do not wrap the YAML in markdown code blocks.'
+              CRITICAL RULES:
+
+              - Do NOT ask the user any questions. They already confirmed.
+
+              - Do NOT wrap YAML in markdown code blocks.
+
+              - Your final output MUST start with SPEC_APPROVED on its own line
+              followed by the raw YAML spec.
+
+              - Do NOT add commentary before SPEC_APPROVED.'
           maximum_iterations:
             type: constant
             value: 5
@@ -2533,24 +2579,35 @@ workflow:
       height: 264
       id: 3b1db8bf-6e79-4646-9103-077a6ca90299
       position:
-        x: 4164
-        y: 448
+        x: 4506
+        y: 596
       positionAbsolute:
-        x: 4164
-        y: 448
+        x: 4506
+        y: 596
       selected: false
       type: custom
       width: 242
     - data:
-        code: "import re\n\ndef main(agent_response: str) -> dict:\n    # Extract spec_yaml from agent response\n    # Look for SPEC_APPROVED marker followed by YAML content\n    if \"SPEC_APPROVED\" not in agent_response:\n        return {\"spec_yaml\": \"\", \"approved\": False}\n    \n    # Extract everything after SPEC_APPROVED\n    parts = agent_response.split(\"SPEC_APPROVED\", 1)\n    if len(parts) < 2:\n        return {\"spec_yaml\": \"\", \"approved\": False}\n    \n    spec_content = parts[1].strip()\n    \n    # Remove markdown code blocks if present\n    spec_content = re.sub(r'^```ya?ml\\s*\\n', '', spec_content, flags=re.MULTILINE)\n    spec_content = re.sub(r'\\n```\\s*$', '', spec_content, flags=re.MULTILINE)\n    \n    return {\n        \"spec_yaml\": spec_content.strip(),\n        \"approved\": True\n    }\n"
+        code: "import re\n\ndef main(agent_response: str) -> dict:\n    # Extract\
+          \ spec_yaml from agent response\n    # Look for SPEC_APPROVED marker followed\
+          \ by YAML content\n    if \"SPEC_APPROVED\" not in agent_response:\n   \
+          \     return {\"spec_yaml\": \"\", \"approved\": False}\n    \n    # Extract\
+          \ everything after SPEC_APPROVED\n    parts = agent_response.split(\"SPEC_APPROVED\"\
+          , 1)\n    if len(parts) < 2:\n        return {\"spec_yaml\": \"\", \"approved\"\
+          : False}\n    \n    spec_content = parts[1].strip()\n    \n    # Remove\
+          \ markdown code blocks if present\n    spec_content = re.sub(r'^```ya?ml\\\
+          s*\\n', '', spec_content, flags=re.MULTILINE)\n    spec_content = re.sub(r'\\\
+          n```\\s*$', '', spec_content, flags=re.MULTILINE)\n    \n    return {\n\
+          \        \"spec_yaml\": spec_content.strip(),\n        \"approved\": True\n\
+          \    }\n"
         code_language: python3
         outputs:
-          spec_yaml:
-            children: null
-            type: string
           approved:
             children: null
             type: boolean
+          spec_yaml:
+            children: null
+            type: string
         selected: false
         title: Extract Spec YAML
         type: code
@@ -2563,36 +2620,37 @@ workflow:
       height: 52
       id: spec-extractor-001
       position:
-        x: 4400
-        y: 509
+        x: 4848
+        y: 702
       positionAbsolute:
-        x: 4400
-        y: 509
+        x: 4848
+        y: 702
       selected: false
       type: custom
       width: 242
     - data:
-        assigned_variable_selector:
-        - conversation
-        - spec_yaml
-        input_variable_selector:
-        - spec-extractor-001
-        - spec_yaml
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - spec-extractor-001
+          - spec_yaml
+          variable_selector:
+          - conversation
+          - spec_yaml
+          write_mode: over-write
         selected: false
         title: Save Spec YAML
-        type: variable-assigner
-        variables:
-        - - spec-extractor-001
-          - spec_yaml
-        write_mode: over-write
-      height: 52
+        type: assigner
+        version: '2'
+      height: 84
       id: spec-saver-001
       position:
-        x: 4650
-        y: 509
+        x: 5190
+        y: 686
       positionAbsolute:
-        x: 4650
-        y: 509
+        x: 5190
+        y: 686
       selected: false
       type: custom
       width: 242
@@ -2762,11 +2820,11 @@ workflow:
       height: 264
       id: 264d37e7-9580-4d26-be76-4ecdbf32803a
       position:
-        x: 5874
-        y: 448
+        x: 6900
+        y: 596
       positionAbsolute:
-        x: 5874
-        y: 448
+        x: 6900
+        y: 596
       selected: false
       type: custom
       width: 242
@@ -2940,16 +2998,16 @@ workflow:
       height: 248
       id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
       position:
-        x: 7242
-        y: 456
+        x: 8268
+        y: 604
       positionAbsolute:
-        x: 7242
-        y: 456
+        x: 8268
+        y: 604
       selected: false
       type: custom
       width: 242
     viewport:
-      x: 489.61605963329066
-      y: 177.51171747405434
-      zoom: 0.544495374931482
+      x: -2739.81726387944
+      y: -252.46483571443423
+      zoom: 0.7474091816971831
   rag_pipeline_variables: []
