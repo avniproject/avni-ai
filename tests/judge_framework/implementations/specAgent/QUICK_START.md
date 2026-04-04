@@ -5,10 +5,10 @@
 ### Step 1: Set Environment Variables
 
 ```bash
-export DIFY_API_KEY="your_dify_api_key_here"
+export DIFY_API_KEY=""
 export DIFY_API_BASE_URL="https://api.dify.ai/v1"
-export AVNI_MCP_SERVER_URL="http://localhost:8023"
-export AVNI_AUTH_TOKEN="your_avni_auth_token"  # Optional
+export AVNI_MCP_SERVER_URL="https://staging-ai.avniproject.org/"
+export AVNI_AUTH_TOKEN=""  # Optional
 ```
 
 ### Step 2: Run Component Validation (Optional)

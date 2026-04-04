@@ -200,16 +200,22 @@ do_import() {
 
     bold "Importing ${file}..."
 
-    # Read YAML content and escape for JSON
-    local yaml_content
-    yaml_content=$(cat "$file")
-
+    # Read YAML content and create JSON payload using temp file to avoid arg length limits
+    local temp_json
+    temp_json=$(mktemp)
+    
+    jq -n \
+        --rawfile yaml "$file" \
+        --arg name "$name" \
+        '{
+            mode: "yaml-content",
+            yaml_content: $yaml,
+            name: (if $name != "" then $name else null end)
+        }' > "$temp_json"
+    
     local json_payload
-    json_payload=$(jq -n --arg yaml "$yaml_content" --arg name "$name" '{
-        mode: "yaml-content",
-        yaml_content: $yaml,
-        name: (if $name != "" then $name else null end)
-    }')
+    json_payload=$(cat "$temp_json")
+    rm -f "$temp_json"
 
     check_cookies
     local csrf
@@ -316,6 +322,70 @@ do_push() {
     do_import "$file"
 }
 
+do_update() {
+    local app_id="${1:-}"
+    local file="${2:-}"
+
+    if [[ -z "$app_id" ]]; then
+        red "Usage: $0 update <app_id> <file.yml>"
+        exit 1
+    fi
+
+    if [[ -z "$file" || ! -f "$file" ]]; then
+        red "File not found: ${file}"
+        exit 1
+    fi
+
+    bold "Updating workflow for app ${app_id}..."
+
+    # Convert YAML to JSON structure that Dify expects
+    local temp_yaml temp_json
+    temp_yaml=$(mktemp)
+    temp_json=$(mktemp)
+    
+    # Parse YAML to JSON
+    python3 -c "import yaml, json, sys; print(json.dumps(yaml.safe_load(open('$file'))))" > "$temp_yaml" 2>/dev/null || {
+        red "Failed to parse YAML. Make sure Python3 with PyYAML is installed."
+        rm -f "$temp_yaml" "$temp_json"
+        exit 1
+    }
+    
+    # Extract graph and features from parsed YAML
+    jq '{
+        graph: .workflow.graph,
+        features: .workflow.features,
+        environment_variables: (.workflow.environment_variables // []),
+        conversation_variables: (.workflow.conversation_variables // [])
+    }' "$temp_yaml" > "$temp_json"
+
+    check_cookies
+    local csrf
+    csrf=$(get_csrf_token)
+
+    # Update the workflow DSL
+    local response
+    response=$(curl -s -X POST "${DIFY_HOST}/console/api/apps/${app_id}/workflows/draft" \
+        -b "$COOKIE_FILE" \
+        -H "X-Csrf-Token: ${csrf}" \
+        -H "Content-Type: application/json" \
+        -d @"$temp_json")
+
+    rm -f "$temp_yaml" "$temp_json"
+
+    # Check if update was successful
+    if echo "$response" | jq -e '.result == "success"' >/dev/null 2>&1; then
+        green "Workflow updated successfully!"
+        echo "  App ID:  ${app_id}"
+        echo "  URL:     ${DIFY_HOST}/app/${app_id}/workflow"
+        echo ""
+        yellow "Don't forget to publish the changes!"
+    else
+        red "Update failed:"
+        echo "$response" | jq . 2>/dev/null || echo "$response"
+        exit 1
+    fi
+}
+
 # ── Main ──────────────────────────────────────────────────
 
 check_deps
@@ -349,6 +419,13 @@ case "${1:-help}" in
     push)
         do_push "${2:-}"
         ;;
+    update)
+        if [[ -z "${2:-}" || -z "${3:-}" ]]; then
+            red "Usage: $0 update <app_id> <file.yml>"
+            exit 1
+        fi
+        do_update "$2" "$3"
+        ;;
     help|--help|-h)
         bold "dify-manage.sh — Manage Dify workflows from the terminal"
         echo ""
@@ -359,6 +436,7 @@ case "${1:-help}" in
         echo "  import <file> [name]     Import DSL as new app"
         echo "  publish, pub [app_id]    Publish a workflow"
         echo "  diff [app_id]            Diff remote vs local DSL"
+        echo "  update <app_id> <file>   Update existing app's workflow DSL"
         echo "  pull [app_id]            Download remote DSL to local file"
         echo "  push [file]              Upload local DSL to Dify"
         echo ""

@@ -123,23 +123,11 @@ def run_spec_agent_tests(
     scenarios = load_test_scenarios(scenarios_file)
     logger.info(f"Loaded {len(scenarios)} test scenarios")
 
+    # Add scenarios to config so TestSubjectGenerator can use them
+    config.generation_config.static_test_cases = scenarios
+
     # Create factory
     factory = SpecAgentTestSubjectFactory(entities_file)
-
-    # Create test subjects
-    test_subjects = []
-    for scenario in scenarios:
-        try:
-            subject = factory.create_from_static_data(scenario, config)
-            test_subjects.append(subject)
-        except Exception as e:
-            logger.error(
-                f"Failed to create test subject for {scenario.get('scenario')}: {e}"
-            )
-            if fail_fast:
-                return 1
-
-    logger.info(f"Created {len(test_subjects)} test subjects")
 
     # Create executor and judge
     executor = SpecAgentExecutor(config)
@@ -147,16 +135,18 @@ def run_spec_agent_tests(
 
     # Create orchestrator
     orchestrator = JudgeOrchestrator(
-        test_subjects=test_subjects,
         executor=executor,
-        judge=judge,
+        judge_strategy=judge,
         progress_reporter=ConsoleProgressReporter(),
-        fail_fast=fail_fast,
     )
 
     # Run tests
     logger.info("Executing tests...")
-    suite_result = orchestrator.run_test_suite()
+    suite_result = orchestrator.run_test_suite(
+        test_subject_factory=factory,
+        config=config,
+        fail_fast=fail_fast,
+    )
 
     # Monitor conversations if enabled
     if monitor_conversations and config.avni_mcp_server_url:
