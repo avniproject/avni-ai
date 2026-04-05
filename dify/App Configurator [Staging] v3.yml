@@ -345,16 +345,16 @@ workflow:
       selected: false
       source: 9c0103c2-e377-4925-8f4a-501ff5b34379
       sourceHandle: source
-      target: store-entities-node
+      target: 25263b32-3d9c-48d8-8b65-a3ac59b09348
       targetHandle: target
       type: custom
       zIndex: 0
     - data:
         sourceType: http-request
         targetType: http-request
-      id: store-entities-to-ambiguity-edge
+      id: e4599f52-31ef-4cf6-8eb9-3b58ff329c1b
       selected: false
-      source: store-entities-node
+      source: 25263b32-3d9c-48d8-8b65-a3ac59b09348
       sourceHandle: source
       target: '1773908701222'
       targetHandle: target
@@ -392,7 +392,7 @@ workflow:
       selected: false
       source: '1774617205889'
       sourceHandle: 'Yes'
-      target: progress-generating-spec
+      target: 57618321-2885-4f02-8799-357f4c930787
       targetHandle: target
       type: custom
       zIndex: 0
@@ -400,9 +400,9 @@ workflow:
         isInLoop: false
         sourceType: answer
         targetType: agent
-      id: progress-spec-to-agent
+      id: ea0cf08c-de6e-4ea7-b3e5-d4fa4741edaf
       selected: false
-      source: progress-generating-spec
+      source: 57618321-2885-4f02-8799-357f4c930787
       sourceHandle: source
       target: 3b1db8bf-6e79-4646-9103-077a6ca90299
       targetHandle: target
@@ -412,11 +412,11 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: confirm-no-to-corrections-prompt
+      id: 53d2e27e-d37f-4c2b-9ac4-ec92b4fc8d62
       selected: false
       source: '1774617205889'
       sourceHandle: 'No'
-      target: corrections-prompt-answer
+      target: 2aec3688-840b-4764-9b24-053c481cf7cb
       targetHandle: target
       type: custom
       zIndex: 0
@@ -468,37 +468,37 @@ workflow:
       selected: false
       source: 3b1db8bf-6e79-4646-9103-077a6ca90299
       sourceHandle: source
-      target: spec-extractor-001
+      target: e5031c06-d598-41ea-89bd-418c8760ef12
       targetHandle: target
       targetType: code
       type: custom
     - data:
         sourceType: code
         targetType: assigner
-      id: edge-extractor-to-saver
+      id: c2e53682-ed6e-4fd0-a795-b155afd16778
       selected: false
-      source: spec-extractor-001
+      source: e5031c06-d598-41ea-89bd-418c8760ef12
       sourceHandle: source
-      target: spec-saver-001
+      target: 18c872d0-3910-476b-8125-41d3990fa66b
       targetHandle: target
       targetType: assigner
       type: custom
     - data:
         sourceType: assigner
         targetType: answer
-      id: edge-saver-to-download-progress
+      id: c4437bd2-043a-45bf-84de-65ca31eb5ec3
       selected: false
-      source: spec-saver-001
+      source: 18c872d0-3910-476b-8125-41d3990fa66b
       sourceHandle: source
-      target: progress-downloading-bundle
+      target: 81598ae0-f377-4824-8d1d-dac6e3ee622d
       targetHandle: target
       type: custom
     - data:
         sourceType: answer
         targetType: http-request
-      id: progress-download-to-http
+      id: f2bf2d7e-b15f-4f54-98e4-d28e49db7d47
       selected: false
-      source: progress-downloading-bundle
+      source: 81598ae0-f377-4824-8d1d-dac6e3ee622d
       sourceHandle: source
       target: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
       targetHandle: target
@@ -507,7 +507,7 @@ workflow:
         isInLoop: false
         sourceType: http-request
         targetType: if-else
-      id: download-to-error-check
+      id: c2f45bd8-09b1-4f8e-b460-89a649aa2be6
       selected: false
       source: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
       sourceHandle: source
@@ -519,11 +519,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: code
-      id: download-error-check-to-build-body
+      id: 5374c028-508c-4bb5-8a0d-9d222ab07b11
       selected: false
       source: '1775380701991'
       sourceHandle: 'false'
-      target: build-patch-body-node
+      target: 6a82d9d6-b4bb-469e-8ef3-2cead76406b6
       targetHandle: target
       type: custom
       zIndex: 0
@@ -531,7 +531,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: download-err-400
+      id: 7b9bcc76-b929-42e4-9281-127961019e34
       selected: false
       source: '1775380701991'
       sourceHandle: 'true'
@@ -543,7 +543,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: download-err-401
+      id: 58fe8850-b001-49cf-a08a-49b0232a5c54
       selected: false
       source: '1775380701991'
       sourceHandle: d26825bc-0735-4704-b42c-eb42f6cb4b67
@@ -555,7 +555,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: download-err-403
+      id: ca7a69d0-3489-4bf9-a7ff-eed51f5aecd4
       selected: false
       source: '1775380701991'
       sourceHandle: bef31e01-b42e-40cf-9c16-fd9fef71ec17
@@ -567,7 +567,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: download-err-404
+      id: 693cea46-5f1c-43e7-b85e-a3f1a346c456
       selected: false
       source: '1775380701991'
       sourceHandle: 16b24b6c-aef8-437c-a9e3-18a892d85f37
@@ -579,7 +579,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: download-err-500
+      id: 33f9cd32-811f-4c69-852f-a66b6099c9a2
       selected: false
       source: '1775380701991'
       sourceHandle: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
@@ -591,9 +591,9 @@ workflow:
         isInLoop: false
         sourceType: code
         targetType: http-request
-      id: build-body-to-patch
+      id: 6b0ac41e-d55e-4891-bddc-589b7e2f8502
       selected: false
-      source: build-patch-body-node
+      source: 6a82d9d6-b4bb-469e-8ef3-2cead76406b6
       sourceHandle: source
       target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
       targetHandle: target
@@ -639,11 +639,11 @@ workflow:
         isInLoop: false
         sourceType: agent
         targetType: if-else
-      id: review-to-bundle-verdict
+      id: 13561a1e-7bf7-4b6f-929c-1c7b9f86acf5
       selected: false
       source: 264d37e7-9580-4d26-be76-4ecdbf32803a
       sourceHandle: source
-      target: check-bundle-verdict
+      target: 83e06f10-4357-46e0-b0cc-242228740e6c
       targetHandle: target
       type: custom
       zIndex: 0
@@ -651,11 +651,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: bundle-approved-to-progress
+      id: 9ae8ebe4-85e7-497a-a867-1522455d36c6
       selected: false
-      source: check-bundle-verdict
+      source: 83e06f10-4357-46e0-b0cc-242228740e6c
       sourceHandle: case-bundle-approved
-      target: progress-uploading-bundle
+      target: 3be38f48-21fd-4fc1-b683-afa0f1852d94
       targetHandle: target
       type: custom
       zIndex: 0
@@ -663,11 +663,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: bundle-approved-default-to-progress
+      id: 6a2286ad-9fa5-4cb2-8994-0d4a0d9e863a
       selected: false
-      source: check-bundle-verdict
+      source: 83e06f10-4357-46e0-b0cc-242228740e6c
       sourceHandle: 'false'
-      target: progress-uploading-bundle
+      target: 3be38f48-21fd-4fc1-b683-afa0f1852d94
       targetHandle: target
       type: custom
       zIndex: 0
@@ -675,9 +675,9 @@ workflow:
         isInLoop: false
         sourceType: answer
         targetType: http-request
-      id: progress-upload-to-http
+      id: 23658fb2-9a4e-425b-ba66-48d75ddbd7ad
       selected: false
-      source: progress-uploading-bundle
+      source: 3be38f48-21fd-4fc1-b683-afa0f1852d94
       sourceHandle: source
       target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       targetHandle: target
@@ -687,11 +687,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: code
-      id: bundle-rejected-to-increment
+      id: 325b76da-b4ad-4bbc-81c6-744de059e418
       selected: false
-      source: check-bundle-verdict
+      source: 83e06f10-4357-46e0-b0cc-242228740e6c
       sourceHandle: case-bundle-rejected
-      target: increment-retry-code
+      target: 2cd3d54a-626b-4baa-86b5-fc244555cd38
       targetHandle: target
       type: custom
       zIndex: 0
@@ -699,11 +699,11 @@ workflow:
         isInLoop: false
         sourceType: http-request
         targetType: if-else
-      id: upload-to-error-check
+      id: 18e8093e-e749-4885-83f8-48c0a8d91322
       selected: false
       source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       sourceHandle: source
-      target: upload-error-check
+      target: 62b26511-73a8-409f-bd0e-a5ae10a0eca7
       targetHandle: target
       type: custom
       zIndex: 0
@@ -711,9 +711,9 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: code
-      id: upload-error-check-to-parse
+      id: 97907d0f-6552-487c-b57c-4830b93d8316
       selected: false
-      source: upload-error-check
+      source: 62b26511-73a8-409f-bd0e-a5ae10a0eca7
       sourceHandle: 'false'
       target: 6d81a37b-960b-42d3-ae88-5799cd773102
       targetHandle: target
@@ -723,11 +723,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: upload-err-400
+      id: 2ab8edfe-abee-4e9e-a804-dd9bce32eb46
       selected: false
-      source: upload-error-check
+      source: 62b26511-73a8-409f-bd0e-a5ae10a0eca7
       sourceHandle: 'true'
-      target: upload-err-400-answer
+      target: 6074d8af-a887-49c7-9600-cd7a39b7da9a
       targetHandle: target
       type: custom
       zIndex: 0
@@ -735,11 +735,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: upload-err-401
+      id: 0dbcbde7-f38e-4570-9b4e-80f4ed41b148
       selected: false
-      source: upload-error-check
+      source: 62b26511-73a8-409f-bd0e-a5ae10a0eca7
       sourceHandle: upload-case-401
-      target: upload-err-401-answer
+      target: df5ce36e-f8b2-4317-a9c5-7b2bc31dfdcc
       targetHandle: target
       type: custom
       zIndex: 0
@@ -747,11 +747,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: upload-err-403
+      id: c9484703-d42a-4e9b-b4cf-cba2da56f9e2
       selected: false
-      source: upload-error-check
+      source: 62b26511-73a8-409f-bd0e-a5ae10a0eca7
       sourceHandle: upload-case-403
-      target: upload-err-403-answer
+      target: 3253f6da-b185-4c99-9649-57b55121ad3c
       targetHandle: target
       type: custom
       zIndex: 0
@@ -759,11 +759,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: upload-err-404
+      id: 4b4490ba-7736-4b2d-b250-bbbb197af184
       selected: false
-      source: upload-error-check
+      source: 62b26511-73a8-409f-bd0e-a5ae10a0eca7
       sourceHandle: upload-case-404
-      target: upload-err-404-answer
+      target: 0913d6f0-d87d-4643-b696-b246007dc457
       targetHandle: target
       type: custom
       zIndex: 0
@@ -771,11 +771,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: upload-err-500
+      id: 6985d114-57a2-4804-af78-a7a5dc0b5457
       selected: false
-      source: upload-error-check
+      source: 62b26511-73a8-409f-bd0e-a5ae10a0eca7
       sourceHandle: upload-case-500
-      target: upload-err-500-answer
+      target: 44ab76d0-bb30-438b-921c-b71ef483066c
       targetHandle: target
       type: custom
       zIndex: 0
@@ -807,11 +807,11 @@ workflow:
         isInLoop: false
         sourceType: agent
         targetType: if-else
-      id: error-agent-to-verdict
+      id: ab10a1d7-1196-489f-8fe8-4310a4ac31f9
       selected: false
       source: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
       sourceHandle: source
-      target: check-error-verdict
+      target: c522b7ba-bf3c-40d8-82ec-870ac46f205f
       targetHandle: target
       type: custom
       zIndex: 0
@@ -819,11 +819,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: code
-      id: error-retry-to-increment
+      id: 4bc7a470-cb38-4100-9a2f-3bd7f19128ac
       selected: false
-      source: check-error-verdict
+      source: c522b7ba-bf3c-40d8-82ec-870ac46f205f
       sourceHandle: case-retry-bundle
-      target: increment-retry-code
+      target: 2cd3d54a-626b-4baa-86b5-fc244555cd38
       targetHandle: target
       type: custom
       zIndex: 0
@@ -831,11 +831,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: error-report-to-answer
+      id: 51d3b9f6-fe14-49b7-90b6-bdec29fa8e6b
       selected: false
-      source: check-error-verdict
+      source: c522b7ba-bf3c-40d8-82ec-870ac46f205f
       sourceHandle: case-error-report
-      target: upload-error-report-answer
+      target: 58d9287e-6a07-4b76-8221-a2fe263566f0
       targetHandle: target
       type: custom
       zIndex: 0
@@ -843,9 +843,9 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: loop
-      id: error-default-to-poll
+      id: 723c66a0-3b24-43fb-9c54-864281b4e7c3
       selected: false
-      source: check-error-verdict
+      source: c522b7ba-bf3c-40d8-82ec-870ac46f205f
       sourceHandle: 'false'
       target: '1774617440956'
       targetHandle: target
@@ -855,11 +855,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: delete-config-to-confirm-prompt
+      id: f06c7092-2a09-47c5-b60f-52a19a1aa77c
       selected: false
       source: '1757493270484'
       sourceHandle: case-delete-config
-      target: delete-confirm-prompt-answer
+      target: 045318f4-d7da-4963-90d0-98294cb60931
       targetHandle: target
       type: custom
       zIndex: 0
@@ -867,11 +867,11 @@ workflow:
         isInLoop: false
         sourceType: answer
         targetType: human-input
-      id: delete-prompt-to-human-input
+      id: 2d90cc3f-ff58-467a-a2d4-71c502ebf376
       selected: false
-      source: delete-confirm-prompt-answer
+      source: 045318f4-d7da-4963-90d0-98294cb60931
       sourceHandle: source
-      target: delete-confirm-human-input
+      target: 12bd8582-9fed-48d1-9ea6-552c23c90ddb
       targetHandle: target
       type: custom
       zIndex: 0
@@ -879,11 +879,11 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: http-request
-      id: delete-yes-to-http
+      id: 2be96f53-86b6-4e7c-ab2c-7f6bb828bce6
       selected: false
-      source: delete-confirm-human-input
+      source: 12bd8582-9fed-48d1-9ea6-552c23c90ddb
       sourceHandle: 'Yes'
-      target: delete-implementation-http
+      target: b5f60a64-a35a-41f8-85e5-bc5fc632c445
       targetHandle: target
       type: custom
       zIndex: 0
@@ -891,11 +891,11 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: delete-no-to-cancel
+      id: 11cb2d64-8cc3-433d-a168-412a661c498e
       selected: false
-      source: delete-confirm-human-input
+      source: 12bd8582-9fed-48d1-9ea6-552c23c90ddb
       sourceHandle: 'No'
-      target: delete-cancelled-answer
+      target: 57544709-393a-4760-991b-fc0149ae7f67
       targetHandle: target
       type: custom
       zIndex: 0
@@ -903,11 +903,11 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: delete-timeout-to-cancel
+      id: 6d5ec430-288b-4958-a537-90ddd421d3a3
       selected: false
-      source: delete-confirm-human-input
+      source: 12bd8582-9fed-48d1-9ea6-552c23c90ddb
       sourceHandle: __timeout
-      target: delete-cancelled-answer
+      target: 57544709-393a-4760-991b-fc0149ae7f67
       targetHandle: target
       type: custom
       zIndex: 0
@@ -915,11 +915,11 @@ workflow:
         isInLoop: false
         sourceType: http-request
         targetType: if-else
-      id: delete-http-to-result-check
+      id: 46107681-8ba7-451a-8a01-eed78cf81779
       selected: false
-      source: delete-implementation-http
+      source: b5f60a64-a35a-41f8-85e5-bc5fc632c445
       sourceHandle: source
-      target: delete-result-check
+      target: 47bbee22-967d-4206-8d2f-f639936f0304
       targetHandle: target
       type: custom
       zIndex: 0
@@ -927,11 +927,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: delete-success-to-answer
+      id: 48a91557-4c30-4e41-ab16-0bc531f395c3
       selected: false
-      source: delete-result-check
+      source: 47bbee22-967d-4206-8d2f-f639936f0304
       sourceHandle: 'true'
-      target: delete-success-answer
+      target: 6877ddae-ae78-49e8-af6f-b0ac0e742daf
       targetHandle: target
       type: custom
       zIndex: 0
@@ -939,11 +939,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: delete-failure-to-answer
+      id: 7b9f4d9b-f3de-475c-90a5-17666784ceda
       selected: false
-      source: delete-result-check
+      source: 47bbee22-967d-4206-8d2f-f639936f0304
       sourceHandle: 'false'
-      target: delete-failure-answer
+      target: b1029877-df56-4bc2-b8fd-e5c7e01d4280
       targetHandle: target
       type: custom
       zIndex: 0
@@ -951,11 +951,11 @@ workflow:
         isInLoop: false
         sourceType: code
         targetType: assigner
-      id: increment-to-save-retry
+      id: 7deda7dd-5e83-4277-851d-f155e6f913d7
       selected: false
-      source: increment-retry-code
+      source: 2cd3d54a-626b-4baa-86b5-fc244555cd38
       sourceHandle: source
-      target: save-retry-count
+      target: 0994a503-b86e-419f-925d-3bc1dc7db02c
       targetHandle: target
       type: custom
       zIndex: 0
@@ -963,11 +963,11 @@ workflow:
         isInLoop: false
         sourceType: assigner
         targetType: if-else
-      id: save-retry-to-max-check
+      id: bc04482f-63ff-44c7-98ce-70e14400dd1c
       selected: false
-      source: save-retry-count
+      source: 0994a503-b86e-419f-925d-3bc1dc7db02c
       sourceHandle: source
-      target: check-max-retries
+      target: c08d56f9-1ff9-462b-a3cf-e2de48566b82
       targetHandle: target
       type: custom
       zIndex: 0
@@ -975,9 +975,9 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: agent
-      id: retry-under-limit-to-spec
+      id: a5c82168-62d8-4a7d-88e7-b139ca50727a
       selected: false
-      source: check-max-retries
+      source: c08d56f9-1ff9-462b-a3cf-e2de48566b82
       sourceHandle: 'false'
       target: 3b1db8bf-6e79-4646-9103-077a6ca90299
       targetHandle: target
@@ -987,11 +987,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: retry-exceeded-to-answer
+      id: 784d808f-7569-475a-9671-f01c20845b56
       selected: false
-      source: check-max-retries
+      source: c08d56f9-1ff9-462b-a3cf-e2de48566b82
       sourceHandle: 'true'
-      target: max-retries-exhausted-answer
+      target: 41dbefd6-cc48-49c2-ae2e-8444773c6404
       targetHandle: target
       type: custom
       zIndex: 0
@@ -1160,11 +1160,11 @@ workflow:
         isInLoop: false
         sourceType: start
         targetType: assigner
-      id: edge-start-to-org-name-assigner
+      id: 974b2a6d-7755-4b17-b296-b0c5dc5d3866
       selected: false
       source: '1711528708197'
       sourceHandle: source
-      target: org-name-assigner
+      target: a2a567f5-2561-4d32-9e9a-bd87977bf876
       targetHandle: target
       type: custom
       zIndex: 0
@@ -1174,7 +1174,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: http-request
         targetType: code
-      id: 1774617517718-source-17749417129260-target
+      id: d53c2956-bc34-4c4d-9a00-5de9e15d78cd
       source: '1774617517718'
       sourceHandle: source
       target: '17749417129260'
@@ -1187,7 +1187,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: code
         targetType: if-else
-      id: 17749417129260-source-1774617558364-target
+      id: 05789e39-2480-473c-ab65-92c0c9aaffc9
       source: '17749417129260'
       sourceHandle: source
       target: '1774617558364'
@@ -1321,7 +1321,7 @@ workflow:
         type: assigner
         version: '2'
       height: 84
-      id: org-name-assigner
+      id: a2a567f5-2561-4d32-9e9a-bd87977bf876
       position:
         x: 362
         y: 935
@@ -1333,7 +1333,7 @@ workflow:
       width: 242
     - data:
         dataset_ids:
-        - 9TmCqtDyQNUaJCKXT7rPGCd21br8q6JzrrUr4xib3E9uqcfMf6t6rxJkkXFK7EzL
+        - df1bfaa2-38ad-457c-8237-6980e83245d9
         multiple_retrieval_config:
           reranking_enable: false
           reranking_mode: weighted_score
@@ -1911,7 +1911,7 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}store-entities'
       height: 141
-      id: store-entities-node
+      id: 25263b32-3d9c-48d8-8b65-a3ac59b09348
       position:
         x: 2784
         y: 686
@@ -2039,7 +2039,7 @@ workflow:
           value_type: string
           variable: spec_yaml
       height: 52
-      id: build-patch-body-node
+      id: 6a82d9d6-b4bb-469e-8ef3-2cead76406b6
       position:
         x: 5874
         y: 700
@@ -2058,7 +2058,7 @@ workflow:
           - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac691
             key: ''
             type: text
-            value: '{{#build-patch-body-node.json_body#}}'
+            value: '{{#6a82d9d6-b4bb-469e-8ef3-2cead76406b6.json_body#}}'
           type: raw-text
         headers: Content-Type:application/json
         method: post
@@ -2614,7 +2614,7 @@ workflow:
         title: Corrections Prompt
         type: answer
       height: 148
-      id: corrections-prompt-answer
+      id: 2aec3688-840b-4764-9b24-053c481cf7cb
       position:
         x: 4506
         y: 1120
@@ -2631,7 +2631,7 @@ workflow:
         title: 'Progress: Generating Spec'
         type: answer
       height: 116
-      id: progress-generating-spec
+      id: 57618321-2885-4f02-8799-357f4c930787
       position:
         x: 4506
         y: 510
@@ -2647,7 +2647,7 @@ workflow:
         title: 'Progress: Downloading Bundle'
         type: answer
       height: 116
-      id: progress-downloading-bundle
+      id: 81598ae0-f377-4824-8d1d-dac6e3ee622d
       position:
         x: 5190
         y: 510
@@ -2663,7 +2663,7 @@ workflow:
         title: 'Progress: Uploading Bundle'
         type: answer
       height: 116
-      id: progress-uploading-bundle
+      id: 3be38f48-21fd-4fc1-b683-afa0f1852d94
       position:
         x: 6900
         y: 510
@@ -3153,7 +3153,7 @@ workflow:
           value_type: string
           variable: agent_response
       height: 52
-      id: spec-extractor-001
+      id: e5031c06-d598-41ea-89bd-418c8760ef12
       position:
         x: 4848
         y: 702
@@ -3168,7 +3168,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - spec-extractor-001
+          - e5031c06-d598-41ea-89bd-418c8760ef12
           - spec_yaml
           variable_selector:
           - conversation
@@ -3179,7 +3179,7 @@ workflow:
         type: assigner
         version: '2'
       height: 84
-      id: spec-saver-001
+      id: 18c872d0-3910-476b-8125-41d3990fa66b
       position:
         x: 5190
         y: 686
@@ -3602,7 +3602,7 @@ workflow:
         title: Upload Error Check
         type: if-else
       height: 436
-      id: upload-error-check
+      id: 62b26511-73a8-409f-bd0e-a5ae10a0eca7
       position:
         x: 7584
         y: 1092
@@ -3621,7 +3621,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: upload-err-400-answer
+      id: 6074d8af-a887-49c7-9600-cd7a39b7da9a
       position:
         x: 7926
         y: 1027
@@ -3639,7 +3639,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: upload-err-401-answer
+      id: df5ce36e-f8b2-4317-a9c5-7b2bc31dfdcc
       position:
         x: 7926
         y: 1166
@@ -3657,7 +3657,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: upload-err-403-answer
+      id: 3253f6da-b185-4c99-9649-57b55121ad3c
       position:
         x: 7926
         y: 1305
@@ -3675,7 +3675,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: upload-err-404-answer
+      id: 0913d6f0-d87d-4643-b696-b246007dc457
       position:
         x: 7926
         y: 1444
@@ -3694,7 +3694,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: upload-err-500-answer
+      id: 44ab76d0-bb30-438b-921c-b71ef483066c
       position:
         x: 7926
         y: 1583
@@ -3733,7 +3733,7 @@ workflow:
         title: Check Bundle Verdict
         type: if-else
       height: 198
-      id: check-bundle-verdict
+      id: 83e06f10-4357-46e0-b0cc-242228740e6c
       position:
         x: 7242
         y: 510
@@ -3771,7 +3771,7 @@ workflow:
         title: Check Error Verdict
         type: if-else
       height: 198
-      id: check-error-verdict
+      id: c522b7ba-bf3c-40d8-82ec-870ac46f205f
       position:
         x: 8610
         y: 510
@@ -3799,7 +3799,7 @@ workflow:
           value_type: number
           variable: current_count
       height: 52
-      id: increment-retry-code
+      id: 2cd3d54a-626b-4baa-86b5-fc244555cd38
       position:
         x: 7584
         y: 380
@@ -3814,7 +3814,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - increment-retry-code
+          - 2cd3d54a-626b-4baa-86b5-fc244555cd38
           - new_count
           variable_selector:
           - conversation
@@ -3825,7 +3825,7 @@ workflow:
         type: assigner
         version: '2'
       height: 84
-      id: save-retry-count
+      id: 0994a503-b86e-419f-925d-3bc1dc7db02c
       position:
         x: 7926
         y: 364
@@ -3844,7 +3844,7 @@ workflow:
             value: '3'
             varType: number
             variable_selector:
-            - increment-retry-code
+            - 2cd3d54a-626b-4baa-86b5-fc244555cd38
             - new_count
           id: 'true'
           logical_operator: and
@@ -3852,7 +3852,7 @@ workflow:
         title: Check Max Retries
         type: if-else
       height: 148
-      id: check-max-retries
+      id: c08d56f9-1ff9-462b-a3cf-e2de48566b82
       position:
         x: 8268
         y: 356
@@ -3871,7 +3871,7 @@ workflow:
         title: Max Retries Exhausted
         type: answer
       height: 148
-      id: max-retries-exhausted-answer
+      id: 41dbefd6-cc48-49c2-ae2e-8444773c6404
       position:
         x: 8610
         y: 270
@@ -3889,7 +3889,7 @@ workflow:
         title: Upload Error Report
         type: answer
       height: 148
-      id: upload-error-report-answer
+      id: 58d9287e-6a07-4b76-8221-a2fe263566f0
       position:
         x: 8952
         y: 604
@@ -4072,7 +4072,7 @@ workflow:
         title: Delete Confirm Prompt
         type: answer
       height: 148
-      id: delete-confirm-prompt-answer
+      id: 045318f4-d7da-4963-90d0-98294cb60931
       position:
         x: 1368
         y: 1100
@@ -4102,7 +4102,7 @@ workflow:
           id: 'No'
           title: 'No'
       height: 190
-      id: delete-confirm-human-input
+      id: 12bd8582-9fed-48d1-9ea6-552c23c90ddb
       position:
         x: 1710
         y: 1100
@@ -4141,7 +4141,7 @@ workflow:
           - auth_token
           variable: auth_token
       height: 178
-      id: delete-implementation-http
+      id: b5f60a64-a35a-41f8-85e5-bc5fc632c445
       position:
         x: 2052
         y: 1100
@@ -4160,7 +4160,7 @@ workflow:
             value: '200'
             varType: number
             variable_selector:
-            - delete-implementation-http
+            - b5f60a64-a35a-41f8-85e5-bc5fc632c445
             - status_code
           id: 'true'
           logical_operator: and
@@ -4168,7 +4168,7 @@ workflow:
         title: Delete Result Check
         type: if-else
       height: 148
-      id: delete-result-check
+      id: 47bbee22-967d-4206-8d2f-f639936f0304
       position:
         x: 2394
         y: 1100
@@ -4186,7 +4186,7 @@ workflow:
         title: Delete Success
         type: answer
       height: 148
-      id: delete-success-answer
+      id: 6877ddae-ae78-49e8-af6f-b0ac0e742daf
       position:
         x: 2736
         y: 1020
@@ -4203,7 +4203,7 @@ workflow:
         title: Delete Failure
         type: answer
       height: 148
-      id: delete-failure-answer
+      id: b1029877-df56-4bc2-b8fd-e5c7e01d4280
       position:
         x: 2736
         y: 1220
@@ -4219,7 +4219,7 @@ workflow:
         title: Delete Cancelled
         type: answer
       height: 116
-      id: delete-cancelled-answer
+      id: 57544709-393a-4760-991b-fc0149ae7f67
       position:
         x: 2052
         y: 1350
