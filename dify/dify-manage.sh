@@ -263,6 +263,71 @@ do_import() {
     fi
 }
 
+do_overwrite() {
+    local app_id="${1:-}"
+    local file="${2:-}"
+
+    if [[ -z "$app_id" || -z "$file" || ! -f "$file" ]]; then
+        red "Usage: $0 overwrite <app_id> <file.yml>"
+        exit 1
+    fi
+
+    bold "Overwriting app ${app_id} DSL from ${file}..."
+
+    local temp_json
+    temp_json=$(mktemp)
+
+    python3 -c "
+import json, sys
+with open('${file}') as f:
+    yaml_content = f.read()
+payload = {'mode': 'yaml-content', 'yaml_content': yaml_content, 'app_id': '${app_id}'}
+json.dump(payload, sys.stdout)
+" > "$temp_json"
+
+    check_cookies
+    local csrf
+    csrf=$(get_csrf_token)
+
+    local response
+    response=$(curl -s --max-time 60 -X POST "${DIFY_HOST}/console/api/apps/import" \
+        -b "$COOKIE_FILE" \
+        -H "X-Csrf-Token: ${csrf}" \
+        -H "Content-Type: application/json" \
+        -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
+        -d @"$temp_json")
+
+    rm -f "$temp_json"
+
+    local status import_id
+    status=$(echo "$response" | jq -r '.status // empty')
+    import_id=$(echo "$response" | jq -r '.id // empty')
+
+    if [[ "$status" == "pending" && -n "$import_id" ]]; then
+        yellow "Import pending — confirming..."
+        local confirm
+        confirm=$(curl -s --max-time 30 -X POST "${DIFY_HOST}/console/api/apps/imports/${import_id}/confirm" \
+            -b "$COOKIE_FILE" \
+            -H "X-Csrf-Token: ${csrf}" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
+            -d '{}')
+        response="$confirm"
+    fi
+
+    local result_app_id
+    result_app_id=$(echo "$response" | jq -r '.app_id // .id // empty')
+
+    if [[ -n "$result_app_id" ]]; then
+        green "Overwrite successful!"
+        echo "  App ID:  ${result_app_id}"
+        echo "  URL:     ${DIFY_HOST}/app/${result_app_id}/workflow"
+    else
+        yellow "Overwrite response:"
+        echo "$response" | jq . 2>/dev/null || echo "$response"
+    fi
+}
+
 do_publish() {
     local app_id
     app_id=$(resolve_app_id "${1:-}")
@@ -440,6 +505,13 @@ case "${1:-help}" in
             exit 1
         fi
         do_update "$2" "$3"
+        ;;
+    overwrite)
+        if [[ -z "${2:-}" || -z "${3:-}" ]]; then
+            red "Usage: $0 overwrite <app_id> <file.yml>"
+            exit 1
+        fi
+        do_overwrite "$2" "$3"
         ;;
     help|--help|-h)
         bold "dify-manage.sh — Manage Dify workflows from the terminal"
