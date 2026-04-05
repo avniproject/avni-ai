@@ -4,7 +4,7 @@ app:
   icon_background: '#FFEAD5'
   icon_type: emoji
   mode: advanced-chat
-  name: 'App Configurator [Staging] v3'
+  name: App Configurator [Staging] v3
   use_icon_as_answer_icon: true
 dependencies:
 - current_identifier: null
@@ -240,17 +240,6 @@ workflow:
   graph:
     edges:
     - data:
-        sourceType: knowledge-retrieval
-        targetType: llm
-      id: 567b3a09-07aa-446a-af58-bb023337ea04
-      selected: false
-      source: 536c1e44-5bdb-479e-8fd4-0b3f36d85a1b
-      sourceHandle: source
-      target: 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         sourceType: if-else
         targetType: llm
       id: 538316d7-e6df-4c85-aa8e-882da2decf95
@@ -317,98 +306,6 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        sourceType: if-else
-        targetType: if-else
-      id: 6a57cf49-c334-464d-a4f4-b9108cf4c092
-      selected: false
-      source: 4f829f1f-f4db-4b21-a501-fcbc863ee2ce
-      sourceHandle: case-filesetup
-      target: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: if-else
-        targetType: document-extractor
-      id: 2830c064-2881-4fcb-b839-384ced8a80cc
-      selected: false
-      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      sourceHandle: 'false'
-      target: addf214e-9e80-4030-9160-5e59b8031e58
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: assigner
-        targetType: http-request
-      id: 9edcc33f-ae77-4d1d-a0a4-9b820d327bbf
-      selected: false
-      source: 9c0103c2-e377-4925-8f4a-501ff5b34379
-      sourceHandle: source
-      target: ecd0bd72-6c77-4fb8-a362-0164343614af
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: http-request
-        targetType: http-request
-      id: 8ee70330-91bd-42d4-bda7-b0d1b1ef9e91
-      selected: false
-      source: ecd0bd72-6c77-4fb8-a362-0164343614af
-      sourceHandle: source
-      target: 3a88cb07-e172-4132-b8b9-8b029f177a84
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: if-else
-        targetType: agent
-      id: 7e25197b-7c15-4124-bb55-0fded6e2bc22
-      selected: false
-      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      sourceHandle: case-true
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: answer
-        targetType: human-input
-      id: 0daa4d9e-549b-44e3-8b91-c890391b486c
-      selected: false
-      source: f1361b33-bc79-43b7-a966-6a9fb53920ff
-      sourceHandle: source
-      target: b105cc65-2258-4933-9567-b484d315e9ee
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: human-input
-        targetType: answer
-      id: 5c8dec84-c4d9-4f52-8371-7d194bc49e9c
-      selected: false
-      source: b105cc65-2258-4933-9567-b484d315e9ee
-      sourceHandle: 'Yes'
-      target: ea75c737-ec88-4d16-ab02-281ab9c2d006
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: answer
-        targetType: agent
-      id: 532a8770-d6f0-4ec5-8c5f-fd27d307902b
-      selected: false
-      source: ea75c737-ec88-4d16-ab02-281ab9c2d006
-      sourceHandle: source
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         isInLoop: false
         sourceType: human-input
         targetType: answer
@@ -423,7 +320,7 @@ workflow:
     - data:
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         sourceType: loop-start
         targetType: tool
       id: 6eba93ff-953a-4d06-89aa-84731de91aa8
@@ -437,7 +334,7 @@ workflow:
     - data:
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         sourceType: tool
         targetType: http-request
       id: 9b6ed349-cd70-432c-a3f8-90a07592d1a7
@@ -457,73 +354,6 @@ workflow:
       source: b105cc65-2258-4933-9567-b484d315e9ee
       sourceHandle: __timeout
       target: ef812954-180c-4672-9c41-4d2e8058fdb5
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: agent
-        targetType: http-request
-      id: fc0d2097-6030-4105-b02c-86352d24d9b5
-      selected: false
-      source: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      sourceHandle: source
-      target: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
-      targetHandle: target
-      targetType: code
-      type: custom
-    - data:
-        sourceType: code
-        targetType: assigner
-      id: 6c3ce3d5-7f91-462e-b6b4-46753d3e259a
-      selected: false
-      source: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
-      sourceHandle: source
-      target: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
-      targetHandle: target
-      targetType: assigner
-      type: custom
-    - data:
-        sourceType: assigner
-        targetType: answer
-      id: a92740cf-64a7-46ad-8c53-81cf386a4815
-      selected: false
-      source: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
-      sourceHandle: source
-      target: c65065ca-cc2a-4584-9a1b-86df0ee71658
-      targetHandle: target
-      type: custom
-    - data:
-        sourceType: answer
-        targetType: http-request
-      id: 82de4fc1-c3f3-4be3-b8e8-8862709ed533
-      selected: false
-      source: c65065ca-cc2a-4584-9a1b-86df0ee71658
-      sourceHandle: source
-      target: a3d80a70-5da7-4edc-9c32-66de6f9845e1
-      targetHandle: target
-      type: custom
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: if-else
-      id: 3971ddb0-eefe-47d0-8aa4-d677388100d2
-      selected: false
-      source: a3d80a70-5da7-4edc-9c32-66de6f9845e1
-      sourceHandle: source
-      target: 2848b2cf-5194-422f-abe7-b634b8f41d82
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: 3def99c0-b9cb-40e5-b647-c6dc7ba25569
-      selected: false
-      source: 2848b2cf-5194-422f-abe7-b634b8f41d82
-      sourceHandle: 'false'
-      target: 92c62559-e52e-454c-a579-ddc4536a6134
       targetHandle: target
       type: custom
       zIndex: 0
@@ -589,138 +419,6 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: code
-        targetType: http-request
-      id: 0bc299d6-6240-4661-b573-e6899f30668b
-      selected: false
-      source: 92c62559-e52e-454c-a579-ddc4536a6134
-      sourceHandle: source
-      target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: code
-      id: 83131e8b-57dc-441c-8c07-c97015775b23
-      selected: false
-      source: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-      sourceHandle: source
-      target: 4eb75ab2-87de-48f6-b52e-35f8646da88d
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: f92114a2-7a0c-4edf-a350-efbaff1f2907
-      selected: false
-      source: 4eb75ab2-87de-48f6-b52e-35f8646da88d
-      sourceHandle: source
-      target: 473230ae-fcca-4f3b-b410-fc792d8b0e88
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: agent
-      id: 59926ff2-ace9-45bc-8fd4-cc82d9b04c9e
-      selected: false
-      source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
-      sourceHandle: source
-      target: 264d37e7-9580-4d26-be76-4ecdbf32803a
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: agent
-        targetType: if-else
-      id: 6f06f805-72ae-4894-9677-1d0b63cb781f
-      selected: false
-      source: 264d37e7-9580-4d26-be76-4ecdbf32803a
-      sourceHandle: source
-      target: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: dcd34318-03fb-4df6-bb10-6c8777927711
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: case-bundle-approved
-      target: 6962ba89-7408-45d1-880f-0fd134dc1705
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 734e7667-4b29-4270-bad9-e4e3e35b1305
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: 'false'
-      target: 6962ba89-7408-45d1-880f-0fd134dc1705
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: answer
-        targetType: http-request
-      id: c6e6eb67-00b7-4020-931e-028b01d76d11
-      selected: false
-      source: 6962ba89-7408-45d1-880f-0fd134dc1705
-      sourceHandle: source
-      target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: 3840d393-2798-4ac7-be8a-0fb4ddeb69c2
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: case-bundle-rejected
-      target: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: if-else
-      id: bc11ec10-85fd-4b15-88e7-97d78d0a6b2c
-      selected: false
-      source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
-      sourceHandle: source
-      target: f9136731-f6e1-472d-8cad-55edaed02022
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: f5f2548d-4792-4243-810f-bbe177faf774
-      selected: false
-      source: f9136731-f6e1-472d-8cad-55edaed02022
-      sourceHandle: 'false'
-      target: 6d81a37b-960b-42d3-ae88-5799cd773102
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: if-else
         targetType: answer
       id: c2d3fd06-15b5-4b05-9a64-da0c534a4402
@@ -776,54 +474,6 @@ workflow:
       source: f9136731-f6e1-472d-8cad-55edaed02022
       sourceHandle: upload-case-500
       target: 608df9da-f21e-4d20-8d01-e4d65fec1256
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: 27d43db2-e252-4315-95f5-65c4abb02d24
-      selected: false
-      source: 6d81a37b-960b-42d3-ae88-5799cd773102
-      sourceHandle: source
-      target: 8e0563d0-7844-4e89-a765-cbd9647e7676
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: agent
-      id: 7cf7a8a2-2bd5-4031-a5f3-cef94b23dafc
-      selected: false
-      source: 8e0563d0-7844-4e89-a765-cbd9647e7676
-      sourceHandle: source
-      target: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: agent
-        targetType: if-else
-      id: 6273898d-3d8f-43cb-a85d-fecc7e85b493
-      selected: false
-      source: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
-      sourceHandle: source
-      target: 50519a54-053f-4c25-9486-ec03eadb94ca
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: 25f23476-610d-445d-bb33-2dbcd15018b6
-      selected: false
-      source: 50519a54-053f-4c25-9486-ec03eadb94ca
-      sourceHandle: case-retry-bundle
-      target: cf4c5fbe-1460-44e4-9775-5650873dfdbd
       targetHandle: target
       type: custom
       zIndex: 0
@@ -949,42 +599,6 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: 0d5eb69d-6231-4410-8b4e-a552e9345921
-      selected: false
-      source: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      sourceHandle: source
-      target: ee69171b-0c05-4dcb-bcb2-4057a5119579
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: if-else
-      id: 2048e825-6713-4a2d-88b7-5199802fa4b3
-      selected: false
-      source: ee69171b-0c05-4dcb-bcb2-4057a5119579
-      sourceHandle: source
-      target: 76910038-4a13-4647-aee2-30be4c282e31
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: agent
-      id: aab247f4-95b7-4fe7-b827-3a22cc90cc39
-      selected: false
-      source: 76910038-4a13-4647-aee2-30be4c282e31
-      sourceHandle: 'false'
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: if-else
         targetType: answer
       id: 1a9c3198-3492-44d0-ad45-0bc4346d072a
@@ -1019,57 +633,9 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: answer
-      id: bae904c0-f895-4c60-8b6a-593862b19932
-      selected: false
-      source: b6ca284e-1eee-4453-ac2f-f1c1b2f8c085
-      sourceHandle: source
-      target: f1361b33-bc79-43b7-a966-6a9fb53920ff
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: llm
-      id: f8e2032e-8140-4742-91f3-10a714a1ca1a
-      selected: false
-      source: 3a88cb07-e172-4132-b8b9-8b029f177a84
-      sourceHandle: source
-      target: b6ca284e-1eee-4453-ac2f-f1c1b2f8c085
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: document-extractor
-        targetType: llm
-      id: 07c5d92f-3ba3-4269-b118-ec7d91a4aa21
-      selected: false
-      source: addf214e-9e80-4030-9160-5e59b8031e58
-      sourceHandle: source
-      target: 5a9ba9a4-8795-4906-a2f9-82fae7b36cc8
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: assigner
-      id: 6766ac12-7e02-4061-b4e3-38ee6dafb2f1
-      selected: false
-      source: 5a9ba9a4-8795-4906-a2f9-82fae7b36cc8
-      sourceHandle: source
-      target: 9c0103c2-e377-4925-8f4a-501ff5b34379
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         sourceType: if-else
         targetType: assigner
       id: d4a7cb88-3ba7-4232-aba7-bdcb0058bf2d
@@ -1083,7 +649,7 @@ workflow:
     - data:
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         sourceType: if-else
         targetType: answer
       id: 80f9c75e-9348-4c4e-b3e4-5e1fc0383930
@@ -1097,7 +663,7 @@ workflow:
     - data:
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         sourceType: assigner
         targetType: answer
       id: 24e376ae-b1b4-4b20-aaae-449ff541bb6e
@@ -1108,30 +674,6 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 1002
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: if-else
-      id: 6ffeea64-4eab-4adf-b0be-c741e6360410
-      selected: false
-      source: 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
-      sourceHandle: source
-      target: 4f829f1f-f4db-4b21-a501-fcbc863ee2ce
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: start
-        targetType: knowledge-retrieval
-      id: 10d2a0a1-734b-47e0-ac78-dae4b71cc724
-      selected: false
-      source: 6a6165a9-076f-47c8-b1d5-26f3fb39907a
-      sourceHandle: source
-      target: 536c1e44-5bdb-479e-8fd4-0b3f36d85a1b
-      targetHandle: target
-      type: custom
-      zIndex: 0
     - data:
         isInLoop: false
         sourceType: start
@@ -1171,7 +713,7 @@ workflow:
     - data:
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         sourceType: http-request
         targetType: code
       id: d7e32139-ef4b-4f78-833c-d51738ebcb7a
@@ -1184,7 +726,7 @@ workflow:
     - data:
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         sourceType: code
         targetType: if-else
       id: fa1c584e-0ecf-459b-9a4f-96fd38c95103
@@ -1194,6 +736,61 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 6a6165a9-076f-47c8-b1d5-26f3fb39907a-source-536c1e44-5bdb-479e-8fd4-0b3f36d85a1b-target
+      source: 6a6165a9-076f-47c8-b1d5-26f3fb39907a
+      sourceHandle: source
+      target: 536c1e44-5bdb-479e-8fd4-0b3f36d85a1b
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 536c1e44-5bdb-479e-8fd4-0b3f36d85a1b-source-27e73ff3-f0ce-4d21-a282-2dc450bf3f5b-target
+      source: 536c1e44-5bdb-479e-8fd4-0b3f36d85a1b
+      sourceHandle: source
+      target: 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b-source-4f829f1f-f4db-4b21-a501-fcbc863ee2ce-target
+      source: 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
+      sourceHandle: source
+      target: 4f829f1f-f4db-4b21-a501-fcbc863ee2ce
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: if-else
+      id: 4f829f1f-f4db-4b21-a501-fcbc863ee2ce-case-filesetup-f1ffbe75-d06a-4349-b6d4-78aabd9596ee-target
+      source: 4f829f1f-f4db-4b21-a501-fcbc863ee2ce
+      sourceHandle: case-filesetup
+      target: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee-false-addf214e-9e80-4030-9160-5e59b8031e58-target
+      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      sourceHandle: 'false'
+      target: addf214e-9e80-4030-9160-5e59b8031e58
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         desc: Define the initial parameters for launching a workflow
@@ -1243,7 +840,7 @@ workflow:
           type: text-input
           variable: avni_mcp_server_url
       height: 257
-      id: '6a6165a9-076f-47c8-b1d5-26f3fb39907a'
+      id: 6a6165a9-076f-47c8-b1d5-26f3fb39907a
       position:
         x: 0
         y: 418
@@ -1258,7 +855,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - '6a6165a9-076f-47c8-b1d5-26f3fb39907a'
+          - 6a6165a9-076f-47c8-b1d5-26f3fb39907a
           - avni_mcp_server_url
           variable_selector:
           - conversation
@@ -1269,7 +866,7 @@ workflow:
         type: assigner
         version: '2'
       height: 84
-      id: '942f84c8-36f3-4af6-8c41-d85b4a3f6f31'
+      id: 942f84c8-36f3-4af6-8c41-d85b4a3f6f31
       position:
         x: 362
         y: 607
@@ -1284,7 +881,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - '6a6165a9-076f-47c8-b1d5-26f3fb39907a'
+          - 6a6165a9-076f-47c8-b1d5-26f3fb39907a
           - auth_token
           variable_selector:
           - conversation
@@ -1295,7 +892,7 @@ workflow:
         type: assigner
         version: '2'
       height: 84
-      id: '74a6ce71-2f7c-47ba-8f2b-3c5aff99727c'
+      id: 74a6ce71-2f7c-47ba-8f2b-3c5aff99727c
       position:
         x: 362
         y: 771
@@ -1310,7 +907,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - '6a6165a9-076f-47c8-b1d5-26f3fb39907a'
+          - 6a6165a9-076f-47c8-b1d5-26f3fb39907a
           - org_name
           variable_selector:
           - conversation
@@ -1333,7 +930,7 @@ workflow:
       width: 242
     - data:
         dataset_ids:
-        - df1bfaa2-38ad-457c-8237-6980e83245d9
+        - 9TmCqtDyQNUaJCKXT7rPGCd21br8q6JzrrUr4xib3E9uqcfMf6t6rxJkkXFK7EzL
         multiple_retrieval_config:
           reranking_enable: false
           reranking_mode: weighted_score
@@ -1362,7 +959,7 @@ workflow:
         title: Knowledge Retrieval
         type: knowledge-retrieval
       height: 90
-      id: '536c1e44-5bdb-479e-8fd4-0b3f36d85a1b'
+      id: 536c1e44-5bdb-479e-8fd4-0b3f36d85a1b
       position:
         x: 342
         y: 437
@@ -1376,7 +973,7 @@ workflow:
         context:
           enabled: true
           variable_selector:
-          - '536c1e44-5bdb-479e-8fd4-0b3f36d85a1b'
+          - 536c1e44-5bdb-479e-8fd4-0b3f36d85a1b
           - result
         model:
           completion_params:
@@ -1403,8 +1000,8 @@ workflow:
             \ support\", \"How does\") → RAG\n4. Delete/reset request (\"delete everything\"\
             , \"clean slate\", \"start fresh\", \"remove all config\") → DELETE_CONFIG\n\
             5. Implementation request (\"build\", \"create\", \"develop\", \"set up\
-            \ for me\") → ASSISTANT\n6. Setup intent WITHOUT file (\"I want to\
-            \ set up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n7. Unrelated\
+            \ for me\") → ASSISTANT\n6. Setup intent WITHOUT file (\"I want to set\
+            \ up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n7. Unrelated\
             \ to Avni → OUT_OF_SCOPE\n8. Anything else Avni-related → RAG\n\n## Deviation\
             \ Handling\nIf setup_mode_active=true and the message is chitchat or out-of-scope,\
             \ still return FILE_SETUP with deviation_detected=true. Do NOT abandon\
@@ -1482,7 +1079,7 @@ workflow:
         title: Orchestrator
         type: llm
       height: 88
-      id: '27e73ff3-f0ce-4d21-a282-2dc450bf3f5b'
+      id: 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
       position:
         x: 684
         y: 438
@@ -1499,7 +1096,7 @@ workflow:
           - comparison_operator: is
             value: FILE_SETUP
             variable_selector:
-            - '27e73ff3-f0ce-4d21-a282-2dc450bf3f5b'
+            - 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
             - structured_output
             - service
           id: case-filesetup
@@ -1509,7 +1106,7 @@ workflow:
           - comparison_operator: is
             value: 'true'
             variable_selector:
-            - '27e73ff3-f0ce-4d21-a282-2dc450bf3f5b'
+            - 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
             - structured_output
             - clarification_needed
           id: case-clarify
@@ -1519,7 +1116,7 @@ workflow:
           - comparison_operator: is
             value: RAG
             variable_selector:
-            - '27e73ff3-f0ce-4d21-a282-2dc450bf3f5b'
+            - 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
             - structured_output
             - service
           id: case-rag
@@ -1529,7 +1126,7 @@ workflow:
           - comparison_operator: is
             value: ASSISTANT
             variable_selector:
-            - '27e73ff3-f0ce-4d21-a282-2dc450bf3f5b'
+            - 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
             - structured_output
             - service
           id: case-assistant
@@ -1539,7 +1136,7 @@ workflow:
           - comparison_operator: is
             value: PROGRAM_SETUP_GUIDANCE
             variable_selector:
-            - '27e73ff3-f0ce-4d21-a282-2dc450bf3f5b'
+            - 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
             - structured_output
             - service
           id: case-setup-guidance
@@ -1549,7 +1146,7 @@ workflow:
           - comparison_operator: is
             value: DELETE_CONFIG
             variable_selector:
-            - '27e73ff3-f0ce-4d21-a282-2dc450bf3f5b'
+            - 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
             - structured_output
             - service
           id: case-delete-config
@@ -1559,7 +1156,7 @@ workflow:
           - comparison_operator: is
             value: OUT_OF_SCOPE
             variable_selector:
-            - '27e73ff3-f0ce-4d21-a282-2dc450bf3f5b'
+            - 27e73ff3-f0ce-4d21-a282-2dc450bf3f5b
             - structured_output
             - service
           id: case-oos
@@ -1567,8 +1164,8 @@ workflow:
         selected: false
         title: Main Router
         type: if-else
-      height: 558
-      id: '4f829f1f-f4db-4b21-a501-fcbc863ee2ce'
+      height: 580
+      id: 4f829f1f-f4db-4b21-a501-fcbc863ee2ce
       position:
         x: 1026
         y: 228
@@ -1582,7 +1179,7 @@ workflow:
         context:
           enabled: true
           variable_selector:
-          - '536c1e44-5bdb-479e-8fd4-0b3f36d85a1b'
+          - 536c1e44-5bdb-479e-8fd4-0b3f36d85a1b
           - result
         model:
           completion_params: {}
@@ -1596,8 +1193,9 @@ workflow:
 
             <context> {{#context#}} </context>
 
-            You are talking to {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.user_name#}} from {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.org_name#}}.
-            You are part of the Avni AI Assistant.
+            You are talking to {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.user_name#}}
+            from {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.org_name#}}. You are part
+            of the Avni AI Assistant.
 
             Currently capable of: 1. Answering questions about the Avni system 2.
             Assistance with designing workflows, forms etc on Avni
@@ -1608,8 +1206,8 @@ workflow:
             - Entities loaded: {{#conversation.entities_jsonl#}}
 
             Rules: - If you don''t know, say so. Don''t guess or invent features.
-            - If greeting, greet warmly by name: {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.user_name#}} - Do
-            not greet repeatedly. - Answer in the user''s language.
+            - If greeting, greet warmly by name: {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.user_name#}}
+            - Do not greet repeatedly. - Answer in the user''s language.
 
             CLARIFICATION DISCIPLINE: - If greeting: respond warmly, do NOT ask questions
             unless user explicitly asks for help - If question has adequate context:
@@ -1626,7 +1224,7 @@ workflow:
         title: RAG LLM
         type: llm
       height: 88
-      id: 'e8e3b068-cdf1-4094-adc2-fcb4bf26c104'
+      id: e8e3b068-cdf1-4094-adc2-fcb4bf26c104
       position:
         x: 1388
         y: 8
@@ -1642,7 +1240,7 @@ workflow:
         title: RAG Answer
         type: answer
       height: 103
-      id: '337ac9ff-56b5-47d3-9358-3431dcecb944'
+      id: 337ac9ff-56b5-47d3-9358-3431dcecb944
       position:
         x: 1730
         y: 0
@@ -1661,7 +1259,7 @@ workflow:
         title: Clarify the question
         type: answer
       height: 135
-      id: 'e4d76fda-c4a2-40eb-a6e2-3ca33bb4a865'
+      id: e4d76fda-c4a2-40eb-a6e2-3ca33bb4a865
       position:
         x: 1388
         y: 176
@@ -1687,7 +1285,7 @@ workflow:
         title: Unrelated Question
         type: answer
       height: 196
-      id: '29a68eb3-abe1-4391-8cad-2192e54528af'
+      id: 29a68eb3-abe1-4391-8cad-2192e54528af
       position:
         x: 1388
         y: 789
@@ -1757,11 +1355,12 @@ workflow:
             {{#conversation.primary_intent#}}
 
             - Ask ONE simple question at a time (guidance, not clarification) - Org
-            Type is {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.org_type#}} - If Org Type is "Production" or
-            "UAT", tell user automatic configurations are not supported for their
-            org type. Do not proceed. - If Org Type is "Trial", proceed with configuration.
-            - You are talking to {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.user_name#}} - When user wants to
-            create config, suggest uploading a Field Workflow Specification file instead.
+            Type is {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.org_type#}} - If Org Type
+            is "Production" or "UAT", tell user automatic configurations are not supported
+            for their org type. Do not proceed. - If Org Type is "Trial", proceed
+            with configuration. - You are talking to {{#6a6165a9-076f-47c8-b1d5-26f3fb39907a.user_name#}}
+            - When user wants to create config, suggest uploading a Field Workflow
+            Specification file instead.
 
             BEHAVIOR: - If setup_mode_active=true: stay focused on configuration,
             minimal questions - If user deviates from setup task, gently redirect:
@@ -1771,7 +1370,7 @@ workflow:
         title: Assistant LLM
         type: llm
       height: 88
-      id: 'e8f8d433-0512-442d-b51e-690b1fd12676'
+      id: e8f8d433-0512-442d-b51e-690b1fd12676
       position:
         x: 1388
         y: 391
@@ -1787,7 +1386,7 @@ workflow:
         title: Assistant Answer
         type: answer
       height: 103
-      id: '70edf318-545a-4702-be66-83abd1e71f9f'
+      id: 70edf318-545a-4702-be66-83abd1e71f9f
       position:
         x: 1730
         y: 383
@@ -1826,7 +1425,7 @@ workflow:
       positionAbsolute:
         x: 1388
         y: 559
-      selected: false
+      selected: true
       type: custom
       width: 242
     - data:
@@ -1837,7 +1436,7 @@ workflow:
         - sys
         - files
       height: 104
-      id: 'addf214e-9e80-4030-9160-5e59b8031e58'
+      id: addf214e-9e80-4030-9160-5e59b8031e58
       position:
         x: 1750
         y: 597
@@ -1852,7 +1451,7 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - '5a9ba9a4-8795-4906-a2f9-82fae7b36cc8'
+          - 5a9ba9a4-8795-4906-a2f9-82fae7b36cc8
           - structured_output
           variable_selector:
           - conversation
@@ -1949,7 +1548,7 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}validate-entities'
       height: 141
-      id: '3a88cb07-e172-4132-b8b9-8b029f177a84'
+      id: 3a88cb07-e172-4132-b8b9-8b029f177a84
       position:
         x: 3118
         y: 702
@@ -1968,8 +1567,8 @@ workflow:
         selected: false
         title: Summary Answer
         type: answer
-      height: 151
-      id: 'f1361b33-bc79-43b7-a966-6a9fb53920ff'
+      height: 152
+      id: f1361b33-bc79-43b7-a966-6a9fb53920ff
       position:
         x: 3790
         y: 697
@@ -2015,8 +1614,8 @@ workflow:
       width: 242
     - data:
         code: "import json\n\ndef main(bundle_b64: str, spec_yaml: str) -> dict:\n\
-          \    body = {\n        \"existing_bundle_b64\": bundle_b64 or \"\",\n   \
-          \     \"spec_yaml\": spec_yaml or \"\"\n    }\n    return {\"json_body\"\
+          \    body = {\n        \"existing_bundle_b64\": bundle_b64 or \"\",\n  \
+          \      \"spec_yaml\": spec_yaml or \"\"\n    }\n    return {\"json_body\"\
           : json.dumps(body)}\n"
         code_language: python3
         outputs:
@@ -2259,7 +1858,7 @@ workflow:
           type: webapp
         form_content: ''
         inputs: []
-        selected: true
+        selected: false
         timeout: 1
         timeout_unit: hour
         title: Confirm Entities
@@ -2272,14 +1871,14 @@ workflow:
           id: 'No'
           title: 'No'
       height: 190
-      id: 'b105cc65-2258-4933-9567-b484d315e9ee'
+      id: b105cc65-2258-4933-9567-b484d315e9ee
       position:
         x: 4144
         y: 667
       positionAbsolute:
         x: 4144
         y: 667
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -2294,7 +1893,7 @@ workflow:
           - conversation
           - loop
         error_handle_mode: terminated
-        height: 490
+        height: 523
         logical_operator: and
         loop_count: 20
         selected: false
@@ -2302,8 +1901,8 @@ workflow:
         title: Upload Poll Loop
         type: loop
         width: 2116
-      height: 490
-      id: '35da18be-8683-4108-a00a-4a695ab52939'
+      height: 523
+      id: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 8610
         y: 483
@@ -2325,7 +1924,7 @@ workflow:
       draggable: false
       height: 48
       id: 47e94f80-07ea-4cf9-b0e3-36875cb6a80c
-      parentId: '35da18be-8683-4108-a00a-4a695ab52939'
+      parentId: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 60
         y: 135
@@ -2343,7 +1942,7 @@ workflow:
         isInIteration: false
         isInLoop: true
         is_team_authorization: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         paramSchemas:
         - auto_generate: null
           default: null
@@ -2391,8 +1990,8 @@ workflow:
             value: 3
         type: tool
       height: 52
-      id: 'c22ed9a5-0d83-4d53-81f6-7c1bb2828a5a'
-      parentId: '35da18be-8683-4108-a00a-4a695ab52939'
+      id: c22ed9a5-0d83-4d53-81f6-7c1bb2828a5a
+      parentId: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 184
         y: 133
@@ -2415,7 +2014,7 @@ workflow:
         headers: avni-auth-token:{{#conversation.auth_token#}}
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         method: get
         params: ''
         retry_config:
@@ -2433,8 +2032,8 @@ workflow:
         url: '{{#conversation.avni_mcp_server_url#}}upload-status/{{#conversation.upload_task_id#}}'
         variables: []
       height: 160
-      id: 'eb1998db-b052-4be3-90fb-ccf69c9aad16'
-      parentId: '35da18be-8683-4108-a00a-4a695ab52939'
+      id: eb1998db-b052-4be3-90fb-ccf69c9aad16
+      parentId: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 506
         y: 79
@@ -2455,26 +2054,26 @@ workflow:
             value: completed
             varType: string
             variable_selector:
-            - '4d4d116e-624d-4a18-8088-161152f67c51'
+            - 4d4d116e-624d-4a18-8088-161152f67c51
             - status
           - comparison_operator: contains
             id: bb085deb-9e17-477b-8010-3d80bc018375
             value: failed
             varType: string
             variable_selector:
-            - '4d4d116e-624d-4a18-8088-161152f67c51'
+            - 4d4d116e-624d-4a18-8088-161152f67c51
             - status
           id: 'true'
           logical_operator: or
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         selected: false
         title: Upload Done?
         type: if-else
       height: 198
-      id: '89c2cb52-3281-4545-af67-31b339980b22'
-      parentId: '35da18be-8683-4108-a00a-4a695ab52939'
+      id: 89c2cb52-3281-4545-af67-31b339980b22
+      parentId: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 1150
         y: 60
@@ -2508,14 +2107,14 @@ workflow:
           - conversation
           - setup_mode_active
           write_mode: over-write
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         selected: false
         title: Break Upload Loop
         type: assigner
         version: '2'
       height: 110
       id: ff6d33df-8310-4f7f-85a6-491645d8b5fe
-      parentId: '35da18be-8683-4108-a00a-4a695ab52939'
+      parentId: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 1492
         y: 244
@@ -2551,13 +2150,13 @@ workflow:
           If you need to make changes, just upload an updated specification or describe
           the corrections in this chat.'
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         selected: false
         title: Upload Done
         type: answer
-      height: 247
+      height: 328
       id: 48d1cfc7-02ef-457e-8e39-bff34b4fb91e
-      parentId: '35da18be-8683-4108-a00a-4a695ab52939'
+      parentId: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 1814
         y: 175
@@ -2571,13 +2170,13 @@ workflow:
     - data:
         answer: ⏳ Uploading bundle to Avni server... Please wait.
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         selected: false
         title: Upload Progress
         type: answer
       height: 116
       id: abe6cb3a-769a-4f59-b705-fef4884fdb5e
-      parentId: '35da18be-8683-4108-a00a-4a695ab52939'
+      parentId: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 1492
         y: 68
@@ -2606,14 +2205,20 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "Please describe the corrections you'd like to make. For example:\n\
-          - \"Remove program X\"\n- \"Change encounter type Y to scheduled\"\n- \"\
-          Add a new subject type called Z\"\n\nI'll update the configuration and show\
-          \ you a revised summary."
+        answer: 'Please describe the corrections you''d like to make. For example:
+
+          - "Remove program X"
+
+          - "Change encounter type Y to scheduled"
+
+          - "Add a new subject type called Z"
+
+
+          I''ll update the configuration and show you a revised summary.'
         selected: false
         title: Corrections Prompt
         type: answer
-      height: 148
+      height: 196
       id: 41baa894-e39d-45c7-826d-9ba1faad150b
       position:
         x: 4506
@@ -2625,12 +2230,12 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "\U0001F504 Generating configuration spec from your confirmed entities.\
-          \ This may take a moment..."
+        answer: 🔄 Generating configuration spec from your confirmed entities. This
+          may take a moment...
         selected: false
         title: 'Progress: Generating Spec'
         type: answer
-      height: 116
+      height: 132
       id: ea75c737-ec88-4d16-ab02-281ab9c2d006
       position:
         x: 4506
@@ -2642,7 +2247,7 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "\U0001F4E5 Downloading existing bundle from Avni..."
+        answer: 📥 Downloading existing bundle from Avni...
         selected: false
         title: 'Progress: Downloading Bundle'
         type: answer
@@ -2658,7 +2263,7 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "\U0001F4E4 Uploading bundle to Avni server..."
+        answer: 📤 Uploading bundle to Avni server...
         selected: false
         title: 'Progress: Uploading Bundle'
         type: answer
@@ -2737,7 +2342,7 @@ workflow:
         vision:
           enabled: false
       height: 88
-      id: 'b6ca284e-1eee-4453-ac2f-f1c1b2f8c085'
+      id: b6ca284e-1eee-4453-ac2f-f1c1b2f8c085
       position:
         x: 3460
         y: 738
@@ -2858,7 +2463,7 @@ workflow:
         vision:
           enabled: false
       height: 88
-      id: '5a9ba9a4-8795-4906-a2f9-82fae7b36cc8'
+      id: 5a9ba9a4-8795-4906-a2f9-82fae7b36cc8
       position:
         x: 2096
         y: 729
@@ -2879,7 +2484,7 @@ workflow:
         code_language: python3
         isInIteration: false
         isInLoop: true
-        loop_id: '35da18be-8683-4108-a00a-4a695ab52939'
+        loop_id: 35da18be-8683-4108-a00a-4a695ab52939
         outputs:
           status:
             children: null
@@ -2892,13 +2497,13 @@ workflow:
         type: code
         variables:
         - value_selector:
-          - 'eb1998db-b052-4be3-90fb-ccf69c9aad16'
+          - eb1998db-b052-4be3-90fb-ccf69c9aad16
           - body
           value_type: string
           variable: body
       height: 52
-      id: '4d4d116e-624d-4a18-8088-161152f67c51'
-      parentId: '35da18be-8683-4108-a00a-4a695ab52939'
+      id: 4d4d116e-624d-4a18-8088-161152f67c51
+      parentId: 35da18be-8683-4108-a00a-4a695ab52939
       position:
         x: 828
         y: 133
@@ -2915,8 +2520,8 @@ workflow:
         agent_parameters:
           instruction:
             type: constant
-            value: 'You are the Spec Agent. The user has ALREADY confirmed their
-              entities. Generate the YAML spec and output it immediately.
+            value: 'You are the Spec Agent. The user has ALREADY confirmed their entities.
+              Generate the YAML spec and output it immediately.
 
 
               Conversation ID: {{#sys.conversation_id#}}
@@ -2930,8 +2535,7 @@ workflow:
 
               2. Call validate_spec with the returned spec_yaml
 
-              3. If validation has errors, call apply_entity_corrections then
-              regenerate.
+              3. If validation has errors, call apply_entity_corrections then regenerate.
 
               4. Output your final message in EXACTLY this format:
 
@@ -2947,8 +2551,8 @@ workflow:
 
               - Do NOT wrap YAML in markdown code blocks.
 
-              - Your final output MUST start with SPEC_APPROVED on its own line
-              followed by the raw YAML spec.
+              - Your final output MUST start with SPEC_APPROVED on its own line followed
+              by the raw YAML spec.
 
               - Do NOT add commentary before SPEC_APPROVED.'
           maximum_iterations:
@@ -3633,12 +3237,13 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: 'Upload failed: Auth token missing or expired. Please start a new conversation.'
+        answer: 'Upload failed: Auth token missing or expired. Please start a new
+          conversation.'
         selected: false
         title: Upload Err 401
         type: answer
         variables: []
-      height: 100
+      height: 132
       id: eed94bb6-3565-4fbc-944c-3b114211f447
       position:
         x: 7926
@@ -3693,7 +3298,7 @@ workflow:
         title: Upload Err 500
         type: answer
         variables: []
-      height: 100
+      height: 116
       id: 608df9da-f21e-4d20-8d01-e4d65fec1256
       position:
         x: 7926
@@ -3732,7 +3337,7 @@ workflow:
         selected: false
         title: Check Bundle Verdict
         type: if-else
-      height: 198
+      height: 220
       id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
       position:
         x: 7242
@@ -3770,7 +3375,7 @@ workflow:
         selected: false
         title: Check Error Verdict
         type: if-else
-      height: 198
+      height: 220
       id: 50519a54-053f-4c25-9486-ec03eadb94ca
       position:
         x: 8610
@@ -3851,7 +3456,7 @@ workflow:
         selected: false
         title: Check Max Retries
         type: if-else
-      height: 148
+      height: 164
       id: 76910038-4a13-4647-aee2-30be4c282e31
       position:
         x: 8268
@@ -3863,14 +3468,16 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "❌ **Maximum retry attempts reached.**\n\nThe configuration could not\
-          \ be completed automatically after 3 attempts. Please review the errors above\
-          \ and try again with a corrected specification, or describe the corrections\
-          \ you'd like to make."
+        answer: '❌ **Maximum retry attempts reached.**
+
+
+          The configuration could not be completed automatically after 3 attempts.
+          Please review the errors above and try again with a corrected specification,
+          or describe the corrections you''d like to make.'
         selected: false
         title: Max Retries Exhausted
         type: answer
-      height: 148
+      height: 196
       id: e6b32cb1-406f-47e0-8f96-18b75d76fdf2
       position:
         x: 8610
@@ -3882,13 +3489,15 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "❌ **Upload failed and could not be auto-corrected.**\n\nPlease review\
-          \ the error details above. You can describe corrections or upload a revised\
-          \ specification to try again."
+        answer: '❌ **Upload failed and could not be auto-corrected.**
+
+
+          Please review the error details above. You can describe corrections or upload
+          a revised specification to try again.'
         selected: false
         title: Upload Error Report
         type: answer
-      height: 148
+      height: 164
       id: 0f4603cf-1aab-4b53-a05d-c5cb6f9194c2
       position:
         x: 8952
@@ -3960,7 +3569,7 @@ workflow:
         title: IF/ELSE 4
         type: if-else
       height: 436
-      id: '2848b2cf-5194-422f-abe7-b634b8f41d82'
+      id: 2848b2cf-5194-422f-abe7-b634b8f41d82
       position:
         x: 5842
         y: 1092
@@ -3979,7 +3588,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: '8b8ee9f6-6f79-42c3-8925-1b1f6557a6c4'
+      id: 8b8ee9f6-6f79-42c3-8925-1b1f6557a6c4
       position:
         x: 6408
         y: 1027
@@ -3997,7 +3606,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: '187a5511-2859-43d3-a332-0673a25c483c'
+      id: 187a5511-2859-43d3-a332-0673a25c483c
       position:
         x: 6408
         y: 1166
@@ -4015,7 +3624,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: '7066fcb1-d654-4d34-9ff5-4fe95c6b6faa'
+      id: 7066fcb1-d654-4d34-9ff5-4fe95c6b6faa
       position:
         x: 6408
         y: 1305
@@ -4033,7 +3642,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: '83eb496d-85e1-46ed-93e1-0472eb34e3d3'
+      id: 83eb496d-85e1-46ed-93e1-0472eb34e3d3
       position:
         x: 6408
         y: 1444
@@ -4052,7 +3661,7 @@ workflow:
         type: answer
         variables: []
       height: 100
-      id: '66abc910-ef40-4cf0-aeef-895f07939ef4'
+      id: 66abc910-ef40-4cf0-aeef-895f07939ef4
       position:
         x: 6408
         y: 1583
@@ -4064,14 +3673,18 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "⚠️ **Are you sure you want to delete the entire implementation?**\n\
-          \nThis will remove all Subject Types, Programs, Encounter Types, Forms, and\
-          \ related configuration from the organisation. This action cannot be undone.\n\
-          \nPlease confirm by clicking **Yes** or **No**."
+        answer: '⚠️ **Are you sure you want to delete the entire implementation?**
+
+
+          This will remove all Subject Types, Programs, Encounter Types, Forms, and
+          related configuration from the organisation. This action cannot be undone.
+
+
+          Please confirm by clicking **Yes** or **No**.'
         selected: false
         title: Delete Confirm Prompt
         type: answer
-      height: 148
+      height: 212
       id: 6494459f-3dee-4fc1-bdff-ff0400aefd52
       position:
         x: 1368
@@ -4124,6 +3737,10 @@ workflow:
           type: none
         headers: Content-Type:application/json
         method: delete
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
         selected: false
         timeout:
           connect: 30
@@ -4140,7 +3757,7 @@ workflow:
           - conversation
           - auth_token
           variable: auth_token
-      height: 178
+      height: 141
       id: fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b
       position:
         x: 2052
@@ -4179,13 +3796,15 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "✅ **Implementation deleted successfully.**\n\nAll configuration has\
-          \ been removed. You can start fresh by uploading a new scoping document or\
-          \ describing your requirements."
+        answer: '✅ **Implementation deleted successfully.**
+
+
+          All configuration has been removed. You can start fresh by uploading a new
+          scoping document or describing your requirements.'
         selected: false
         title: Delete Success
         type: answer
-      height: 148
+      height: 164
       id: c776a305-2e50-42e0-9209-32881d893c32
       position:
         x: 2736
@@ -4197,8 +3816,11 @@ workflow:
       type: custom
       width: 242
     - data:
-        answer: "❌ **Failed to delete implementation.**\n\nThe server returned an error.\
-          \ Please check your auth token is valid and try again."
+        answer: '❌ **Failed to delete implementation.**
+
+
+          The server returned an error. Please check your auth token is valid and
+          try again.'
         selected: false
         title: Delete Failure
         type: answer
@@ -4218,7 +3840,7 @@ workflow:
         selected: false
         title: Delete Cancelled
         type: answer
-      height: 116
+      height: 132
       id: 3cfb30bf-9386-48db-bfa2-3bd3359cf040
       position:
         x: 2052
@@ -4230,7 +3852,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -2285.295576146779
-      y: -142.94366930576234
-      zoom: 0.4530137365532593
+      x: 212.81786224653024
+      y: 112.07810791526754
+      zoom: 0.5
   rag_pipeline_variables: []
