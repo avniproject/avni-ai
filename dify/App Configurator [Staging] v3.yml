@@ -4,7 +4,7 @@ app:
   icon_background: '#FFEAD5'
   icon_type: emoji
   mode: advanced-chat
-  name: 'App Configurator [Staging] v3'
+  name: App Configurator [Staging] v3
   use_icon_as_answer_icon: true
 dependencies:
 - current_identifier: null
@@ -190,17 +190,6 @@ workflow:
       - remote_url
       - local_file
       enabled: true
-      fileUploadConfig:
-        attachment_image_file_size_limit: 2
-        audio_file_size_limit: 50
-        batch_count_limit: 5
-        file_size_limit: 15
-        file_upload_limit: 50
-        image_file_batch_limit: 10
-        image_file_size_limit: 10
-        single_chunk_attachment_limit: 10
-        video_file_size_limit: 100
-        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -240,20 +229,9 @@ workflow:
   graph:
     edges:
     - data:
-        sourceType: knowledge-retrieval
-        targetType: llm
-      id: 567b3a09-07aa-446a-af58-bb023337ea04
-      selected: false
-      source: '1758713692744'
-      sourceHandle: source
-      target: '1757492907627'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         sourceType: if-else
         targetType: llm
-      id: 538316d7-e6df-4c85-aa8e-882da2decf95
+      id: 1757493270484-case-rag-1757495664531-target
       selected: false
       source: '1757493270484'
       sourceHandle: case-rag
@@ -264,7 +242,7 @@ workflow:
     - data:
         sourceType: llm
         targetType: answer
-      id: d3514041-504a-4de1-bce9-63101ad5f1e4
+      id: 1757495664531-source-1757495688732-target
       selected: false
       source: '1757495664531'
       sourceHandle: source
@@ -275,7 +253,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: answer
-      id: 875c60cc-86f0-489d-9f97-a1e53966a106
+      id: 1757493270484-case-clarify-1758608702077-target
       selected: false
       source: '1757493270484'
       sourceHandle: case-clarify
@@ -286,7 +264,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: answer
-      id: c501d3e4-1f59-4ac4-9cdd-55ba7b42b765
+      id: 1757493270484-case-oos-1758699378772-target
       selected: false
       source: '1757493270484'
       sourceHandle: case-oos
@@ -297,7 +275,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: llm
-      id: fa6827a3-35fe-4bf5-9749-cb047c315329
+      id: 1757493270484-case-assistant-17580163919060-target
       selected: false
       source: '1757493270484'
       sourceHandle: case-assistant
@@ -308,7 +286,7 @@ workflow:
     - data:
         sourceType: llm
         targetType: answer
-      id: c32374c3-d160-41f0-84f9-32eeda89cd7c
+      id: 17580163919060-source-1760358474156-target
       selected: false
       source: '17580163919060'
       sourceHandle: source
@@ -317,102 +295,10 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        sourceType: if-else
-        targetType: if-else
-      id: 6a57cf49-c334-464d-a4f4-b9108cf4c092
-      selected: false
-      source: '1757493270484'
-      sourceHandle: case-filesetup
-      target: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: if-else
-        targetType: document-extractor
-      id: 2830c064-2881-4fcb-b839-384ced8a80cc
-      selected: false
-      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      sourceHandle: 'false'
-      target: '1774264909113'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: assigner
-        targetType: http-request
-      id: 9edcc33f-ae77-4d1d-a0a4-9b820d327bbf
-      selected: false
-      source: 9c0103c2-e377-4925-8f4a-501ff5b34379
-      sourceHandle: source
-      target: ecd0bd72-6c77-4fb8-a362-0164343614af
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: http-request
-        targetType: http-request
-      id: 8ee70330-91bd-42d4-bda7-b0d1b1ef9e91
-      selected: false
-      source: ecd0bd72-6c77-4fb8-a362-0164343614af
-      sourceHandle: source
-      target: '1773908701222'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        sourceType: if-else
-        targetType: agent
-      id: 7e25197b-7c15-4124-bb55-0fded6e2bc22
-      selected: false
-      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      sourceHandle: case-true
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: answer
-        targetType: human-input
-      id: 0daa4d9e-549b-44e3-8b91-c890391b486c
-      selected: false
-      source: '1773909436902'
-      sourceHandle: source
-      target: '1774617205889'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: 5c8dec84-c4d9-4f52-8371-7d194bc49e9c
-      selected: false
-      source: '1774617205889'
-      sourceHandle: 'Yes'
-      target: ea75c737-ec88-4d16-ab02-281ab9c2d006
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: answer
-        targetType: agent
-      id: 532a8770-d6f0-4ec5-8c5f-fd27d307902b
-      selected: false
-      source: ea75c737-ec88-4d16-ab02-281ab9c2d006
-      sourceHandle: source
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: human-input
-        targetType: answer
-      id: 34a092ad-c6d5-4ae1-9b21-f13100daefee
+      id: 1774617205889-No-41baa894-e39d-45c7-826d-9ba1faad150b-target
       selected: false
       source: '1774617205889'
       sourceHandle: 'No'
@@ -426,7 +312,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: loop-start
         targetType: tool
-      id: 6eba93ff-953a-4d06-89aa-84731de91aa8
+      id: 47e94f80-07ea-4cf9-b0e3-36875cb6a80c-source-1774617481433-target
       selected: false
       source: 47e94f80-07ea-4cf9-b0e3-36875cb6a80c
       sourceHandle: source
@@ -440,7 +326,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: tool
         targetType: http-request
-      id: 9b6ed349-cd70-432c-a3f8-90a07592d1a7
+      id: 1774617481433-source-1774617517718-target
       selected: false
       source: '1774617481433'
       sourceHandle: source
@@ -452,7 +338,7 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: 8976fc6a-a699-4cbe-a732-28196a29717e
+      id: 1774617205889-__timeout-ef812954-180c-4672-9c41-4d2e8058fdb5-target
       selected: false
       source: '1774617205889'
       sourceHandle: __timeout
@@ -462,76 +348,9 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: agent
-        targetType: http-request
-      id: fc0d2097-6030-4105-b02c-86352d24d9b5
-      selected: false
-      source: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      sourceHandle: source
-      target: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
-      targetHandle: target
-      targetType: code
-      type: custom
-    - data:
-        sourceType: code
-        targetType: assigner
-      id: 6c3ce3d5-7f91-462e-b6b4-46753d3e259a
-      selected: false
-      source: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
-      sourceHandle: source
-      target: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
-      targetHandle: target
-      targetType: assigner
-      type: custom
-    - data:
-        sourceType: assigner
-        targetType: answer
-      id: a92740cf-64a7-46ad-8c53-81cf386a4815
-      selected: false
-      source: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
-      sourceHandle: source
-      target: c65065ca-cc2a-4584-9a1b-86df0ee71658
-      targetHandle: target
-      type: custom
-    - data:
-        sourceType: answer
-        targetType: http-request
-      id: 82de4fc1-c3f3-4be3-b8e8-8862709ed533
-      selected: false
-      source: c65065ca-cc2a-4584-9a1b-86df0ee71658
-      sourceHandle: source
-      target: a3d80a70-5da7-4edc-9c32-66de6f9845e1
-      targetHandle: target
-      type: custom
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: if-else
-      id: 3971ddb0-eefe-47d0-8aa4-d677388100d2
-      selected: false
-      source: a3d80a70-5da7-4edc-9c32-66de6f9845e1
-      sourceHandle: source
-      target: '1775380701991'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: 3def99c0-b9cb-40e5-b647-c6dc7ba25569
-      selected: false
-      source: '1775380701991'
-      sourceHandle: 'false'
-      target: 92c62559-e52e-454c-a579-ddc4536a6134
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 83a65c01-c680-4fe1-acc9-5fc79f7a12c0
+      id: 1775380701991-true-1775380779498-target
       selected: false
       source: '1775380701991'
       sourceHandle: 'true'
@@ -543,7 +362,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 52902246-5c44-4d17-9e2a-e12fed46be09
+      id: 1775380701991-d26825bc-0735-4704-b42c-eb42f6cb4b67-1775380796294-target
       selected: false
       source: '1775380701991'
       sourceHandle: d26825bc-0735-4704-b42c-eb42f6cb4b67
@@ -555,7 +374,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: f8bddd65-6adf-4aa2-8892-54e1111f7c4b
+      id: 1775380701991-bef31e01-b42e-40cf-9c16-fd9fef71ec17-1775380815321-target
       selected: false
       source: '1775380701991'
       sourceHandle: bef31e01-b42e-40cf-9c16-fd9fef71ec17
@@ -567,7 +386,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 9b19d130-7def-40a6-9991-09d6c1093494
+      id: 1775380701991-16b24b6c-aef8-437c-a9e3-18a892d85f37-1775380840852-target
       selected: false
       source: '1775380701991'
       sourceHandle: 16b24b6c-aef8-437c-a9e3-18a892d85f37
@@ -579,7 +398,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 3725b1d1-7d4b-4ce2-b7e0-53a5e5d92d87
+      id: 1775380701991-54bc604c-0b21-4ea6-8050-d3af11bdbce4-1775380857743-target
       selected: false
       source: '1775380701991'
       sourceHandle: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
@@ -589,141 +408,9 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: code
-        targetType: http-request
-      id: 0bc299d6-6240-4661-b573-e6899f30668b
-      selected: false
-      source: 92c62559-e52e-454c-a579-ddc4536a6134
-      sourceHandle: source
-      target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: code
-      id: 83131e8b-57dc-441c-8c07-c97015775b23
-      selected: false
-      source: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-      sourceHandle: source
-      target: 4eb75ab2-87de-48f6-b52e-35f8646da88d
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: f92114a2-7a0c-4edf-a350-efbaff1f2907
-      selected: false
-      source: 4eb75ab2-87de-48f6-b52e-35f8646da88d
-      sourceHandle: source
-      target: 473230ae-fcca-4f3b-b410-fc792d8b0e88
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: agent
-      id: 59926ff2-ace9-45bc-8fd4-cc82d9b04c9e
-      selected: false
-      source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
-      sourceHandle: source
-      target: 264d37e7-9580-4d26-be76-4ecdbf32803a
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: agent
-        targetType: if-else
-      id: 6f06f805-72ae-4894-9677-1d0b63cb781f
-      selected: false
-      source: 264d37e7-9580-4d26-be76-4ecdbf32803a
-      sourceHandle: source
-      target: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: dcd34318-03fb-4df6-bb10-6c8777927711
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: case-bundle-approved
-      target: 6962ba89-7408-45d1-880f-0fd134dc1705
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 734e7667-4b29-4270-bad9-e4e3e35b1305
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: 'false'
-      target: 6962ba89-7408-45d1-880f-0fd134dc1705
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: answer
-        targetType: http-request
-      id: c6e6eb67-00b7-4020-931e-028b01d76d11
-      selected: false
-      source: 6962ba89-7408-45d1-880f-0fd134dc1705
-      sourceHandle: source
-      target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: 3840d393-2798-4ac7-be8a-0fb4ddeb69c2
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: case-bundle-rejected
-      target: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: if-else
-      id: bc11ec10-85fd-4b15-88e7-97d78d0a6b2c
-      selected: false
-      source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
-      sourceHandle: source
-      target: f9136731-f6e1-472d-8cad-55edaed02022
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: f5f2548d-4792-4243-810f-bbe177faf774
-      selected: false
-      source: f9136731-f6e1-472d-8cad-55edaed02022
-      sourceHandle: 'false'
-      target: 6d81a37b-960b-42d3-ae88-5799cd773102
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: c2d3fd06-15b5-4b05-9a64-da0c534a4402
+      id: f9136731-f6e1-472d-8cad-55edaed02022-true-da538de9-c1a6-46e9-b189-9e5978bf6521-target
       selected: false
       source: f9136731-f6e1-472d-8cad-55edaed02022
       sourceHandle: 'true'
@@ -735,7 +422,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 6430bfca-0214-43c3-93e3-6d86d49bcdff
+      id: f9136731-f6e1-472d-8cad-55edaed02022-upload-case-401-eed94bb6-3565-4fbc-944c-3b114211f447-target
       selected: false
       source: f9136731-f6e1-472d-8cad-55edaed02022
       sourceHandle: upload-case-401
@@ -747,7 +434,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 9db08a1d-bc02-4f2c-aa9e-5577fed018e1
+      id: f9136731-f6e1-472d-8cad-55edaed02022-upload-case-403-848fa968-67cb-41cc-a287-322536fe9f69-target
       selected: false
       source: f9136731-f6e1-472d-8cad-55edaed02022
       sourceHandle: upload-case-403
@@ -759,7 +446,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: bd658ad0-0e3a-4181-8df3-0fe2f5544abe
+      id: f9136731-f6e1-472d-8cad-55edaed02022-upload-case-404-7b04db95-2264-496e-8447-0efb83a7b9a2-target
       selected: false
       source: f9136731-f6e1-472d-8cad-55edaed02022
       sourceHandle: upload-case-404
@@ -771,7 +458,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: f3560770-af07-4b82-a69c-b569556d0f88
+      id: f9136731-f6e1-472d-8cad-55edaed02022-upload-case-500-608df9da-f21e-4d20-8d01-e4d65fec1256-target
       selected: false
       source: f9136731-f6e1-472d-8cad-55edaed02022
       sourceHandle: upload-case-500
@@ -781,57 +468,9 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: 27d43db2-e252-4315-95f5-65c4abb02d24
-      selected: false
-      source: 6d81a37b-960b-42d3-ae88-5799cd773102
-      sourceHandle: source
-      target: 8e0563d0-7844-4e89-a765-cbd9647e7676
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: agent
-      id: 7cf7a8a2-2bd5-4031-a5f3-cef94b23dafc
-      selected: false
-      source: 8e0563d0-7844-4e89-a765-cbd9647e7676
-      sourceHandle: source
-      target: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: agent
-        targetType: if-else
-      id: 6273898d-3d8f-43cb-a85d-fecc7e85b493
-      selected: false
-      source: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
-      sourceHandle: source
-      target: 50519a54-053f-4c25-9486-ec03eadb94ca
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: 25f23476-610d-445d-bb33-2dbcd15018b6
-      selected: false
-      source: 50519a54-053f-4c25-9486-ec03eadb94ca
-      sourceHandle: case-retry-bundle
-      target: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 1efc98d6-5259-48f4-8d5c-5070280b7c0c
+      id: 50519a54-053f-4c25-9486-ec03eadb94ca-case-error-report-0f4603cf-1aab-4b53-a05d-c5cb6f9194c2-target
       selected: false
       source: 50519a54-053f-4c25-9486-ec03eadb94ca
       sourceHandle: case-error-report
@@ -843,7 +482,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: loop
-      id: 2795cb77-3d53-4f58-8f4a-83795e7f4ef5
+      id: 50519a54-053f-4c25-9486-ec03eadb94ca-false-1774617440956-target
       selected: false
       source: 50519a54-053f-4c25-9486-ec03eadb94ca
       sourceHandle: 'false'
@@ -855,7 +494,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 1fd37563-4e27-4513-ac64-285252a6be58
+      id: 1757493270484-case-delete-config-6494459f-3dee-4fc1-bdff-ff0400aefd52-target
       selected: false
       source: '1757493270484'
       sourceHandle: case-delete-config
@@ -867,7 +506,7 @@ workflow:
         isInLoop: false
         sourceType: answer
         targetType: human-input
-      id: 83618b08-77b8-4192-9e51-849d1a5c695c
+      id: 6494459f-3dee-4fc1-bdff-ff0400aefd52-source-5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88-target
       selected: false
       source: 6494459f-3dee-4fc1-bdff-ff0400aefd52
       sourceHandle: source
@@ -879,7 +518,7 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: http-request
-      id: 8f9c1b42-cf3b-4dcf-9ba8-d8848452ea2f
+      id: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88-Yes-fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b-target
       selected: false
       source: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88
       sourceHandle: 'Yes'
@@ -891,7 +530,7 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: 1095c308-ab1b-423d-905f-9440034dffd4
+      id: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88-No-3cfb30bf-9386-48db-bfa2-3bd3359cf040-target
       selected: false
       source: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88
       sourceHandle: 'No'
@@ -903,7 +542,7 @@ workflow:
         isInLoop: false
         sourceType: human-input
         targetType: answer
-      id: 03d16593-0963-4eb3-94bf-abc7ac9f4c3d
+      id: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88-__timeout-3cfb30bf-9386-48db-bfa2-3bd3359cf040-target
       selected: false
       source: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88
       sourceHandle: __timeout
@@ -915,7 +554,7 @@ workflow:
         isInLoop: false
         sourceType: http-request
         targetType: if-else
-      id: f2628cd3-a5cc-40d5-a45f-6d7c759be676
+      id: fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b-source-13f1b052-2aed-4126-937d-5a4837d77639-target
       selected: false
       source: fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b
       sourceHandle: source
@@ -927,7 +566,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: aa8fb267-1494-40cf-b763-f5caa2f31cca
+      id: 13f1b052-2aed-4126-937d-5a4837d77639-true-c776a305-2e50-42e0-9209-32881d893c32-target
       selected: false
       source: 13f1b052-2aed-4126-937d-5a4837d77639
       sourceHandle: 'true'
@@ -939,7 +578,7 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 2c0a3302-d904-4d25-bac6-5334d67b47d4
+      id: 13f1b052-2aed-4126-937d-5a4837d77639-false-750b6d5a-d7b6-4e8f-8449-b51e3d84f7fd-target
       selected: false
       source: 13f1b052-2aed-4126-937d-5a4837d77639
       sourceHandle: 'false'
@@ -949,45 +588,9 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: 0d5eb69d-6231-4410-8b4e-a552e9345921
-      selected: false
-      source: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      sourceHandle: source
-      target: ee69171b-0c05-4dcb-bcb2-4057a5119579
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: if-else
-      id: 2048e825-6713-4a2d-88b7-5199802fa4b3
-      selected: false
-      source: ee69171b-0c05-4dcb-bcb2-4057a5119579
-      sourceHandle: source
-      target: 76910038-4a13-4647-aee2-30be4c282e31
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: agent
-      id: aab247f4-95b7-4fe7-b827-3a22cc90cc39
-      selected: false
-      source: 76910038-4a13-4647-aee2-30be4c282e31
-      sourceHandle: 'false'
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 1a9c3198-3492-44d0-ad45-0bc4346d072a
+      id: 76910038-4a13-4647-aee2-30be4c282e31-true-e6b32cb1-406f-47e0-8f96-18b75d76fdf2-target
       selected: false
       source: 76910038-4a13-4647-aee2-30be4c282e31
       sourceHandle: 'true'
@@ -998,7 +601,7 @@ workflow:
     - data:
         sourceType: if-else
         targetType: answer
-      id: 98938e7f-b8bd-4afb-bba6-5d0716785311
+      id: 1757493270484-case-setup-guidance-d9ccc273-d1c4-44d1-8894-177b64b92bfa-target
       selected: false
       source: '1757493270484'
       sourceHandle: case-setup-guidance
@@ -1010,59 +613,11 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 832726e4-72f8-4a5a-860a-1dfc3d3cfebc
+      id: 1757493270484-false-1758699378772-target
       selected: false
       source: '1757493270484'
       sourceHandle: 'false'
       target: '1758699378772'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: answer
-      id: bae904c0-f895-4c60-8b6a-593862b19932
-      selected: false
-      source: '17748474036620'
-      sourceHandle: source
-      target: '1773909436902'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: llm
-      id: f8e2032e-8140-4742-91f3-10a714a1ca1a
-      selected: false
-      source: '1773908701222'
-      sourceHandle: source
-      target: '17748474036620'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: document-extractor
-        targetType: llm
-      id: 07c5d92f-3ba3-4269-b118-ec7d91a4aa21
-      selected: false
-      source: '1774264909113'
-      sourceHandle: source
-      target: '17748507380970'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: assigner
-      id: 6766ac12-7e02-4061-b4e3-38ee6dafb2f1
-      selected: false
-      source: '17748507380970'
-      sourceHandle: source
-      target: 9c0103c2-e377-4925-8f4a-501ff5b34379
       targetHandle: target
       type: custom
       zIndex: 0
@@ -1072,7 +627,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: if-else
         targetType: assigner
-      id: d4a7cb88-3ba7-4232-aba7-bdcb0058bf2d
+      id: 1774617558364-true-ff6d33df-8310-4f7f-85a6-491645d8b5fe-target
       selected: false
       source: '1774617558364'
       sourceHandle: 'true'
@@ -1086,7 +641,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: if-else
         targetType: answer
-      id: 80f9c75e-9348-4c4e-b3e4-5e1fc0383930
+      id: 1774617558364-false-abe6cb3a-769a-4f59-b705-fef4884fdb5e-target
       selected: false
       source: '1774617558364'
       sourceHandle: 'false'
@@ -1100,7 +655,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: assigner
         targetType: answer
-      id: 24e376ae-b1b4-4b20-aaae-449ff541bb6e
+      id: ff6d33df-8310-4f7f-85a6-491645d8b5fe-source-48d1cfc7-02ef-457e-8e39-bff34b4fb91e-target
       selected: false
       source: ff6d33df-8310-4f7f-85a6-491645d8b5fe
       sourceHandle: source
@@ -1110,33 +665,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: false
-        sourceType: llm
-        targetType: if-else
-      id: 6ffeea64-4eab-4adf-b0be-c741e6360410
-      selected: false
-      source: '1757492907627'
-      sourceHandle: source
-      target: '1757493270484'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: start
-        targetType: knowledge-retrieval
-      id: 10d2a0a1-734b-47e0-ac78-dae4b71cc724
-      selected: false
-      source: '1711528708197'
-      sourceHandle: source
-      target: '1758713692744'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: start
         targetType: assigner
-      id: 3768efbc-85a1-4b13-a8b3-59be2f46bb81
+      id: 1711528708197-source-1774005428719-target
       selected: false
       source: '1711528708197'
       sourceHandle: source
@@ -1148,7 +679,7 @@ workflow:
         isInLoop: false
         sourceType: start
         targetType: assigner
-      id: 52dde296-fa85-448b-b8e3-5934d4a368c6
+      id: 1711528708197-source-1774005484035-target
       selected: false
       source: '1711528708197'
       sourceHandle: source
@@ -1160,7 +691,7 @@ workflow:
         isInLoop: false
         sourceType: start
         targetType: assigner
-      id: bf74e0c7-c9a6-43b7-a545-101ad833d5e5
+      id: 1711528708197-source-8cf929e0-b909-47df-949b-6d40ed0a3bbe-target
       selected: false
       source: '1711528708197'
       sourceHandle: source
@@ -1174,7 +705,7 @@ workflow:
         loop_id: '1774617440956'
         sourceType: http-request
         targetType: code
-      id: d7e32139-ef4b-4f78-833c-d51738ebcb7a
+      id: 1774617517718-source-17749417129260-target
       source: '1774617517718'
       sourceHandle: source
       target: '17749417129260'
@@ -1187,13 +718,425 @@ workflow:
         loop_id: '1774617440956'
         sourceType: code
         targetType: if-else
-      id: fa1c584e-0ecf-459b-9a4f-96fd38c95103
+      id: 17749417129260-source-1774617558364-target
       source: '17749417129260'
       sourceHandle: source
       target: '1774617558364'
       targetHandle: target
       type: custom
       zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1711528708197-source-1758713692744-target
+      source: '1711528708197'
+      sourceHandle: source
+      target: '1758713692744'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1758713692744-source-1757492907627-target
+      source: '1758713692744'
+      sourceHandle: source
+      target: '1757492907627'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1757492907627-source-1757493270484-target
+      selected: false
+      source: '1757492907627'
+      sourceHandle: source
+      target: '1757493270484'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: if-else
+      id: 1757493270484-case-filesetup-f1ffbe75-d06a-4349-b6d4-78aabd9596ee-target
+      source: '1757493270484'
+      sourceHandle: case-filesetup
+      target: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee-false-1774264909113-target
+      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      sourceHandle: 'false'
+      target: '1774264909113'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1774264909113-source-17748507380970-target
+      source: '1774264909113'
+      sourceHandle: source
+      target: '17748507380970'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: assigner
+      id: 17748507380970-source-9c0103c2-e377-4925-8f4a-501ff5b34379-target
+      source: '17748507380970'
+      sourceHandle: source
+      target: 9c0103c2-e377-4925-8f4a-501ff5b34379
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: http-request
+      id: 9c0103c2-e377-4925-8f4a-501ff5b34379-source-ecd0bd72-6c77-4fb8-a362-0164343614af-target
+      source: 9c0103c2-e377-4925-8f4a-501ff5b34379
+      sourceHandle: source
+      target: ecd0bd72-6c77-4fb8-a362-0164343614af
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: agent
+      id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee-case-true-3b1db8bf-6e79-4646-9103-077a6ca90299-target
+      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      sourceHandle: case-true
+      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: agent
+      id: 1774617205889-Yes-3b1db8bf-6e79-4646-9103-077a6ca90299-target
+      source: '1774617205889'
+      sourceHandle: 'Yes'
+      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: human-input
+      id: 1773909436902-source-1774617205889-target
+      source: '1773909436902'
+      sourceHandle: source
+      target: '1774617205889'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: 1774617205889-Yes-ea75c737-ec88-4d16-ab02-281ab9c2d006-target
+      source: '1774617205889'
+      sourceHandle: 'Yes'
+      target: ea75c737-ec88-4d16-ab02-281ab9c2d006
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 17748474036620-source-1773909436902-target
+      source: '17748474036620'
+      sourceHandle: source
+      target: '1773909436902'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1773908701222-source-17748474036620-target
+      source: '1773908701222'
+      sourceHandle: source
+      target: '17748474036620'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: http-request
+      id: ecd0bd72-6c77-4fb8-a362-0164343614af-source-1773908701222-target
+      source: ecd0bd72-6c77-4fb8-a362-0164343614af
+      sourceHandle: source
+      target: '1773908701222'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: code
+      id: 3b1db8bf-6e79-4646-9103-077a6ca90299-source-0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c-target
+      source: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      sourceHandle: source
+      target: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c-source-61246b3d-16a0-4768-8b58-d9d3aa1c0441-target
+      source: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
+      sourceHandle: source
+      target: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: answer
+      id: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c-source-c65065ca-cc2a-4584-9a1b-86df0ee71658-target
+      source: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
+      sourceHandle: source
+      target: c65065ca-cc2a-4584-9a1b-86df0ee71658
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: http-request
+      id: 61246b3d-16a0-4768-8b58-d9d3aa1c0441-source-a3d80a70-5da7-4edc-9c32-66de6f9845e1-target
+      source: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
+      sourceHandle: source
+      target: a3d80a70-5da7-4edc-9c32-66de6f9845e1
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: a3d80a70-5da7-4edc-9c32-66de6f9845e1-source-92c62559-e52e-454c-a579-ddc4536a6134-target
+      source: a3d80a70-5da7-4edc-9c32-66de6f9845e1
+      sourceHandle: source
+      target: 92c62559-e52e-454c-a579-ddc4536a6134
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2-source-4eb75ab2-87de-48f6-b52e-35f8646da88d-target
+      source: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
+      sourceHandle: source
+      target: 4eb75ab2-87de-48f6-b52e-35f8646da88d
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: 92c62559-e52e-454c-a579-ddc4536a6134-source-e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2-target
+      source: 92c62559-e52e-454c-a579-ddc4536a6134
+      sourceHandle: source
+      target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 4eb75ab2-87de-48f6-b52e-35f8646da88d-source-473230ae-fcca-4f3b-b410-fc792d8b0e88-target
+      source: 4eb75ab2-87de-48f6-b52e-35f8646da88d
+      sourceHandle: source
+      target: 473230ae-fcca-4f3b-b410-fc792d8b0e88
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: answer
+      id: 473230ae-fcca-4f3b-b410-fc792d8b0e88-source-6962ba89-7408-45d1-880f-0fd134dc1705-target
+      source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
+      sourceHandle: source
+      target: 6962ba89-7408-45d1-880f-0fd134dc1705
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: agent
+      id: 473230ae-fcca-4f3b-b410-fc792d8b0e88-source-264d37e7-9580-4d26-be76-4ecdbf32803a-target
+      source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
+      sourceHandle: source
+      target: 264d37e7-9580-4d26-be76-4ecdbf32803a
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: if-else
+      id: 264d37e7-9580-4d26-be76-4ecdbf32803a-source-fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f-target
+      source: 264d37e7-9580-4d26-be76-4ecdbf32803a
+      sourceHandle: source
+      target: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: if-else
+      id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2-fail-branch-1775380701991-target
+      source: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
+      sourceHandle: fail-branch
+      target: '1775380701991'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f-case-bundle-approved-959d2ca3-2445-4375-ac9e-f68f47724a2f-target
+      selected: false
+      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
+      sourceHandle: case-bundle-approved
+      target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 959d2ca3-2445-4375-ac9e-f68f47724a2f-source-6d81a37b-960b-42d3-ae88-5799cd773102-target
+      selected: false
+      source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
+      sourceHandle: source
+      target: 6d81a37b-960b-42d3-ae88-5799cd773102
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 6d81a37b-960b-42d3-ae88-5799cd773102-source-8e0563d0-7844-4e89-a765-cbd9647e7676-target
+      source: 6d81a37b-960b-42d3-ae88-5799cd773102
+      sourceHandle: source
+      target: 8e0563d0-7844-4e89-a765-cbd9647e7676
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f-case-bundle-rejected-cf4c5fbe-1460-44e4-9775-5650873dfdbd-target
+      selected: false
+      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
+      sourceHandle: case-bundle-rejected
+      target: cf4c5fbe-1460-44e4-9775-5650873dfdbd
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f-false-cf4c5fbe-1460-44e4-9775-5650873dfdbd-target
+      selected: false
+      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
+      sourceHandle: 'false'
+      target: cf4c5fbe-1460-44e4-9775-5650873dfdbd
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: cf4c5fbe-1460-44e4-9775-5650873dfdbd-source-ee69171b-0c05-4dcb-bcb2-4057a5119579-target
+      source: cf4c5fbe-1460-44e4-9775-5650873dfdbd
+      sourceHandle: source
+      target: ee69171b-0c05-4dcb-bcb2-4057a5119579
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: ee69171b-0c05-4dcb-bcb2-4057a5119579-source-76910038-4a13-4647-aee2-30be4c282e31-target
+      source: ee69171b-0c05-4dcb-bcb2-4057a5119579
+      sourceHandle: source
+      target: 76910038-4a13-4647-aee2-30be4c282e31
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: agent
+      id: 8e0563d0-7844-4e89-a765-cbd9647e7676-source-f6a7cffe-d1af-4c54-9a49-a64cf97e3584-target
+      source: 8e0563d0-7844-4e89-a765-cbd9647e7676
+      sourceHandle: source
+      target: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: if-else
+      id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584-source-50519a54-053f-4c25-9486-ec03eadb94ca-target
+      source: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+      sourceHandle: source
+      target: 50519a54-053f-4c25-9486-ec03eadb94ca
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: if-else
+      id: 959d2ca3-2445-4375-ac9e-f68f47724a2f-fail-branch-f9136731-f6e1-472d-8cad-55edaed02022-target
+      source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
+      sourceHandle: fail-branch
+      target: f9136731-f6e1-472d-8cad-55edaed02022
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         desc: Define the initial parameters for launching a workflow
@@ -1246,10 +1189,10 @@ workflow:
       id: '1711528708197'
       position:
         x: 0
-        y: 418
+        y: 331
       positionAbsolute:
         x: 0
-        y: 418
+        y: 331
       selected: false
       type: custom
       width: 242
@@ -1272,10 +1215,10 @@ workflow:
       id: '1774005428719'
       position:
         x: 362
-        y: 607
+        y: 0
       positionAbsolute:
         x: 362
-        y: 607
+        y: 0
       selected: false
       type: custom
       width: 242
@@ -1298,10 +1241,10 @@ workflow:
       id: '1774005484035'
       position:
         x: 362
-        y: 771
+        y: 164
       positionAbsolute:
         x: 362
-        y: 771
+        y: 164
       selected: false
       type: custom
       width: 242
@@ -1324,16 +1267,16 @@ workflow:
       id: 8cf929e0-b909-47df-949b-6d40ed0a3bbe
       position:
         x: 362
-        y: 935
+        y: 328
       positionAbsolute:
         x: 362
-        y: 935
+        y: 328
       selected: false
       type: custom
       width: 242
     - data:
         dataset_ids:
-        - df1bfaa2-38ad-457c-8237-6980e83245d9
+        - 9TmCqtDyQNUaJCKXT7rPGCd21br8q6JzrrUr4xib3E9uqcfMf6t6rxJkkXFK7EzL
         multiple_retrieval_config:
           reranking_enable: false
           reranking_mode: weighted_score
@@ -1364,11 +1307,11 @@ workflow:
       height: 90
       id: '1758713692744'
       position:
-        x: 342
-        y: 437
+        x: 362
+        y: 492
       positionAbsolute:
-        x: 342
-        y: 437
+        x: 362
+        y: 492
       selected: false
       type: custom
       width: 242
@@ -1403,8 +1346,8 @@ workflow:
             \ support\", \"How does\") → RAG\n4. Delete/reset request (\"delete everything\"\
             , \"clean slate\", \"start fresh\", \"remove all config\") → DELETE_CONFIG\n\
             5. Implementation request (\"build\", \"create\", \"develop\", \"set up\
-            \ for me\") → ASSISTANT\n6. Setup intent WITHOUT file (\"I want to\
-            \ set up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n7. Unrelated\
+            \ for me\") → ASSISTANT\n6. Setup intent WITHOUT file (\"I want to set\
+            \ up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n7. Unrelated\
             \ to Avni → OUT_OF_SCOPE\n8. Anything else Avni-related → RAG\n\n## Deviation\
             \ Handling\nIf setup_mode_active=true and the message is chitchat or out-of-scope,\
             \ still return FILE_SETUP with deviation_detected=true. Do NOT abandon\
@@ -1484,11 +1427,11 @@ workflow:
       height: 88
       id: '1757492907627'
       position:
-        x: 684
-        y: 438
+        x: 704
+        y: 493
       positionAbsolute:
-        x: 684
-        y: 438
+        x: 704
+        y: 493
       selected: false
       type: custom
       width: 242
@@ -1567,15 +1510,15 @@ workflow:
         selected: false
         title: Main Router
         type: if-else
-      height: 558
+      height: 580
       id: '1757493270484'
       position:
-        x: 1026
-        y: 228
+        x: 1046
+        y: 258
       positionAbsolute:
-        x: 1026
-        y: 228
-      selected: false
+        x: 1046
+        y: 258
+      selected: true
       type: custom
       width: 242
     - data:
@@ -1628,11 +1571,11 @@ workflow:
       height: 88
       id: '1757495664531'
       position:
-        x: 1388
-        y: 8
+        x: 1408
+        y: 60
       positionAbsolute:
-        x: 1388
-        y: 8
+        x: 1408
+        y: 60
       selected: false
       type: custom
       width: 242
@@ -1644,11 +1587,11 @@ workflow:
       height: 103
       id: '1757495688732'
       position:
-        x: 1730
-        y: 0
+        x: 1750
+        y: 52
       positionAbsolute:
-        x: 1730
-        y: 0
+        x: 1750
+        y: 52
       selected: false
       type: custom
       width: 242
@@ -1663,11 +1606,11 @@ workflow:
       height: 135
       id: '1758608702077'
       position:
-        x: 1388
-        y: 176
+        x: 1408
+        y: 228
       positionAbsolute:
-        x: 1388
-        y: 176
+        x: 1408
+        y: 228
       selected: false
       type: custom
       width: 242
@@ -1689,11 +1632,11 @@ workflow:
       height: 196
       id: '1758699378772'
       position:
-        x: 1388
-        y: 789
+        x: 1408
+        y: 839
       positionAbsolute:
-        x: 1388
-        y: 789
+        x: 1408
+        y: 839
       selected: false
       type: custom
       width: 242
@@ -1725,11 +1668,11 @@ workflow:
       height: 356
       id: d9ccc273-d1c4-44d1-8894-177b64b92bfa
       position:
-        x: 1388
-        y: 1065
+        x: 1408
+        y: 1115
       positionAbsolute:
-        x: 1388
-        y: 1065
+        x: 1408
+        y: 1115
       selected: false
       type: custom
       width: 242
@@ -1773,11 +1716,11 @@ workflow:
       height: 88
       id: '17580163919060'
       position:
-        x: 1388
-        y: 391
+        x: 1408
+        y: 443
       positionAbsolute:
-        x: 1388
-        y: 391
+        x: 1408
+        y: 443
       selected: false
       type: custom
       width: 242
@@ -1789,11 +1732,11 @@ workflow:
       height: 103
       id: '1760358474156'
       position:
-        x: 1730
-        y: 383
+        x: 1750
+        y: 435
       positionAbsolute:
-        x: 1730
-        y: 383
+        x: 1750
+        y: 435
       selected: false
       type: custom
       width: 242
@@ -1821,11 +1764,11 @@ workflow:
       height: 150
       id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
       position:
-        x: 1388
-        y: 559
+        x: 1408
+        y: 1551
       positionAbsolute:
-        x: 1388
-        y: 559
+        x: 1408
+        y: 1551
       selected: false
       type: custom
       width: 242
@@ -1839,11 +1782,11 @@ workflow:
       height: 104
       id: '1774264909113'
       position:
-        x: 1750
-        y: 597
+        x: 1770
+        y: 1589
       positionAbsolute:
-        x: 1750
-        y: 597
+        x: 1770
+        y: 1589
       selected: false
       type: custom
       width: 242
@@ -1874,11 +1817,11 @@ workflow:
       height: 110
       id: 9c0103c2-e377-4925-8f4a-501ff5b34379
       position:
-        x: 2450
-        y: 738
+        x: 2454
+        y: 1586
       positionAbsolute:
-        x: 2450
-        y: 738
+        x: 2454
+        y: 1586
       selected: false
       type: custom
       width: 242
@@ -1913,11 +1856,11 @@ workflow:
       height: 141
       id: ecd0bd72-6c77-4fb8-a362-0164343614af
       position:
-        x: 2784
-        y: 686
+        x: 2796
+        y: 1570
       positionAbsolute:
-        x: 2784
-        y: 686
+        x: 2796
+        y: 1570
       selected: false
       type: custom
       width: 242
@@ -1951,11 +1894,11 @@ workflow:
       height: 141
       id: '1773908701222'
       position:
-        x: 3118
-        y: 702
+        x: 3138
+        y: 1570
       positionAbsolute:
-        x: 3118
-        y: 702
+        x: 3138
+        y: 1570
       selected: false
       type: custom
       width: 242
@@ -1971,11 +1914,11 @@ workflow:
       height: 151
       id: '1773909436902'
       position:
-        x: 3790
-        y: 697
+        x: 3822
+        y: 1565
       positionAbsolute:
-        x: 3790
-        y: 697
+        x: 3822
+        y: 1565
       selected: false
       type: custom
       width: 242
@@ -2005,18 +1948,18 @@ workflow:
       height: 141
       id: a3d80a70-5da7-4edc-9c32-66de6f9845e1
       position:
-        x: 5532
-        y: 657
+        x: 5572
+        y: 1905
       positionAbsolute:
-        x: 5532
-        y: 657
+        x: 5572
+        y: 1905
       selected: false
       type: custom
       width: 242
     - data:
         code: "import json\n\ndef main(bundle_b64: str, spec_yaml: str) -> dict:\n\
-          \    body = {\n        \"existing_bundle_b64\": bundle_b64 or \"\",\n   \
-          \     \"spec_yaml\": spec_yaml or \"\"\n    }\n    return {\"json_body\"\
+          \    body = {\n        \"existing_bundle_b64\": bundle_b64 or \"\",\n  \
+          \      \"spec_yaml\": spec_yaml or \"\"\n    }\n    return {\"json_body\"\
           : json.dumps(body)}\n"
         code_language: python3
         outputs:
@@ -2041,11 +1984,11 @@ workflow:
       height: 52
       id: 92c62559-e52e-454c-a579-ddc4536a6134
       position:
-        x: 5874
-        y: 700
+        x: 5914
+        y: 1950
       positionAbsolute:
-        x: 5874
-        y: 700
+        x: 5914
+        y: 1950
       selected: false
       type: custom
       width: 242
@@ -2060,6 +2003,7 @@ workflow:
             type: text
             value: '{{#92c62559-e52e-454c-a579-ddc4536a6134.json_body#}}'
           type: raw-text
+        error_strategy: fail-branch
         headers: Content-Type:application/json
         method: post
         params: ''
@@ -2076,14 +2020,14 @@ workflow:
         title: Patch Bundle
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}patch-bundle'
-      height: 141
+      height: 177
       id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
       position:
-        x: 5874
-        y: 657
+        x: 6256
+        y: 1887
       positionAbsolute:
-        x: 5874
-        y: 657
+        x: 6256
+        y: 1887
       selected: false
       type: custom
       width: 242
@@ -2117,11 +2061,11 @@ workflow:
       height: 52
       id: 4eb75ab2-87de-48f6-b52e-35f8646da88d
       position:
-        x: 6216
-        y: 702
+        x: 6638
+        y: 1920
       positionAbsolute:
-        x: 6216
-        y: 702
+        x: 6638
+        y: 1920
       selected: false
       type: custom
       width: 242
@@ -2143,11 +2087,11 @@ workflow:
       height: 84
       id: 473230ae-fcca-4f3b-b410-fc792d8b0e88
       position:
-        x: 6558
-        y: 686
+        x: 6980
+        y: 1904
       positionAbsolute:
-        x: 6558
-        y: 686
+        x: 6980
+        y: 1904
       selected: false
       type: custom
       width: 242
@@ -2163,6 +2107,7 @@ workflow:
             value: "{\n  \"bundle_zip_b64\": \"{{#conversation.bundle_zip_b64#}}\"\
               \n}\n"
           type: json
+        error_strategy: fail-branch
         headers: 'Content-Type:application/json
 
           avni-auth-token:{{#conversation.auth_token#}}'
@@ -2181,14 +2126,14 @@ workflow:
         title: Upload Bundle
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}upload-bundle'
-      height: 141
+      height: 177
       id: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       position:
-        x: 7242
-        y: 657
+        x: 8046
+        y: 1109
       positionAbsolute:
-        x: 7242
-        y: 657
+        x: 8046
+        y: 1109
       selected: false
       type: custom
       width: 242
@@ -2218,11 +2163,11 @@ workflow:
       height: 52
       id: 6d81a37b-960b-42d3-ae88-5799cd773102
       position:
-        x: 7584
-        y: 702
+        x: 8388
+        y: 1142
       positionAbsolute:
-        x: 7584
-        y: 702
+        x: 8388
+        y: 1142
       selected: false
       type: custom
       width: 242
@@ -2244,11 +2189,11 @@ workflow:
       height: 84
       id: 8e0563d0-7844-4e89-a765-cbd9647e7676
       position:
-        x: 7926
-        y: 686
+        x: 8730
+        y: 1126
       positionAbsolute:
-        x: 7926
-        y: 686
+        x: 8730
+        y: 1126
       selected: false
       type: custom
       width: 242
@@ -2259,7 +2204,7 @@ workflow:
           type: webapp
         form_content: ''
         inputs: []
-        selected: true
+        selected: false
         timeout: 1
         timeout_unit: hour
         title: Confirm Entities
@@ -2274,12 +2219,12 @@ workflow:
       height: 190
       id: '1774617205889'
       position:
-        x: 4144
-        y: 667
+        x: 4164
+        y: 1546
       positionAbsolute:
-        x: 4144
-        y: 667
-      selected: true
+        x: 4164
+        y: 1546
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -2305,11 +2250,11 @@ workflow:
       height: 490
       id: '1774617440956'
       position:
-        x: 8610
-        y: 483
+        x: 9816
+        y: 1342
       positionAbsolute:
-        x: 8610
-        y: 483
+        x: 9816
+        y: 1342
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2330,8 +2275,8 @@ workflow:
         x: 60
         y: 135
       positionAbsolute:
-        x: 8670
-        y: 618
+        x: 9876
+        y: 1477
       selectable: false
       selected: false
       sourcePosition: right
@@ -2397,8 +2342,8 @@ workflow:
         x: 184
         y: 133
       positionAbsolute:
-        x: 8794
-        y: 616
+        x: 10000
+        y: 1475
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2439,8 +2384,8 @@ workflow:
         x: 506
         y: 79
       positionAbsolute:
-        x: 9116
-        y: 562
+        x: 10322
+        y: 1421
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2479,8 +2424,8 @@ workflow:
         x: 1150
         y: 60
       positionAbsolute:
-        x: 9760
-        y: 543
+        x: 10966
+        y: 1402
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2520,8 +2465,8 @@ workflow:
         x: 1492
         y: 244
       positionAbsolute:
-        x: 10102
-        y: 727
+        x: 11308
+        y: 1586
       selected: false
       type: custom
       width: 242
@@ -2559,11 +2504,11 @@ workflow:
       id: 48d1cfc7-02ef-457e-8e39-bff34b4fb91e
       parentId: '1774617440956'
       position:
-        x: 1814
-        y: 175
+        x: 1816.4920534036537
+        y: 65
       positionAbsolute:
-        x: 10424
-        y: 658
+        x: 11632.492053403654
+        y: 1407
       selected: false
       type: custom
       width: 242
@@ -2582,8 +2527,8 @@ workflow:
         x: 1492
         y: 68
       positionAbsolute:
-        x: 10102
-        y: 551
+        x: 11308
+        y: 1410
       selected: false
       type: custom
       width: 242
@@ -2597,79 +2542,85 @@ workflow:
       height: 148
       id: ef812954-180c-4672-9c41-4d2e8058fdb5
       position:
-        x: 4506
-        y: 940
+        x: 4526
+        y: 1429
       positionAbsolute:
-        x: 4506
-        y: 940
+        x: 4526
+        y: 1429
       selected: false
       type: custom
       width: 242
     - data:
-        answer: "Please describe the corrections you'd like to make. For example:\n\
-          - \"Remove program X\"\n- \"Change encounter type Y to scheduled\"\n- \"\
-          Add a new subject type called Z\"\n\nI'll update the configuration and show\
-          \ you a revised summary."
+        answer: 'Please describe the corrections you''d like to make. For example:
+
+          - "Remove program X"
+
+          - "Change encounter type Y to scheduled"
+
+          - "Add a new subject type called Z"
+
+
+          I''ll update the configuration and show you a revised summary.'
         selected: false
         title: Corrections Prompt
         type: answer
       height: 148
       id: 41baa894-e39d-45c7-826d-9ba1faad150b
       position:
-        x: 4506
-        y: 1120
+        x: 4526
+        y: 1201
       positionAbsolute:
-        x: 4506
-        y: 1120
+        x: 4526
+        y: 1201
       selected: false
       type: custom
       width: 242
     - data:
-        answer: "\U0001F504 Generating configuration spec from your confirmed entities.\
-          \ This may take a moment..."
+        answer: 🔄 Generating configuration spec from your confirmed entities. This
+          may take a moment...
         selected: false
         title: 'Progress: Generating Spec'
         type: answer
       height: 116
       id: ea75c737-ec88-4d16-ab02-281ab9c2d006
       position:
-        x: 4506
-        y: 510
+        x: 4526
+        y: 1657
       positionAbsolute:
-        x: 4506
-        y: 510
+        x: 4526
+        y: 1657
       selected: false
       type: custom
       width: 242
     - data:
-        answer: "\U0001F4E5 Downloading existing bundle from Avni..."
+        answer: 📥 Downloading existing bundle from Avni...
         selected: false
         title: 'Progress: Downloading Bundle'
         type: answer
       height: 116
       id: c65065ca-cc2a-4584-9a1b-86df0ee71658
       position:
-        x: 5190
-        y: 510
+        x: 5230
+        y: 2098
       positionAbsolute:
-        x: 5190
-        y: 510
+        x: 5230
+        y: 2098
       selected: false
       type: custom
       width: 242
     - data:
-        answer: "\U0001F4E4 Uploading bundle to Avni server..."
+        answer: 📤 Uploading bundle to Avni server...
         selected: false
         title: 'Progress: Uploading Bundle'
         type: answer
       height: 116
       id: 6962ba89-7408-45d1-880f-0fd134dc1705
       position:
-        x: 6900
-        y: 510
+        x: 7342
+        y: 1874
       positionAbsolute:
-        x: 6900
-        y: 510
+        x: 7342
+        y: 1874
       selected: false
       type: custom
       width: 242
@@ -2739,11 +2690,11 @@ workflow:
       height: 88
       id: '17748474036620'
       position:
-        x: 3460
-        y: 738
+        x: 3480
+        y: 1597
       positionAbsolute:
-        x: 3460
-        y: 738
+        x: 3480
+        y: 1597
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2860,11 +2811,11 @@ workflow:
       height: 88
       id: '17748507380970'
       position:
-        x: 2096
-        y: 729
+        x: 2112
+        y: 1597
       positionAbsolute:
-        x: 2096
-        y: 729
+        x: 2112
+        y: 1597
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2903,8 +2854,8 @@ workflow:
         x: 828
         y: 133
       positionAbsolute:
-        x: 9438
-        y: 616
+        x: 10644
+        y: 1475
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2915,8 +2866,8 @@ workflow:
         agent_parameters:
           instruction:
             type: constant
-            value: 'You are the Spec Agent. The user has ALREADY confirmed their
-              entities. Generate the YAML spec and output it immediately.
+            value: 'You are the Spec Agent. The user has ALREADY confirmed their entities.
+              Generate the YAML spec and output it immediately.
 
 
               Conversation ID: {{#sys.conversation_id#}}
@@ -2930,8 +2881,7 @@ workflow:
 
               2. Call validate_spec with the returned spec_yaml
 
-              3. If validation has errors, call apply_entity_corrections then
-              regenerate.
+              3. If validation has errors, call apply_entity_corrections then regenerate.
 
               4. Output your final message in EXACTLY this format:
 
@@ -2947,8 +2897,8 @@ workflow:
 
               - Do NOT wrap YAML in markdown code blocks.
 
-              - Your final output MUST start with SPEC_APPROVED on its own line
-              followed by the raw YAML spec.
+              - Your final output MUST start with SPEC_APPROVED on its own line followed
+              by the raw YAML spec.
 
               - Do NOT add commentary before SPEC_APPROVED.'
           maximum_iterations:
@@ -3114,11 +3064,11 @@ workflow:
       height: 264
       id: 3b1db8bf-6e79-4646-9103-077a6ca90299
       position:
-        x: 4506
-        y: 596
+        x: 4526
+        y: 1853
       positionAbsolute:
-        x: 4506
-        y: 596
+        x: 4526
+        y: 1853
       selected: false
       type: custom
       width: 242
@@ -3155,11 +3105,11 @@ workflow:
       height: 52
       id: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
       position:
-        x: 4848
-        y: 702
+        x: 4868
+        y: 1959
       positionAbsolute:
-        x: 4848
-        y: 702
+        x: 4868
+        y: 1959
       selected: false
       type: custom
       width: 242
@@ -3181,11 +3131,11 @@ workflow:
       height: 84
       id: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
       position:
-        x: 5190
-        y: 686
+        x: 5230
+        y: 1934
       positionAbsolute:
-        x: 5190
-        y: 686
+        x: 5230
+        y: 1934
       selected: false
       type: custom
       width: 242
@@ -3355,11 +3305,11 @@ workflow:
       height: 264
       id: 264d37e7-9580-4d26-be76-4ecdbf32803a
       position:
-        x: 6900
-        y: 596
+        x: 7342
+        y: 2070
       positionAbsolute:
-        x: 6900
-        y: 596
+        x: 7342
+        y: 2070
       selected: false
       type: custom
       width: 242
@@ -3533,11 +3483,11 @@ workflow:
       height: 248
       id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
       position:
-        x: 8268
-        y: 604
+        x: 9112
+        y: 1044
       positionAbsolute:
-        x: 8268
-        y: 604
+        x: 9112
+        y: 1044
       selected: false
       type: custom
       width: 242
@@ -3604,11 +3554,11 @@ workflow:
       height: 436
       id: f9136731-f6e1-472d-8cad-55edaed02022
       position:
-        x: 7584
-        y: 1092
+        x: 8408
+        y: 1383
       positionAbsolute:
-        x: 7584
-        y: 1092
+        x: 8408
+        y: 1383
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3623,17 +3573,18 @@ workflow:
       height: 100
       id: da538de9-c1a6-46e9-b189-9e5978bf6521
       position:
-        x: 7926
-        y: 1027
+        x: 8770
+        y: 1290
       positionAbsolute:
-        x: 7926
-        y: 1027
+        x: 8770
+        y: 1290
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     - data:
-        answer: 'Upload failed: Auth token missing or expired. Please start a new conversation.'
+        answer: 'Upload failed: Auth token missing or expired. Please start a new
+          conversation.'
         selected: false
         title: Upload Err 401
         type: answer
@@ -3641,11 +3592,11 @@ workflow:
       height: 100
       id: eed94bb6-3565-4fbc-944c-3b114211f447
       position:
-        x: 7926
-        y: 1166
+        x: 8770
+        y: 1470
       positionAbsolute:
-        x: 7926
-        y: 1166
+        x: 8770
+        y: 1470
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3659,11 +3610,11 @@ workflow:
       height: 100
       id: 848fa968-67cb-41cc-a287-322536fe9f69
       position:
-        x: 7926
-        y: 1305
+        x: 8770
+        y: 1650
       positionAbsolute:
-        x: 7926
-        y: 1305
+        x: 8770
+        y: 1650
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3677,11 +3628,11 @@ workflow:
       height: 100
       id: 7b04db95-2264-496e-8447-0efb83a7b9a2
       position:
-        x: 7926
-        y: 1444
+        x: 8770
+        y: 1830
       positionAbsolute:
-        x: 7926
-        y: 1444
+        x: 8770
+        y: 1830
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3696,11 +3647,11 @@ workflow:
       height: 100
       id: 608df9da-f21e-4d20-8d01-e4d65fec1256
       position:
-        x: 7926
-        y: 1583
+        x: 8770
+        y: 2010
       positionAbsolute:
-        x: 7926
-        y: 1583
+        x: 8770
+        y: 2010
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3735,11 +3686,11 @@ workflow:
       height: 198
       id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
       position:
-        x: 7242
-        y: 510
+        x: 7684
+        y: 2103
       positionAbsolute:
-        x: 7242
-        y: 510
+        x: 7684
+        y: 2103
       selected: false
       type: custom
       width: 242
@@ -3773,11 +3724,11 @@ workflow:
       height: 198
       id: 50519a54-053f-4c25-9486-ec03eadb94ca
       position:
-        x: 8610
-        y: 510
+        x: 9454
+        y: 1069
       positionAbsolute:
-        x: 8610
-        y: 510
+        x: 9454
+        y: 1069
       selected: false
       type: custom
       width: 242
@@ -3801,11 +3752,11 @@ workflow:
       height: 52
       id: cf4c5fbe-1460-44e4-9775-5650873dfdbd
       position:
-        x: 7584
-        y: 380
+        x: 8046
+        y: 2238
       positionAbsolute:
-        x: 7584
-        y: 380
+        x: 8046
+        y: 2238
       selected: false
       type: custom
       width: 242
@@ -3827,11 +3778,11 @@ workflow:
       height: 84
       id: ee69171b-0c05-4dcb-bcb2-4057a5119579
       position:
-        x: 7926
-        y: 364
+        x: 8388
+        y: 2222
       positionAbsolute:
-        x: 7926
-        y: 364
+        x: 8388
+        y: 2222
       selected: false
       type: custom
       width: 242
@@ -3839,7 +3790,7 @@ workflow:
         cases:
         - case_id: 'true'
           conditions:
-          - comparison_operator: '>='
+          - comparison_operator: '≥'
             id: cmr-cond-exceeded
             value: '3'
             varType: number
@@ -3854,48 +3805,52 @@ workflow:
       height: 148
       id: 76910038-4a13-4647-aee2-30be4c282e31
       position:
-        x: 8268
-        y: 356
+        x: 8730
+        y: 2190
       positionAbsolute:
-        x: 8268
-        y: 356
+        x: 8730
+        y: 2190
       selected: false
       type: custom
       width: 242
     - data:
-        answer: "❌ **Maximum retry attempts reached.**\n\nThe configuration could not\
-          \ be completed automatically after 3 attempts. Please review the errors above\
-          \ and try again with a corrected specification, or describe the corrections\
-          \ you'd like to make."
+        answer: '❌ **Maximum retry attempts reached.**
+
+
+          The configuration could not be completed automatically after 3 attempts.
+          Please review the errors above and try again with a corrected specification,
+          or describe the corrections you''d like to make.'
         selected: false
         title: Max Retries Exhausted
         type: answer
       height: 148
       id: e6b32cb1-406f-47e0-8f96-18b75d76fdf2
       position:
-        x: 8610
-        y: 270
+        x: 9072
+        y: 2190
       positionAbsolute:
-        x: 8610
-        y: 270
+        x: 9072
+        y: 2190
       selected: false
       type: custom
       width: 242
     - data:
-        answer: "❌ **Upload failed and could not be auto-corrected.**\n\nPlease review\
-          \ the error details above. You can describe corrections or upload a revised\
-          \ specification to try again."
+        answer: '❌ **Upload failed and could not be auto-corrected.**
+
+
+          Please review the error details above. You can describe corrections or upload
+          a revised specification to try again.'
         selected: false
         title: Upload Error Report
         type: answer
       height: 148
       id: 0f4603cf-1aab-4b53-a05d-c5cb6f9194c2
       position:
-        x: 8952
-        y: 604
+        x: 9816
+        y: 1114
       positionAbsolute:
-        x: 8952
-        y: 604
+        x: 9816
+        y: 1114
       selected: false
       type: custom
       width: 242
@@ -3962,11 +3917,11 @@ workflow:
       height: 436
       id: '1775380701991'
       position:
-        x: 5842
-        y: 1092
+        x: 6618
+        y: 2052
       positionAbsolute:
-        x: 5842
-        y: 1092
+        x: 6618
+        y: 2052
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3981,11 +3936,11 @@ workflow:
       height: 100
       id: '1775380779498'
       position:
-        x: 6408
-        y: 1027
+        x: 6980
+        y: 2068
       positionAbsolute:
-        x: 6408
-        y: 1027
+        x: 6980
+        y: 2068
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3999,11 +3954,11 @@ workflow:
       height: 100
       id: '1775380796294'
       position:
-        x: 6408
-        y: 1166
+        x: 6980
+        y: 2248
       positionAbsolute:
-        x: 6408
-        y: 1166
+        x: 6980
+        y: 2248
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4017,11 +3972,11 @@ workflow:
       height: 100
       id: '1775380815321'
       position:
-        x: 6408
-        y: 1305
+        x: 6980
+        y: 2428
       positionAbsolute:
-        x: 6408
-        y: 1305
+        x: 6980
+        y: 2428
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4035,11 +3990,11 @@ workflow:
       height: 100
       id: '1775380840852'
       position:
-        x: 6408
-        y: 1444
+        x: 6980
+        y: 2608
       positionAbsolute:
-        x: 6408
-        y: 1444
+        x: 6980
+        y: 2608
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4054,31 +4009,35 @@ workflow:
       height: 100
       id: '1775380857743'
       position:
-        x: 6408
-        y: 1583
+        x: 6980
+        y: 2788
       positionAbsolute:
-        x: 6408
-        y: 1583
+        x: 6980
+        y: 2788
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     - data:
-        answer: "⚠️ **Are you sure you want to delete the entire implementation?**\n\
-          \nThis will remove all Subject Types, Programs, Encounter Types, Forms, and\
-          \ related configuration from the organisation. This action cannot be undone.\n\
-          \nPlease confirm by clicking **Yes** or **No**."
+        answer: '⚠️ **Are you sure you want to delete the entire implementation?**
+
+
+          This will remove all Subject Types, Programs, Encounter Types, Forms, and
+          related configuration from the organisation. This action cannot be undone.
+
+
+          Please confirm by clicking **Yes** or **No**.'
         selected: false
         title: Delete Confirm Prompt
         type: answer
       height: 148
       id: 6494459f-3dee-4fc1-bdff-ff0400aefd52
       position:
-        x: 1368
-        y: 1100
+        x: 1408
+        y: 611
       positionAbsolute:
-        x: 1368
-        y: 1100
+        x: 1408
+        y: 611
       selected: false
       type: custom
       width: 242
@@ -4104,11 +4063,11 @@ workflow:
       height: 190
       id: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88
       position:
-        x: 1710
-        y: 1100
+        x: 1770
+        y: 618
       positionAbsolute:
-        x: 1710
-        y: 1100
+        x: 1770
+        y: 618
       selected: false
       type: custom
       width: 242
@@ -4124,6 +4083,11 @@ workflow:
           type: none
         headers: Content-Type:application/json
         method: delete
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
         selected: false
         timeout:
           connect: 30
@@ -4143,11 +4107,11 @@ workflow:
       height: 178
       id: fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b
       position:
-        x: 2052
-        y: 1100
+        x: 2132
+        y: 457
       positionAbsolute:
-        x: 2052
-        y: 1100
+        x: 2132
+        y: 457
       selected: false
       type: custom
       width: 242
@@ -4170,46 +4134,51 @@ workflow:
       height: 148
       id: 13f1b052-2aed-4126-937d-5a4837d77639
       position:
-        x: 2394
-        y: 1100
+        x: 2474
+        y: 472
       positionAbsolute:
-        x: 2394
-        y: 1100
+        x: 2474
+        y: 472
       selected: false
       type: custom
       width: 242
     - data:
-        answer: "✅ **Implementation deleted successfully.**\n\nAll configuration has\
-          \ been removed. You can start fresh by uploading a new scoping document or\
-          \ describing your requirements."
+        answer: '✅ **Implementation deleted successfully.**
+
+
+          All configuration has been removed. You can start fresh by uploading a new
+          scoping document or describing your requirements.'
         selected: false
         title: Delete Success
         type: answer
       height: 148
       id: c776a305-2e50-42e0-9209-32881d893c32
       position:
-        x: 2736
-        y: 1020
+        x: 2836
+        y: 487
       positionAbsolute:
-        x: 2736
-        y: 1020
+        x: 2836
+        y: 487
       selected: false
       type: custom
       width: 242
     - data:
-        answer: "❌ **Failed to delete implementation.**\n\nThe server returned an error.\
-          \ Please check your auth token is valid and try again."
+        answer: '❌ **Failed to delete implementation.**
+
+
+          The server returned an error. Please check your auth token is valid and
+          try again.'
         selected: false
         title: Delete Failure
         type: answer
       height: 148
       id: 750b6d5a-d7b6-4e8f-8449-b51e3d84f7fd
       position:
-        x: 2736
-        y: 1220
+        x: 2836
+        y: 715
       positionAbsolute:
-        x: 2736
-        y: 1220
+        x: 2836
+        y: 715
       selected: false
       type: custom
       width: 242
@@ -4221,16 +4190,16 @@ workflow:
       height: 116
       id: 3cfb30bf-9386-48db-bfa2-3bd3359cf040
       position:
-        x: 2052
-        y: 1350
+        x: 2132
+        y: 715
       positionAbsolute:
-        x: 2052
-        y: 1350
+        x: 2132
+        y: 715
       selected: false
       type: custom
       width: 242
     viewport:
-      x: -2285.295576146779
-      y: -142.94366930576234
-      zoom: 0.4530137365532593
+      x: 265.86552495973547
+      y: 128.72449020004825
+      zoom: 0.4012755097999517
   rag_pipeline_variables: []

@@ -60,6 +60,10 @@ for i, line in enumerate(lines):
 
 text = ''.join(lines)
 
+# Strip single quotes wrapping UUIDs in source:/target: lines
+import re as _re
+text = _re.sub(r"^(      (?:source|target): )'([0-9a-f\-]+)'$", r'\1\2', text, flags=_re.MULTILINE)
+
 with open(OUTPUT, 'w') as f:
     f.write(text)
 
