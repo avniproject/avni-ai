@@ -4083,17 +4083,25 @@ workflow:
       type: custom
       width: 242
     - data:
-        options:
-        - 'Yes'
-        - 'No'
+        delivery_methods:
+        - enabled: true
+          id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+          type: webapp
+        form_content: ''
+        inputs: []
         selected: false
-        timeout:
-          enabled: true
-          max_wait_time: 120
+        timeout: 2
+        timeout_unit: hour
         title: Delete Confirmation
         type: human-input
-        wait_for_variable: null
-      height: 112
+        user_actions:
+        - button_style: primary
+          id: 'Yes'
+          title: 'Yes'
+        - button_style: default
+          id: 'No'
+          title: 'No'
+      height: 190
       id: delete-confirm-human-input
       position:
         x: 1710

@@ -58,8 +58,8 @@ check_cookies() {
     fi
     # Check if cookies are expired by examining the access token expiry
     local exp
-    exp=$(grep "__Host-access_token" "$COOKIE_FILE" 2>/dev/null | awk '{print $5}')
-    if [[ -n "$exp" && "$exp" -lt "$(date +%s)" ]]; then
+    exp=$(grep "__Host-access_token" "$COOKIE_FILE" 2>/dev/null | head -1 | awk '{print $5}' | tr -d '[:space:]')
+    if [[ -n "$exp" && "$exp" =~ ^[0-9]+$ ]] && (( exp < $(date +%s) )); then
         yellow "Cookies expired. Run '$0 login' to refresh."
         exit 1
     fi
@@ -75,10 +75,11 @@ api() {
     check_cookies
     local csrf
     csrf=$(get_csrf_token)
-    curl -s -X "$method" "${DIFY_HOST}/console/api${path}" \
+    curl -s --max-time 30 -X "$method" "${DIFY_HOST}/console/api${path}" \
         -b "$COOKIE_FILE" \
         -H "X-Csrf-Token: ${csrf}" \
         -H "Content-Type: application/json" \
+        -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
         "$@"
 }
 
@@ -268,7 +269,7 @@ do_publish() {
 
     bold "Publishing workflow for ${app_id}..."
     local response
-    response=$(api POST "/apps/${app_id}/workflows/publish")
+    response=$(api POST "/apps/${app_id}/workflows/publish" -d '{}')
 
     local result
     result=$(echo "$response" | jq -r '.result // empty')
@@ -362,12 +363,26 @@ do_update() {
     local csrf
     csrf=$(get_csrf_token)
 
-    # Update the workflow DSL
-    local response
-    response=$(curl -s -X POST "${DIFY_HOST}/console/api/apps/${app_id}/workflows/draft" \
+    # Fetch current draft hash to avoid 409 conflict
+    local draft_hash
+    draft_hash=$(curl -s --max-time 30 -X GET "${DIFY_HOST}/console/api/apps/${app_id}/workflows/draft" \
         -b "$COOKIE_FILE" \
         -H "X-Csrf-Token: ${csrf}" \
         -H "Content-Type: application/json" \
+        -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
+        | jq -r '.hash // empty')
+    if [[ -n "$draft_hash" ]]; then
+        jq --arg hash "$draft_hash" '. + {hash: $hash}' "$temp_json" > "${temp_json}.hashed" && mv "${temp_json}.hashed" "$temp_json"
+        yellow "Using draft hash: ${draft_hash}"
+    fi
+
+    # Update the workflow DSL
+    local response
+    response=$(curl -s --max-time 60 -X POST "${DIFY_HOST}/console/api/apps/${app_id}/workflows/draft" \
+        -b "$COOKIE_FILE" \
+        -H "X-Csrf-Token: ${csrf}" \
+        -H "Content-Type: application/json" \
+        -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
         -d @"$temp_json")
 
     rm -f "$temp_yaml" "$temp_json"
