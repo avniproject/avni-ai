@@ -66,3 +66,19 @@ form_validation_test_report.*
 
 # Local reference
 ref/
+
+# Dify auth cookies (sensitive)
+*.dify-cookies
+.dify-cookies
+cookies*.txt
+cloud.dify.ai_cookies.txt
+
+# One-off fix scripts
+fix_*.py
+rebuild_*.py
+full_uuid_remap.py
+fix_missing_edges.py
+
+# Generated/exported DSL artifacts in root
+AppConfigV3_*.yml
+App\ Configurator*.yml
