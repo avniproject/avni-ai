@@ -1,0 +1,323 @@
+# Plan: Emulate & Validate Self-Healing App Configurator Flow Against Staging
+
+## Context
+
+The v3 Dify workflow (`dify/App Configurator [Staging] v3.yml`) has a **linear, non-recoverable pipeline**. After spec generation, if bundle validation fails or upload fails, the Error Agent is a dead end — it feeds into the Upload Poll Loop which can only output "done" or "progress", with no path back to fix the spec or regenerate the bundle.
+
+**Goal**: Build a Python emulation script that:
+1. Exercises the full flow against `https://staging-ai.avniproject.org/` using a real scoping document
+2. Implements the iterative PEV (Planner-Executor-Verifier) self-healing loop
+3. Validates all backend endpoints work correctly end-to-end
+4. Produces findings that will inform the reliable v4 Dify workflow design
+
+### User Decisions
+- **Auth**: Read from `.env` file (`AVNI_AUTH_TOKEN`, `AVNI_MCP_SERVER_URL`)
+- **Test input**: Real scoping document (`tests/resources/scoping/Durga India Modelling.xlsx`)
+- **Bundle strategy**: Patch existing bundle (`/download-bundle-b64` + `/patch-bundle`)
+
+### Golden Rules
+1. Keep it simple
+2. Agent nodes in Dify cannot use avni auth token (only HTTP-request nodes)
+3. User persona doesn't know Avni (minimize jargon)
+4. Flow should be self-healing and self-correcting
+
+### AI Design Patterns Applied
+| Pattern | Where | Implementation |
+|---------|-------|----------------|
+| **PEV** | Core macro-loop | Spec Agent plans → HTTP nodes execute bundle/upload → verify status → re-plan on failure |
+| **ReAct** | Spec Agent simulation | generate-spec → validate → observe errors → correct → regenerate |
+| **Reflection** | Spec validation loop | Generate → validate → self-critique → refine |
+| **Dry-Run Harness** | Human confirmation | Show spec summary before bundle generation (simulated as log output in emulation) |
+
+---
+
+## Architecture: The Self-Healing PEV Loop
+
+```
+[Entity Extraction] ─── one-time ───→ [Store Entities]
+                                            │
+                                            ▼
+                                   ┌─── CYCLE CHECK ◄────────────────────┐
+                                   │   (cycle < 3?)                      │
+                                   │      │ no → GIVE UP                 │
+                                   │      │ yes                          │
+                                   │      ▼                              │
+                                   │   SPEC AGENT                       │
+                                   │   (generate → validate → fix)      │
+                                   │      │                              │
+                                   │      ▼                              │
+                                   │   DOWNLOAD EXISTING BUNDLE          │
+                                   │      │                              │
+                                   │      ▼                              │
+                                   │   PATCH BUNDLE                      │
+                                   │      │                              │
+                                   │      ▼                              │
+                                   │   VALIDATE BUNDLE ──invalid──→ DIAGNOSE ──→ loop back
+                                   │      │ valid                        │
+                                   │      ▼                              │
+                                   │   UPLOAD BUNDLE                     │
+                                   │      │                              │
+                                   │      ▼                              │
+                                   │   POLL STATUS                       │
+                                   │      │                              │
+                                   │      ▼                              │
+                                   │   CHECK RESULT                      │
+                                   │    /        \                       │
+                                   │ success    failed ──→ DIAGNOSE ─────┘
+                                   │   │
+                                   │   ▼
+                                   └─ DONE
+```
+
+---
+
+## Implementation Steps
+
+### Step 1: Create emulation test infrastructure
+
+**Files to create:**
+- `tests/emulation/__init__.py`
+- `tests/emulation/app_configurator_flow.py` — Main emulation class
+- `tests/emulation/test_app_configurator_flow.py` — Pytest test cases
+
+### Step 2: Implement `AppConfiguratorFlow` class
+
+Core class that orchestrates the full flow:
+
+```python
+class AppConfiguratorFlow:
+    """Emulates the Dify App Configurator workflow against staging backend."""
+    
+    def __init__(self, base_url, auth_token):
+        self.base_url = base_url
+        self.auth_token = auth_token
+        self.client = httpx.Client(timeout=120)
+        
+        # Conversation state (mirrors Dify conversation variables)
+        self.conversation_id = str(uuid4())
+        self.entities = {}
+        self.spec_yaml = ""
+        self.bundle_zip_b64 = ""
+        self.existing_bundle_b64 = ""
+        self.upload_task_id = ""
+        self.cycle_count = 0
+        self.max_cycles = 3
+        self.error_diagnosis = ""
+```
+
+### Step 3: Implement each phase as a method
+
+**Phase A: Entity Extraction**
+- Read the real scoping document (`tests/resources/scoping/Durga India Modelling.xlsx`)
+- For the emulation, we can either:
+  - Call the Dify workflow's entity extractor via API (if available)
+  - Or use a pre-extracted entities JSON captured from a previous v3 run
+  - Or build a minimal entities dict manually from the known document structure
+- Call `POST /store-entities` with `{conversation_id, entities}`
+- Call `POST /validate-entities` with `{entities}` to check issues
+- Log the validation result (simulates Summary LLM + human confirmation)
+
+**Phase C: Spec Generation (simulating Spec Agent ReAct loop)**
+```python
+def run_spec_agent(self):
+    """Simulate the Spec Agent's ReAct loop."""
+    for attempt in range(3):
+        # If we have error_diagnosis from a previous failed cycle, apply corrections first
+        if self.error_diagnosis:
+            self._apply_corrections_from_diagnosis()
+        
+        # Generate spec
+        resp = self.post("/generate-spec", {"conversation_id": self.conversation_id})
+        self.spec_yaml = resp["spec_yaml"]
+        
+        # Validate spec
+        resp = self.post("/validate-spec", {"spec_yaml": self.spec_yaml})
+        if resp["valid"]:
+            return True
+        
+        # Auto-correct based on validation errors
+        corrections = self._derive_corrections(resp["errors"])
+        if corrections:
+            self.post("/apply-entity-corrections", {
+                "conversation_id": self.conversation_id, 
+                "corrections": corrections
+            })
+        else:
+            break  # Can't auto-fix, proceed anyway
+    return True  # Proceed even with warnings
+```
+
+**Phase D: Bundle Generation & Upload**
+```python
+def run_bundle_generation(self):
+    # D1: Download existing org bundle
+    resp = self.get("/download-bundle-b64", headers={"avni-auth-token": self.auth_token})
+    self.existing_bundle_b64 = resp["bundle_zip_b64"]
+    
+    # D2: Patch bundle with spec
+    resp = self.post("/patch-bundle", {
+        "existing_bundle_b64": self.existing_bundle_b64,
+        "spec_yaml": self.spec_yaml
+    })
+    self.bundle_zip_b64 = resp["patched_bundle_b64"]
+    
+    # D3: Validate bundle
+    resp = self.post("/validate-bundle", {"bundle_zip_b64": self.bundle_zip_b64})
+    if not resp["valid"]:
+        return "bundle_invalid", resp["errors"]
+    
+    # D4: Upload bundle
+    resp = self.post("/upload-bundle", {"bundle_zip_b64": self.bundle_zip_b64},
+                     headers={"avni-auth-token": self.auth_token})
+    self.upload_task_id = resp["task_id"]
+    
+    # D5: Poll status
+    for _ in range(20):
+        time.sleep(3)
+        resp = self.get(f"/upload-status/{self.upload_task_id}")
+        if resp["status"] in ("completed", "failed"):
+            return resp["status"], resp.get("errors", [])
+    
+    return "timeout", ["Upload polling timed out"]
+```
+
+**Phase E: Diagnosis & Retry**
+```python
+def diagnose_and_retry(self, failure_type, errors):
+    """Analyze failure, derive corrections, loop back."""
+    self.error_diagnosis = f"{failure_type}: {errors}"
+    # In real Dify flow, the Diagnose Agent would reason about this
+    # In emulation, we log and let the Spec Agent handle it on next cycle
+```
+
+**Main Loop (PEV)**
+```python
+def run(self):
+    """Execute the full PEV loop."""
+    self.store_and_validate_entities()
+    
+    while self.cycle_count < self.max_cycles:
+        self.cycle_count += 1
+        log(f"=== Cycle {self.cycle_count}/{self.max_cycles} ===")
+        
+        # PLAN: Generate/fix spec
+        self.run_spec_agent()
+        
+        # EXECUTE: Generate bundle, validate, upload
+        status, errors = self.run_bundle_generation()
+        
+        # VERIFY: Check result
+        if status == "completed":
+            log("SUCCESS: Bundle uploaded and imported!")
+            return True
+        
+        # DIAGNOSE: Analyze failure for next cycle
+        self.diagnose_and_retry(status, errors)
+        log(f"Cycle {self.cycle_count} failed: {status}. Retrying...")
+    
+    log(f"FAILED after {self.max_cycles} cycles. Last error: {self.error_diagnosis}")
+    return False
+```
+
+### Step 4: Create pytest test cases
+
+```python
+# tests/emulation/test_app_configurator_flow.py
+
+def test_happy_path():
+    """Full flow succeeds on first cycle."""
+    flow = AppConfiguratorFlow.from_env()
+    flow.entities = load_test_entities()
+    assert flow.run() == True
+    assert flow.cycle_count == 1
+
+def test_spec_validation_recovery():
+    """Spec has validation errors, auto-corrects on second cycle."""
+    flow = AppConfiguratorFlow.from_env()
+    flow.entities = load_entities_with_known_issues()
+    result = flow.run()
+    # Should succeed after auto-correction
+
+def test_max_retries_exhausted():
+    """After 3 failed cycles, flow gives up gracefully."""
+    flow = AppConfiguratorFlow.from_env()
+    flow.entities = load_hopelessly_broken_entities()
+    flow.max_cycles = 3
+    result = flow.run()
+    assert flow.cycle_count == 3
+```
+
+### Step 5: Run against staging and iterate
+
+```bash
+# Load env vars
+source .env
+# Override for staging-ai
+export AVNI_MCP_SERVER_URL="https://staging-ai.avniproject.org/"
+
+# Run the emulation
+python -m pytest tests/emulation/test_app_configurator_flow.py -v -s --tb=long
+```
+
+### Step 6: Document findings for Dify v4 design
+
+Based on emulation results:
+- Which endpoints fail and error patterns
+- Whether patch-bundle works reliably with the staging org's existing config
+- How many cycles the self-healing loop typically needs
+- What correction strategies work for common error types
+- Concrete Spec Agent prompt improvements
+
+---
+
+## Critical Files
+
+| File | Action |
+|------|--------|
+| `tests/emulation/__init__.py` | **CREATE** |
+| `tests/emulation/app_configurator_flow.py` | **CREATE** — Main emulation class |
+| `tests/emulation/test_app_configurator_flow.py` | **CREATE** — Pytest test cases |
+| `tests/resources/scoping/Durga India Modelling.xlsx` | **READ** — Real test input |
+| `.env` | **READ** — Auth token and server URL |
+| `src/handlers/entity_handlers.py` | **READ** — /store-entities, /validate-entities, /apply-entity-corrections contracts |
+| `src/handlers/spec_handlers.py` | **READ** — /generate-spec, /validate-spec, /spec-to-entities, /bundle-to-spec contracts |
+| `src/handlers/bundle_handlers.py` | **READ** — /generate-bundle, /validate-bundle, /patch-bundle, /download-bundle-b64 contracts |
+| `src/handlers/upload_handlers.py` | **READ** — /upload-bundle, /upload-status contracts |
+| `dify/avni-ai-tools-openapi.yaml` | **READ** — OpenAPI endpoint definitions |
+| `dify/App Configurator [Staging] v3.yml` | **READ** — Reference for current flow |
+
+### Existing code to reuse
+- `tests/dify/common/dify_client.py` — DifyClient class (for potential Dify API tests)
+- `tests/judge_framework/implementations/specAgent/spec_agent_executor.py` — SPEC_APPROVED extraction logic
+- `.env` pattern — `AVNI_MCP_SERVER_URL`, `AVNI_AUTH_TOKEN` env vars
+
+---
+
+## Auth Boundary (matches golden rule)
+
+| Endpoint | Needs Auth | Called By |
+|----------|-----------|-----------|
+| `POST /store-entities` | Yes (header) | HTTP-request node |
+| `POST /validate-entities` | No* | Agent tool or HTTP node |
+| `POST /apply-entity-corrections` | No* | Agent tool |
+| `POST /generate-spec` | No* | Agent tool |
+| `POST /validate-spec` | No | Agent tool |
+| `GET /download-bundle-b64` | Yes (header) | HTTP-request node |
+| `POST /patch-bundle` | No | HTTP-request node |
+| `POST /validate-bundle` | No | Agent tool or HTTP node |
+| `POST /upload-bundle` | Yes (header) | HTTP-request node |
+| `GET /upload-status/{task_id}` | No | HTTP-request node or Agent tool |
+
+*These endpoints accept conversation_id to look up stored entities, but don't require auth headers per the OpenAPI spec.
+
+---
+
+## Verification
+
+1. **Endpoint reachability**: Each staging endpoint responds (health check first)
+2. **Entity store/validate round-trip**: Store entities → validate → get validation result
+3. **Spec generation**: generate-spec produces valid YAML → validate-spec confirms
+4. **Bundle patch flow**: download existing → patch with spec → validate patched bundle
+5. **Upload flow**: upload bundle → poll status → completed
+6. **Self-healing loop**: Intentionally break something → diagnose → fix → retry → succeed
+7. **Max retries**: Force 3 failures → graceful termination with diagnosis

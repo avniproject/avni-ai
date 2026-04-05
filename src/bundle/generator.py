@@ -207,6 +207,20 @@ class BundleGenerator:
                 )
                 self.bundle["forms"].append(cancel_form)
 
+                # Register cancellation form concepts so they aren't orphaned
+                for group in cancel_form.get("formElementGroups", []):
+                    for elem in group.get("formElements", []):
+                        concept = elem.get("concept", {})
+                        if concept.get("name") and concept.get("uuid"):
+                            self.concept_generator.generated_concepts.append(
+                                {
+                                    "name": concept["name"],
+                                    "uuid": concept["uuid"],
+                                    "dataType": concept.get("dataType", "Text"),
+                                    "active": True,
+                                }
+                            )
+
             # Generate form mapping
             self._generate_form_mapping(form_spec, form["uuid"])
 
@@ -606,6 +620,22 @@ class BundleGenerator:
         }
         entities = {_key_map.get(k, k): v for k, v in entities.items()}
 
+        # Validate through EntitySpec before generating — catches duplicates and bad cross-refs
+        from ..schemas.bundle_models import EntitySpec as _EntitySpec
+        _reverse_map = {"subjectTypes": "subject_types", "encounterTypes": "encounter_types", "addressLevels": "address_levels"}
+        _norm = {_reverse_map.get(k, k): v for k, v in entities.items()}
+        try:
+            _EntitySpec(
+                subject_types=_norm.get("subject_types", []),
+                programs=_norm.get("programs", []),
+                encounter_types=_norm.get("encounter_types", []),
+                address_levels=_norm.get("address_levels", []),
+                groups=_norm.get("groups", []),
+            )
+        except ValueError as exc:
+            logger.warning("BundleGenerator.generate: EntitySpec validation failed: %s", exc)
+            raise
+
         # Process in server-expected order
         if entities.get("addressLevels"):
             self.process_address_levels(entities["addressLevels"])
@@ -691,8 +721,11 @@ class BundleGenerator:
             )
 
             # 12. Groups and privileges
-            for key in ("groups", "groupPrivileges"):
-                zf.writestr(f"{key}.json", json.dumps(self.bundle[key], indent=2))
+            zf.writestr("groups.json", json.dumps(self.bundle["groups"], indent=2))
+            zf.writestr(
+                "groupPrivilege.json",
+                json.dumps(self.bundle["groupPrivileges"], indent=2),
+            )
 
             # 13. Report cards and dashboards
             zf.writestr(

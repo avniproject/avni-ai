@@ -29,3 +29,9 @@ if not os.getenv("DIFY_API_BASE_URL"):
 AVNI_BASE_URL = os.getenv("AVNI_BASE_URL", "https://staging.avniproject.org")
 DIFY_API_KEY = os.getenv("DIFY_API_KEY")
 DIFY_API_BASE_URL = os.getenv("DIFY_API_BASE_URL", "https://api.dify.ai/v1")
+
+AVNI_ORG_NAME = os.getenv("AVNI_ORG_NAME", "")
+SCOPING_DOC_PATH = os.getenv("SCOPING_DOC_PATH", "")
+MAX_PEV_CYCLES = int(os.getenv("MAX_PEV_CYCLES", "3"))
+POLL_INTERVAL_SECS = float(os.getenv("POLL_INTERVAL_SECS", "3.0"))
+POLL_MAX_ATTEMPTS = int(os.getenv("POLL_MAX_ATTEMPTS", "20"))

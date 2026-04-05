@@ -146,6 +146,22 @@ workflow:
     - existing_bundle_b64
     value: ''
     value_type: string
+  - description: Organisation name persisted across conversation turns
+    id: 7a1b2c3d-e4f5-4678-9a0b-1c2d3e4f5678
+    name: org_name
+    selector:
+    - conversation
+    - org_name
+    value: ''
+    value_type: string
+  - description: PEV retry cycle counter for self-healing loop
+    id: 8b2c3d4e-f5a6-4789-0b1c-2d3e4f567890
+    name: retry_count
+    selector:
+    - conversation
+    - retry_count
+    value: 0
+    value_type: integer
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -371,11 +387,23 @@ workflow:
     - data:
         isInLoop: false
         sourceType: human-input
-        targetType: agent
+        targetType: answer
       id: 5c8dec84-c4d9-4f52-8371-7d194bc49e9c
       selected: false
       source: '1774617205889'
       sourceHandle: 'Yes'
+      target: progress-generating-spec
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: agent
+      id: progress-spec-to-agent
+      selected: false
+      source: progress-generating-spec
+      sourceHandle: source
       target: 3b1db8bf-6e79-4646-9103-077a6ca90299
       targetHandle: target
       type: custom
@@ -383,12 +411,12 @@ workflow:
     - data:
         isInLoop: false
         sourceType: human-input
-        targetType: agent
-      id: confirm-no-to-spec-agent
+        targetType: answer
+      id: confirm-no-to-corrections-prompt
       selected: false
       source: '1774617205889'
       sourceHandle: 'No'
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      target: corrections-prompt-answer
       targetHandle: target
       type: custom
       zIndex: 0
@@ -457,24 +485,105 @@ workflow:
       type: custom
     - data:
         sourceType: assigner
-        targetType: http-request
-      id: edge-saver-to-download
+        targetType: answer
+      id: edge-saver-to-download-progress
       selected: false
       source: spec-saver-001
       sourceHandle: source
+      target: progress-downloading-bundle
+      targetHandle: target
+      type: custom
+    - data:
+        sourceType: answer
+        targetType: http-request
+      id: progress-download-to-http
+      selected: false
+      source: progress-downloading-bundle
+      sourceHandle: source
       target: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
       targetHandle: target
-      targetType: http-request
       type: custom
     - data:
         isInLoop: false
         sourceType: http-request
-        targetType: code
-      id: download-to-build-body
+        targetType: if-else
+      id: download-to-error-check
       selected: false
       source: d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
       sourceHandle: source
+      target: '1775380701991'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: download-error-check-to-build-body
+      selected: false
+      source: '1775380701991'
+      sourceHandle: 'false'
       target: build-patch-body-node
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: download-err-400
+      selected: false
+      source: '1775380701991'
+      sourceHandle: 'true'
+      target: '1775380779498'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: download-err-401
+      selected: false
+      source: '1775380701991'
+      sourceHandle: d26825bc-0735-4704-b42c-eb42f6cb4b67
+      target: '1775380796294'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: download-err-403
+      selected: false
+      source: '1775380701991'
+      sourceHandle: bef31e01-b42e-40cf-9c16-fd9fef71ec17
+      target: '1775380815321'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: download-err-404
+      selected: false
+      source: '1775380701991'
+      sourceHandle: 16b24b6c-aef8-437c-a9e3-18a892d85f37
+      target: '1775380840852'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: download-err-500
+      selected: false
+      source: '1775380701991'
+      sourceHandle: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
+      target: '1775380857743'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -529,10 +638,46 @@ workflow:
     - data:
         isInLoop: false
         sourceType: agent
-        targetType: http-request
-      id: c88fda86-0a85-4272-bdb5-f710f0430bf7
+        targetType: if-else
+      id: review-to-bundle-verdict
       selected: false
       source: 264d37e7-9580-4d26-be76-4ecdbf32803a
+      sourceHandle: source
+      target: check-bundle-verdict
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: bundle-approved-to-progress
+      selected: false
+      source: check-bundle-verdict
+      sourceHandle: case-bundle-approved
+      target: progress-uploading-bundle
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: bundle-approved-default-to-progress
+      selected: false
+      source: check-bundle-verdict
+      sourceHandle: 'false'
+      target: progress-uploading-bundle
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: http-request
+      id: progress-upload-to-http
+      selected: false
+      source: progress-uploading-bundle
       sourceHandle: source
       target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       targetHandle: target
@@ -540,13 +685,97 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: http-request
+        sourceType: if-else
         targetType: code
-      id: b52e7621-1d82-4538-ab09-ee3c1d8dd2c4
+      id: bundle-rejected-to-increment
+      selected: false
+      source: check-bundle-verdict
+      sourceHandle: case-bundle-rejected
+      target: increment-retry-code
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: if-else
+      id: upload-to-error-check
       selected: false
       source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       sourceHandle: source
+      target: upload-error-check
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: upload-error-check-to-parse
+      selected: false
+      source: upload-error-check
+      sourceHandle: 'false'
       target: 6d81a37b-960b-42d3-ae88-5799cd773102
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: upload-err-400
+      selected: false
+      source: upload-error-check
+      sourceHandle: 'true'
+      target: upload-err-400-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: upload-err-401
+      selected: false
+      source: upload-error-check
+      sourceHandle: upload-case-401
+      target: upload-err-401-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: upload-err-403
+      selected: false
+      source: upload-error-check
+      sourceHandle: upload-case-403
+      target: upload-err-403-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: upload-err-404
+      selected: false
+      source: upload-error-check
+      sourceHandle: upload-case-404
+      target: upload-err-404-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: upload-err-500
+      selected: false
+      source: upload-error-check
+      sourceHandle: upload-case-500
+      target: upload-err-500-answer
       targetHandle: target
       type: custom
       zIndex: 0
@@ -577,12 +806,192 @@ workflow:
     - data:
         isInLoop: false
         sourceType: agent
-        targetType: loop
-      id: 4f771046-2c04-491d-89b6-16bf6d444b9a
+        targetType: if-else
+      id: error-agent-to-verdict
       selected: false
       source: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
       sourceHandle: source
+      target: check-error-verdict
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: error-retry-to-increment
+      selected: false
+      source: check-error-verdict
+      sourceHandle: case-retry-bundle
+      target: increment-retry-code
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: error-report-to-answer
+      selected: false
+      source: check-error-verdict
+      sourceHandle: case-error-report
+      target: upload-error-report-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: loop
+      id: error-default-to-poll
+      selected: false
+      source: check-error-verdict
+      sourceHandle: 'false'
       target: '1774617440956'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: delete-config-to-confirm-prompt
+      selected: false
+      source: '1757493270484'
+      sourceHandle: case-delete-config
+      target: delete-confirm-prompt-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: human-input
+      id: delete-prompt-to-human-input
+      selected: false
+      source: delete-confirm-prompt-answer
+      sourceHandle: source
+      target: delete-confirm-human-input
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: http-request
+      id: delete-yes-to-http
+      selected: false
+      source: delete-confirm-human-input
+      sourceHandle: 'Yes'
+      target: delete-implementation-http
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: delete-no-to-cancel
+      selected: false
+      source: delete-confirm-human-input
+      sourceHandle: 'No'
+      target: delete-cancelled-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: delete-timeout-to-cancel
+      selected: false
+      source: delete-confirm-human-input
+      sourceHandle: __timeout
+      target: delete-cancelled-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: if-else
+      id: delete-http-to-result-check
+      selected: false
+      source: delete-implementation-http
+      sourceHandle: source
+      target: delete-result-check
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: delete-success-to-answer
+      selected: false
+      source: delete-result-check
+      sourceHandle: 'true'
+      target: delete-success-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: delete-failure-to-answer
+      selected: false
+      source: delete-result-check
+      sourceHandle: 'false'
+      target: delete-failure-answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: increment-to-save-retry
+      selected: false
+      source: increment-retry-code
+      sourceHandle: source
+      target: save-retry-count
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: save-retry-to-max-check
+      selected: false
+      source: save-retry-count
+      sourceHandle: source
+      target: check-max-retries
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: agent
+      id: retry-under-limit-to-spec
+      selected: false
+      source: check-max-retries
+      sourceHandle: 'false'
+      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: retry-exceeded-to-answer
+      selected: false
+      source: check-max-retries
+      sourceHandle: 'true'
+      target: max-retries-exhausted-answer
       targetHandle: target
       type: custom
       zIndex: 0
@@ -748,6 +1157,18 @@ workflow:
       type: custom
       zIndex: 0
     - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: edge-start-to-org-name-assigner
+      selected: false
+      source: '1711528708197'
+      sourceHandle: source
+      target: org-name-assigner
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
         isInIteration: false
         isInLoop: true
         loop_id: '1774617440956'
@@ -885,6 +1306,32 @@ workflow:
       type: custom
       width: 242
     - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1711528708197'
+          - org_name
+          variable_selector:
+          - conversation
+          - org_name
+          write_mode: over-write
+        selected: false
+        title: Org name assigner
+        type: assigner
+        version: '2'
+      height: 84
+      id: org-name-assigner
+      position:
+        x: 362
+        y: 935
+      positionAbsolute:
+        x: 362
+        y: 935
+      selected: false
+      type: custom
+      width: 242
+    - data:
         dataset_ids:
         - 9TmCqtDyQNUaJCKXT7rPGCd21br8q6JzrrUr4xib3E9uqcfMf6t6rxJkkXFK7EzL
         multiple_retrieval_config:
@@ -953,11 +1400,12 @@ workflow:
             \ non-empty → FILE_SETUP (user is mid-setup; anchor to it even if message\
             \ drifts)\n2. Greeting (hi/hello/thanks) → RAG, clarification_needed=false\n\
             3. Capability question (\"Can Avni\", \"Is it possible\", \"Does Avni\
-            \ support\", \"How does\") → RAG\n4. Implementation request (\"build\"\
-            , \"create\", \"develop\", \"set up for me\", \"delete everything\", \"\
-            clean slate\") → ASSISTANT\n5. Setup intent WITHOUT file (\"I want to\
-            \ set up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n6. Unrelated\
-            \ to Avni → OUT_OF_SCOPE\n7. Anything else Avni-related → RAG\n\n## Deviation\
+            \ support\", \"How does\") → RAG\n4. Delete/reset request (\"delete everything\"\
+            , \"clean slate\", \"start fresh\", \"remove all config\") → DELETE_CONFIG\n\
+            5. Implementation request (\"build\", \"create\", \"develop\", \"set up\
+            \ for me\") → ASSISTANT\n6. Setup intent WITHOUT file (\"I want to\
+            \ set up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n7. Unrelated\
+            \ to Avni → OUT_OF_SCOPE\n8. Anything else Avni-related → RAG\n\n## Deviation\
             \ Handling\nIf setup_mode_active=true and the message is chitchat or out-of-scope,\
             \ still return FILE_SETUP with deviation_detected=true. Do NOT abandon\
             \ the session.\n\n## Clarification Policy\nSet clarification_needed=true\
@@ -965,7 +1413,7 @@ workflow:
             \ one specific missing detail\n- That detail materially changes the answer\n\
             - The session is NOT in setup mode\nMax 2 questions. Each question must\
             \ name exactly what information is expected.\n\n## Response Format\n{\"\
-            service\": \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|OUT_OF_SCOPE\"\
+            service\": \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|DELETE_CONFIG|OUT_OF_SCOPE\"\
             ,\n \"confidence\": 0.0-1.0,\n \"question_type\": \"...\",\n \"routing_reason\"\
             : \"...\",\n \"clarification_needed\": false,\n \"clarifying_questions\"\
             : [],\n \"deviation_detected\": false}\n"
@@ -998,6 +1446,7 @@ workflow:
                 - ASSISTANT
                 - FILE_SETUP
                 - PROGRAM_SETUP_GUIDANCE
+                - DELETE_CONFIG
                 - OUT_OF_SCOPE
                 type: string
             required:
@@ -1095,6 +1544,16 @@ workflow:
             - service
           id: case-setup-guidance
           logical_operator: and
+        - case_id: case-delete-config
+          conditions:
+          - comparison_operator: is
+            value: DELETE_CONFIG
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: case-delete-config
+          logical_operator: and
         - case_id: case-oos
           conditions:
           - comparison_operator: is
@@ -1108,7 +1567,7 @@ workflow:
         selected: false
         title: Main Router
         type: if-else
-      height: 508
+      height: 558
       id: '1757493270484'
       position:
         x: 1026
@@ -1435,9 +1894,7 @@ workflow:
             value: "{\n  \"conversation_id\": \"{{#sys.conversation_id#}}\",\n  \"\
               entities\": {{#conversation.entities_jsonl#}}\n}\n"
           type: json
-        headers: 'Content-Type:application/json
-
-          avni-auth-token:{{#conversation.auth_token#}}'
+        headers: Content-Type:application/json
         method: post
         params: ''
         retry_config:
@@ -1473,11 +1930,9 @@ workflow:
           - id: 7b3e4f5a-c6d7-4e89-a0b1-c2d3e4f5a6b7
             key: ''
             type: text
-            value: "{\n  \"entities\": {{#conversation.entities_jsonl#}}\n}\n"
+            value: "{\n  \"conversation_id\": \"{{#sys.conversation_id#}}\"\n}\n"
           type: json
-        headers: 'Content-Type:application/json
-
-          avni-auth-token:{{#conversation.auth_token#}}'
+        headers: Content-Type:application/json
         method: post
         params: ''
         retry_config:
@@ -2081,8 +2536,20 @@ workflow:
           **Confidence score:**  {{#4eb75ab2-87de-48f6-b52e-35f8646da88d.confidence#}}
 
 
-          You can now log into Avni to review your configuration. If you need to make
-          changes, just upload an updated specification or describe the corrections.'
+          **Next steps:**
+
+          1. Log into [Avni](https://app.avniproject.org) to review your configuration
+
+          2. Check Subject Types, Programs, Encounter Types, and Forms in the Admin
+          panel
+
+          3. Verify form fields and mappings are correct
+
+          4. Test the workflow by creating a sample subject
+
+
+          If you need to make changes, just upload an updated specification or describe
+          the corrections in this chat.'
         isInLoop: true
         loop_id: '1774617440956'
         selected: false
@@ -2135,6 +2602,74 @@ workflow:
       positionAbsolute:
         x: 4506
         y: 940
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: "Please describe the corrections you'd like to make. For example:\n\
+          - \"Remove program X\"\n- \"Change encounter type Y to scheduled\"\n- \"\
+          Add a new subject type called Z\"\n\nI'll update the configuration and show\
+          \ you a revised summary."
+        selected: false
+        title: Corrections Prompt
+        type: answer
+      height: 148
+      id: corrections-prompt-answer
+      position:
+        x: 4506
+        y: 1120
+      positionAbsolute:
+        x: 4506
+        y: 1120
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: "\U0001F504 Generating configuration spec from your confirmed entities.\
+          \ This may take a moment..."
+        selected: false
+        title: 'Progress: Generating Spec'
+        type: answer
+      height: 116
+      id: progress-generating-spec
+      position:
+        x: 4506
+        y: 510
+      positionAbsolute:
+        x: 4506
+        y: 510
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: "\U0001F4E5 Downloading existing bundle from Avni..."
+        selected: false
+        title: 'Progress: Downloading Bundle'
+        type: answer
+      height: 116
+      id: progress-downloading-bundle
+      position:
+        x: 5190
+        y: 510
+      positionAbsolute:
+        x: 5190
+        y: 510
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: "\U0001F4E4 Uploading bundle to Avni server..."
+        selected: false
+        title: 'Progress: Uploading Bundle'
+        type: answer
+      height: 116
+      id: progress-uploading-bundle
+      position:
+        x: 6900
+        y: 510
+      positionAbsolute:
+        x: 6900
+        y: 510
       selected: false
       type: custom
       width: 242
@@ -3006,8 +3541,688 @@ workflow:
       selected: false
       type: custom
       width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000001
+            value: '400'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: 'true'
+          logical_operator: and
+        - case_id: upload-case-401
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000002
+            value: '401'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: upload-case-401
+          logical_operator: and
+        - case_id: upload-case-403
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000003
+            value: '403'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: upload-case-403
+          logical_operator: and
+        - case_id: upload-case-404
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000004
+            value: '404'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: upload-case-404
+          logical_operator: and
+        - case_id: upload-case-500
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000005
+            value: '500'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: upload-case-500
+          logical_operator: and
+        selected: false
+        title: Upload Error Check
+        type: if-else
+      height: 436
+      id: upload-error-check
+      position:
+        x: 7584
+        y: 1092
+      positionAbsolute:
+        x: 7584
+        y: 1092
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: bad request format'
+        selected: false
+        title: Upload Err 400
+        type: answer
+        variables: []
+      height: 100
+      id: upload-err-400-answer
+      position:
+        x: 7926
+        y: 1027
+      positionAbsolute:
+        x: 7926
+        y: 1027
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: Auth token missing or expired. Please start a new conversation.'
+        selected: false
+        title: Upload Err 401
+        type: answer
+        variables: []
+      height: 100
+      id: upload-err-401-answer
+      position:
+        x: 7926
+        y: 1166
+      positionAbsolute:
+        x: 7926
+        y: 1166
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: Unauthorized access'
+        selected: false
+        title: Upload Err 403
+        type: answer
+        variables: []
+      height: 100
+      id: upload-err-403-answer
+      position:
+        x: 7926
+        y: 1305
+      positionAbsolute:
+        x: 7926
+        y: 1305
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: Entity not found'
+        selected: false
+        title: Upload Err 404
+        type: answer
+        variables: []
+      height: 100
+      id: upload-err-404-answer
+      position:
+        x: 7926
+        y: 1444
+      positionAbsolute:
+        x: 7926
+        y: 1444
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: Server error. Please try again later.'
+        selected: false
+        title: Upload Err 500
+        type: answer
+        variables: []
+      height: 100
+      id: upload-err-500-answer
+      position:
+        x: 7926
+        y: 1583
+      positionAbsolute:
+        x: 7926
+        y: 1583
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: case-bundle-approved
+          conditions:
+          - comparison_operator: contains
+            id: cbv-cond-approved
+            value: BUNDLE_APPROVED
+            varType: string
+            variable_selector:
+            - 264d37e7-9580-4d26-be76-4ecdbf32803a
+            - text
+          id: case-bundle-approved
+          logical_operator: and
+        - case_id: case-bundle-rejected
+          conditions:
+          - comparison_operator: contains
+            id: cbv-cond-rejected
+            value: BUNDLE_REJECTED
+            varType: string
+            variable_selector:
+            - 264d37e7-9580-4d26-be76-4ecdbf32803a
+            - text
+          id: case-bundle-rejected
+          logical_operator: and
+        selected: false
+        title: Check Bundle Verdict
+        type: if-else
+      height: 198
+      id: check-bundle-verdict
+      position:
+        x: 7242
+        y: 510
+      positionAbsolute:
+        x: 7242
+        y: 510
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: case-retry-bundle
+          conditions:
+          - comparison_operator: contains
+            id: cev-cond-retry
+            value: RETRY_BUNDLE
+            varType: string
+            variable_selector:
+            - f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+            - text
+          id: case-retry-bundle
+          logical_operator: and
+        - case_id: case-error-report
+          conditions:
+          - comparison_operator: contains
+            id: cev-cond-error
+            value: ERROR_REPORT
+            varType: string
+            variable_selector:
+            - f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+            - text
+          id: case-error-report
+          logical_operator: and
+        selected: false
+        title: Check Error Verdict
+        type: if-else
+      height: 198
+      id: check-error-verdict
+      position:
+        x: 8610
+        y: 510
+      positionAbsolute:
+        x: 8610
+        y: 510
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        code: "def main(current_count: int) -> dict:\n    return {\"new_count\": (current_count\
+          \ or 0) + 1}\n"
+        code_language: python3
+        outputs:
+          new_count:
+            children: null
+            type: number
+        selected: false
+        title: Increment Retry
+        type: code
+        variables:
+        - value_selector:
+          - conversation
+          - retry_count
+          value_type: number
+          variable: current_count
+      height: 52
+      id: increment-retry-code
+      position:
+        x: 7584
+        y: 380
+      positionAbsolute:
+        x: 7584
+        y: 380
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - increment-retry-code
+          - new_count
+          variable_selector:
+          - conversation
+          - retry_count
+          write_mode: over-write
+        selected: false
+        title: Save Retry Count
+        type: assigner
+        version: '2'
+      height: 84
+      id: save-retry-count
+      position:
+        x: 7926
+        y: 364
+      positionAbsolute:
+        x: 7926
+        y: 364
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: '>='
+            id: cmr-cond-exceeded
+            value: '3'
+            varType: number
+            variable_selector:
+            - increment-retry-code
+            - new_count
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: Check Max Retries
+        type: if-else
+      height: 148
+      id: check-max-retries
+      position:
+        x: 8268
+        y: 356
+      positionAbsolute:
+        x: 8268
+        y: 356
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: "❌ **Maximum retry attempts reached.**\n\nThe configuration could not\
+          \ be completed automatically after 3 attempts. Please review the errors above\
+          \ and try again with a corrected specification, or describe the corrections\
+          \ you'd like to make."
+        selected: false
+        title: Max Retries Exhausted
+        type: answer
+      height: 148
+      id: max-retries-exhausted-answer
+      position:
+        x: 8610
+        y: 270
+      positionAbsolute:
+        x: 8610
+        y: 270
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: "❌ **Upload failed and could not be auto-corrected.**\n\nPlease review\
+          \ the error details above. You can describe corrections or upload a revised\
+          \ specification to try again."
+        selected: false
+        title: Upload Error Report
+        type: answer
+      height: 148
+      id: upload-error-report-answer
+      position:
+        x: 8952
+        y: 604
+      positionAbsolute:
+        x: 8952
+        y: 604
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: '='
+            id: 672c5bec-9261-4ee1-a82d-2b743caa821b
+            value: '400'
+            varType: number
+            variable_selector:
+            - d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+            - status_code
+          id: 'true'
+          logical_operator: and
+        - case_id: d26825bc-0735-4704-b42c-eb42f6cb4b67
+          conditions:
+          - comparison_operator: '='
+            id: 4c421e43-485e-4ed1-857d-d7d121c4e3fe
+            value: '401'
+            varType: number
+            variable_selector:
+            - d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+            - status_code
+          id: d26825bc-0735-4704-b42c-eb42f6cb4b67
+          logical_operator: and
+        - case_id: bef31e01-b42e-40cf-9c16-fd9fef71ec17
+          conditions:
+          - comparison_operator: '='
+            id: 191a228d-f21b-4e30-aa99-cdaf8f14df5a
+            value: '403'
+            varType: number
+            variable_selector:
+            - d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+            - status_code
+          id: bef31e01-b42e-40cf-9c16-fd9fef71ec17
+          logical_operator: and
+        - case_id: 16b24b6c-aef8-437c-a9e3-18a892d85f37
+          conditions:
+          - comparison_operator: '='
+            id: bde8bc5c-7b23-4a53-965f-5092fa64ed6c
+            value: '404'
+            varType: number
+            variable_selector:
+            - d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+            - status_code
+          id: 16b24b6c-aef8-437c-a9e3-18a892d85f37
+          logical_operator: and
+        - case_id: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
+          conditions:
+          - comparison_operator: '='
+            id: 42dce423-7b96-4112-a0a1-f15e66b21422
+            value: '500'
+            varType: number
+            variable_selector:
+            - d7e8f9a0-b1c2-4d3e-f4a5-b6c7d8e9f0a1
+            - status_code
+          id: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
+          logical_operator: and
+        selected: false
+        title: IF/ELSE 4
+        type: if-else
+      height: 436
+      id: '1775380701991'
+      position:
+        x: 5842
+        y: 1092
+      positionAbsolute:
+        x: 5842
+        y: 1092
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: bad request format
+        selected: false
+        title: Answer 10
+        type: answer
+        variables: []
+      height: 100
+      id: '1775380779498'
+      position:
+        x: 6408
+        y: 1027
+      positionAbsolute:
+        x: 6408
+        y: 1027
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: Auth token missing or expired
+        selected: false
+        title: Answer 11
+        type: answer
+        variables: []
+      height: 100
+      id: '1775380796294'
+      position:
+        x: 6408
+        y: 1166
+      positionAbsolute:
+        x: 6408
+        y: 1166
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Unauthorized access '
+        selected: false
+        title: Answer 12
+        type: answer
+        variables: []
+      height: 100
+      id: '1775380815321'
+      position:
+        x: 6408
+        y: 1305
+      positionAbsolute:
+        x: 6408
+        y: 1305
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: Entity not found
+        selected: false
+        title: Answer 13
+        type: answer
+        variables: []
+      height: 100
+      id: '1775380840852'
+      position:
+        x: 6408
+        y: 1444
+      positionAbsolute:
+        x: 6408
+        y: 1444
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: server error
+        selected: false
+        title: Answer 14
+        type: answer
+        variables: []
+      height: 100
+      id: '1775380857743'
+      position:
+        x: 6408
+        y: 1583
+      positionAbsolute:
+        x: 6408
+        y: 1583
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: "⚠️ **Are you sure you want to delete the entire implementation?**\n\
+          \nThis will remove all Subject Types, Programs, Encounter Types, Forms, and\
+          \ related configuration from the organisation. This action cannot be undone.\n\
+          \nPlease confirm by clicking **Yes** or **No**."
+        selected: false
+        title: Delete Confirm Prompt
+        type: answer
+      height: 148
+      id: delete-confirm-prompt-answer
+      position:
+        x: 1368
+        y: 1100
+      positionAbsolute:
+        x: 1368
+        y: 1100
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        options:
+        - 'Yes'
+        - 'No'
+        selected: false
+        timeout:
+          enabled: true
+          max_wait_time: 120
+        title: Delete Confirmation
+        type: human-input
+        wait_for_variable: null
+      height: 112
+      id: delete-confirm-human-input
+      position:
+        x: 1710
+        y: 1100
+      positionAbsolute:
+        x: 1710
+        y: 1100
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config:
+            api_key: ''
+            header: avni-auth-token
+            type: custom
+          type: api-key
+        body:
+          data: ''
+          type: none
+        headers: Content-Type:application/json
+        method: delete
+        selected: false
+        timeout:
+          connect: 30
+          max_connect_timeout: 300
+          max_read_timeout: 600
+          max_write_timeout: 600
+          read: 120
+          write: 120
+        title: Delete Implementation
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}/api/implementation'
+        variables:
+        - value_selector:
+          - conversation
+          - auth_token
+          variable: auth_token
+      height: 178
+      id: delete-implementation-http
+      position:
+        x: 2052
+        y: 1100
+      positionAbsolute:
+        x: 2052
+        y: 1100
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: '='
+            id: drc-cond-200
+            value: '200'
+            varType: number
+            variable_selector:
+            - delete-implementation-http
+            - status_code
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: Delete Result Check
+        type: if-else
+      height: 148
+      id: delete-result-check
+      position:
+        x: 2394
+        y: 1100
+      positionAbsolute:
+        x: 2394
+        y: 1100
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: "✅ **Implementation deleted successfully.**\n\nAll configuration has\
+          \ been removed. You can start fresh by uploading a new scoping document or\
+          \ describing your requirements."
+        selected: false
+        title: Delete Success
+        type: answer
+      height: 148
+      id: delete-success-answer
+      position:
+        x: 2736
+        y: 1020
+      positionAbsolute:
+        x: 2736
+        y: 1020
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: "❌ **Failed to delete implementation.**\n\nThe server returned an error.\
+          \ Please check your auth token is valid and try again."
+        selected: false
+        title: Delete Failure
+        type: answer
+      height: 148
+      id: delete-failure-answer
+      position:
+        x: 2736
+        y: 1220
+      positionAbsolute:
+        x: 2736
+        y: 1220
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: Delete operation cancelled. Your current configuration remains unchanged.
+        selected: false
+        title: Delete Cancelled
+        type: answer
+      height: 116
+      id: delete-cancelled-answer
+      position:
+        x: 2052
+        y: 1350
+      positionAbsolute:
+        x: 2052
+        y: 1350
+      selected: false
+      type: custom
+      width: 242
     viewport:
-      x: -2739.81726387944
-      y: -252.46483571443423
-      zoom: 0.7474091816971831
+      x: -2285.295576146779
+      y: -142.94366930576234
+      zoom: 0.4530137365532593
   rag_pipeline_variables: []

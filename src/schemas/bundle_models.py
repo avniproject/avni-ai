@@ -26,11 +26,14 @@ class FieldSpec(BaseModel):
     name: str
     dataType: str = "Text"
     mandatory: bool = False
+    group: str | None = None
     unit: str | None = None
     min: float | None = None
     max: float | None = None
     options: list[str] | None = None
+    selectionType: str | None = None
     skipLogic: SkipLogicSpec | None = None
+    keyValues: dict[str, Any] | None = None
 
 
 # ── Form-level ─────────────────────────────────────────────────────────────────
@@ -100,8 +103,64 @@ class EntitySpec(BaseModel):
     forms: list[FormSpec] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def at_least_one_subject_type(self) -> "EntitySpec":
+    def validate_no_duplicates_and_cross_refs(self) -> "EntitySpec":
+        errors: list[str] = []
+
+        # ── Duplicate checks ──────────────────────────────────────────────────
+        def _check_dupes(items: list, label: str) -> set[str]:
+            seen: set[str] = set()
+            dupes: set[str] = set()
+            for item in items:
+                name = getattr(item, "name", "").strip()
+                if not name:
+                    continue
+                key = name.lower()
+                if key in seen:
+                    dupes.add(name)
+                    errors.append(f"Duplicate {label}: '{name}'")
+                seen.add(key)
+            return seen
+
+        st_names = _check_dupes(self.subject_types, "subject_type")
+        prog_names = _check_dupes(self.programs, "program")
+        _check_dupes(self.encounter_types, "encounter_type")
+        _check_dupes(self.address_levels, "address_level")
+
+        # ── Cross-reference checks ────────────────────────────────────────────
+        for prog in self.programs:
+            target = (prog.target_subject_type or "").strip()
+            if target and target.lower() not in st_names:
+                errors.append(
+                    f"Program '{prog.name}' references unknown subject_type '{target}'"
+                )
+
+        for enc in self.encounter_types:
+            prog_ref = (enc.program_name or "").strip()
+            st_ref = (enc.subject_type or "").strip()
+            if prog_ref and prog_ref.lower() not in prog_names:
+                errors.append(
+                    f"EncounterType '{enc.name}' references unknown program '{prog_ref}'"
+                )
+            if st_ref and st_ref.lower() not in st_names:
+                errors.append(
+                    f"EncounterType '{enc.name}' references unknown subject_type '{st_ref}'"
+                )
+
+        if errors:
+            raise ValueError("EntitySpec validation failed:\n" + "\n".join(f"  - {e}" for e in errors))
+
         return self
+
+    def to_entities_dict(self) -> dict:
+        """Return a plain dict compatible with AppConfiguratorFlow.state.entities_jsonl."""
+        return {
+            "subject_types": [st.model_dump() for st in self.subject_types],
+            "programs": [p.model_dump() for p in self.programs],
+            "encounter_types": [e.model_dump() for e in self.encounter_types],
+            "address_levels": [a.model_dump() for a in self.address_levels],
+            "groups": [g.model_dump() for g in self.groups],
+            "forms": [f.model_dump() for f in self.forms],
+        }
 
 
 # ── Request bodies ─────────────────────────────────────────────────────────────

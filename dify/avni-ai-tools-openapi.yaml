@@ -273,7 +273,7 @@ paths:
   /validate-bundle:
     post:
       operationId: validate_bundle
-      summary: Validate a generated bundle ZIP for structural correctness
+      summary: Validate a generated bundle for structural correctness
       requestBody:
         required: true
         content:
@@ -281,11 +281,11 @@ paths:
             schema:
               type: object
               properties:
-                bundle_zip_b64:
-                  type: string
-                  description: Base64 encoded bundle ZIP to validate
+                bundle:
+                  type: object
+                  description: Bundle JSON dict to validate (not base64, not a ZIP)
               required:
-                - bundle_zip_b64
+                - bundle
       responses:
         '200':
           description: Validation result
@@ -308,7 +308,8 @@ paths:
   /patch-bundle:
     post:
       operationId: patch_bundle
-      summary: Patch an existing bundle with corrections
+      summary: Patch an existing bundle ZIP with a new spec
+      description: Decodes the existing bundle, generates a fresh bundle from the spec, and applies patches (voiding stale forms/mappings).
       requestBody:
         required: true
         content:
@@ -319,11 +320,12 @@ paths:
                 existing_bundle_b64:
                   type: string
                   description: Base64 encoded existing bundle ZIP
-                corrections:
-                  type: object
-                  description: Corrections to apply to the bundle
+                spec_yaml:
+                  type: string
+                  description: Approved YAML spec string to generate the patched bundle from
               required:
                 - existing_bundle_b64
+                - spec_yaml
       responses:
         '200':
           description: Patched bundle

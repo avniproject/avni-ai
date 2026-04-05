@@ -21,28 +21,19 @@ def _load_uuid_registry() -> dict[str, str]:
 UUID_REGISTRY: dict[str, str] = _load_uuid_registry()
 
 
-def _java_string_hash(seed: str) -> int:
-    """Replicate JS hash: hash = ((hash << 5) - hash) + charCode; hash &= hash."""
-    h = 0
-    for ch in seed:
-        h = ((h << 5) - h) + ord(ch)
-        h &= 0xFFFFFFFF  # keep 32-bit
-        if h >= 0x80000000:
-            h -= 0x100000000
-    return h
+# Stable namespace for all Avni deterministic UUIDs
+_AVNI_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, "avni.project.org")
 
 
 def generate_deterministic_uuid(seed: str) -> str:
     """
-    Produce a UUID whose first 8 hex chars are derived from *seed*
-    and the remainder is a random UUID v4 tail.  This matches the JS:
-        const hex = Math.abs(hash).toString(16).padStart(8, '0');
-        return `${hex.substring(0, 8)}-${uuidv4().substring(9)}`;
+    Produce a fully deterministic UUID v5 from *seed*.
+
+    Same seed always yields the same UUID — this guarantees that
+    re-running the generator produces identical bundles, enabling
+    idempotent re-uploads (Avni upserts by UUID).
     """
-    h = abs(_java_string_hash(seed))
-    prefix = format(h, "x").zfill(8)[:8]
-    tail = str(uuid.uuid4())[9:]  # everything after first 8+dash
-    return f"{prefix}-{tail}"
+    return str(uuid.uuid5(_AVNI_NAMESPACE, seed))
 
 
 def lookup_answer_uuid(name: str) -> str | None:

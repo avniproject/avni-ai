@@ -7,9 +7,14 @@ and returns an entities dict that can be fed directly into BundleGenerator.gener
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import yaml
+
+from ..schemas.bundle_models import EntitySpec
+
+logger = logging.getLogger(__name__)
 
 
 def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
@@ -136,6 +141,19 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
         )
     if not entities["groups"]:
         entities["groups"] = [{"name": "Everyone", "has_all_privileges": False}]
+
+    # Validate through EntitySpec — catches duplicates and cross-ref errors early
+    try:
+        EntitySpec(
+            subject_types=entities["subject_types"],
+            programs=entities["programs"],
+            encounter_types=entities["encounter_types"],
+            address_levels=entities["address_levels"],
+            groups=entities["groups"],
+        )
+    except ValueError as exc:
+        logger.warning("spec_to_entities: EntitySpec validation warnings: %s", exc)
+        raise
 
     return entities
 

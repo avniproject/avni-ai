@@ -7,9 +7,14 @@ into the human-readable YAML spec format defined in avni-ai-iterative-dev-plan.m
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import yaml
+
+from ..schemas.bundle_models import EntitySpec
+
+logger = logging.getLogger(__name__)
 
 
 def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
@@ -19,10 +24,22 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
     entities keys: subject_types, programs, encounter_types, address_levels,
                    groups, forms (optional)
     """
+    # Validate through EntitySpec — catches duplicates and cross-ref errors before YAML generation
+    try:
+        EntitySpec(
+            subject_types=entities.get("subject_types", []),
+            programs=entities.get("programs", []),
+            encounter_types=entities.get("encounter_types", []),
+            address_levels=entities.get("address_levels", []),
+            groups=entities.get("groups", []),
+        )
+    except ValueError as exc:
+        logger.warning("entities_to_spec: EntitySpec validation failed: %s", exc)
+        raise
+
     spec: dict[str, Any] = {}
 
-    if org_name:
-        spec["org"] = org_name
+    spec["org"] = org_name or "Unknown Organization"
 
     spec["settings"] = {"languages": ["en"], "enableComments": True}
 

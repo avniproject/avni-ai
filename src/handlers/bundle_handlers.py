@@ -7,13 +7,14 @@ Endpoints: POST /generate-bundle, POST /validate-bundle, GET /download-bundle,
 from __future__ import annotations
 
 import base64
+import json
 import logging
 
 import httpx
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-from ..bundle.canonical_zip import patch_bundle_zip
+from ..bundle.canonical_zip import patch_bundle_zip, unzip_to_map
 from ..bundle.generator import BundleGenerator
 from ..bundle.spec_parser import spec_to_entities
 from ..bundle.validators import BundleValidator
@@ -311,10 +312,59 @@ async def handle_patch_bundle(request: Request) -> JSONResponse:
                 "utf-8"
             )
 
-        # 5. Apply patches to existing ZIP
+        # 5. Void stale forms and formMappings from the existing bundle.
+        # "Stale" = present in the existing bundle but NOT in the new spec (by UUID).
+        # Entries present in both are replaced by the new spec's version (Avni upserts by UUID),
+        # so we must NOT void those — that would create ghost-voided duplicates on re-runs.
+        existing_file_map = unzip_to_map(existing_zip_bytes)
+
+        # Build the set of UUIDs produced by the new spec's formMappings
+        new_fm_bytes = patches.get("formMappings.json", b"[]")
+        new_fm: list = json.loads(new_fm_bytes) if new_fm_bytes else []
+        new_fm_uuids = {m.get("uuid") for m in new_fm if m.get("uuid")}
+
+        # Void only formMappings whose UUID is absent from the new spec
+        if "formMappings.json" in existing_file_map:
+            try:
+                existing_fm = json.loads(existing_file_map["formMappings.json"])
+                if isinstance(existing_fm, list):
+                    stale_fm = [
+                        {**m, "isVoided": True}
+                        for m in existing_fm
+                        if m.get("uuid") not in new_fm_uuids
+                    ]
+                    if stale_fm:
+                        # Merge: voided-stale first so Avni deactivates them, then fresh entries
+                        patches["formMappings.json"] = json.dumps(stale_fm + new_fm, indent=2).encode("utf-8")
+                        logger.info(
+                            "patch-bundle: voided %d stale formMappings, kept %d new",
+                            len(stale_fm), len(new_fm),
+                        )
+                    # else: no stale mappings — new spec's formMappings.json patch is already correct
+            except Exception as exc:
+                logger.warning("patch-bundle: could not process existing formMappings: %s", exc)
+
+        # Void only forms whose name is absent from the new spec (stale forms like old MCH forms)
+        new_form_names = {form.get("name", "") for form in fresh_bundle.get("forms", [])}
+        for zip_entry, content_bytes in existing_file_map.items():
+            if not zip_entry.startswith("forms/") or zip_entry in patches:
+                continue
+            form_name = zip_entry[len("forms/"):]
+            if form_name.endswith(".json"):
+                form_name = form_name[:-5]
+            if form_name not in new_form_names:
+                try:
+                    existing_form = json.loads(content_bytes)
+                    if isinstance(existing_form, dict):
+                        patches[zip_entry] = json.dumps({**existing_form, "isVoided": True}, indent=2).encode("utf-8")
+                        logger.info("patch-bundle: voided stale form '%s'", zip_entry)
+                except Exception:
+                    pass
+
+        # 6. Apply patches to existing ZIP
         patched_zip = patch_bundle_zip(existing_zip_bytes, patches)
 
-        # 6. Return result
+        # 7. Return result
         patched_b64 = base64.b64encode(patched_zip).decode("ascii")
 
         return JSONResponse(
