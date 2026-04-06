@@ -94,8 +94,32 @@ async def handle_validate_bundle(request: Request) -> JSONResponse:
 
     bundle = body.get("bundle")
     if not bundle:
+        b64 = body.get("bundle_zip_b64", "")
+        if b64:
+            try:
+                zip_bytes = base64.b64decode(b64)
+                file_map = unzip_to_map(zip_bytes)
+                bundle = {}
+                forms = []
+                for fname, fbytes in file_map.items():
+                    try:
+                        parsed = json.loads(fbytes)
+                    except Exception:
+                        continue
+                    if fname.startswith("forms/"):
+                        forms.append(parsed)
+                    else:
+                        key = fname.replace(".json", "")
+                        bundle[key] = parsed
+                if forms:
+                    bundle["forms"] = forms
+            except Exception as e:
+                return JSONResponse(
+                    {"error": f"Failed to decode bundle_zip_b64: {e}"}, status_code=400
+                )
+    if not bundle:
         return JSONResponse(
-            {"error": "Missing 'bundle' in request body"}, status_code=400
+            {"error": "Missing 'bundle' or 'bundle_zip_b64' in request body"}, status_code=400
         )
 
     try:

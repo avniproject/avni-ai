@@ -284,8 +284,9 @@ paths:
                 bundle:
                   type: object
                   description: Bundle JSON dict to validate (not base64, not a ZIP)
-              required:
-                - bundle
+                bundle_zip_b64:
+                  type: string
+                  description: Base64 encoded bundle ZIP — alternative to bundle dict; server decodes internally
       responses:
         '200':
           description: Validation result

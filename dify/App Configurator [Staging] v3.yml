@@ -3233,19 +3233,31 @@ workflow:
         agent_parameters:
           instruction:
             type: constant
-            value: 'You are the Review Agent for the Avni App Configurator. Your task
-              is to inspect the generated bundle before uploading to Avni.
+            value: 'You are the Review Agent. You have ONE job: validate the bundle
+              and output a verdict token.
 
 
-              Workflow:
+              Step 1 — Call validate_bundle immediately. Pass bundle_zip_b64 from
+              context (conversation variable bundle_zip_b64).
 
-              1. Call validate_bundle — it will automatically use the bundle from
-              context.
+              Step 2 — Read the result:
 
-              2. If there are errors, report them and output BUNDLE_REJECTED with
-              error details. Stop.
+              - If valid=true and errors=[]: your entire response must be exactly:
+              BUNDLE_APPROVED
 
-              3. If validation passes, output BUNDLE_APPROVED.'
+              - If valid=false or errors is non-empty: your entire response must
+              start with: BUNDLE_REJECTED: followed by the error list.
+
+
+              RULES:
+
+              - Call validate_bundle exactly once. No other tool calls.
+
+              - Do NOT write any preamble, greeting, or explanation before the verdict.
+
+              - Do NOT ask the user any questions.
+
+              - Your response MUST begin with BUNDLE_APPROVED or BUNDLE_REJECTED.'
           maximum_iterations:
             type: constant
             value: 3
@@ -3344,7 +3356,7 @@ workflow:
               tool_label: validate_bundle
               tool_name: validate_bundle
               type: api
-            - enabled: true
+            - enabled: false
               extra:
                 description: Convert an existing bundle to human-readable YAML spec
               parameters:
@@ -3379,8 +3391,8 @@ workflow:
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
         agent_strategy_provider_name: langgenius/agent/agent
-        desc: Inspects generated bundle before upload. Validates bundle, optionally
-          converts to spec for diff, then proceeds to upload.
+        desc: Inspects generated bundle before upload. Validates bundle ZIP using
+          bundle_zip_b64 from context, outputs BUNDLE_APPROVED or BUNDLE_REJECTED.
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
         selected: false
