@@ -224,7 +224,7 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
 async def handle_patch_bundle(request: Request) -> JSONResponse:
     """
     POST /patch-bundle
-    Body: { "existing_bundle_b64": "...", "spec_yaml": "..." }
+    Body: multipart/form-data with fields existing_bundle_b64 and spec_yaml
     No auth needed — deterministic local processing.
 
     Flow:
@@ -236,15 +236,18 @@ async def handle_patch_bundle(request: Request) -> JSONResponse:
       6. Re-zip using canonical order
       7. Return patched ZIP as base64
     """
-    import json
-
+    content_type = request.headers.get("content-type", "")
+    logger.info("patch-bundle: content-type=%r", content_type)
     try:
-        body = await request.json()
-    except Exception:
-        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
-
-    existing_b64 = body.get("existing_bundle_b64")
-    spec_yaml = body.get("spec_yaml")
+        form = await request.form()
+    except Exception as e:
+        logger.error("patch-bundle: form parse failed: %s", e)
+        return JSONResponse({"error": f"Form parse failed: {e}"}, status_code=400)
+    existing_b64 = form.get("existing_bundle_b64")
+    spec_yaml = form.get("spec_yaml")
+    logger.info("patch-bundle: existing_b64 len=%s spec_yaml len=%s",
+                len(existing_b64) if existing_b64 else "MISSING",
+                len(spec_yaml) if spec_yaml else "MISSING")
 
     if not existing_b64:
         return JSONResponse(

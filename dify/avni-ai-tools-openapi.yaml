@@ -338,6 +338,16 @@ paths:
                     type: string
                   files_patched:
                     type: integer
+        '400':
+          description: Bad request — malformed body or invalid spec
+        '401':
+          description: Unauthorized — missing or expired auth token
+        '403':
+          description: Forbidden — insufficient permissions
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
 
   /upload-bundle:
     post:
@@ -365,6 +375,16 @@ paths:
                 properties:
                   task_id:
                     type: string
+        '400':
+          description: Bad request — malformed bundle
+        '401':
+          description: Unauthorized — missing or expired auth token
+        '403':
+          description: Forbidden — insufficient permissions
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
 
   /upload-status/{task_id}:
     get:
@@ -434,6 +454,16 @@ paths:
                 properties:
                   bundle_zip_b64:
                     type: string
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized — missing or expired auth token
+        '403':
+          description: Forbidden — insufficient permissions
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
 
   /execute-python:
     post:

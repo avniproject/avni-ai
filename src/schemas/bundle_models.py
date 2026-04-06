@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 # ── Field-level ────────────────────────────────────────────────────────────────
@@ -84,6 +84,11 @@ class EncounterTypeSpec(BaseModel):
     subject_type: str = ""
     is_program_encounter: bool = False
     is_scheduled: bool = True
+
+    @field_validator("program_name", mode="before")
+    @classmethod
+    def coerce_none_to_empty(cls, v: object) -> str:
+        return "" if v is None else v
 
 
 class GroupSpec(BaseModel):

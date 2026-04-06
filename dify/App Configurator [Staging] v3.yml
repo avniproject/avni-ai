@@ -146,6 +146,14 @@ workflow:
     - existing_bundle_b64
     value: ''
     value_type: string
+  - description: Base64 encoded bundle ZIP extracted from download response for patching
+    id: c2d3e4f5-a6b7-4890-c1d2-e3f4a5b6c7d8
+    name: patch_input_bundle_b64
+    selector:
+    - conversation
+    - patch_input_bundle_b64
+    value: ''
+    value_type: string
   - description: Organisation name persisted across conversation turns
     id: 7a1b2c3d-e4f5-4678-9a0b-1c2d3e4f5678
     name: org_name
@@ -190,6 +198,17 @@ workflow:
       - remote_url
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -960,9 +979,20 @@ workflow:
     - data:
         isInLoop: false
         sourceType: code
-        targetType: http-request
-      id: 92c62559-e52e-454c-a579-ddc4536a6134-source-e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2-target
+        targetType: assigner
+      id: 92c62559-e52e-454c-a579-ddc4536a6134-source-b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7-target
       source: 92c62559-e52e-454c-a579-ddc4536a6134
+      sourceHandle: source
+      target: b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: http-request
+      id: b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7-source-e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2-target
+      source: b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7
       sourceHandle: source
       target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
       targetHandle: target
@@ -1134,6 +1164,39 @@ workflow:
       source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       sourceHandle: fail-branch
       target: f9136731-f6e1-472d-8cad-55edaed02022
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1775380701991-false-1775380857743-target
+      source: '1775380701991'
+      sourceHandle: 'false'
+      target: '1775380857743'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: f9136731-f6e1-472d-8cad-55edaed02022-false-608df9da-f21e-4d20-8d01-e4d65fec1256-target
+      source: f9136731-f6e1-472d-8cad-55edaed02022
+      sourceHandle: 'false'
+      target: 608df9da-f21e-4d20-8d01-e4d65fec1256
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: if-else
+      id: a3d80a70-5da7-4edc-9c32-66de6f9845e1-fail-branch-1775380701991-target
+      source: a3d80a70-5da7-4edc-9c32-66de6f9845e1
+      sourceHandle: fail-branch
+      target: '1775380701991'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -1514,11 +1577,11 @@ workflow:
       id: '1757493270484'
       position:
         x: 1046
-        y: 258
+        y: 247
       positionAbsolute:
         x: 1046
-        y: 258
-      selected: true
+        y: 247
+      selected: false
       type: custom
       width: 242
     - data:
@@ -1572,10 +1635,10 @@ workflow:
       id: '1757495664531'
       position:
         x: 1408
-        y: 60
+        y: 34
       positionAbsolute:
         x: 1408
-        y: 60
+        y: 34
       selected: false
       type: custom
       width: 242
@@ -1588,10 +1651,10 @@ workflow:
       id: '1757495688732'
       position:
         x: 1750
-        y: 52
+        y: 26
       positionAbsolute:
         x: 1750
-        y: 52
+        y: 26
       selected: false
       type: custom
       width: 242
@@ -1607,10 +1670,10 @@ workflow:
       id: '1758608702077'
       position:
         x: 1408
-        y: 228
+        y: 202
       positionAbsolute:
         x: 1408
-        y: 228
+        y: 202
       selected: false
       type: custom
       width: 242
@@ -1633,10 +1696,10 @@ workflow:
       id: '1758699378772'
       position:
         x: 1408
-        y: 839
+        y: 877
       positionAbsolute:
         x: 1408
-        y: 839
+        y: 877
       selected: false
       type: custom
       width: 242
@@ -1669,10 +1732,10 @@ workflow:
       id: d9ccc273-d1c4-44d1-8894-177b64b92bfa
       position:
         x: 1408
-        y: 1115
+        y: 1153
       positionAbsolute:
         x: 1408
-        y: 1115
+        y: 1153
       selected: false
       type: custom
       width: 242
@@ -1717,10 +1780,10 @@ workflow:
       id: '17580163919060'
       position:
         x: 1408
-        y: 443
+        y: 417
       positionAbsolute:
         x: 1408
-        y: 443
+        y: 417
       selected: false
       type: custom
       width: 242
@@ -1733,10 +1796,10 @@ workflow:
       id: '1760358474156'
       position:
         x: 1750
-        y: 435
+        y: 409
       positionAbsolute:
         x: 1750
-        y: 435
+        y: 409
       selected: false
       type: custom
       width: 242
@@ -1765,10 +1828,10 @@ workflow:
       id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
       position:
         x: 1408
-        y: 1551
+        y: 1589
       positionAbsolute:
         x: 1408
-        y: 1551
+        y: 1589
       selected: false
       type: custom
       width: 242
@@ -1783,10 +1846,10 @@ workflow:
       id: '1774264909113'
       position:
         x: 1770
-        y: 1589
+        y: 1627
       positionAbsolute:
         x: 1770
-        y: 1589
+        y: 1627
       selected: false
       type: custom
       width: 242
@@ -1818,10 +1881,10 @@ workflow:
       id: 9c0103c2-e377-4925-8f4a-501ff5b34379
       position:
         x: 2454
-        y: 1586
+        y: 1624
       positionAbsolute:
         x: 2454
-        y: 1586
+        y: 1624
       selected: false
       type: custom
       width: 242
@@ -1836,7 +1899,7 @@ workflow:
             type: text
             value: "{\n  \"conversation_id\": \"{{#sys.conversation_id#}}\",\n  \"\
               entities\": {{#conversation.entities_jsonl#}}\n}\n"
-          type: json
+          type: raw-text
         headers: Content-Type:application/json
         method: post
         params: ''
@@ -1857,11 +1920,11 @@ workflow:
       id: ecd0bd72-6c77-4fb8-a362-0164343614af
       position:
         x: 2796
-        y: 1570
+        y: 1608
       positionAbsolute:
         x: 2796
-        y: 1570
-      selected: false
+        y: 1608
+      selected: true
       type: custom
       width: 242
     - data:
@@ -1874,7 +1937,7 @@ workflow:
             key: ''
             type: text
             value: "{\n  \"conversation_id\": \"{{#sys.conversation_id#}}\"\n}\n"
-          type: json
+          type: raw-text
         headers: Content-Type:application/json
         method: post
         params: ''
@@ -1895,10 +1958,10 @@ workflow:
       id: '1773908701222'
       position:
         x: 3138
-        y: 1570
+        y: 1608
       positionAbsolute:
         x: 3138
-        y: 1570
+        y: 1608
       selected: false
       type: custom
       width: 242
@@ -1915,10 +1978,10 @@ workflow:
       id: '1773909436902'
       position:
         x: 3822
-        y: 1565
+        y: 1603
       positionAbsolute:
         x: 3822
-        y: 1565
+        y: 1603
       selected: false
       type: custom
       width: 242
@@ -1927,8 +1990,11 @@ workflow:
           config: null
           type: no-auth
         body:
-          data: ''
+          data:
+          - type: text
+            value: ''
           type: none
+        error_strategy: fail-branch
         headers: avni-auth-token:{{#conversation.auth_token#}}
         method: get
         params: includeLocations:false
@@ -1945,25 +2011,25 @@ workflow:
         title: Download Existing Bundle
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}download-bundle-b64'
-      height: 141
+      height: 177
       id: a3d80a70-5da7-4edc-9c32-66de6f9845e1
       position:
         x: 5572
-        y: 1905
+        y: 1682
       positionAbsolute:
         x: 5572
-        y: 1905
+        y: 1682
       selected: false
       type: custom
       width: 242
     - data:
-        code: "import json\n\ndef main(bundle_b64: str, spec_yaml: str) -> dict:\n\
-          \    body = {\n        \"existing_bundle_b64\": bundle_b64 or \"\",\n  \
-          \      \"spec_yaml\": spec_yaml or \"\"\n    }\n    return {\"json_body\"\
-          : json.dumps(body)}\n"
+        code: "import json\n\ndef main(raw_body: str) -> dict:\n    try:\n       \
+          \ parsed = json.loads(raw_body) if isinstance(raw_body, str) else raw_body\n\
+          \    except (json.JSONDecodeError, TypeError):\n        parsed = {}\n  \
+          \  return {\"bundle_b64\": parsed.get(\"bundle_zip_b64\", \"\")}\n"
         code_language: python3
         outputs:
-          json_body:
+          bundle_b64:
             children: null
             type: string
         selected: false
@@ -1973,22 +2039,42 @@ workflow:
         - value_selector:
           - a3d80a70-5da7-4edc-9c32-66de6f9845e1
           - body
-          - bundle_zip_b64
           value_type: string
-          variable: bundle_b64
-        - value_selector:
-          - conversation
-          - spec_yaml
-          value_type: string
-          variable: spec_yaml
+          variable: raw_body
       height: 52
       id: 92c62559-e52e-454c-a579-ddc4536a6134
       position:
         x: 5914
-        y: 1950
+        y: 1774
       positionAbsolute:
         x: 5914
-        y: 1950
+        y: 1774
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - 92c62559-e52e-454c-a579-ddc4536a6134
+          - bundle_b64
+          variable_selector:
+          - conversation
+          - patch_input_bundle_b64
+          write_mode: over-write
+        selected: false
+        title: Save Patch Input Bundle B64
+        type: assigner
+        version: '2'
+      height: 84
+      id: b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7
+      position:
+        x: 6256
+        y: 1758
+      positionAbsolute:
+        x: 6256
+        y: 1758
       selected: false
       type: custom
       width: 242
@@ -1999,12 +2085,16 @@ workflow:
         body:
           data:
           - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac691
-            key: ''
+            key: existing_bundle_b64
             type: text
-            value: '{{#92c62559-e52e-454c-a579-ddc4536a6134.json_body#}}'
-          type: raw-text
+            value: '{{#conversation.patch_input_bundle_b64#}}'
+          - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac692
+            key: spec_yaml
+            type: text
+            value: '{{#conversation.spec_yaml#}}'
+          type: form-data
         error_strategy: fail-branch
-        headers: Content-Type:application/json
+        headers: ''
         method: post
         params: ''
         retry_config:
@@ -2023,11 +2113,11 @@ workflow:
       height: 177
       id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
       position:
-        x: 6256
-        y: 1887
+        x: 6598
+        y: 1711
       positionAbsolute:
-        x: 6256
-        y: 1887
+        x: 6598
+        y: 1711
       selected: false
       type: custom
       width: 242
@@ -2061,11 +2151,11 @@ workflow:
       height: 52
       id: 4eb75ab2-87de-48f6-b52e-35f8646da88d
       position:
-        x: 6638
-        y: 1920
+        x: 6960
+        y: 2140
       positionAbsolute:
-        x: 6638
-        y: 1920
+        x: 6960
+        y: 2140
       selected: false
       type: custom
       width: 242
@@ -2087,11 +2177,11 @@ workflow:
       height: 84
       id: 473230ae-fcca-4f3b-b410-fc792d8b0e88
       position:
-        x: 6980
-        y: 1904
+        x: 7302
+        y: 2124
       positionAbsolute:
-        x: 6980
-        y: 1904
+        x: 7302
+        y: 2124
       selected: false
       type: custom
       width: 242
@@ -2106,7 +2196,7 @@ workflow:
             type: text
             value: "{\n  \"bundle_zip_b64\": \"{{#conversation.bundle_zip_b64#}}\"\
               \n}\n"
-          type: json
+          type: raw-text
         error_strategy: fail-branch
         headers: 'Content-Type:application/json
 
@@ -2129,11 +2219,11 @@ workflow:
       height: 177
       id: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       position:
-        x: 8046
-        y: 1109
+        x: 8368
+        y: 1301
       positionAbsolute:
-        x: 8046
-        y: 1109
+        x: 8368
+        y: 1301
       selected: false
       type: custom
       width: 242
@@ -2163,11 +2253,11 @@ workflow:
       height: 52
       id: 6d81a37b-960b-42d3-ae88-5799cd773102
       position:
-        x: 8388
-        y: 1142
+        x: 8710
+        y: 1334
       positionAbsolute:
-        x: 8388
-        y: 1142
+        x: 8710
+        y: 1334
       selected: false
       type: custom
       width: 242
@@ -2189,11 +2279,11 @@ workflow:
       height: 84
       id: 8e0563d0-7844-4e89-a765-cbd9647e7676
       position:
-        x: 8730
-        y: 1126
+        x: 9052
+        y: 1318
       positionAbsolute:
-        x: 8730
-        y: 1126
+        x: 9052
+        y: 1318
       selected: false
       type: custom
       width: 242
@@ -2220,10 +2310,10 @@ workflow:
       id: '1774617205889'
       position:
         x: 4164
-        y: 1546
+        y: 1584
       positionAbsolute:
         x: 4164
-        y: 1546
+        y: 1584
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2239,7 +2329,7 @@ workflow:
           - conversation
           - loop
         error_handle_mode: terminated
-        height: 490
+        height: 530
         logical_operator: and
         loop_count: 20
         selected: false
@@ -2247,14 +2337,14 @@ workflow:
         title: Upload Poll Loop
         type: loop
         width: 2116
-      height: 490
+      height: 530
       id: '1774617440956'
       position:
-        x: 9816
-        y: 1342
+        x: 10138
+        y: 1544
       positionAbsolute:
-        x: 9816
-        y: 1342
+        x: 10138
+        y: 1544
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2275,8 +2365,8 @@ workflow:
         x: 60
         y: 135
       positionAbsolute:
-        x: 9876
-        y: 1477
+        x: 10198
+        y: 1679
       selectable: false
       selected: false
       sourcePosition: right
@@ -2342,8 +2432,8 @@ workflow:
         x: 184
         y: 133
       positionAbsolute:
-        x: 10000
-        y: 1475
+        x: 10322
+        y: 1677
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2384,8 +2474,8 @@ workflow:
         x: 506
         y: 79
       positionAbsolute:
-        x: 10322
-        y: 1421
+        x: 10644
+        y: 1623
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2424,8 +2514,8 @@ workflow:
         x: 1150
         y: 60
       positionAbsolute:
-        x: 10966
-        y: 1402
+        x: 11288
+        y: 1604
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2465,8 +2555,8 @@ workflow:
         x: 1492
         y: 244
       positionAbsolute:
-        x: 11308
-        y: 1586
+        x: 11630
+        y: 1788
       selected: false
       type: custom
       width: 242
@@ -2500,15 +2590,15 @@ workflow:
         selected: false
         title: Upload Done
         type: answer
-      height: 247
+      height: 343
       id: 48d1cfc7-02ef-457e-8e39-bff34b4fb91e
       parentId: '1774617440956'
       position:
-        x: 1816.4920534036537
-        y: 65
+        x: 1814
+        y: 127
       positionAbsolute:
-        x: 11632.492053403654
-        y: 1407
+        x: 11952
+        y: 1671
       selected: false
       type: custom
       width: 242
@@ -2527,8 +2617,8 @@ workflow:
         x: 1492
         y: 68
       positionAbsolute:
-        x: 11308
-        y: 1410
+        x: 11630
+        y: 1612
       selected: false
       type: custom
       width: 242
@@ -2543,10 +2633,10 @@ workflow:
       id: ef812954-180c-4672-9c41-4d2e8058fdb5
       position:
         x: 4526
-        y: 1429
+        y: 1420
       positionAbsolute:
         x: 4526
-        y: 1429
+        y: 1420
       selected: false
       type: custom
       width: 242
@@ -2564,14 +2654,14 @@ workflow:
         selected: false
         title: Corrections Prompt
         type: answer
-      height: 148
+      height: 196
       id: 41baa894-e39d-45c7-826d-9ba1faad150b
       position:
         x: 4526
-        y: 1201
+        y: 1144
       positionAbsolute:
         x: 4526
-        y: 1201
+        y: 1144
       selected: false
       type: custom
       width: 242
@@ -2581,14 +2671,14 @@ workflow:
         selected: false
         title: 'Progress: Generating Spec'
         type: answer
-      height: 116
+      height: 132
       id: ea75c737-ec88-4d16-ab02-281ab9c2d006
       position:
         x: 4526
-        y: 1657
+        y: 1992
       positionAbsolute:
         x: 4526
-        y: 1657
+        y: 1992
       selected: false
       type: custom
       width: 242
@@ -2601,10 +2691,10 @@ workflow:
       id: c65065ca-cc2a-4584-9a1b-86df0ee71658
       position:
         x: 5230
-        y: 2098
+        y: 1893
       positionAbsolute:
         x: 5230
-        y: 2098
+        y: 1893
       selected: false
       type: custom
       width: 242
@@ -2616,11 +2706,11 @@ workflow:
       height: 116
       id: 6962ba89-7408-45d1-880f-0fd134dc1705
       position:
-        x: 7342
-        y: 1874
+        x: 7664
+        y: 2094
       positionAbsolute:
-        x: 7342
-        y: 1874
+        x: 7664
+        y: 2094
       selected: false
       type: custom
       width: 242
@@ -2691,10 +2781,10 @@ workflow:
       id: '17748474036620'
       position:
         x: 3480
-        y: 1597
+        y: 1635
       positionAbsolute:
         x: 3480
-        y: 1597
+        y: 1635
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2812,10 +2902,10 @@ workflow:
       id: '17748507380970'
       position:
         x: 2112
-        y: 1597
+        y: 1635
       positionAbsolute:
         x: 2112
-        y: 1597
+        y: 1635
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2854,8 +2944,8 @@ workflow:
         x: 828
         y: 133
       positionAbsolute:
-        x: 10644
-        y: 1475
+        x: 10966
+        y: 1677
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3065,10 +3155,10 @@ workflow:
       id: 3b1db8bf-6e79-4646-9103-077a6ca90299
       position:
         x: 4526
-        y: 1853
+        y: 1648
       positionAbsolute:
         x: 4526
-        y: 1853
+        y: 1648
       selected: false
       type: custom
       width: 242
@@ -3106,10 +3196,10 @@ workflow:
       id: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
       position:
         x: 4868
-        y: 1959
+        y: 1754
       positionAbsolute:
         x: 4868
-        y: 1959
+        y: 1754
       selected: false
       type: custom
       width: 242
@@ -3132,10 +3222,10 @@ workflow:
       id: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
       position:
         x: 5230
-        y: 1934
+        y: 1729
       positionAbsolute:
         x: 5230
-        y: 1934
+        y: 1729
       selected: false
       type: custom
       width: 242
@@ -3147,20 +3237,15 @@ workflow:
               is to inspect the generated bundle before uploading to Avni.
 
 
-              Bundle (base64): {{#conversation.bundle_zip_b64#}}
-
-
               Workflow:
 
-              1. Call validate-bundle to check for structural issues.
+              1. Call validate_bundle — it will automatically use the bundle from
+              context.
 
-              2. If there are errors, report them and stop (do not upload).
+              2. If there are errors, report them and output BUNDLE_REJECTED with
+              error details. Stop.
 
-              3. If validation passes, call bundle-to-spec to show a human-readable
-              summary.
-
-              4. Output: BUNDLE_APPROVED to proceed with upload, or BUNDLE_REJECTED
-              with error details.'
+              3. If validation passes, output BUNDLE_APPROVED.'
           maximum_iterations:
             type: constant
             value: 3
@@ -3305,11 +3390,11 @@ workflow:
       height: 264
       id: 264d37e7-9580-4d26-be76-4ecdbf32803a
       position:
-        x: 7342
-        y: 2070
+        x: 7664
+        y: 2290
       positionAbsolute:
-        x: 7342
-        y: 2070
+        x: 7664
+        y: 2290
       selected: false
       type: custom
       width: 242
@@ -3483,11 +3568,11 @@ workflow:
       height: 248
       id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
       position:
-        x: 9112
-        y: 1044
+        x: 9434
+        y: 1236
       positionAbsolute:
-        x: 9112
-        y: 1044
+        x: 9434
+        y: 1236
       selected: false
       type: custom
       width: 242
@@ -3554,11 +3639,11 @@ workflow:
       height: 436
       id: f9136731-f6e1-472d-8cad-55edaed02022
       position:
-        x: 8408
-        y: 1383
+        x: 8730
+        y: 1622
       positionAbsolute:
-        x: 8408
-        y: 1383
+        x: 8730
+        y: 1622
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3573,11 +3658,11 @@ workflow:
       height: 100
       id: da538de9-c1a6-46e9-b189-9e5978bf6521
       position:
-        x: 8770
-        y: 1290
+        x: 9092
+        y: 1482
       positionAbsolute:
-        x: 8770
-        y: 1290
+        x: 9092
+        y: 1482
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3589,14 +3674,14 @@ workflow:
         title: Upload Err 401
         type: answer
         variables: []
-      height: 100
+      height: 132
       id: eed94bb6-3565-4fbc-944c-3b114211f447
       position:
-        x: 8770
-        y: 1470
+        x: 9092
+        y: 1662
       positionAbsolute:
-        x: 8770
-        y: 1470
+        x: 9092
+        y: 1662
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3610,11 +3695,11 @@ workflow:
       height: 100
       id: 848fa968-67cb-41cc-a287-322536fe9f69
       position:
-        x: 8770
-        y: 1650
+        x: 9092
+        y: 1874
       positionAbsolute:
-        x: 8770
-        y: 1650
+        x: 9092
+        y: 1874
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3628,11 +3713,11 @@ workflow:
       height: 100
       id: 7b04db95-2264-496e-8447-0efb83a7b9a2
       position:
-        x: 8770
-        y: 1830
+        x: 9092
+        y: 2054
       positionAbsolute:
-        x: 8770
-        y: 1830
+        x: 9092
+        y: 2054
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3644,14 +3729,14 @@ workflow:
         title: Upload Err 500
         type: answer
         variables: []
-      height: 100
+      height: 116
       id: 608df9da-f21e-4d20-8d01-e4d65fec1256
       position:
-        x: 8770
-        y: 2010
+        x: 9092
+        y: 2234
       positionAbsolute:
-        x: 8770
-        y: 2010
+        x: 9092
+        y: 2234
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3683,14 +3768,14 @@ workflow:
         selected: false
         title: Check Bundle Verdict
         type: if-else
-      height: 198
+      height: 220
       id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
       position:
-        x: 7684
-        y: 2103
+        x: 8006
+        y: 2312
       positionAbsolute:
-        x: 7684
-        y: 2103
+        x: 8006
+        y: 2312
       selected: false
       type: custom
       width: 242
@@ -3721,14 +3806,14 @@ workflow:
         selected: false
         title: Check Error Verdict
         type: if-else
-      height: 198
+      height: 220
       id: 50519a54-053f-4c25-9486-ec03eadb94ca
       position:
-        x: 9454
-        y: 1069
+        x: 9776
+        y: 1250
       positionAbsolute:
-        x: 9454
-        y: 1069
+        x: 9776
+        y: 1250
       selected: false
       type: custom
       width: 242
@@ -3752,11 +3837,11 @@ workflow:
       height: 52
       id: cf4c5fbe-1460-44e4-9775-5650873dfdbd
       position:
-        x: 8046
-        y: 2238
+        x: 8368
+        y: 2466
       positionAbsolute:
-        x: 8046
-        y: 2238
+        x: 8368
+        y: 2466
       selected: false
       type: custom
       width: 242
@@ -3778,11 +3863,11 @@ workflow:
       height: 84
       id: ee69171b-0c05-4dcb-bcb2-4057a5119579
       position:
-        x: 8388
-        y: 2222
+        x: 8710
+        y: 2450
       positionAbsolute:
-        x: 8388
-        y: 2222
+        x: 8710
+        y: 2450
       selected: false
       type: custom
       width: 242
@@ -3790,7 +3875,7 @@ workflow:
         cases:
         - case_id: 'true'
           conditions:
-          - comparison_operator: '≥'
+          - comparison_operator: ≥
             id: cmr-cond-exceeded
             value: '3'
             varType: number
@@ -3802,14 +3887,14 @@ workflow:
         selected: false
         title: Check Max Retries
         type: if-else
-      height: 148
+      height: 124
       id: 76910038-4a13-4647-aee2-30be4c282e31
       position:
-        x: 8730
-        y: 2190
+        x: 9052
+        y: 2430
       positionAbsolute:
-        x: 8730
-        y: 2190
+        x: 9052
+        y: 2430
       selected: false
       type: custom
       width: 242
@@ -3823,14 +3908,14 @@ workflow:
         selected: false
         title: Max Retries Exhausted
         type: answer
-      height: 148
+      height: 196
       id: e6b32cb1-406f-47e0-8f96-18b75d76fdf2
       position:
-        x: 9072
-        y: 2190
+        x: 9394
+        y: 2394
       positionAbsolute:
-        x: 9072
-        y: 2190
+        x: 9394
+        y: 2394
       selected: false
       type: custom
       width: 242
@@ -3843,14 +3928,14 @@ workflow:
         selected: false
         title: Upload Error Report
         type: answer
-      height: 148
+      height: 164
       id: 0f4603cf-1aab-4b53-a05d-c5cb6f9194c2
       position:
-        x: 9816
-        y: 1114
+        x: 10138
+        y: 1300
       positionAbsolute:
-        x: 9816
-        y: 1114
+        x: 10138
+        y: 1300
       selected: false
       type: custom
       width: 242
@@ -3912,16 +3997,16 @@ workflow:
           id: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
           logical_operator: and
         selected: false
-        title: IF/ELSE 4
+        title: Bundle HTTP Request Error
         type: if-else
       height: 436
       id: '1775380701991'
       position:
-        x: 6618
-        y: 2052
+        x: 6960
+        y: 1479
       positionAbsolute:
-        x: 6618
-        y: 2052
+        x: 6960
+        y: 1479
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3936,11 +4021,12 @@ workflow:
       height: 100
       id: '1775380779498'
       position:
-        x: 6980
-        y: 2068
+        x: 7322
+        y: 1224
       positionAbsolute:
-        x: 6980
-        y: 2068
+        x: 7322
+        y: 1224
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3954,11 +4040,11 @@ workflow:
       height: 100
       id: '1775380796294'
       position:
-        x: 6980
-        y: 2248
+        x: 7322
+        y: 1404
       positionAbsolute:
-        x: 6980
-        y: 2248
+        x: 7322
+        y: 1404
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3972,11 +4058,11 @@ workflow:
       height: 100
       id: '1775380815321'
       position:
-        x: 6980
-        y: 2428
+        x: 7322
+        y: 1584
       positionAbsolute:
-        x: 6980
-        y: 2428
+        x: 7322
+        y: 1584
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3990,11 +4076,11 @@ workflow:
       height: 100
       id: '1775380840852'
       position:
-        x: 6980
-        y: 2608
+        x: 7322
+        y: 1764
       positionAbsolute:
-        x: 6980
-        y: 2608
+        x: 7322
+        y: 1764
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4009,11 +4095,11 @@ workflow:
       height: 100
       id: '1775380857743'
       position:
-        x: 6980
-        y: 2788
+        x: 7322
+        y: 1944
       positionAbsolute:
-        x: 6980
-        y: 2788
+        x: 7322
+        y: 1944
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4030,14 +4116,14 @@ workflow:
         selected: false
         title: Delete Confirm Prompt
         type: answer
-      height: 148
+      height: 212
       id: 6494459f-3dee-4fc1-bdff-ff0400aefd52
       position:
         x: 1408
-        y: 611
+        y: 585
       positionAbsolute:
         x: 1408
-        y: 611
+        y: 585
       selected: false
       type: custom
       width: 242
@@ -4063,11 +4149,11 @@ workflow:
       height: 190
       id: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88
       position:
-        x: 1770
-        y: 618
+        x: 1750
+        y: 596
       positionAbsolute:
-        x: 1770
-        y: 618
+        x: 1750
+        y: 596
       selected: false
       type: custom
       width: 242
@@ -4104,14 +4190,14 @@ workflow:
           - conversation
           - auth_token
           variable: auth_token
-      height: 178
+      height: 141
       id: fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b
       position:
-        x: 2132
-        y: 457
+        x: 2112
+        y: 467
       positionAbsolute:
-        x: 2132
-        y: 457
+        x: 2112
+        y: 467
       selected: false
       type: custom
       width: 242
@@ -4134,11 +4220,11 @@ workflow:
       height: 148
       id: 13f1b052-2aed-4126-937d-5a4837d77639
       position:
-        x: 2474
-        y: 472
+        x: 2454
+        y: 464
       positionAbsolute:
-        x: 2474
-        y: 472
+        x: 2454
+        y: 464
       selected: false
       type: custom
       width: 242
@@ -4151,14 +4237,14 @@ workflow:
         selected: false
         title: Delete Success
         type: answer
-      height: 148
+      height: 164
       id: c776a305-2e50-42e0-9209-32881d893c32
       position:
-        x: 2836
-        y: 487
+        x: 2816
+        y: 264
       positionAbsolute:
-        x: 2836
-        y: 487
+        x: 2816
+        y: 264
       selected: false
       type: custom
       width: 242
@@ -4174,11 +4260,11 @@ workflow:
       height: 148
       id: 750b6d5a-d7b6-4e8f-8449-b51e3d84f7fd
       position:
-        x: 2836
-        y: 715
+        x: 2816
+        y: 508
       positionAbsolute:
-        x: 2836
-        y: 715
+        x: 2816
+        y: 508
       selected: false
       type: custom
       width: 242
@@ -4187,19 +4273,19 @@ workflow:
         selected: false
         title: Delete Cancelled
         type: answer
-      height: 116
+      height: 132
       id: 3cfb30bf-9386-48db-bfa2-3bd3359cf040
       position:
-        x: 2132
-        y: 715
+        x: 2112
+        y: 688
       positionAbsolute:
-        x: 2132
-        y: 715
+        x: 2112
+        y: 688
       selected: false
       type: custom
       width: 242
     viewport:
-      x: 265.86552495973547
-      y: 128.72449020004825
-      zoom: 0.4012755097999517
+      x: -502.7857142857142
+      y: -189.4285714285715
+      zoom: 0.25
   rag_pipeline_variables: []
