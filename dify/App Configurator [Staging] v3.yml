@@ -1015,40 +1015,12 @@ workflow:
         isInLoop: true
         loop_id: '1775539639483'
         sourceType: code
-        targetType: assigner
-      id: 17755397988579-source-177553979885710-target
-      selected: false
-      source: '17755397988579'
-      sourceHandle: source
-      target: '177553979885710'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1775539639483'
-        sourceType: code
         targetType: answer
       id: 17755397988579-source-17755397988576-target
       selected: false
       source: '17755397988579'
       sourceHandle: source
       target: '17755397988576'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInIteration: false
-        isInLoop: true
-        loop_id: '1775539639483'
-        sourceType: assigner
-        targetType: http-request
-      id: 177553979885710-source-17755397988570-target
-      selected: false
-      source: '177553979885710'
-      sourceHandle: source
-      target: '17755397988570'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -1274,6 +1246,7 @@ workflow:
         sourceType: if-else
         targetType: http-request
       id: 1775541471535-true-959d2ca3-2445-4375-ac9e-f68f47724a2f-target
+      selected: false
       source: '1775541471535'
       sourceHandle: 'true'
       target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
@@ -1286,6 +1259,7 @@ workflow:
         sourceType: if-else
         targetType: answer
       id: 1775541471535-false-1775541508232-target
+      selected: false
       source: '1775541471535'
       sourceHandle: 'false'
       target: '1775541508232'
@@ -1297,6 +1271,7 @@ workflow:
         sourceType: loop
         targetType: if-else
       id: 1775539639483-source-1775541471535-target
+      selected: false
       source: '1775539639483'
       sourceHandle: source
       target: '1775541471535'
@@ -1326,6 +1301,45 @@ workflow:
       source: '177553979885712'
       sourceHandle: 'false'
       target: '1775545071563'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: code
+        targetType: if-else
+      id: 17755397988579--1775573605182-target
+      source: '17755397988579'
+      sourceHandle: source
+      target: '1775573605182'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: assigner
+      id: 1775573605182-true-177553979885710-target
+      source: '1775573605182'
+      sourceHandle: 'true'
+      target: '177553979885710'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: assigner
+        targetType: http-request
+      id: 177553979885710-source-17755397988570-target
+      source: '177553979885710'
+      sourceHandle: source
+      target: '17755397988570'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -2148,11 +2162,11 @@ workflow:
       height: 177
       id: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       position:
-        x: 9418
-        y: 2652
+        x: 9740
+        y: 2474
       positionAbsolute:
-        x: 9418
-        y: 2652
+        x: 9740
+        y: 2474
       selected: false
       type: custom
       width: 242
@@ -2182,11 +2196,11 @@ workflow:
       height: 52
       id: 6d81a37b-960b-42d3-ae88-5799cd773102
       position:
-        x: 9760
-        y: 2685
+        x: 10082
+        y: 2507
       positionAbsolute:
-        x: 9760
-        y: 2685
+        x: 10082
+        y: 2507
       selected: false
       type: custom
       width: 242
@@ -2208,11 +2222,11 @@ workflow:
       height: 84
       id: 8e0563d0-7844-4e89-a765-cbd9647e7676
       position:
-        x: 10102
-        y: 2669
+        x: 10424
+        y: 2491
       positionAbsolute:
-        x: 10102
-        y: 2669
+        x: 10424
+        y: 2491
       selected: false
       type: custom
       width: 242
@@ -2269,11 +2283,11 @@ workflow:
       height: 530
       id: '1774617440956'
       position:
-        x: 11188
-        y: 2895
+        x: 11510
+        y: 2717
       positionAbsolute:
-        x: 11188
-        y: 2895
+        x: 11510
+        y: 2717
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2294,8 +2308,8 @@ workflow:
         x: 60
         y: 135
       positionAbsolute:
-        x: 11248
-        y: 3030
+        x: 11570
+        y: 2852
       selectable: false
       selected: false
       sourcePosition: right
@@ -2361,8 +2375,8 @@ workflow:
         x: 184
         y: 133
       positionAbsolute:
-        x: 11372
-        y: 3028
+        x: 11694
+        y: 2850
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2403,8 +2417,8 @@ workflow:
         x: 506
         y: 79
       positionAbsolute:
-        x: 11694
-        y: 2974
+        x: 12016
+        y: 2796
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2443,8 +2457,8 @@ workflow:
         x: 1150
         y: 60
       positionAbsolute:
-        x: 12338
-        y: 2955
+        x: 12660
+        y: 2777
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2484,8 +2498,8 @@ workflow:
         x: 1492
         y: 244
       positionAbsolute:
-        x: 12680
-        y: 3139
+        x: 13002
+        y: 2961
       selected: false
       type: custom
       width: 242
@@ -2523,8 +2537,8 @@ workflow:
         x: 1814
         y: 145
       positionAbsolute:
-        x: 13002
-        y: 3040
+        x: 13324
+        y: 2862
       selected: false
       type: custom
       width: 242
@@ -2543,8 +2557,8 @@ workflow:
         x: 1492
         y: 68
       positionAbsolute:
-        x: 12680
-        y: 2963
+        x: 13002
+        y: 2785
       selected: false
       type: custom
       width: 242
@@ -2838,8 +2852,8 @@ workflow:
         x: 828
         y: 133
       positionAbsolute:
-        x: 12016
-        y: 3028
+        x: 12338
+        y: 2850
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2888,7 +2902,8 @@ workflow:
               type: model-selector
           query:
             type: constant
-            value: '{{#sys.query#}}'
+            value: Check the upload status for task_id {{#conversation.upload_task_id#}}
+              and diagnose any errors.
           tools:
             type: constant
             value:
@@ -2961,8 +2976,10 @@ workflow:
                 description: Validate a generated bundle ZIP
               parameters:
                 bundle_zip_b64:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#conversation.bundle_zip_b64#}}'
               provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
               provider_show_name: Avni AI Staging openAPI
               settings: {}
@@ -2993,8 +3010,10 @@ workflow:
                 description: Check bundle upload status
               parameters:
                 task_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#conversation.upload_task_id#}}'
               provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
               provider_show_name: Avni AI Staging openAPI
               settings: {}
@@ -3016,11 +3035,11 @@ workflow:
       height: 248
       id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
       position:
-        x: 10484
-        y: 2587
+        x: 10806
+        y: 2409
       positionAbsolute:
-        x: 10484
-        y: 2587
+        x: 10806
+        y: 2409
       selected: false
       type: custom
       width: 242
@@ -3087,11 +3106,11 @@ workflow:
       height: 436
       id: f9136731-f6e1-472d-8cad-55edaed02022
       position:
-        x: 9780
-        y: 2973
+        x: 10102
+        y: 2795
       positionAbsolute:
-        x: 9780
-        y: 2973
+        x: 10102
+        y: 2795
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3106,11 +3125,12 @@ workflow:
       height: 100
       id: da538de9-c1a6-46e9-b189-9e5978bf6521
       position:
-        x: 10142
-        y: 2833
+        x: 10464
+        y: 2655
       positionAbsolute:
-        x: 10142
-        y: 2833
+        x: 10464
+        y: 2655
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3125,11 +3145,12 @@ workflow:
       height: 132
       id: eed94bb6-3565-4fbc-944c-3b114211f447
       position:
-        x: 10142
-        y: 3013
+        x: 10464
+        y: 2835
       positionAbsolute:
-        x: 10142
-        y: 3013
+        x: 10464
+        y: 2835
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3143,11 +3164,12 @@ workflow:
       height: 100
       id: 848fa968-67cb-41cc-a287-322536fe9f69
       position:
-        x: 10142
-        y: 3225
+        x: 10464
+        y: 3047
       positionAbsolute:
-        x: 10142
-        y: 3225
+        x: 10464
+        y: 3047
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3161,11 +3183,11 @@ workflow:
       height: 100
       id: 7b04db95-2264-496e-8447-0efb83a7b9a2
       position:
-        x: 10142
-        y: 3405
+        x: 10464
+        y: 3227
       positionAbsolute:
-        x: 10142
-        y: 3405
+        x: 10464
+        y: 3227
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3180,11 +3202,12 @@ workflow:
       height: 116
       id: 608df9da-f21e-4d20-8d01-e4d65fec1256
       position:
-        x: 10142
-        y: 3585
+        x: 10464
+        y: 3407
       positionAbsolute:
-        x: 10142
-        y: 3585
+        x: 10464
+        y: 3407
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3219,11 +3242,11 @@ workflow:
       height: 220
       id: 50519a54-053f-4c25-9486-ec03eadb94ca
       position:
-        x: 10826
-        y: 2601
+        x: 11148
+        y: 2423
       positionAbsolute:
-        x: 10826
-        y: 2601
+        x: 11148
+        y: 2423
       selected: false
       type: custom
       width: 242
@@ -3239,11 +3262,11 @@ workflow:
       height: 164
       id: 0f4603cf-1aab-4b53-a05d-c5cb6f9194c2
       position:
-        x: 11188
-        y: 2651
+        x: 11510
+        y: 2473
       positionAbsolute:
-        x: 11188
-        y: 2651
+        x: 11510
+        y: 2473
       selected: false
       type: custom
       width: 242
@@ -3437,27 +3460,27 @@ workflow:
           - conversation
           - spec_loop_active
         error_handle_mode: terminated
-        height: 1207
+        height: 1346
         logical_operator: and
         loop_count: 5
         selected: false
         start_node_id: 1775539639483start
         title: Spec Review Loop
         type: loop
-        width: 4432
-      height: 1207
+        width: 4752
+      height: 1346
       id: '1775539639483'
       position:
-        x: 5542.8667764206575
-        y: 1944.4169741355836
+        x: 4526
+        y: 1878
       positionAbsolute:
-        x: 5542.8667764206575
-        y: 1944.4169741355836
-      selected: true
+        x: 4526
+        y: 1878
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 4432
+      width: 4752
       zIndex: 1
     - data:
         desc: ''
@@ -3471,10 +3494,10 @@ workflow:
       parentId: '1775539639483'
       position:
         x: 60
-        y: 458
+        y: 440
       positionAbsolute:
-        x: 5602.8667764206575
-        y: 2402.4169741355836
+        x: 4586
+        y: 2318
       selectable: false
       sourcePosition: right
       targetPosition: left
@@ -3515,11 +3538,11 @@ workflow:
       id: '17755397988570'
       parentId: '1775539639483'
       position:
-        x: 1492
-        y: 544
+        x: 1814
+        y: 384
       positionAbsolute:
-        x: 7034.8667764206575
-        y: 2488.4169741355836
+        x: 6340
+        y: 2262
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3552,11 +3575,11 @@ workflow:
       id: '17755397988571'
       parentId: '1775539639483'
       position:
-        x: 1814
-        y: 636
+        x: 2136
+        y: 476
       positionAbsolute:
-        x: 7356.8667764206575
-        y: 2580.4169741355836
+        x: 6662
+        y: 2354
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3585,11 +3608,11 @@ workflow:
       id: '17755397988572'
       parentId: '1775539639483'
       position:
-        x: 2136
-        y: 620
+        x: 2458
+        y: 460
       positionAbsolute:
-        x: 7678.8667764206575
-        y: 2564.4169741355836
+        x: 6984
+        y: 2338
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3636,11 +3659,11 @@ workflow:
       id: '17755397988573'
       parentId: '1775539639483'
       position:
-        x: 2458
-        y: 573
+        x: 2780
+        y: 413
       positionAbsolute:
-        x: 8000.8667764206575
-        y: 2517.4169741355836
+        x: 7306
+        y: 2291
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3681,11 +3704,11 @@ workflow:
       id: '17755397988574'
       parentId: '1775539639483'
       position:
-        x: 2800
+        x: 3122
         y: 876
       positionAbsolute:
-        x: 8342.866776420658
-        y: 2820.4169741355836
+        x: 7648
+        y: 2754
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3714,11 +3737,11 @@ workflow:
       id: '17755397988575'
       parentId: '1775539639483'
       position:
-        x: 3142
+        x: 3444
         y: 860
       positionAbsolute:
-        x: 8684.866776420658
-        y: 2804.4169741355836
+        x: 7970
+        y: 2738
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3739,10 +3762,10 @@ workflow:
       parentId: '1775539639483'
       position:
         x: 1170
-        y: 415
+        y: 223
       positionAbsolute:
-        x: 6712.8667764206575
-        y: 2359.4169741355836
+        x: 5696
+        y: 2101
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3762,11 +3785,11 @@ workflow:
       id: '17755397988577'
       parentId: '1775539639483'
       position:
-        x: 3484
-        y: 600
+        x: 3786
+        y: 830
       positionAbsolute:
-        x: 9026.866776420658
-        y: 2544.4169741355836
+        x: 8312
+        y: 2708
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3777,67 +3800,27 @@ workflow:
         agent_parameters:
           instruction:
             type: constant
-            value: 'You are the Spec Agent. The user has ALREADY confirmed their entities.
-              Generate the YAML spec and output it immediately.
-
-
-              Conversation ID: {{#sys.conversation_id#}}
-
-
-              IMPORTANT: use conversation_id for all tool calls.
-
-
-              {% if conversation.review_errors and conversation.review_errors != ""
-              %}
-
-              PREVIOUS BUNDLE WAS REJECTED. Errors from the Review Agent:
-
-
-              {{#conversation.review_errors#}}
-
-
-              You MUST fix these errors before regenerating the spec. Apply corrections
-              via apply_entity_corrections before calling generate_spec.
-
-              {% endif %}
-
-
-              Steps — do ALL in order, do NOT ask the user anything:
-
-
-              1. If review_errors exist (see above): call apply_entity_corrections
-              with the corrections needed to fix those errors, then proceed.
-
-
-              2. Call generate_spec with {"conversation_id": "{{#sys.conversation_id#}}"}
-
-
-              3. Call validate_spec with the returned spec_yaml
-
-
-              4. If validation has errors, call apply_entity_corrections then regenerate.
-
-
-              5. Output your final message in EXACTLY this format:
-
-
-              SPEC_APPROVED
-
-              (paste the complete YAML spec here)
-
-
-              CRITICAL RULES:
-
-              - Do NOT ask the user any questions. They already confirmed.
-
-              - Do NOT wrap YAML in markdown code blocks.
-
-              - Your final output MUST start with SPEC_APPROVED on its own line followed
-              by the raw YAML spec.
-
-              - Do NOT add commentary before SPEC_APPROVED.
-
-              '
+            value: "You are the Spec Agent. The user has ALREADY confirmed their entities.\
+              \ Generate the YAML spec and output it immediately.\n\nConversation\
+              \ ID: {{#sys.conversation_id#}}\n\nIMPORTANT: use conversation_id for\
+              \ all tool calls.\n\n{% if conversation.review_errors and conversation.review_errors\
+              \ != \"\" %}\nPREVIOUS BUNDLE WAS REJECTED. The following structural\
+              \ errors were found in the generated bundle:\n\n{{#conversation.review_errors#}}\n\
+              \nYou MUST address these errors in the spec before regenerating. Analyse\
+              \ what entity-level \nchanges are needed to fix the bundle errors, call\
+              \ apply_entity_corrections with those \ncorrections, then call generate_spec\
+              \ again.\n{% endif %}\n\nSteps — do ALL in order, do NOT ask the user\
+              \ anything:\n\n1. If review_errors exist (see above): call apply_entity_corrections\
+              \ with the corrections needed to fix those errors, then proceed.\n\n\
+              2. Call generate_spec (conversation_id and org_name are pre-filled —\
+              \ just invoke it).\n\n3. Call validate_spec with the returned spec_yaml\n\
+              \n4. If validation has errors, call apply_entity_corrections then regenerate.\n\
+              \n5. Output your final message in EXACTLY this format:\n\nSPEC_APPROVED\n\
+              (paste the complete YAML spec here)\n\nCRITICAL RULES:\n- Do NOT ask\
+              \ the user any questions. They already confirmed.\n- Do NOT wrap YAML\
+              \ in markdown code blocks.\n- Your final output MUST start with SPEC_APPROVED\
+              \ on its own line followed by the raw YAML spec.\n- Do NOT add commentary\
+              \ before SPEC_APPROVED.\n"
           maximum_iterations:
             type: constant
             value: 5
@@ -3854,7 +3837,8 @@ workflow:
               type: model-selector
           query:
             type: constant
-            value: '{{#sys.query#}}'
+            value: Generate the YAML spec now. Call generate_spec immediately with
+              conversation_id and org_name.
           tools:
             type: constant
             value:
@@ -3965,10 +3949,10 @@ workflow:
       parentId: '1775539639483'
       position:
         x: 506
-        y: 350
+        y: 332
       positionAbsolute:
-        x: 6048.8667764206575
-        y: 2294.4169741355836
+        x: 5032
+        y: 2210
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4013,11 +3997,11 @@ workflow:
       parentId: '1775539639483'
       position:
         x: 828
-        y: 456
+        y: 438
       positionAbsolute:
-        x: 6370.8667764206575
-        y: 2400.4169741355836
-      selected: false
+        x: 5354
+        y: 2316
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4045,11 +4029,11 @@ workflow:
       id: '177553979885710'
       parentId: '1775539639483'
       position:
-        x: 1170
-        y: 591
+        x: 1492
+        y: 431
       positionAbsolute:
-        x: 6712.8667764206575
-        y: 2535.4169741355836
+        x: 6018
+        y: 2309
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4131,11 +4115,11 @@ workflow:
       id: '177553979885711'
       parentId: '1775539639483'
       position:
-        x: 3484
-        y: 776
+        x: 3786
+        y: 1006
       positionAbsolute:
-        x: 9026.866776420658
-        y: 2720.4169741355836
+        x: 8312
+        y: 2884
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4176,11 +4160,11 @@ workflow:
       id: '177553979885712'
       parentId: '1775539639483'
       position:
-        x: 3806
-        y: 806
+        x: 4108
+        y: 1036
       positionAbsolute:
-        x: 9348.866776420658
-        y: 2750.4169741355836
+        x: 8634
+        y: 2914
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4254,11 +4238,11 @@ workflow:
       id: '177553979885713'
       parentId: '1775539639483'
       position:
-        x: 2800
-        y: 341
+        x: 3122
+        y: 181
       positionAbsolute:
-        x: 8342.866776420658
-        y: 2285.4169741355836
+        x: 7648
+        y: 2059
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4278,11 +4262,11 @@ workflow:
       id: '177553979885714'
       parentId: '1775539639483'
       position:
-        x: 3142
+        x: 3444
         y: 380
       positionAbsolute:
-        x: 8684.866776420658
-        y: 2324.4169741355836
+        x: 7970
+        y: 2258
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4302,11 +4286,11 @@ workflow:
       id: '177553979885715'
       parentId: '1775539639483'
       position:
-        x: 3142
+        x: 3464
         y: 60
       positionAbsolute:
-        x: 8684.866776420658
-        y: 2004.4169741355836
+        x: 7990
+        y: 1938
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4326,11 +4310,11 @@ workflow:
       id: '177553979885716'
       parentId: '1775539639483'
       position:
-        x: 3122
-        y: 540
+        x: 3464
+        y: 700
       positionAbsolute:
-        x: 8664.866776420658
-        y: 2484.4169741355836
+        x: 7990
+        y: 2578
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4350,11 +4334,11 @@ workflow:
       id: '177553979885717'
       parentId: '1775539639483'
       position:
-        x: 3142
-        y: 220
+        x: 3464
+        y: 540
       positionAbsolute:
-        x: 8684.866776420658
-        y: 2164.4169741355836
+        x: 7990
+        y: 2418
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4374,11 +4358,11 @@ workflow:
       id: '177553979885718'
       parentId: '1775539639483'
       position:
-        x: 3142
-        y: 700
+        x: 3464
+        y: 220
       positionAbsolute:
-        x: 8684.866776420658
-        y: 2644.4169741355836
+        x: 7990
+        y: 2098
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4417,10 +4401,10 @@ workflow:
       parentId: '1775539639483'
       position:
         x: 184
-        y: 427
+        y: 409
       positionAbsolute:
-        x: 5726.8667764206575
-        y: 2371.4169741355836
+        x: 4710
+        y: 2287
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4458,11 +4442,11 @@ workflow:
       id: '17755411834170'
       parentId: '1775539639483'
       position:
-        x: 4128
-        y: 861
+        x: 4450
+        y: 975
       positionAbsolute:
-        x: 9670.866776420658
-        y: 2805.4169741355836
+        x: 8976
+        y: 2853
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4488,11 +4472,11 @@ workflow:
       height: 124
       id: '1775541471535'
       position:
-        x: 9056
-        y: 2667
+        x: 9378
+        y: 2489
       positionAbsolute:
-        x: 9056
-        y: 2667
+        x: 9378
+        y: 2489
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4507,11 +4491,11 @@ workflow:
       height: 116
       id: '1775541508232'
       position:
-        x: 9418
-        y: 2909
+        x: 9740
+        y: 2731
       positionAbsolute:
-        x: 9418
-        y: 2909
+        x: 9740
+        y: 2731
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4539,11 +4523,45 @@ workflow:
       id: '1775545071563'
       parentId: '1775539639483'
       position:
-        x: 4128
-        y: 1010
+        x: 4450
+        y: 1145
       positionAbsolute:
-        x: 9670.866776420658
-        y: 2954.4169741355836
+        x: 8976
+        y: 3023
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: 528acb2b-45c5-4049-af46-ea5f2b46f835
+            value: true
+            varType: boolean
+            variable_selector:
+            - '17755397988579'
+            - approved
+          id: 'true'
+          logical_operator: and
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        selected: false
+        title: Is Spec Approved?
+        type: if-else
+      height: 148
+      id: '1775573605182'
+      parentId: '1775539639483'
+      position:
+        x: 1170
+        y: 399
+      positionAbsolute:
+        x: 5696
+        y: 2277
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4551,7 +4569,7 @@ workflow:
       width: 242
       zIndex: 1002
     viewport:
-      x: -1036.5730338604442
-      y: -394.96643346242206
-      zoom: 0.25
+      x: -3256
+      y: -948
+      zoom: 0.7
   rag_pipeline_variables: []
