@@ -49,12 +49,11 @@ paths:
             schema:
               type: object
               properties:
-                entities:
-                  type: object
-                  description: Entities dict (pass this OR conversation_id)
                 conversation_id:
                   type: string
                   description: Dify conversation ID — server looks up entities from store
+              required:
+                - conversation_id
       responses:
         '200':
           description: Validation result
@@ -91,9 +90,6 @@ paths:
             schema:
               type: object
               properties:
-                entities:
-                  type: object
-                  description: Current entities object (pass this OR conversation_id)
                 conversation_id:
                   type: string
                   description: Dify conversation ID — server looks up and updates stored entities
@@ -103,6 +99,7 @@ paths:
                   items:
                     type: object
               required:
+                - conversation_id
                 - corrections
       responses:
         '200':
@@ -126,15 +123,14 @@ paths:
             schema:
               type: object
               properties:
-                entities:
-                  type: object
-                  description: Entities dict to generate spec from (pass this OR conversation_id)
                 conversation_id:
                   type: string
                   description: Dify conversation ID — server looks up entities from store
                 org_name:
                   type: string
                   description: Organisation name
+              required:
+                - conversation_id
       responses:
         '200':
           description: Generated YAML spec
@@ -354,6 +350,13 @@ paths:
     post:
       operationId: upload_bundle
       summary: Upload a bundle ZIP to Avni server for import
+      parameters:
+        - name: avni-auth-token
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Avni authentication token
       requestBody:
         required: true
         content:
@@ -368,7 +371,7 @@ paths:
                 - bundle_zip_b64
       responses:
         '200':
-          description: Upload task ID
+          description: Upload task created
           content:
             application/json:
               schema:
@@ -376,14 +379,13 @@ paths:
                 properties:
                   task_id:
                     type: string
+                  status:
+                    type: string
+                    enum: [pending]
         '400':
           description: Bad request — malformed bundle
         '401':
           description: Unauthorized — missing or expired auth token
-        '403':
-          description: Forbidden — insufficient permissions
-        '404':
-          description: Not found
         '500':
           description: Internal server error
 
@@ -406,15 +408,17 @@ paths:
               schema:
                 type: object
                 properties:
+                  task_id:
+                    type: string
                   status:
                     type: string
                     enum: [pending, processing, completed, failed]
-                  message:
+                  progress:
                     type: string
-                  errors:
-                    type: array
-                    items:
-                      type: string
+                  result:
+                    type: object
+                  error:
+                    type: string
 
   /api/existing-config:
     get:

@@ -222,6 +222,17 @@ workflow:
       - remote_url
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -3437,12 +3448,12 @@ workflow:
       height: 1207
       id: '1775539639483'
       position:
-        x: 4526
-        y: 1878
+        x: 5542.8667764206575
+        y: 1944.4169741355836
       positionAbsolute:
-        x: 4526
-        y: 1878
-      selected: false
+        x: 5542.8667764206575
+        y: 1944.4169741355836
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3462,8 +3473,8 @@ workflow:
         x: 60
         y: 458
       positionAbsolute:
-        x: 4586
-        y: 2336
+        x: 5602.8667764206575
+        y: 2402.4169741355836
       selectable: false
       sourcePosition: right
       targetPosition: left
@@ -3507,8 +3518,8 @@ workflow:
         x: 1492
         y: 544
       positionAbsolute:
-        x: 6018
-        y: 2422
+        x: 7034.8667764206575
+        y: 2488.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3544,8 +3555,8 @@ workflow:
         x: 1814
         y: 636
       positionAbsolute:
-        x: 6340
-        y: 2514
+        x: 7356.8667764206575
+        y: 2580.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3577,8 +3588,8 @@ workflow:
         x: 2136
         y: 620
       positionAbsolute:
-        x: 6662
-        y: 2498
+        x: 7678.8667764206575
+        y: 2564.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3608,7 +3619,7 @@ workflow:
         method: post
         params: ''
         retry_config:
-          max_retries: 1
+          max_retries: 3
           retry_enabled: true
           retry_interval: 2000
         selected: false
@@ -3628,8 +3639,8 @@ workflow:
         x: 2458
         y: 573
       positionAbsolute:
-        x: 6984
-        y: 2451
+        x: 8000.8667764206575
+        y: 2517.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3673,8 +3684,8 @@ workflow:
         x: 2800
         y: 876
       positionAbsolute:
-        x: 7326
-        y: 2754
+        x: 8342.866776420658
+        y: 2820.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3706,8 +3717,8 @@ workflow:
         x: 3142
         y: 860
       positionAbsolute:
-        x: 7668
-        y: 2738
+        x: 8684.866776420658
+        y: 2804.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3730,8 +3741,8 @@ workflow:
         x: 1170
         y: 415
       positionAbsolute:
-        x: 5696
-        y: 2293
+        x: 6712.8667764206575
+        y: 2359.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3754,8 +3765,8 @@ workflow:
         x: 3484
         y: 600
       positionAbsolute:
-        x: 8010
-        y: 2478
+        x: 9026.866776420658
+        y: 2544.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3851,9 +3862,11 @@ workflow:
               extra:
                 description: Validate extracted entities for structural issues
               parameters:
-                entities:
-                  auto: 1
-                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
               provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
               provider_show_name: Avni AI Staging openAPI
               settings: {}
@@ -3865,10 +3878,12 @@ workflow:
               extra:
                 description: Apply corrections to extracted entities
               parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
                 corrections:
-                  auto: 1
-                  value: null
-                entities:
                   auto: 1
                   value: null
               provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
@@ -3880,20 +3895,40 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Generate YAML spec from entities
+                description: Generate a human-readable YAML spec from entities
               parameters:
-                entities:
-                  auto: 1
-                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
                 org_name:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#conversation.org_name#}}'
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Generate a human-readable YAML spec from entities
+              tool_label: generate_spec
+              tool_name: generate_spec
+              type: api
+            - enabled: false
+              extra:
+                description: Convert a YAML spec to a full entities dict for bundle
+                  generation
+              parameters:
+                spec_yaml:
                   auto: 1
                   value: null
               provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
               provider_show_name: Avni AI Staging openAPI
               settings: {}
-              tool_description: Generate YAML spec from entities
-              tool_label: generate_spec
-              tool_name: generate_spec
+              tool_description: Convert a YAML spec to a full entities dict for bundle
+                generation
+              tool_label: spec_to_entities
+              tool_name: spec_to_entities
               type: api
             - enabled: true
               extra:
@@ -3910,71 +3945,6 @@ workflow:
                 errors
               tool_label: validate_spec
               tool_name: validate_spec
-              type: api
-            - enabled: false
-              extra:
-                description: Validate a generated bundle ZIP
-              parameters:
-                bundle_zip_b64:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Validate a generated bundle ZIP
-              tool_label: validate_bundle
-              tool_name: validate_bundle
-              type: api
-            - enabled: false
-              extra:
-                description: Convert an existing bundle to human-readable YAML spec
-              parameters:
-                bundle:
-                  auto: 1
-                  value: null
-                org_name:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Convert an existing bundle to human-readable YAML
-                spec
-              tool_label: bundle_to_spec
-              tool_name: bundle_to_spec
-              type: api
-            - enabled: false
-              extra:
-                description: Check bundle upload status
-              parameters:
-                task_id:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Check bundle upload status
-              tool_label: upload_status
-              tool_name: upload_status
-              type: api
-            - enabled: true
-              extra:
-                description: Call this once after entity extraction. Agent tools can
-                  then pass only conversation_id instead of the full entities payload.
-              parameters:
-                conversation_id:
-                  auto: 1
-                  value: null
-                entities:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Call this once after entity extraction. Agent tools
-                can then pass only conversation_id instead of the full entities payload.
-              tool_label: store_entities
-              tool_name: store_entities
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
@@ -3997,9 +3967,9 @@ workflow:
         x: 506
         y: 350
       positionAbsolute:
-        x: 5032
-        y: 2228
-      selected: true
+        x: 6048.8667764206575
+        y: 2294.4169741355836
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4045,8 +4015,8 @@ workflow:
         x: 828
         y: 456
       positionAbsolute:
-        x: 5354
-        y: 2334
+        x: 6370.8667764206575
+        y: 2400.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4078,8 +4048,8 @@ workflow:
         x: 1170
         y: 591
       positionAbsolute:
-        x: 5696
-        y: 2469
+        x: 6712.8667764206575
+        y: 2535.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4164,8 +4134,8 @@ workflow:
         x: 3484
         y: 776
       positionAbsolute:
-        x: 8010
-        y: 2654
+        x: 9026.866776420658
+        y: 2720.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4209,8 +4179,8 @@ workflow:
         x: 3806
         y: 806
       positionAbsolute:
-        x: 8332
-        y: 2684
+        x: 9348.866776420658
+        y: 2750.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4287,8 +4257,8 @@ workflow:
         x: 2800
         y: 341
       positionAbsolute:
-        x: 7326
-        y: 2219
+        x: 8342.866776420658
+        y: 2285.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4311,8 +4281,8 @@ workflow:
         x: 3142
         y: 380
       positionAbsolute:
-        x: 7668
-        y: 2258
+        x: 8684.866776420658
+        y: 2324.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4335,8 +4305,8 @@ workflow:
         x: 3142
         y: 60
       positionAbsolute:
-        x: 7668
-        y: 1938
+        x: 8684.866776420658
+        y: 2004.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4359,8 +4329,8 @@ workflow:
         x: 3122
         y: 540
       positionAbsolute:
-        x: 7648
-        y: 2418
+        x: 8664.866776420658
+        y: 2484.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4383,8 +4353,8 @@ workflow:
         x: 3142
         y: 220
       positionAbsolute:
-        x: 7668
-        y: 2098
+        x: 8684.866776420658
+        y: 2164.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4407,8 +4377,8 @@ workflow:
         x: 3142
         y: 700
       positionAbsolute:
-        x: 7668
-        y: 2578
+        x: 8684.866776420658
+        y: 2644.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4449,8 +4419,8 @@ workflow:
         x: 184
         y: 427
       positionAbsolute:
-        x: 4710
-        y: 2305
+        x: 5726.8667764206575
+        y: 2371.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4491,8 +4461,8 @@ workflow:
         x: 4128
         y: 861
       positionAbsolute:
-        x: 8654
-        y: 2739
+        x: 9670.866776420658
+        y: 2805.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4572,8 +4542,8 @@ workflow:
         x: 4128
         y: 1010
       positionAbsolute:
-        x: 8654
-        y: 2888
+        x: 9670.866776420658
+        y: 2954.4169741355836
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4581,7 +4551,7 @@ workflow:
       width: 242
       zIndex: 1002
     viewport:
-      x: -1341.5388636682824
-      y: -336.2409441652892
-      zoom: 0.3565127233880833
+      x: -1036.5730338604442
+      y: -394.96643346242206
+      zoom: 0.25
   rag_pipeline_variables: []

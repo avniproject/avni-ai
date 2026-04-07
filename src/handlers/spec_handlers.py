@@ -35,8 +35,8 @@ async def handle_generate_spec(request: Request) -> JSONResponse:
     except Exception:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
-    entities = body.get("entities")
-    conversation_id = body.get("conversation_id")
+    entities = body.get("entities") or None
+    conversation_id = body.get("conversation_id") or None
 
     if entities is None and conversation_id:
         entities = _entity_store.get(conversation_id)
