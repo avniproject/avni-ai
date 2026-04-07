@@ -27,6 +27,14 @@ version: 0.6.0
 workflow:
   conversation_variables:
   - description: ''
+    id: 46d3fb17-24ab-41bd-ac14-eadaab0b6922
+    name: review_errors
+    selector:
+    - conversation
+    - review_errors
+    value: ''
+    value_type: string
+  - description: ''
     id: 2f4fff3b-8643-4e22-9d9f-70b34a4ae94a
     name: bundle_approved
     selector:
@@ -214,17 +222,6 @@ workflow:
       - remote_url
       - local_file
       enabled: true
-      fileUploadConfig:
-        attachment_image_file_size_limit: 2
-        audio_file_size_limit: 50
-        batch_count_limit: 5
-        file_size_limit: 15
-        file_upload_limit: 50
-        image_file_batch_limit: 10
-        image_file_size_limit: 10
-        single_chunk_attachment_limit: 10
-        video_file_size_limit: 100
-        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -1295,6 +1292,32 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: assigner
+      id: 177553979885712-case-bundle-rejected-1775545071563-target
+      source: '177553979885712'
+      sourceHandle: case-bundle-rejected
+      target: '1775545071563'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: assigner
+      id: 177553979885712-false-1775545071563-target
+      source: '177553979885712'
+      sourceHandle: 'false'
+      target: '1775545071563'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
     nodes:
     - data:
         desc: Define the initial parameters for launching a workflow
@@ -3752,15 +3775,39 @@ workflow:
 
               IMPORTANT: use conversation_id for all tool calls.
 
+
+              {% if conversation.review_errors and conversation.review_errors != ""
+              %}
+
+              PREVIOUS BUNDLE WAS REJECTED. Errors from the Review Agent:
+
+
+              {{#conversation.review_errors#}}
+
+
+              You MUST fix these errors before regenerating the spec. Apply corrections
+              via apply_entity_corrections before calling generate_spec.
+
+              {% endif %}
+
+
               Steps — do ALL in order, do NOT ask the user anything:
 
-              1. Call generate_spec with {"conversation_id": "{{#sys.conversation_id#}}"}
 
-              2. Call validate_spec with the returned spec_yaml
+              1. If review_errors exist (see above): call apply_entity_corrections
+              with the corrections needed to fix those errors, then proceed.
 
-              3. If validation has errors, call apply_entity_corrections then regenerate.
 
-              4. Output your final message in EXACTLY this format:
+              2. Call generate_spec with {"conversation_id": "{{#sys.conversation_id#}}"}
+
+
+              3. Call validate_spec with the returned spec_yaml
+
+
+              4. If validation has errors, call apply_entity_corrections then regenerate.
+
+
+              5. Output your final message in EXACTLY this format:
 
 
               SPEC_APPROVED
@@ -3777,7 +3824,9 @@ workflow:
               - Your final output MUST start with SPEC_APPROVED on its own line followed
               by the raw YAML spec.
 
-              - Do NOT add commentary before SPEC_APPROVED.'
+              - Do NOT add commentary before SPEC_APPROVED.
+
+              '
           maximum_iterations:
             type: constant
             value: 5
@@ -3950,7 +3999,7 @@ workflow:
       positionAbsolute:
         x: 5032
         y: 2228
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4046,13 +4095,13 @@ workflow:
               \ pre-filled in the validate_bundle tool. Do NOT look for it anywhere\
               \ else. Do NOT ask the user for it. Just call the tool immediately.\n\
               \nStep 1 — Call validate_bundle NOW. The parameter is pre-filled; invoke\
-              \ the tool as-is.\nStep 2 — Read the result:\n  \u2022 If valid=true\
-              \ and errors=[]: respond with exactly: BUNDLE_APPROVED\n  \u2022 If\
-              \ valid=false or errors is non-empty: respond with exactly: BUNDLE_REJECTED:\
-              \ followed by the error list.\n\nRULES:\n- Call validate_bundle exactly\
-              \ once. No other tool calls.\n- Do NOT write any preamble, greeting,\
-              \ or explanation.\n- Do NOT ask the user any questions.\n- Your ENTIRE\
-              \ response MUST be either BUNDLE_APPROVED or BUNDLE_REJECTED: <errors>."
+              \ the tool as-is.\nStep 2 — Read the result:\n  • If valid=true and\
+              \ errors=[]: respond with exactly: BUNDLE_APPROVED\n  • If valid=false\
+              \ or errors is non-empty: respond with exactly: BUNDLE_REJECTED: followed\
+              \ by the error list.\n\nRULES:\n- Call validate_bundle exactly once.\
+              \ No other tool calls.\n- Do NOT write any preamble, greeting, or explanation.\n\
+              - Do NOT ask the user any questions.\n- Your ENTIRE response MUST be\
+              \ either BUNDLE_APPROVED or BUNDLE_REJECTED: <errors>."
           maximum_iterations:
             type: constant
             value: 3
@@ -4104,7 +4153,7 @@ workflow:
         loop_id: '1775539639483'
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
-        selected: true
+        selected: false
         title: Review Agent
         tool_node_version: '2'
         type: agent
@@ -4117,7 +4166,7 @@ workflow:
       positionAbsolute:
         x: 8010
         y: 2654
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4498,8 +4547,41 @@ workflow:
       targetPosition: left
       type: custom
       width: 242
+    - data:
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '177553979885711'
+          - text
+          variable_selector:
+          - conversation
+          - review_errors
+          write_mode: over-write
+        loop_id: '1775539639483'
+        selected: false
+        title: Variable Assigner 12
+        type: assigner
+        version: '2'
+      height: 84
+      id: '1775545071563'
+      parentId: '1775539639483'
+      position:
+        x: 4128
+        y: 1010
+      positionAbsolute:
+        x: 8654
+        y: 2888
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
     viewport:
-      x: -1832.5582580576051
-      y: -274.77899692388246
-      zoom: 0.25034681392783364
+      x: -1341.5388636682824
+      y: -336.2409441652892
+      zoom: 0.3565127233880833
   rag_pipeline_variables: []
