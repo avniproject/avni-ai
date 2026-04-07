@@ -26,6 +26,22 @@ kind: app
 version: 0.6.0
 workflow:
   conversation_variables:
+  - description: ''
+    id: 2f4fff3b-8643-4e22-9d9f-70b34a4ae94a
+    name: bundle_approved
+    selector:
+    - conversation
+    - bundle_approved
+    value: false
+    value_type: boolean
+  - description: ''
+    id: 999821f7-4bbe-4eaa-802e-c9b9ba9b22ab
+    name: spec_loop_active
+    selector:
+    - conversation
+    - spec_loop_active
+    value: true
+    value_type: boolean
   - description: Avni auth token for API calls
     id: f3337c5a-b833-47a7-8eeb-1d29182542f9
     name: auth_token
@@ -198,6 +214,17 @@ workflow:
       - remote_url
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -351,66 +378,6 @@ workflow:
       source: '1774617205889'
       sourceHandle: __timeout
       target: ef812954-180c-4672-9c41-4d2e8058fdb5
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1775380701991-true-1775380779498-target
-      selected: false
-      source: '1775380701991'
-      sourceHandle: 'true'
-      target: '1775380779498'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1775380701991-d26825bc-0735-4704-b42c-eb42f6cb4b67-1775380796294-target
-      selected: false
-      source: '1775380701991'
-      sourceHandle: d26825bc-0735-4704-b42c-eb42f6cb4b67
-      target: '1775380796294'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1775380701991-bef31e01-b42e-40cf-9c16-fd9fef71ec17-1775380815321-target
-      selected: false
-      source: '1775380701991'
-      sourceHandle: bef31e01-b42e-40cf-9c16-fd9fef71ec17
-      target: '1775380815321'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1775380701991-16b24b6c-aef8-437c-a9e3-18a892d85f37-1775380840852-target
-      selected: false
-      source: '1775380701991'
-      sourceHandle: 16b24b6c-aef8-437c-a9e3-18a892d85f37
-      target: '1775380840852'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 1775380701991-54bc604c-0b21-4ea6-8050-d3af11bdbce4-1775380857743-target
-      selected: false
-      source: '1775380701991'
-      sourceHandle: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
-      target: '1775380857743'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -595,18 +562,6 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
-      id: 76910038-4a13-4647-aee2-30be4c282e31-true-e6b32cb1-406f-47e0-8f96-18b75d76fdf2-target
-      selected: false
-      source: 76910038-4a13-4647-aee2-30be4c282e31
-      sourceHandle: 'true'
-      target: e6b32cb1-406f-47e0-8f96-18b75d76fdf2
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         sourceType: if-else
         targetType: answer
       id: 1757493270484-case-setup-guidance-d9ccc273-d1c4-44d1-8894-177b64b92bfa-target
@@ -714,6 +669,7 @@ workflow:
         sourceType: http-request
         targetType: code
       id: 1774617517718-source-17749417129260-target
+      selected: false
       source: '1774617517718'
       sourceHandle: source
       target: '17749417129260'
@@ -727,6 +683,7 @@ workflow:
         sourceType: code
         targetType: if-else
       id: 17749417129260-source-1774617558364-target
+      selected: false
       source: '17749417129260'
       sourceHandle: source
       target: '1774617558364'
@@ -738,6 +695,7 @@ workflow:
         sourceType: start
         targetType: knowledge-retrieval
       id: 1711528708197-source-1758713692744-target
+      selected: false
       source: '1711528708197'
       sourceHandle: source
       target: '1758713692744'
@@ -749,6 +707,7 @@ workflow:
         sourceType: knowledge-retrieval
         targetType: llm
       id: 1758713692744-source-1757492907627-target
+      selected: false
       source: '1758713692744'
       sourceHandle: source
       target: '1757492907627'
@@ -772,6 +731,7 @@ workflow:
         sourceType: if-else
         targetType: if-else
       id: 1757493270484-case-filesetup-f1ffbe75-d06a-4349-b6d4-78aabd9596ee-target
+      selected: false
       source: '1757493270484'
       sourceHandle: case-filesetup
       target: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
@@ -783,6 +743,7 @@ workflow:
         sourceType: if-else
         targetType: document-extractor
       id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee-false-1774264909113-target
+      selected: false
       source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
       sourceHandle: 'false'
       target: '1774264909113'
@@ -794,6 +755,7 @@ workflow:
         sourceType: document-extractor
         targetType: llm
       id: 1774264909113-source-17748507380970-target
+      selected: false
       source: '1774264909113'
       sourceHandle: source
       target: '17748507380970'
@@ -805,6 +767,7 @@ workflow:
         sourceType: llm
         targetType: assigner
       id: 17748507380970-source-9c0103c2-e377-4925-8f4a-501ff5b34379-target
+      selected: false
       source: '17748507380970'
       sourceHandle: source
       target: 9c0103c2-e377-4925-8f4a-501ff5b34379
@@ -816,6 +779,7 @@ workflow:
         sourceType: assigner
         targetType: http-request
       id: 9c0103c2-e377-4925-8f4a-501ff5b34379-source-ecd0bd72-6c77-4fb8-a362-0164343614af-target
+      selected: false
       source: 9c0103c2-e377-4925-8f4a-501ff5b34379
       sourceHandle: source
       target: ecd0bd72-6c77-4fb8-a362-0164343614af
@@ -824,31 +788,10 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: if-else
-        targetType: agent
-      id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee-case-true-3b1db8bf-6e79-4646-9103-077a6ca90299-target
-      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
-      sourceHandle: case-true
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: human-input
-        targetType: agent
-      id: 1774617205889-Yes-3b1db8bf-6e79-4646-9103-077a6ca90299-target
-      source: '1774617205889'
-      sourceHandle: 'Yes'
-      target: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: answer
         targetType: human-input
       id: 1773909436902-source-1774617205889-target
+      selected: false
       source: '1773909436902'
       sourceHandle: source
       target: '1774617205889'
@@ -860,6 +803,7 @@ workflow:
         sourceType: human-input
         targetType: answer
       id: 1774617205889-Yes-ea75c737-ec88-4d16-ab02-281ab9c2d006-target
+      selected: false
       source: '1774617205889'
       sourceHandle: 'Yes'
       target: ea75c737-ec88-4d16-ab02-281ab9c2d006
@@ -871,6 +815,7 @@ workflow:
         sourceType: llm
         targetType: answer
       id: 17748474036620-source-1773909436902-target
+      selected: false
       source: '17748474036620'
       sourceHandle: source
       target: '1773909436902'
@@ -882,6 +827,7 @@ workflow:
         sourceType: http-request
         targetType: llm
       id: 1773908701222-source-17748474036620-target
+      selected: false
       source: '1773908701222'
       sourceHandle: source
       target: '17748474036620'
@@ -893,164 +839,10 @@ workflow:
         sourceType: http-request
         targetType: http-request
       id: ecd0bd72-6c77-4fb8-a362-0164343614af-source-1773908701222-target
+      selected: false
       source: ecd0bd72-6c77-4fb8-a362-0164343614af
       sourceHandle: source
       target: '1773908701222'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: agent
-        targetType: code
-      id: 3b1db8bf-6e79-4646-9103-077a6ca90299-source-0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c-target
-      source: 3b1db8bf-6e79-4646-9103-077a6ca90299
-      sourceHandle: source
-      target: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c-source-61246b3d-16a0-4768-8b58-d9d3aa1c0441-target
-      source: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
-      sourceHandle: source
-      target: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: answer
-      id: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c-source-c65065ca-cc2a-4584-9a1b-86df0ee71658-target
-      source: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
-      sourceHandle: source
-      target: c65065ca-cc2a-4584-9a1b-86df0ee71658
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: http-request
-      id: 61246b3d-16a0-4768-8b58-d9d3aa1c0441-source-a3d80a70-5da7-4edc-9c32-66de6f9845e1-target
-      source: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
-      sourceHandle: source
-      target: a3d80a70-5da7-4edc-9c32-66de6f9845e1
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: code
-      id: a3d80a70-5da7-4edc-9c32-66de6f9845e1-source-92c62559-e52e-454c-a579-ddc4536a6134-target
-      source: a3d80a70-5da7-4edc-9c32-66de6f9845e1
-      sourceHandle: source
-      target: 92c62559-e52e-454c-a579-ddc4536a6134
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: code
-      id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2-source-4eb75ab2-87de-48f6-b52e-35f8646da88d-target
-      source: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-      sourceHandle: source
-      target: 4eb75ab2-87de-48f6-b52e-35f8646da88d
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: 92c62559-e52e-454c-a579-ddc4536a6134-source-b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7-target
-      source: 92c62559-e52e-454c-a579-ddc4536a6134
-      sourceHandle: source
-      target: b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: http-request
-      id: b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7-source-e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2-target
-      source: b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7
-      sourceHandle: source
-      target: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: 4eb75ab2-87de-48f6-b52e-35f8646da88d-source-473230ae-fcca-4f3b-b410-fc792d8b0e88-target
-      source: 4eb75ab2-87de-48f6-b52e-35f8646da88d
-      sourceHandle: source
-      target: 473230ae-fcca-4f3b-b410-fc792d8b0e88
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: answer
-      id: 473230ae-fcca-4f3b-b410-fc792d8b0e88-source-6962ba89-7408-45d1-880f-0fd134dc1705-target
-      source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
-      sourceHandle: source
-      target: 6962ba89-7408-45d1-880f-0fd134dc1705
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: agent
-      id: 473230ae-fcca-4f3b-b410-fc792d8b0e88-source-264d37e7-9580-4d26-be76-4ecdbf32803a-target
-      source: 473230ae-fcca-4f3b-b410-fc792d8b0e88
-      sourceHandle: source
-      target: 264d37e7-9580-4d26-be76-4ecdbf32803a
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: agent
-        targetType: if-else
-      id: 264d37e7-9580-4d26-be76-4ecdbf32803a-source-fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f-target
-      source: 264d37e7-9580-4d26-be76-4ecdbf32803a
-      sourceHandle: source
-      target: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: http-request
-        targetType: if-else
-      id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2-fail-branch-1775380701991-target
-      source: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-      sourceHandle: fail-branch
-      target: '1775380701991'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: http-request
-      id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f-case-bundle-approved-959d2ca3-2445-4375-ac9e-f68f47724a2f-target
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: case-bundle-approved
-      target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       targetHandle: target
       type: custom
       zIndex: 0
@@ -1071,6 +863,7 @@ workflow:
         sourceType: code
         targetType: assigner
       id: 6d81a37b-960b-42d3-ae88-5799cd773102-source-8e0563d0-7844-4e89-a765-cbd9647e7676-target
+      selected: false
       source: 6d81a37b-960b-42d3-ae88-5799cd773102
       sourceHandle: source
       target: 8e0563d0-7844-4e89-a765-cbd9647e7676
@@ -1079,55 +872,10 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f-case-bundle-rejected-cf4c5fbe-1460-44e4-9775-5650873dfdbd-target
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: case-bundle-rejected
-      target: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: code
-      id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f-false-cf4c5fbe-1460-44e4-9775-5650873dfdbd-target
-      selected: false
-      source: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
-      sourceHandle: 'false'
-      target: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: assigner
-      id: cf4c5fbe-1460-44e4-9775-5650873dfdbd-source-ee69171b-0c05-4dcb-bcb2-4057a5119579-target
-      source: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      sourceHandle: source
-      target: ee69171b-0c05-4dcb-bcb2-4057a5119579
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: assigner
-        targetType: if-else
-      id: ee69171b-0c05-4dcb-bcb2-4057a5119579-source-76910038-4a13-4647-aee2-30be4c282e31-target
-      source: ee69171b-0c05-4dcb-bcb2-4057a5119579
-      sourceHandle: source
-      target: 76910038-4a13-4647-aee2-30be4c282e31
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: assigner
         targetType: agent
       id: 8e0563d0-7844-4e89-a765-cbd9647e7676-source-f6a7cffe-d1af-4c54-9a49-a64cf97e3584-target
+      selected: false
       source: 8e0563d0-7844-4e89-a765-cbd9647e7676
       sourceHandle: source
       target: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
@@ -1139,6 +887,7 @@ workflow:
         sourceType: agent
         targetType: if-else
       id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584-source-50519a54-053f-4c25-9486-ec03eadb94ca-target
+      selected: false
       source: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
       sourceHandle: source
       target: 50519a54-053f-4c25-9486-ec03eadb94ca
@@ -1150,6 +899,7 @@ workflow:
         sourceType: http-request
         targetType: if-else
       id: 959d2ca3-2445-4375-ac9e-f68f47724a2f-fail-branch-f9136731-f6e1-472d-8cad-55edaed02022-target
+      selected: false
       source: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       sourceHandle: fail-branch
       target: f9136731-f6e1-472d-8cad-55edaed02022
@@ -1160,18 +910,8 @@ workflow:
         isInLoop: false
         sourceType: if-else
         targetType: answer
-      id: 1775380701991-false-1775380857743-target
-      source: '1775380701991'
-      sourceHandle: 'false'
-      target: '1775380857743'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: if-else
-        targetType: answer
       id: f9136731-f6e1-472d-8cad-55edaed02022-false-608df9da-f21e-4d20-8d01-e4d65fec1256-target
+      selected: false
       source: f9136731-f6e1-472d-8cad-55edaed02022
       sourceHandle: 'false'
       target: 608df9da-f21e-4d20-8d01-e4d65fec1256
@@ -1179,13 +919,379 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        isInLoop: false
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: answer
+      id: 177553979885713-true-177553979885714-target
+      selected: false
+      source: '177553979885713'
+      sourceHandle: 'true'
+      target: '177553979885714'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: answer
+      id: 177553979885713-d26825bc-0735-4704-b42c-eb42f6cb4b67-177553979885715-target
+      selected: false
+      source: '177553979885713'
+      sourceHandle: d26825bc-0735-4704-b42c-eb42f6cb4b67
+      target: '177553979885715'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: answer
+      id: 177553979885713-bef31e01-b42e-40cf-9c16-fd9fef71ec17-177553979885716-target
+      selected: false
+      source: '177553979885713'
+      sourceHandle: bef31e01-b42e-40cf-9c16-fd9fef71ec17
+      target: '177553979885716'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: answer
+      id: 177553979885713-16b24b6c-aef8-437c-a9e3-18a892d85f37-177553979885717-target
+      selected: false
+      source: '177553979885713'
+      sourceHandle: 16b24b6c-aef8-437c-a9e3-18a892d85f37
+      target: '177553979885717'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: answer
+      id: 177553979885713-54bc604c-0b21-4ea6-8050-d3af11bdbce4-177553979885718-target
+      selected: false
+      source: '177553979885713'
+      sourceHandle: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
+      target: '177553979885718'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: agent
+        targetType: code
+      id: 17755397988578-source-17755397988579-target
+      selected: false
+      source: '17755397988578'
+      sourceHandle: source
+      target: '17755397988579'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: code
+        targetType: assigner
+      id: 17755397988579-source-177553979885710-target
+      selected: false
+      source: '17755397988579'
+      sourceHandle: source
+      target: '177553979885710'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: code
+        targetType: answer
+      id: 17755397988579-source-17755397988576-target
+      selected: false
+      source: '17755397988579'
+      sourceHandle: source
+      target: '17755397988576'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: assigner
+        targetType: http-request
+      id: 177553979885710-source-17755397988570-target
+      selected: false
+      source: '177553979885710'
+      sourceHandle: source
+      target: '17755397988570'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: http-request
+        targetType: code
+      id: 17755397988570-source-17755397988571-target
+      selected: false
+      source: '17755397988570'
+      sourceHandle: source
+      target: '17755397988571'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: http-request
+        targetType: code
+      id: 17755397988573-source-17755397988574-target
+      selected: false
+      source: '17755397988573'
+      sourceHandle: source
+      target: '17755397988574'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: code
+        targetType: assigner
+      id: 17755397988571-source-17755397988572-target
+      selected: false
+      source: '17755397988571'
+      sourceHandle: source
+      target: '17755397988572'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: assigner
+        targetType: http-request
+      id: 17755397988572-source-17755397988573-target
+      selected: false
+      source: '17755397988572'
+      sourceHandle: source
+      target: '17755397988573'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: code
+        targetType: assigner
+      id: 17755397988574-source-17755397988575-target
+      selected: false
+      source: '17755397988574'
+      sourceHandle: source
+      target: '17755397988575'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: assigner
+        targetType: answer
+      id: 17755397988575-source-17755397988577-target
+      selected: false
+      source: '17755397988575'
+      sourceHandle: source
+      target: '17755397988577'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: assigner
+        targetType: agent
+      id: 17755397988575-source-177553979885711-target
+      selected: false
+      source: '17755397988575'
+      sourceHandle: source
+      target: '177553979885711'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: agent
+        targetType: if-else
+      id: 177553979885711-source-177553979885712-target
+      selected: false
+      source: '177553979885711'
+      sourceHandle: source
+      target: '177553979885712'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         sourceType: http-request
         targetType: if-else
-      id: a3d80a70-5da7-4edc-9c32-66de6f9845e1-fail-branch-1775380701991-target
-      source: a3d80a70-5da7-4edc-9c32-66de6f9845e1
+      id: 17755397988573-fail-branch-177553979885713-target
+      selected: false
+      source: '17755397988573'
       sourceHandle: fail-branch
-      target: '1775380701991'
+      target: '177553979885713'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: answer
+      id: 177553979885713-false-177553979885718-target
+      selected: false
+      source: '177553979885713'
+      sourceHandle: 'false'
+      target: '177553979885718'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: http-request
+        targetType: if-else
+      id: 17755397988570-fail-branch-177553979885713-target
+      selected: false
+      source: '17755397988570'
+      sourceHandle: fail-branch
+      target: '177553979885713'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: loop-start
+        targetType: assigner
+      id: 1775539639483start-source-17755399262440-target
+      selected: false
+      source: 1775539639483start
+      sourceHandle: source
+      target: '17755399262440'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: assigner
+        targetType: agent
+      id: 17755399262440-source-17755397988578-target
+      selected: false
+      source: '17755399262440'
+      sourceHandle: source
+      target: '17755397988578'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        sourceType: if-else
+        targetType: assigner
+      id: 177553979885712-case-bundle-approved-17755411834170-target
+      source: '177553979885712'
+      sourceHandle: case-bundle-approved
+      target: '17755411834170'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: human-input
+        targetType: loop
+      id: 1774617205889-Yes-1775539639483-target
+      source: '1774617205889'
+      sourceHandle: 'Yes'
+      target: '1775539639483'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: loop
+      id: f1ffbe75-d06a-4349-b6d4-78aabd9596ee-case-true-1775539639483-target
+      source: f1ffbe75-d06a-4349-b6d4-78aabd9596ee
+      sourceHandle: case-true
+      target: '1775539639483'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1775541471535-true-959d2ca3-2445-4375-ac9e-f68f47724a2f-target
+      source: '1775541471535'
+      sourceHandle: 'true'
+      target: 959d2ca3-2445-4375-ac9e-f68f47724a2f
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1775541471535-false-1775541508232-target
+      source: '1775541471535'
+      sourceHandle: 'false'
+      target: '1775541508232'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: loop
+        targetType: if-else
+      id: 1775539639483-source-1775541471535-target
+      source: '1775539639483'
+      sourceHandle: source
+      target: '1775541471535'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -1980,206 +2086,6 @@ workflow:
           type: no-auth
         body:
           data:
-          - type: text
-            value: ''
-          type: none
-        error_strategy: fail-branch
-        headers: avni-auth-token:{{#conversation.auth_token#}}
-        method: get
-        params: includeLocations:false
-        retry_config:
-          max_retries: 1
-          retry_enabled: true
-          retry_interval: 2000
-        selected: false
-        ssl_verify: true
-        timeout:
-          max_connect_timeout: 10
-          max_read_timeout: 120
-          max_write_timeout: 10
-        title: Download Existing Bundle
-        type: http-request
-        url: '{{#conversation.avni_mcp_server_url#}}download-bundle-b64'
-      height: 177
-      id: a3d80a70-5da7-4edc-9c32-66de6f9845e1
-      position:
-        x: 5572
-        y: 1682
-      positionAbsolute:
-        x: 5572
-        y: 1682
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        code: "import json\n\ndef main(raw_body: str) -> dict:\n    try:\n       \
-          \ parsed = json.loads(raw_body) if isinstance(raw_body, str) else raw_body\n\
-          \    except (json.JSONDecodeError, TypeError):\n        parsed = {}\n  \
-          \  return {\"bundle_b64\": parsed.get(\"bundle_zip_b64\", \"\")}\n"
-        code_language: python3
-        outputs:
-          bundle_b64:
-            children: null
-            type: string
-        selected: false
-        title: Build Patch Body
-        type: code
-        variables:
-        - value_selector:
-          - a3d80a70-5da7-4edc-9c32-66de6f9845e1
-          - body
-          value_type: string
-          variable: raw_body
-      height: 52
-      id: 92c62559-e52e-454c-a579-ddc4536a6134
-      position:
-        x: 5914
-        y: 1774
-      positionAbsolute:
-        x: 5914
-        y: 1774
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        items:
-        - input_type: variable
-          operation: over-write
-          value:
-          - 92c62559-e52e-454c-a579-ddc4536a6134
-          - bundle_b64
-          variable_selector:
-          - conversation
-          - patch_input_bundle_b64
-          write_mode: over-write
-        selected: false
-        title: Save Patch Input Bundle B64
-        type: assigner
-        version: '2'
-      height: 84
-      id: b1c2d3e4-f5a6-4789-b0c1-d2e3f4a5b6c7
-      position:
-        x: 6256
-        y: 1758
-      positionAbsolute:
-        x: 6256
-        y: 1758
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        authorization:
-          config: null
-          type: no-auth
-        body:
-          data:
-          - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac691
-            key: existing_bundle_b64
-            type: text
-            value: '{{#conversation.patch_input_bundle_b64#}}'
-          - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac692
-            key: spec_yaml
-            type: text
-            value: '{{#conversation.spec_yaml#}}'
-          type: form-data
-        error_strategy: fail-branch
-        headers: ''
-        method: post
-        params: ''
-        retry_config:
-          max_retries: 1
-          retry_enabled: true
-          retry_interval: 2000
-        selected: false
-        ssl_verify: true
-        timeout:
-          max_connect_timeout: 10
-          max_read_timeout: 180
-          max_write_timeout: 30
-        title: Patch Bundle
-        type: http-request
-        url: '{{#conversation.avni_mcp_server_url#}}patch-bundle'
-      height: 177
-      id: e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-      position:
-        x: 6598
-        y: 1711
-      positionAbsolute:
-        x: 6598
-        y: 1711
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        code: "import json\n\ndef main(body: str) -> dict:\n    try:\n        parsed\
-          \ = json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
-          \ TypeError):\n        parsed = {}\n    return {\n        \"bundle_zip_b64\"\
-          : parsed.get(\"patched_bundle_b64\", parsed.get(\"bundle_zip_b64\", \"\"\
-          )),\n        \"files_patched\": parsed.get(\"files_patched\", 0),\n    \
-          \    \"confidence\": parsed.get(\"confidence\", {})\n    }\n"
-        code_language: python3
-        outputs:
-          bundle_zip_b64:
-            children: null
-            type: string
-          confidence:
-            children: null
-            type: object
-          files_patched:
-            children: null
-            type: number
-        selected: false
-        title: Parse Bundle Response
-        type: code
-        variables:
-        - value_selector:
-          - e8f9a0b1-c2d3-4e4f-a5b6-c7d8e9f0a1b2
-          - body
-          value_type: string
-          variable: body
-      height: 52
-      id: 4eb75ab2-87de-48f6-b52e-35f8646da88d
-      position:
-        x: 6960
-        y: 2140
-      positionAbsolute:
-        x: 6960
-        y: 2140
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        items:
-        - input_type: variable
-          operation: over-write
-          value:
-          - 4eb75ab2-87de-48f6-b52e-35f8646da88d
-          - bundle_zip_b64
-          variable_selector:
-          - conversation
-          - bundle_zip_b64
-          write_mode: over-write
-        selected: false
-        title: Save Bundle B64
-        type: assigner
-        version: '2'
-      height: 84
-      id: 473230ae-fcca-4f3b-b410-fc792d8b0e88
-      position:
-        x: 7302
-        y: 2124
-      positionAbsolute:
-        x: 7302
-        y: 2124
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        authorization:
-          config: null
-          type: no-auth
-        body:
-          data:
           - id: 94a48a21-1e24-4f35-93d1-920d93afe268
             key: ''
             type: text
@@ -2208,11 +2114,11 @@ workflow:
       height: 177
       id: 959d2ca3-2445-4375-ac9e-f68f47724a2f
       position:
-        x: 8368
-        y: 1301
+        x: 9418
+        y: 2652
       positionAbsolute:
-        x: 8368
-        y: 1301
+        x: 9418
+        y: 2652
       selected: false
       type: custom
       width: 242
@@ -2242,11 +2148,11 @@ workflow:
       height: 52
       id: 6d81a37b-960b-42d3-ae88-5799cd773102
       position:
-        x: 8710
-        y: 1334
+        x: 9760
+        y: 2685
       positionAbsolute:
-        x: 8710
-        y: 1334
+        x: 9760
+        y: 2685
       selected: false
       type: custom
       width: 242
@@ -2268,11 +2174,11 @@ workflow:
       height: 84
       id: 8e0563d0-7844-4e89-a765-cbd9647e7676
       position:
-        x: 9052
-        y: 1318
+        x: 10102
+        y: 2669
       positionAbsolute:
-        x: 9052
-        y: 1318
+        x: 10102
+        y: 2669
       selected: false
       type: custom
       width: 242
@@ -2329,11 +2235,11 @@ workflow:
       height: 530
       id: '1774617440956'
       position:
-        x: 10138
-        y: 1544
+        x: 11188
+        y: 2895
       positionAbsolute:
-        x: 10138
-        y: 1544
+        x: 11188
+        y: 2895
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2354,8 +2260,8 @@ workflow:
         x: 60
         y: 135
       positionAbsolute:
-        x: 10198
-        y: 1679
+        x: 11248
+        y: 3030
       selectable: false
       selected: false
       sourcePosition: right
@@ -2421,8 +2327,8 @@ workflow:
         x: 184
         y: 133
       positionAbsolute:
-        x: 10322
-        y: 1677
+        x: 11372
+        y: 3028
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2463,8 +2369,8 @@ workflow:
         x: 506
         y: 79
       positionAbsolute:
-        x: 10644
-        y: 1623
+        x: 11694
+        y: 2974
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2503,8 +2409,8 @@ workflow:
         x: 1150
         y: 60
       positionAbsolute:
-        x: 11288
-        y: 1604
+        x: 12338
+        y: 2955
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2544,8 +2450,8 @@ workflow:
         x: 1492
         y: 244
       positionAbsolute:
-        x: 11630
-        y: 1788
+        x: 12680
+        y: 3139
       selected: false
       type: custom
       width: 242
@@ -2555,9 +2461,6 @@ workflow:
 
 
           Your implementation bundle has been generated and uploaded to Avni.
-
-
-          **Confidence score:**  {{#4eb75ab2-87de-48f6-b52e-35f8646da88d.confidence#}}
 
 
           **Next steps:**
@@ -2579,15 +2482,15 @@ workflow:
         selected: false
         title: Upload Done
         type: answer
-      height: 343
+      height: 308
       id: 48d1cfc7-02ef-457e-8e39-bff34b4fb91e
       parentId: '1774617440956'
       position:
         x: 1814
-        y: 127
+        y: 145
       positionAbsolute:
-        x: 11952
-        y: 1671
+        x: 13002
+        y: 3040
       selected: false
       type: custom
       width: 242
@@ -2606,8 +2509,8 @@ workflow:
         x: 1492
         y: 68
       positionAbsolute:
-        x: 11630
-        y: 1612
+        x: 12680
+        y: 2963
       selected: false
       type: custom
       width: 242
@@ -2622,10 +2525,10 @@ workflow:
       id: ef812954-180c-4672-9c41-4d2e8058fdb5
       position:
         x: 4526
-        y: 1420
+        y: 1438
       positionAbsolute:
         x: 4526
-        y: 1420
+        y: 1438
       selected: false
       type: custom
       width: 242
@@ -2647,10 +2550,10 @@ workflow:
       id: 41baa894-e39d-45c7-826d-9ba1faad150b
       position:
         x: 4526
-        y: 1144
+        y: 1162
       positionAbsolute:
         x: 4526
-        y: 1144
+        y: 1162
       selected: false
       type: custom
       width: 242
@@ -2664,42 +2567,10 @@ workflow:
       id: ea75c737-ec88-4d16-ab02-281ab9c2d006
       position:
         x: 4526
-        y: 1992
+        y: 1666
       positionAbsolute:
         x: 4526
-        y: 1992
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        answer: 📥 Downloading existing bundle from Avni...
-        selected: false
-        title: 'Progress: Downloading Bundle'
-        type: answer
-      height: 116
-      id: c65065ca-cc2a-4584-9a1b-86df0ee71658
-      position:
-        x: 5230
-        y: 1893
-      positionAbsolute:
-        x: 5230
-        y: 1893
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        answer: 📤 Uploading bundle to Avni server...
-        selected: false
-        title: 'Progress: Uploading Bundle'
-        type: answer
-      height: 116
-      id: 6962ba89-7408-45d1-880f-0fd134dc1705
-      position:
-        x: 7664
-        y: 2094
-      positionAbsolute:
-        x: 7664
-        y: 2094
+        y: 1666
       selected: false
       type: custom
       width: 242
@@ -2933,8 +2804,935 @@ workflow:
         x: 828
         y: 133
       positionAbsolute:
-        x: 10966
-        y: 1677
+        x: 12016
+        y: 3028
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: 'You are the Error Agent for the Avni App Configurator. An upload
+              was initiated and you need to monitor or diagnose any issues.
+
+
+              Upload Task ID: {{#conversation.upload_task_id#}}
+
+              Server URL: {{#conversation.avni_mcp_server_url#}}
+
+
+              Workflow:
+
+              1. Check upload status.
+
+              2. If completed successfully, report success to user.
+
+              3. If failed, analyze error message, diagnose root cause.
+
+              4. If fixable (e.g. missing field, wrong format), attempt fix and output
+              RETRY_BUNDLE with corrected entities.
+
+              5. If not fixable, output clear ERROR_REPORT explaining what failed
+              and why.'
+          maximum_iterations:
+            type: constant
+            value: 3
+          model:
+            type: constant
+            value:
+              completion_params:
+                max_tokens: 8192
+                temperature: 0.2
+              mode: chat
+              model: claude-haiku-4-5-20251001
+              model_type: llm
+              provider: langgenius/anthropic/anthropic
+              type: model-selector
+          query:
+            type: constant
+            value: '{{#sys.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: false
+              extra:
+                description: Validate extracted entities for structural issues
+              parameters:
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate extracted entities for structural issues
+              tool_label: validate_entities
+              tool_name: validate_entities
+              type: api
+            - enabled: false
+              extra:
+                description: Apply corrections to extracted entities
+              parameters:
+                corrections:
+                  auto: 1
+                  value: null
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Apply corrections to extracted entities
+              tool_label: apply_entity_corrections
+              tool_name: apply_entity_corrections
+              type: api
+            - enabled: false
+              extra:
+                description: Generate YAML spec from entities
+              parameters:
+                entities:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Generate YAML spec from entities
+              tool_label: generate_spec
+              tool_name: generate_spec
+              type: api
+            - enabled: false
+              extra:
+                description: Validate a YAML spec for structural and cross-reference
+                  errors
+              parameters:
+                spec_yaml:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate a YAML spec for structural and cross-reference
+                errors
+              tool_label: validate_spec
+              tool_name: validate_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Validate a generated bundle ZIP
+              parameters:
+                bundle_zip_b64:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Validate a generated bundle ZIP
+              tool_label: validate_bundle
+              tool_name: validate_bundle
+              type: api
+            - enabled: false
+              extra:
+                description: Convert an existing bundle to human-readable YAML spec
+              parameters:
+                bundle:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Convert an existing bundle to human-readable YAML
+                spec
+              tool_label: bundle_to_spec
+              tool_name: bundle_to_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Check bundle upload status
+              parameters:
+                task_id:
+                  auto: 1
+                  value: null
+              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
+              provider_show_name: Avni AI Staging openAPI
+              settings: {}
+              tool_description: Check bundle upload status
+              tool_label: upload_status
+              tool_name: upload_status
+              type: api
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: Diagnoses upload failures, analyzes server errors, and attempts recovery
+          or reports clearly to the user.
+        output_schema: null
+        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Error Agent
+        tool_node_version: '2'
+        type: agent
+      height: 248
+      id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+      position:
+        x: 10484
+        y: 2587
+      positionAbsolute:
+        x: 10484
+        y: 2587
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000001
+            value: '400'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: 'true'
+          logical_operator: and
+        - case_id: upload-case-401
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000002
+            value: '401'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: upload-case-401
+          logical_operator: and
+        - case_id: upload-case-403
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000003
+            value: '403'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: upload-case-403
+          logical_operator: and
+        - case_id: upload-case-404
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000004
+            value: '404'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: upload-case-404
+          logical_operator: and
+        - case_id: upload-case-500
+          conditions:
+          - comparison_operator: '='
+            id: a1b2c3d4-0001-4001-8001-000000000005
+            value: '500'
+            varType: number
+            variable_selector:
+            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
+            - status_code
+          id: upload-case-500
+          logical_operator: and
+        selected: false
+        title: Upload Error Check
+        type: if-else
+      height: 436
+      id: f9136731-f6e1-472d-8cad-55edaed02022
+      position:
+        x: 9780
+        y: 2973
+      positionAbsolute:
+        x: 9780
+        y: 2973
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: bad request format'
+        selected: false
+        title: Upload Err 400
+        type: answer
+        variables: []
+      height: 100
+      id: da538de9-c1a6-46e9-b189-9e5978bf6521
+      position:
+        x: 10142
+        y: 2833
+      positionAbsolute:
+        x: 10142
+        y: 2833
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: Auth token missing or expired. Please start a new
+          conversation.'
+        selected: false
+        title: Upload Err 401
+        type: answer
+        variables: []
+      height: 132
+      id: eed94bb6-3565-4fbc-944c-3b114211f447
+      position:
+        x: 10142
+        y: 3013
+      positionAbsolute:
+        x: 10142
+        y: 3013
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: Unauthorized access'
+        selected: false
+        title: Upload Err 403
+        type: answer
+        variables: []
+      height: 100
+      id: 848fa968-67cb-41cc-a287-322536fe9f69
+      position:
+        x: 10142
+        y: 3225
+      positionAbsolute:
+        x: 10142
+        y: 3225
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: Entity not found'
+        selected: false
+        title: Upload Err 404
+        type: answer
+        variables: []
+      height: 100
+      id: 7b04db95-2264-496e-8447-0efb83a7b9a2
+      position:
+        x: 10142
+        y: 3405
+      positionAbsolute:
+        x: 10142
+        y: 3405
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Upload failed: Server error. Please try again later.'
+        selected: false
+        title: Upload Err 500
+        type: answer
+        variables: []
+      height: 116
+      id: 608df9da-f21e-4d20-8d01-e4d65fec1256
+      position:
+        x: 10142
+        y: 3585
+      positionAbsolute:
+        x: 10142
+        y: 3585
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: case-retry-bundle
+          conditions:
+          - comparison_operator: contains
+            id: cev-cond-retry
+            value: RETRY_BUNDLE
+            varType: string
+            variable_selector:
+            - f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+            - text
+          id: case-retry-bundle
+          logical_operator: and
+        - case_id: case-error-report
+          conditions:
+          - comparison_operator: contains
+            id: cev-cond-error
+            value: ERROR_REPORT
+            varType: string
+            variable_selector:
+            - f6a7cffe-d1af-4c54-9a49-a64cf97e3584
+            - text
+          id: case-error-report
+          logical_operator: and
+        selected: false
+        title: Check Error Verdict
+        type: if-else
+      height: 220
+      id: 50519a54-053f-4c25-9486-ec03eadb94ca
+      position:
+        x: 10826
+        y: 2601
+      positionAbsolute:
+        x: 10826
+        y: 2601
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: '❌ **Upload failed and could not be auto-corrected.**
+
+
+          Please review the error details above. You can describe corrections or upload
+          a revised specification to try again.'
+        selected: false
+        title: Upload Error Report
+        type: answer
+      height: 164
+      id: 0f4603cf-1aab-4b53-a05d-c5cb6f9194c2
+      position:
+        x: 11188
+        y: 2651
+      positionAbsolute:
+        x: 11188
+        y: 2651
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: '⚠️ **Are you sure you want to delete the entire implementation?**
+
+
+          This will remove all Subject Types, Programs, Encounter Types, Forms, and
+          related configuration from the organisation. This action cannot be undone.
+
+
+          Please confirm by clicking **Yes** or **No**.'
+        selected: false
+        title: Delete Confirm Prompt
+        type: answer
+      height: 212
+      id: 6494459f-3dee-4fc1-bdff-ff0400aefd52
+      position:
+        x: 1408
+        y: 585
+      positionAbsolute:
+        x: 1408
+        y: 585
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        delivery_methods:
+        - enabled: true
+          id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+          type: webapp
+        form_content: ''
+        inputs: []
+        selected: false
+        timeout: 2
+        timeout_unit: hour
+        title: Delete Confirmation
+        type: human-input
+        user_actions:
+        - button_style: primary
+          id: 'Yes'
+          title: 'Yes'
+        - button_style: default
+          id: 'No'
+          title: 'No'
+      height: 190
+      id: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88
+      position:
+        x: 1750
+        y: 596
+      positionAbsolute:
+        x: 1750
+        y: 596
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config:
+            api_key: ''
+            header: avni-auth-token
+            type: custom
+          type: api-key
+        body:
+          data: ''
+          type: none
+        headers: Content-Type:application/json
+        method: delete
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        timeout:
+          connect: 30
+          max_connect_timeout: 300
+          max_read_timeout: 600
+          max_write_timeout: 600
+          read: 120
+          write: 120
+        title: Delete Implementation
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}/api/implementation'
+        variables:
+        - value_selector:
+          - conversation
+          - auth_token
+          variable: auth_token
+      height: 141
+      id: fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b
+      position:
+        x: 2112
+        y: 467
+      positionAbsolute:
+        x: 2112
+        y: 467
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: '='
+            id: drc-cond-200
+            value: '200'
+            varType: number
+            variable_selector:
+            - fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b
+            - status_code
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: Delete Result Check
+        type: if-else
+      height: 148
+      id: 13f1b052-2aed-4126-937d-5a4837d77639
+      position:
+        x: 2454
+        y: 464
+      positionAbsolute:
+        x: 2454
+        y: 464
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: '✅ **Implementation deleted successfully.**
+
+
+          All configuration has been removed. You can start fresh by uploading a new
+          scoping document or describing your requirements.'
+        selected: false
+        title: Delete Success
+        type: answer
+      height: 164
+      id: c776a305-2e50-42e0-9209-32881d893c32
+      position:
+        x: 2816
+        y: 264
+      positionAbsolute:
+        x: 2816
+        y: 264
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: '❌ **Failed to delete implementation.**
+
+
+          The server returned an error. Please check your auth token is valid and
+          try again.'
+        selected: false
+        title: Delete Failure
+        type: answer
+      height: 148
+      id: 750b6d5a-d7b6-4e8f-8449-b51e3d84f7fd
+      position:
+        x: 2816
+        y: 508
+      positionAbsolute:
+        x: 2816
+        y: 508
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        answer: Delete operation cancelled. Your current configuration remains unchanged.
+        selected: false
+        title: Delete Cancelled
+        type: answer
+      height: 132
+      id: 3cfb30bf-9386-48db-bfa2-3bd3359cf040
+      position:
+        x: 2112
+        y: 688
+      positionAbsolute:
+        x: 2112
+        y: 688
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        break_conditions:
+        - comparison_operator: is
+          id: 72e8e510-e913-4b81-bb98-a7995578e7d3
+          value: false
+          varType: boolean
+          variable_selector:
+          - conversation
+          - spec_loop_active
+        error_handle_mode: terminated
+        height: 1207
+        logical_operator: and
+        loop_count: 5
+        selected: false
+        start_node_id: 1775539639483start
+        title: Spec Review Loop
+        type: loop
+        width: 4432
+      height: 1207
+      id: '1775539639483'
+      position:
+        x: 4526
+        y: 1878
+      positionAbsolute:
+        x: 4526
+        y: 1878
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 4432
+      zIndex: 1
+    - data:
+        desc: ''
+        isInLoop: true
+        selected: false
+        title: ''
+        type: loop-start
+      draggable: false
+      height: 48
+      id: 1775539639483start
+      parentId: '1775539639483'
+      position:
+        x: 60
+        y: 458
+      positionAbsolute:
+        x: 4586
+        y: 2336
+      selectable: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-loop-start
+      width: 44
+      zIndex: 1002
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - type: text
+            value: ''
+          type: none
+        error_strategy: fail-branch
+        headers: avni-auth-token:{{#conversation.auth_token#}}
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        method: get
+        params: includeLocations:false
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 2000
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 120
+          max_write_timeout: 10
+        title: Download Existing Bundle
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}download-bundle-b64'
+        variables: []
+      height: 177
+      id: '17755397988570'
+      parentId: '1775539639483'
+      position:
+        x: 1492
+        y: 544
+      positionAbsolute:
+        x: 6018
+        y: 2422
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        code: "import json\n\ndef main(raw_body: str) -> dict:\n    try:\n       \
+          \ parsed = json.loads(raw_body) if isinstance(raw_body, str) else raw_body\n\
+          \    except (json.JSONDecodeError, TypeError):\n        parsed = {}\n  \
+          \  return {\"bundle_b64\": parsed.get(\"bundle_zip_b64\", \"\")}\n"
+        code_language: python3
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        outputs:
+          bundle_b64:
+            children: null
+            type: string
+        selected: false
+        title: Build Patch Body
+        type: code
+        variables:
+        - value_selector:
+          - '17755397988570'
+          - body
+          value_type: string
+          variable: raw_body
+      height: 52
+      id: '17755397988571'
+      parentId: '1775539639483'
+      position:
+        x: 1814
+        y: 636
+      positionAbsolute:
+        x: 6340
+        y: 2514
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '17755397988571'
+          - bundle_b64
+          variable_selector:
+          - conversation
+          - patch_input_bundle_b64
+          write_mode: over-write
+        loop_id: '1775539639483'
+        selected: false
+        title: Save Patch Input Bundle B64
+        type: assigner
+        version: '2'
+      height: 84
+      id: '17755397988572'
+      parentId: '1775539639483'
+      position:
+        x: 2136
+        y: 620
+      positionAbsolute:
+        x: 6662
+        y: 2498
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac691
+            key: existing_bundle_b64
+            type: text
+            value: '{{#conversation.patch_input_bundle_b64#}}'
+          - id: 4d4c1c5d-e5b8-45f0-b692-c0a5a42ac692
+            key: spec_yaml
+            type: text
+            value: '{{#conversation.spec_yaml#}}'
+          type: form-data
+        error_strategy: fail-branch
+        headers: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 2000
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 180
+          max_write_timeout: 30
+        title: Patch Bundle
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}patch-bundle'
+        variables: []
+      height: 177
+      id: '17755397988573'
+      parentId: '1775539639483'
+      position:
+        x: 2458
+        y: 573
+      positionAbsolute:
+        x: 6984
+        y: 2451
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        code: "import json\n\ndef main(body: str) -> dict:\n    try:\n        parsed\
+          \ = json.loads(body) if isinstance(body, str) else body\n    except (json.JSONDecodeError,\
+          \ TypeError):\n        parsed = {}\n    return {\n        \"bundle_zip_b64\"\
+          : parsed.get(\"patched_bundle_b64\", parsed.get(\"bundle_zip_b64\", \"\"\
+          )),\n        \"files_patched\": parsed.get(\"files_patched\", 0),\n    \
+          \    \"confidence\": parsed.get(\"confidence\", {})\n    }\n"
+        code_language: python3
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        outputs:
+          bundle_zip_b64:
+            children: null
+            type: string
+          confidence:
+            children: null
+            type: object
+          files_patched:
+            children: null
+            type: number
+        selected: false
+        title: Parse Bundle Response
+        type: code
+        variables:
+        - value_selector:
+          - '17755397988573'
+          - body
+          value_type: string
+          variable: body
+      height: 52
+      id: '17755397988574'
+      parentId: '1775539639483'
+      position:
+        x: 2800
+        y: 876
+      positionAbsolute:
+        x: 7326
+        y: 2754
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '17755397988574'
+          - bundle_zip_b64
+          variable_selector:
+          - conversation
+          - bundle_zip_b64
+          write_mode: over-write
+        loop_id: '1775539639483'
+        selected: false
+        title: Save Bundle B64
+        type: assigner
+        version: '2'
+      height: 84
+      id: '17755397988575'
+      parentId: '1775539639483'
+      position:
+        x: 3142
+        y: 860
+      positionAbsolute:
+        x: 7668
+        y: 2738
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        answer: 📥 Downloading existing bundle from Avni...
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        selected: false
+        title: 'Progress: Downloading Bundle'
+        type: answer
+        variables: []
+      height: 116
+      id: '17755397988576'
+      parentId: '1775539639483'
+      position:
+        x: 1170
+        y: 415
+      positionAbsolute:
+        x: 5696
+        y: 2293
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        answer: 📤 Uploading bundle to Avni server...
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
+        selected: false
+        title: 'Progress: Uploading Bundle'
+        type: answer
+        variables: []
+      height: 116
+      id: '17755397988577'
+      parentId: '1775539639483'
+      position:
+        x: 3484
+        y: 600
+      positionAbsolute:
+        x: 8010
+        y: 2478
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3134,6 +3932,9 @@ workflow:
         agent_strategy_provider_name: langgenius/agent/agent
         desc: Iteratively refines entities with user corrections, generates and validates
           YAML spec, then stores approved spec in conversation.
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
         selected: false
@@ -3141,16 +3942,20 @@ workflow:
         tool_node_version: '2'
         type: agent
       height: 264
-      id: 3b1db8bf-6e79-4646-9103-077a6ca90299
+      id: '17755397988578'
+      parentId: '1775539639483'
       position:
-        x: 4526
-        y: 1648
+        x: 506
+        y: 350
       positionAbsolute:
-        x: 4526
-        y: 1648
+        x: 5032
+        y: 2228
       selected: false
+      sourcePosition: right
+      targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
         code: "import re\n\ndef main(agent_response: str) -> dict:\n    # Extract\
           \ spec_yaml from agent response\n    # Look for SPEC_APPROVED marker followed\
@@ -3165,6 +3970,9 @@ workflow:
           \        \"spec_yaml\": spec_content.strip(),\n        \"approved\": True\n\
           \    }\n"
         code_language: python3
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         outputs:
           approved:
             children: null
@@ -3177,47 +3985,58 @@ workflow:
         type: code
         variables:
         - value_selector:
-          - 3b1db8bf-6e79-4646-9103-077a6ca90299
+          - '17755397988578'
           - text
           value_type: string
           variable: agent_response
       height: 52
-      id: 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
+      id: '17755397988579'
+      parentId: '1775539639483'
       position:
-        x: 4868
-        y: 1754
+        x: 828
+        y: 456
       positionAbsolute:
-        x: 4868
-        y: 1754
+        x: 5354
+        y: 2334
       selected: false
+      sourcePosition: right
+      targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
+        isInIteration: false
+        isInLoop: true
         items:
         - input_type: variable
           operation: over-write
           value:
-          - 0e3ec62b-9e28-4d64-b0f6-60d5c6fb1a1c
+          - '17755397988579'
           - spec_yaml
           variable_selector:
           - conversation
           - spec_yaml
           write_mode: over-write
+        loop_id: '1775539639483'
         selected: false
         title: Save Spec YAML
         type: assigner
         version: '2'
       height: 84
-      id: 61246b3d-16a0-4768-8b58-d9d3aa1c0441
+      id: '177553979885710'
+      parentId: '1775539639483'
       position:
-        x: 5230
-        y: 1729
+        x: 1170
+        y: 591
       positionAbsolute:
-        x: 5230
-        y: 1729
+        x: 5696
+        y: 2469
       selected: false
+      sourcePosition: right
+      targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
         agent_parameters:
           instruction:
@@ -3367,6 +4186,9 @@ workflow:
         agent_strategy_provider_name: langgenius/agent/agent
         desc: Inspects generated bundle before upload. Validates bundle ZIP using
           bundle_zip_b64 from context, outputs BUNDLE_APPROVED or BUNDLE_REJECTED.
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
         selected: false
@@ -3374,359 +4196,20 @@ workflow:
         tool_node_version: '2'
         type: agent
       height: 280
-      id: 264d37e7-9580-4d26-be76-4ecdbf32803a
+      id: '177553979885711'
+      parentId: '1775539639483'
       position:
-        x: 7664
-        y: 2290
+        x: 3484
+        y: 776
       positionAbsolute:
-        x: 7664
-        y: 2290
-      selected: true
-      type: custom
-      width: 242
-    - data:
-        agent_parameters:
-          instruction:
-            type: constant
-            value: 'You are the Error Agent for the Avni App Configurator. An upload
-              was initiated and you need to monitor or diagnose any issues.
-
-
-              Upload Task ID: {{#conversation.upload_task_id#}}
-
-              Server URL: {{#conversation.avni_mcp_server_url#}}
-
-
-              Workflow:
-
-              1. Check upload status.
-
-              2. If completed successfully, report success to user.
-
-              3. If failed, analyze error message, diagnose root cause.
-
-              4. If fixable (e.g. missing field, wrong format), attempt fix and output
-              RETRY_BUNDLE with corrected entities.
-
-              5. If not fixable, output clear ERROR_REPORT explaining what failed
-              and why.'
-          maximum_iterations:
-            type: constant
-            value: 3
-          model:
-            type: constant
-            value:
-              completion_params:
-                max_tokens: 8192
-                temperature: 0.2
-              mode: chat
-              model: claude-haiku-4-5-20251001
-              model_type: llm
-              provider: langgenius/anthropic/anthropic
-              type: model-selector
-          query:
-            type: constant
-            value: '{{#sys.query#}}'
-          tools:
-            type: constant
-            value:
-            - enabled: false
-              extra:
-                description: Validate extracted entities for structural issues
-              parameters:
-                entities:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Validate extracted entities for structural issues
-              tool_label: validate_entities
-              tool_name: validate_entities
-              type: api
-            - enabled: false
-              extra:
-                description: Apply corrections to extracted entities
-              parameters:
-                corrections:
-                  auto: 1
-                  value: null
-                entities:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Apply corrections to extracted entities
-              tool_label: apply_entity_corrections
-              tool_name: apply_entity_corrections
-              type: api
-            - enabled: false
-              extra:
-                description: Generate YAML spec from entities
-              parameters:
-                entities:
-                  auto: 1
-                  value: null
-                org_name:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Generate YAML spec from entities
-              tool_label: generate_spec
-              tool_name: generate_spec
-              type: api
-            - enabled: false
-              extra:
-                description: Validate a YAML spec for structural and cross-reference
-                  errors
-              parameters:
-                spec_yaml:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Validate a YAML spec for structural and cross-reference
-                errors
-              tool_label: validate_spec
-              tool_name: validate_spec
-              type: api
-            - enabled: true
-              extra:
-                description: Validate a generated bundle ZIP
-              parameters:
-                bundle_zip_b64:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Validate a generated bundle ZIP
-              tool_label: validate_bundle
-              tool_name: validate_bundle
-              type: api
-            - enabled: false
-              extra:
-                description: Convert an existing bundle to human-readable YAML spec
-              parameters:
-                bundle:
-                  auto: 1
-                  value: null
-                org_name:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Convert an existing bundle to human-readable YAML
-                spec
-              tool_label: bundle_to_spec
-              tool_name: bundle_to_spec
-              type: api
-            - enabled: true
-              extra:
-                description: Check bundle upload status
-              parameters:
-                task_id:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Check bundle upload status
-              tool_label: upload_status
-              tool_name: upload_status
-              type: api
-        agent_strategy_label: FunctionCalling
-        agent_strategy_name: function_calling
-        agent_strategy_provider_name: langgenius/agent/agent
-        desc: Diagnoses upload failures, analyzes server errors, and attempts recovery
-          or reports clearly to the user.
-        output_schema: null
-        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
-        selected: false
-        title: Error Agent
-        tool_node_version: '2'
-        type: agent
-      height: 248
-      id: f6a7cffe-d1af-4c54-9a49-a64cf97e3584
-      position:
-        x: 9434
-        y: 1236
-      positionAbsolute:
-        x: 9434
-        y: 1236
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        cases:
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: '='
-            id: a1b2c3d4-0001-4001-8001-000000000001
-            value: '400'
-            varType: number
-            variable_selector:
-            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
-            - status_code
-          id: 'true'
-          logical_operator: and
-        - case_id: upload-case-401
-          conditions:
-          - comparison_operator: '='
-            id: a1b2c3d4-0001-4001-8001-000000000002
-            value: '401'
-            varType: number
-            variable_selector:
-            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
-            - status_code
-          id: upload-case-401
-          logical_operator: and
-        - case_id: upload-case-403
-          conditions:
-          - comparison_operator: '='
-            id: a1b2c3d4-0001-4001-8001-000000000003
-            value: '403'
-            varType: number
-            variable_selector:
-            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
-            - status_code
-          id: upload-case-403
-          logical_operator: and
-        - case_id: upload-case-404
-          conditions:
-          - comparison_operator: '='
-            id: a1b2c3d4-0001-4001-8001-000000000004
-            value: '404'
-            varType: number
-            variable_selector:
-            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
-            - status_code
-          id: upload-case-404
-          logical_operator: and
-        - case_id: upload-case-500
-          conditions:
-          - comparison_operator: '='
-            id: a1b2c3d4-0001-4001-8001-000000000005
-            value: '500'
-            varType: number
-            variable_selector:
-            - 959d2ca3-2445-4375-ac9e-f68f47724a2f
-            - status_code
-          id: upload-case-500
-          logical_operator: and
-        selected: false
-        title: Upload Error Check
-        type: if-else
-      height: 436
-      id: f9136731-f6e1-472d-8cad-55edaed02022
-      position:
-        x: 8730
-        y: 1622
-      positionAbsolute:
-        x: 8730
-        y: 1622
+        x: 8010
+        y: 2654
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
-    - data:
-        answer: 'Upload failed: bad request format'
-        selected: false
-        title: Upload Err 400
-        type: answer
-        variables: []
-      height: 100
-      id: da538de9-c1a6-46e9-b189-9e5978bf6521
-      position:
-        x: 9092
-        y: 1482
-      positionAbsolute:
-        x: 9092
-        y: 1482
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: 'Upload failed: Auth token missing or expired. Please start a new
-          conversation.'
-        selected: false
-        title: Upload Err 401
-        type: answer
-        variables: []
-      height: 132
-      id: eed94bb6-3565-4fbc-944c-3b114211f447
-      position:
-        x: 9092
-        y: 1662
-      positionAbsolute:
-        x: 9092
-        y: 1662
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: 'Upload failed: Unauthorized access'
-        selected: false
-        title: Upload Err 403
-        type: answer
-        variables: []
-      height: 100
-      id: 848fa968-67cb-41cc-a287-322536fe9f69
-      position:
-        x: 9092
-        y: 1874
-      positionAbsolute:
-        x: 9092
-        y: 1874
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: 'Upload failed: Entity not found'
-        selected: false
-        title: Upload Err 404
-        type: answer
-        variables: []
-      height: 100
-      id: 7b04db95-2264-496e-8447-0efb83a7b9a2
-      position:
-        x: 9092
-        y: 2054
-      positionAbsolute:
-        x: 9092
-        y: 2054
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        answer: 'Upload failed: Server error. Please try again later.'
-        selected: false
-        title: Upload Err 500
-        type: answer
-        variables: []
-      height: 116
-      id: 608df9da-f21e-4d20-8d01-e4d65fec1256
-      position:
-        x: 9092
-        y: 2234
-      positionAbsolute:
-        x: 9092
-        y: 2234
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
+      zIndex: 1002
     - data:
         cases:
         - case_id: case-bundle-approved
@@ -3736,7 +4219,7 @@ workflow:
             value: BUNDLE_APPROVED
             varType: string
             variable_selector:
-            - 264d37e7-9580-4d26-be76-4ecdbf32803a
+            - '177553979885711'
             - text
           id: case-bundle-approved
           logical_operator: and
@@ -3747,184 +4230,31 @@ workflow:
             value: BUNDLE_REJECTED
             varType: string
             variable_selector:
-            - 264d37e7-9580-4d26-be76-4ecdbf32803a
+            - '177553979885711'
             - text
           id: case-bundle-rejected
           logical_operator: and
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         selected: false
         title: Check Bundle Verdict
         type: if-else
       height: 220
-      id: fdc6e190-6b61-49f1-8b9c-1df70dd6ee1f
+      id: '177553979885712'
+      parentId: '1775539639483'
       position:
-        x: 8006
-        y: 2312
+        x: 3806
+        y: 806
       positionAbsolute:
-        x: 8006
-        y: 2312
+        x: 8332
+        y: 2684
       selected: false
+      sourcePosition: right
+      targetPosition: left
       type: custom
       width: 242
-    - data:
-        cases:
-        - case_id: case-retry-bundle
-          conditions:
-          - comparison_operator: contains
-            id: cev-cond-retry
-            value: RETRY_BUNDLE
-            varType: string
-            variable_selector:
-            - f6a7cffe-d1af-4c54-9a49-a64cf97e3584
-            - text
-          id: case-retry-bundle
-          logical_operator: and
-        - case_id: case-error-report
-          conditions:
-          - comparison_operator: contains
-            id: cev-cond-error
-            value: ERROR_REPORT
-            varType: string
-            variable_selector:
-            - f6a7cffe-d1af-4c54-9a49-a64cf97e3584
-            - text
-          id: case-error-report
-          logical_operator: and
-        selected: false
-        title: Check Error Verdict
-        type: if-else
-      height: 220
-      id: 50519a54-053f-4c25-9486-ec03eadb94ca
-      position:
-        x: 9776
-        y: 1250
-      positionAbsolute:
-        x: 9776
-        y: 1250
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        code: "def main(current_count: int) -> dict:\n    return {\"new_count\": (current_count\
-          \ or 0) + 1}\n"
-        code_language: python3
-        outputs:
-          new_count:
-            children: null
-            type: number
-        selected: false
-        title: Increment Retry
-        type: code
-        variables:
-        - value_selector:
-          - conversation
-          - retry_count
-          value_type: number
-          variable: current_count
-      height: 52
-      id: cf4c5fbe-1460-44e4-9775-5650873dfdbd
-      position:
-        x: 8368
-        y: 2466
-      positionAbsolute:
-        x: 8368
-        y: 2466
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        items:
-        - input_type: variable
-          operation: over-write
-          value:
-          - cf4c5fbe-1460-44e4-9775-5650873dfdbd
-          - new_count
-          variable_selector:
-          - conversation
-          - retry_count
-          write_mode: over-write
-        selected: false
-        title: Save Retry Count
-        type: assigner
-        version: '2'
-      height: 84
-      id: ee69171b-0c05-4dcb-bcb2-4057a5119579
-      position:
-        x: 8710
-        y: 2450
-      positionAbsolute:
-        x: 8710
-        y: 2450
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        cases:
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: ≥
-            id: cmr-cond-exceeded
-            value: '3'
-            varType: number
-            variable_selector:
-            - cf4c5fbe-1460-44e4-9775-5650873dfdbd
-            - new_count
-          id: 'true'
-          logical_operator: and
-        selected: false
-        title: Check Max Retries
-        type: if-else
-      height: 124
-      id: 76910038-4a13-4647-aee2-30be4c282e31
-      position:
-        x: 9052
-        y: 2430
-      positionAbsolute:
-        x: 9052
-        y: 2430
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        answer: '❌ **Maximum retry attempts reached.**
-
-
-          The configuration could not be completed automatically after 3 attempts.
-          Please review the errors above and try again with a corrected specification,
-          or describe the corrections you''d like to make.'
-        selected: false
-        title: Max Retries Exhausted
-        type: answer
-      height: 196
-      id: e6b32cb1-406f-47e0-8f96-18b75d76fdf2
-      position:
-        x: 9394
-        y: 2394
-      positionAbsolute:
-        x: 9394
-        y: 2394
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        answer: '❌ **Upload failed and could not be auto-corrected.**
-
-
-          Please review the error details above. You can describe corrections or upload
-          a revised specification to try again.'
-        selected: false
-        title: Upload Error Report
-        type: answer
-      height: 164
-      id: 0f4603cf-1aab-4b53-a05d-c5cb6f9194c2
-      position:
-        x: 10138
-        y: 1300
-      positionAbsolute:
-        x: 10138
-        y: 1300
-      selected: false
-      type: custom
-      width: 242
+      zIndex: 1002
     - data:
         cases:
         - case_id: 'true'
@@ -3934,7 +4264,7 @@ workflow:
             value: '400'
             varType: number
             variable_selector:
-            - a3d80a70-5da7-4edc-9c32-66de6f9845e1
+            - '17755397988573'
             - status_code
           id: 'true'
           logical_operator: and
@@ -3945,7 +4275,7 @@ workflow:
             value: '401'
             varType: number
             variable_selector:
-            - a3d80a70-5da7-4edc-9c32-66de6f9845e1
+            - '17755397988573'
             - status_code
           id: d26825bc-0735-4704-b42c-eb42f6cb4b67
           logical_operator: and
@@ -3956,7 +4286,7 @@ workflow:
             value: '403'
             varType: number
             variable_selector:
-            - a3d80a70-5da7-4edc-9c32-66de6f9845e1
+            - '17755397988573'
             - status_code
           id: bef31e01-b42e-40cf-9c16-fd9fef71ec17
           logical_operator: and
@@ -3967,7 +4297,7 @@ workflow:
             value: '404'
             varType: number
             variable_selector:
-            - a3d80a70-5da7-4edc-9c32-66de6f9845e1
+            - '17755397988573'
             - status_code
           id: 16b24b6c-aef8-437c-a9e3-18a892d85f37
           logical_operator: and
@@ -3978,300 +4308,285 @@ workflow:
             value: '500'
             varType: number
             variable_selector:
-            - a3d80a70-5da7-4edc-9c32-66de6f9845e1
+            - '17755397988573'
             - status_code
           id: 54bc604c-0b21-4ea6-8050-d3af11bdbce4
           logical_operator: and
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         selected: false
         title: Bundle HTTP Request Error
         type: if-else
       height: 436
-      id: '1775380701991'
+      id: '177553979885713'
+      parentId: '1775539639483'
       position:
-        x: 6960
-        y: 1479
+        x: 2800
+        y: 341
       positionAbsolute:
-        x: 6960
-        y: 1479
+        x: 7326
+        y: 2219
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
         answer: bad request format
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         selected: false
-        title: Answer 10
+        title: Bad Request Error
         type: answer
         variables: []
       height: 100
-      id: '1775380779498'
+      id: '177553979885714'
+      parentId: '1775539639483'
       position:
-        x: 7322
-        y: 1224
+        x: 3142
+        y: 380
       positionAbsolute:
-        x: 7322
-        y: 1224
+        x: 7668
+        y: 2258
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
         answer: Auth token missing or expired
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         selected: false
-        title: Answer 11
+        title: Auth Token Error
         type: answer
         variables: []
       height: 100
-      id: '1775380796294'
+      id: '177553979885715'
+      parentId: '1775539639483'
       position:
-        x: 7322
-        y: 1404
+        x: 3142
+        y: 60
       positionAbsolute:
-        x: 7322
-        y: 1404
+        x: 7668
+        y: 1938
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
         answer: 'Unauthorized access '
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         selected: false
-        title: Answer 12
+        title: Unauthorized Error
         type: answer
         variables: []
       height: 100
-      id: '1775380815321'
+      id: '177553979885716'
+      parentId: '1775539639483'
       position:
-        x: 7322
-        y: 1584
+        x: 3122
+        y: 540
       positionAbsolute:
-        x: 7322
-        y: 1584
+        x: 7648
+        y: 2418
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
         answer: Entity not found
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         selected: false
-        title: Answer 13
+        title: Not Found Error
         type: answer
         variables: []
       height: 100
-      id: '1775380840852'
+      id: '177553979885717'
+      parentId: '1775539639483'
       position:
-        x: 7322
-        y: 1764
+        x: 3142
+        y: 220
       positionAbsolute:
-        x: 7322
-        y: 1764
+        x: 7668
+        y: 2098
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
         answer: server error
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1775539639483'
         selected: false
-        title: Answer 14
+        title: Server Error
         type: answer
         variables: []
       height: 100
-      id: '1775380857743'
+      id: '177553979885718'
+      parentId: '1775539639483'
       position:
-        x: 7322
-        y: 1944
+        x: 3142
+        y: 700
       positionAbsolute:
-        x: 7322
-        y: 1944
+        x: 7668
+        y: 2578
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
     - data:
-        answer: '⚠️ **Are you sure you want to delete the entire implementation?**
-
-
-          This will remove all Subject Types, Programs, Encounter Types, Forms, and
-          related configuration from the organisation. This action cannot be undone.
-
-
-          Please confirm by clicking **Yes** or **No**.'
-        selected: false
-        title: Delete Confirm Prompt
-        type: answer
-      height: 212
-      id: 6494459f-3dee-4fc1-bdff-ff0400aefd52
-      position:
-        x: 1408
-        y: 585
-      positionAbsolute:
-        x: 1408
-        y: 585
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        delivery_methods:
-        - enabled: true
-          id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-          type: webapp
-        form_content: ''
-        inputs: []
-        selected: false
-        timeout: 2
-        timeout_unit: hour
-        title: Delete Confirmation
-        type: human-input
-        user_actions:
-        - button_style: primary
-          id: 'Yes'
-          title: 'Yes'
-        - button_style: default
-          id: 'No'
-          title: 'No'
-      height: 190
-      id: 5fad1f03-767c-4ce6-a5ec-0ae45f9ebc88
-      position:
-        x: 1750
-        y: 596
-      positionAbsolute:
-        x: 1750
-        y: 596
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        authorization:
-          config:
-            api_key: ''
-            header: avni-auth-token
-            type: custom
-          type: api-key
-        body:
-          data: ''
-          type: none
-        headers: Content-Type:application/json
-        method: delete
-        params: ''
-        retry_config:
-          max_retries: 3
-          retry_enabled: true
-          retry_interval: 100
-        selected: false
-        timeout:
-          connect: 30
-          max_connect_timeout: 300
-          max_read_timeout: 600
-          max_write_timeout: 600
-          read: 120
-          write: 120
-        title: Delete Implementation
-        type: http-request
-        url: '{{#conversation.avni_mcp_server_url#}}/api/implementation'
-        variables:
-        - value_selector:
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
           - conversation
-          - auth_token
-          variable: auth_token
-      height: 141
-      id: fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b
+          - 'False'
+          variable_selector:
+          - conversation
+          - bundle_approved
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'True'
+          variable_selector:
+          - conversation
+          - spec_loop_active
+          write_mode: over-write
+        loop_id: '1775539639483'
+        selected: false
+        title: Reset Loop State
+        type: assigner
+        version: '2'
+      height: 110
+      id: '17755399262440'
+      parentId: '1775539639483'
       position:
-        x: 2112
-        y: 467
+        x: 184
+        y: 427
       positionAbsolute:
-        x: 2112
-        y: 467
+        x: 4710
+        y: 2305
       selected: false
+      sourcePosition: right
+      targetPosition: left
       type: custom
       width: 242
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'False'
+          variable_selector:
+          - conversation
+          - spec_loop_active
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'True'
+          variable_selector:
+          - conversation
+          - bundle_approved
+          write_mode: over-write
+        loop_id: '1775539639483'
+        selected: false
+        title: Set Bundle Approved
+        type: assigner
+        version: '2'
+      height: 110
+      id: '17755411834170'
+      parentId: '1775539639483'
+      position:
+        x: 4128
+        y: 861
+      positionAbsolute:
+        x: 8654
+        y: 2739
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
     - data:
         cases:
         - case_id: 'true'
           conditions:
-          - comparison_operator: '='
-            id: drc-cond-200
-            value: '200'
-            varType: number
+          - comparison_operator: is
+            id: af353ccd-14c6-4604-afe6-1b8f91161b05
+            value: true
+            varType: boolean
             variable_selector:
-            - fd04c2c9-c8ad-4ee4-a836-00f71a2fa43b
-            - status_code
+            - conversation
+            - bundle_approved
           id: 'true'
           logical_operator: and
         selected: false
-        title: Delete Result Check
+        title: Is Bundle Approved?
         type: if-else
-      height: 148
-      id: 13f1b052-2aed-4126-937d-5a4837d77639
+      height: 124
+      id: '1775541471535'
       position:
-        x: 2454
-        y: 464
+        x: 9056
+        y: 2667
       positionAbsolute:
-        x: 2454
-        y: 464
+        x: 9056
+        y: 2667
       selected: false
+      sourcePosition: right
+      targetPosition: left
       type: custom
       width: 242
     - data:
-        answer: '✅ **Implementation deleted successfully.**
-
-
-          All configuration has been removed. You can start fresh by uploading a new
-          scoping document or describing your requirements.'
+        answer: Bundle Failed Spec Review, Max Retries Exhausted
         selected: false
-        title: Delete Success
+        title: Max Retries Exhausted
         type: answer
-      height: 164
-      id: c776a305-2e50-42e0-9209-32881d893c32
+        variables: []
+      height: 116
+      id: '1775541508232'
       position:
-        x: 2816
-        y: 264
+        x: 9418
+        y: 2909
       positionAbsolute:
-        x: 2816
-        y: 264
+        x: 9418
+        y: 2909
       selected: false
-      type: custom
-      width: 242
-    - data:
-        answer: '❌ **Failed to delete implementation.**
-
-
-          The server returned an error. Please check your auth token is valid and
-          try again.'
-        selected: false
-        title: Delete Failure
-        type: answer
-      height: 148
-      id: 750b6d5a-d7b6-4e8f-8449-b51e3d84f7fd
-      position:
-        x: 2816
-        y: 508
-      positionAbsolute:
-        x: 2816
-        y: 508
-      selected: false
-      type: custom
-      width: 242
-    - data:
-        answer: Delete operation cancelled. Your current configuration remains unchanged.
-        selected: false
-        title: Delete Cancelled
-        type: answer
-      height: 132
-      id: 3cfb30bf-9386-48db-bfa2-3bd3359cf040
-      position:
-        x: 2112
-        y: 688
-      positionAbsolute:
-        x: 2112
-        y: 688
-      selected: false
+      sourcePosition: right
+      targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: -3317.8714285714286
-      y: -665.8571428571431
-      zoom: 0.5
+      x: -1829.25
+      y: -273.75
+      zoom: 0.25
   rag_pipeline_variables: []
