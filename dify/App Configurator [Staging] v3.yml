@@ -3419,7 +3419,7 @@ workflow:
       positionAbsolute:
         x: 4526
         y: 1878
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4041,16 +4041,18 @@ workflow:
         agent_parameters:
           instruction:
             type: constant
-            value: "You are the Review Agent. You have ONE job: validate the bundle\
-              \ and output a verdict.\n\nStep 1 — Call validate_bundle immediately.\
-              \ The bundle_zip_b64 variable is available in context.\nStep 2 — Read\
-              \ the result:\n  • If valid=true and errors=[]: your entire response\
-              \ must be exactly: BUNDLE_APPROVED\n  • If valid=false or errors is\
-              \ non-empty: your entire response must start with: BUNDLE_REJECTED:\
+            value: "You are the Review Agent. You have ONE job: call validate_bundle\
+              \ and output a verdict token.\n\nThe bundle_zip_b64 parameter is already\
+              \ pre-filled in the validate_bundle tool. Do NOT look for it anywhere\
+              \ else. Do NOT ask the user for it. Just call the tool immediately.\n\
+              \nStep 1 — Call validate_bundle NOW. The parameter is pre-filled; invoke\
+              \ the tool as-is.\nStep 2 — Read the result:\n  \u2022 If valid=true\
+              \ and errors=[]: respond with exactly: BUNDLE_APPROVED\n  \u2022 If\
+              \ valid=false or errors is non-empty: respond with exactly: BUNDLE_REJECTED:\
               \ followed by the error list.\n\nRULES:\n- Call validate_bundle exactly\
               \ once. No other tool calls.\n- Do NOT write any preamble, greeting,\
-              \ or explanation.\n- Do NOT ask the user any questions.\n- Your response\
-              \ MUST begin with BUNDLE_APPROVED or BUNDLE_REJECTED."
+              \ or explanation.\n- Do NOT ask the user any questions.\n- Your ENTIRE\
+              \ response MUST be either BUNDLE_APPROVED or BUNDLE_REJECTED: <errors>."
           maximum_iterations:
             type: constant
             value: 3
@@ -4067,119 +4069,30 @@ workflow:
               type: model-selector
           query:
             type: constant
-            value: '{{#sys.query#}}'
+            value: Validate the bundle now.
           tools:
             type: constant
             value:
-            - enabled: false
-              extra:
-                description: Validate extracted entities for structural issues
-              parameters:
-                entities:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Validate extracted entities for structural issues
-              tool_label: validate_entities
-              tool_name: validate_entities
-              type: api
-            - enabled: false
-              extra:
-                description: Apply corrections to extracted entities
-              parameters:
-                corrections:
-                  auto: 1
-                  value: null
-                entities:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Apply corrections to extracted entities
-              tool_label: apply_entity_corrections
-              tool_name: apply_entity_corrections
-              type: api
-            - enabled: false
-              extra:
-                description: Generate YAML spec from entities
-              parameters:
-                entities:
-                  auto: 1
-                  value: null
-                org_name:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Generate YAML spec from entities
-              tool_label: generate_spec
-              tool_name: generate_spec
-              type: api
-            - enabled: false
-              extra:
-                description: Validate a YAML spec for structural and cross-reference
-                  errors
-              parameters:
-                spec_yaml:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Validate a YAML spec for structural and cross-reference
-                errors
-              tool_label: validate_spec
-              tool_name: validate_spec
-              type: api
             - enabled: true
               extra:
-                description: Validate a generated bundle ZIP
-              parameters:
-                bundle_zip_b64:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Validate a generated bundle ZIP
-              tool_label: validate_bundle
-              tool_name: validate_bundle
-              type: api
-            - enabled: true
-              extra:
-                description: Convert an existing bundle to human-readable YAML spec
+                description: Validate a generated bundle for structural correctness
               parameters:
                 bundle:
-                  auto: 1
-                  value: null
-                org_name:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: null
+                bundle_zip_b64:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#conversation.bundle_zip_b64#}}'
               provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
               provider_show_name: Avni AI Staging openAPI
               settings: {}
-              tool_description: Convert an existing bundle to human-readable YAML
-                spec
-              tool_label: bundle_to_spec
-              tool_name: bundle_to_spec
-              type: api
-            - enabled: false
-              extra:
-                description: Check bundle upload status
-              parameters:
-                task_id:
-                  auto: 1
-                  value: null
-              provider_name: 808c3c77-09f3-4380-8339-d99c1dc6eb59
-              provider_show_name: Avni AI Staging openAPI
-              settings: {}
-              tool_description: Check bundle upload status
-              tool_label: upload_status
-              tool_name: upload_status
+              tool_description: Validate a generated bundle for structural correctness
+              tool_label: validate_bundle
+              tool_name: validate_bundle
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
@@ -4191,7 +4104,7 @@ workflow:
         loop_id: '1775539639483'
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
-        selected: false
+        selected: true
         title: Review Agent
         tool_node_version: '2'
         type: agent
@@ -4204,7 +4117,7 @@ workflow:
       positionAbsolute:
         x: 8010
         y: 2654
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4586,7 +4499,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -1829.25
-      y: -273.75
-      zoom: 0.25
+      x: -1832.5582580576051
+      y: -274.77899692388246
+      zoom: 0.25034681392783364
   rag_pipeline_variables: []
