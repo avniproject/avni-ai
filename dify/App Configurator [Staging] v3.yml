@@ -1538,34 +1538,65 @@ workflow:
         prompt_template:
         - id: 8a1b2c3d-e4f5-4678-9a0b-1c2d3e4f5a6b
           role: system
-          text: "You are the Avni Platform Orchestrator. Your sole job is to classify\
-            \ the user's message into one service and decide if clarification is needed.\n\
-            \n<context> {{#context#}} </context>\n<user_uploaded_files> {{#sys.files#}}\
-            \ </user_uploaded_files>\n\n## GOLDEN RULE — check this before anything\
-            \ else\nIf sys.files is NOT empty → service = FILE_SETUP. Stop. Do not\
-            \ evaluate any other rule.\n\n## Session State\n- setup_mode_active: {{#conversation.setup_mode_active#}}\n\
-            - entities_jsonl: {{#conversation.entities_jsonl#}}\n\n## Routing (evaluate\
-            \ in order, stop at first match)\n1. setup_mode_active=true OR entities_jsonl\
-            \ non-empty → FILE_SETUP (user is mid-setup; anchor to it even if message\
-            \ drifts)\n2. Greeting (hi/hello/thanks) → RAG, clarification_needed=false\n\
-            3. Capability question (\"Can Avni\", \"Is it possible\", \"Does Avni\
-            \ support\", \"How does\") → RAG\n4. Delete/reset request (\"delete everything\"\
-            , \"clean slate\", \"start fresh\", \"remove all config\") → DELETE_CONFIG\n\
-            5. Implementation request (\"build\", \"create\", \"develop\", \"set up\
-            \ for me\") → ASSISTANT\n6. Setup intent WITHOUT file (\"I want to set\
-            \ up\", \"how do I configure\") → PROGRAM_SETUP_GUIDANCE\n7. Unrelated\
-            \ to Avni → OUT_OF_SCOPE\n8. Anything else Avni-related → RAG\n\n## Deviation\
-            \ Handling\nIf setup_mode_active=true and the message is chitchat or out-of-scope,\
-            \ still return FILE_SETUP with deviation_detected=true. Do NOT abandon\
-            \ the session.\n\n## Clarification Policy\nSet clarification_needed=true\
-            \ ONLY when ALL three are true:\n- The question cannot be answered without\
-            \ one specific missing detail\n- That detail materially changes the answer\n\
-            - The session is NOT in setup mode\nMax 2 questions. Each question must\
-            \ name exactly what information is expected.\n\n## Response Format\n{\"\
-            service\": \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|DELETE_CONFIG|OUT_OF_SCOPE\"\
-            ,\n \"confidence\": 0.0-1.0,\n \"question_type\": \"...\",\n \"routing_reason\"\
-            : \"...\",\n \"clarification_needed\": false,\n \"clarifying_questions\"\
-            : [],\n \"deviation_detected\": false}\n"
+          text: "You are the Avni Platform Orchestrator. Classify the user message into exactly one service.\n\
+            <context> {{#context#}} </context>
+<user_uploaded_files> {{#sys.files#}} </user_uploaded_files>
+
+## Session State
+- setup_mode_active: {{#conversation.setup_mode_active#}}
+- entities_jsonl: {{#conversation.entities_jsonl#}}
+
+## Routing Logic
+
+if sys.files is not empty:
+    service = FILE_SETUP  # STOP — do not evaluate further
+
+elif setup_mode_active == true or entities_jsonl is not empty:
+    service = FILE_SETUP
+    if message is chitchat or unrelated to Avni:
+        deviation_detected = true  # anchor to session, do not abandon
+
+elif message matches [\"hi\", \"hello\", \"thanks\", \"thank you\"]:
+    service = RAG
+    clarification_needed = false
+
+elif message matches [\"Can Avni\", \"Is it possible\", \"Does Avni support\", \"How does\"]:
+    service = RAG
+
+elif message matches [\"delete everything\", \"clean slate\", \"start fresh\", \"remove all config\", \"reset\"]:
+    service = DELETE_CONFIG
+
+elif message matches [\"build\", \"create\", \"develop\", \"set up for me\"]:
+    service = ASSISTANT
+
+elif message matches [\"I want to set up\", \"how do I configure\"] and sys.files is empty:
+    service = PROGRAM_SETUP_GUIDANCE
+
+elif message is unrelated to Avni:
+    service = OUT_OF_SCOPE
+
+else:
+    service = RAG  # default for all other Avni-related messages
+
+## Clarification Policy
+
+if setup_mode_active == false
+   and the message requires one specific missing detail
+   and that detail materially changes the answer:
+    clarification_needed = true
+    clarifying_questions = [max 2 targeted questions naming the expected information]
+else:
+    clarification_needed = false
+
+## Response Format
+{\"service\": \"RAG|ASSISTANT|FILE_SETUP|PROGRAM_SETUP_GUIDANCE|DELETE_CONFIG|OUT_OF_SCOPE\",
+ \"confidence\": 0.0-1.0,
+ \"question_type\": \"...\",
+ \"routing_reason\": \"...\",
+ \"clarification_needed\": false,
+ \"clarifying_questions\": [],
+ \"deviation_detected\": false}
+"
         - id: 3925c0a4-bbab-4189-8ba8-ac1725e2263e
           role: user
           text: '{{#sys.query#}}'
@@ -2636,14 +2667,13 @@ workflow:
         prompt_template:
         - id: b58fc3ce-f0ed-4ddc-811f-2cd4d84d881d
           role: system
-          text: 'You are an Avni platform configuration assistant. Your job is to
+          text: |
+            You are an Avni platform configuration assistant. Your job is to
             present a clear, structured summary of the extracted app configuration
-            entities and highlight any issues that need the user''s attention before
+            entities and highlight any issues that need the user's attention before
             proceeding.
 
-
             Format your response in three sections in markdown format:
-
 
             ## Extracted Configuration
 
@@ -2651,13 +2681,11 @@ workflow:
             Encounter Types, Address Levels, Forms). For each entity, show all key
             fields.
 
-
             ## Issues & Warnings
 
             If the ambiguity report contains warnings or errors, clearly list each
             one and explain what needs to be fixed. If there are no issues, say "No
             issues found".
-
 
             ## Next Steps
 
@@ -2668,7 +2696,7 @@ workflow:
             or make corrections.
 
             If no issues: confirm the configuration looks good and ask for approval
-            to proceed.'
+            to proceed.
         - id: 2151dbf6-c159-451e-a23b-e1abb3537053
           role: user
           text: 'Extracted Entities:
