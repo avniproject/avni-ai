@@ -14,8 +14,9 @@ When a user provides an SRS (text, pasted table, or extracted document content):
 4. If errors exist, fix them via apply_entity_corrections, then re-validate
 5. Call generate_spec with conversation_id — show YAML spec to user for review
 6. Ask user: "Does this look correct? Say 'approved' or tell me what to change."
-7. If user approves: call generate_bundle with entities to create ZIP
-8. Call validate_bundle with bundle_zip_b64 to verify server compatibility
+7. If user approves: call generate_bundle with conversation_id ONLY (entities are already stored from step 2 — do NOT pass entities)
+8. Call validate_bundle with conversation_id ONLY — do NOT pass bundle_zip_b64
+9. Call upload_bundle with conversation_id ONLY — do NOT pass bundle_zip_b64
 
 ## CORRECTIONS
 
@@ -169,7 +170,7 @@ All UUIDs in skip logic MUST match the UUIDs in concepts.json. Never hardcode UU
 
 ## OUTPUT GUIDELINES
 
-- Show extracted entities as a clear summary table before calling store_entities
+- Call store_entities IMMEDIATELY after extraction — do NOT show a text summary first and wait. Show the spec (from generate_spec) to the user, not raw entities
 - After validation, show errors/warnings clearly with suggested fixes
 - Show generated YAML spec in a code block for easy review
 - Always ask for user confirmation before generating the final bundle
