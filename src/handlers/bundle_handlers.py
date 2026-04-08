@@ -119,7 +119,8 @@ async def handle_validate_bundle(request: Request) -> JSONResponse:
                 )
     if not bundle:
         return JSONResponse(
-            {"error": "Missing 'bundle' or 'bundle_zip_b64' in request body"}, status_code=400
+            {"error": "Missing 'bundle' or 'bundle_zip_b64' in request body"},
+            status_code=400,
         )
 
     try:
@@ -269,9 +270,11 @@ async def handle_patch_bundle(request: Request) -> JSONResponse:
         return JSONResponse({"error": f"Form parse failed: {e}"}, status_code=400)
     existing_b64 = form.get("existing_bundle_b64")
     spec_yaml = form.get("spec_yaml")
-    logger.info("patch-bundle: existing_b64 len=%s spec_yaml len=%s",
-                len(existing_b64) if existing_b64 else "MISSING",
-                len(spec_yaml) if spec_yaml else "MISSING")
+    logger.info(
+        "patch-bundle: existing_b64 len=%s spec_yaml len=%s",
+        len(existing_b64) if existing_b64 else "MISSING",
+        len(spec_yaml) if spec_yaml else "MISSING",
+    )
 
     if not existing_b64:
         return JSONResponse(
@@ -362,28 +365,37 @@ async def handle_patch_bundle(request: Request) -> JSONResponse:
                     ]
                     if stale_fm:
                         # Merge: voided-stale first so Avni deactivates them, then fresh entries
-                        patches["formMappings.json"] = json.dumps(stale_fm + new_fm, indent=2).encode("utf-8")
+                        patches["formMappings.json"] = json.dumps(
+                            stale_fm + new_fm, indent=2
+                        ).encode("utf-8")
                         logger.info(
                             "patch-bundle: voided %d stale formMappings, kept %d new",
-                            len(stale_fm), len(new_fm),
+                            len(stale_fm),
+                            len(new_fm),
                         )
                     # else: no stale mappings — new spec's formMappings.json patch is already correct
             except Exception as exc:
-                logger.warning("patch-bundle: could not process existing formMappings: %s", exc)
+                logger.warning(
+                    "patch-bundle: could not process existing formMappings: %s", exc
+                )
 
         # Void only forms whose name is absent from the new spec (stale forms like old MCH forms)
-        new_form_names = {form.get("name", "") for form in fresh_bundle.get("forms", [])}
+        new_form_names = {
+            form.get("name", "") for form in fresh_bundle.get("forms", [])
+        }
         for zip_entry, content_bytes in existing_file_map.items():
             if not zip_entry.startswith("forms/") or zip_entry in patches:
                 continue
-            form_name = zip_entry[len("forms/"):]
+            form_name = zip_entry[len("forms/") :]
             if form_name.endswith(".json"):
                 form_name = form_name[:-5]
             if form_name not in new_form_names:
                 try:
                     existing_form = json.loads(content_bytes)
                     if isinstance(existing_form, dict):
-                        patches[zip_entry] = json.dumps({**existing_form, "isVoided": True}, indent=2).encode("utf-8")
+                        patches[zip_entry] = json.dumps(
+                            {**existing_form, "isVoided": True}, indent=2
+                        ).encode("utf-8")
                         logger.info("patch-bundle: voided stale form '%s'", zip_entry)
                 except Exception:
                     pass

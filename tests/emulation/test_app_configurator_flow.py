@@ -25,10 +25,12 @@ logger = logging.getLogger(__name__)
 
 # ── Fixtures ─────────────────────────────────────────────────────
 
+
 @pytest.fixture(scope="session")
 def env_check():
     """Ensure required environment variables are set."""
     from dotenv import load_dotenv
+
     load_dotenv()
 
     token = os.environ.get("AVNI_AUTH_TOKEN", "")
@@ -56,6 +58,7 @@ def sample_entities() -> dict:
 
 # ── Health Check ─────────────────────────────────────────────────
 
+
 class TestHealthCheck:
     def test_server_reachable(self, flow: AppConfiguratorFlow):
         """Staging server responds to /health."""
@@ -67,13 +70,17 @@ class TestHealthCheck:
 
 # ── Phase A: Entity Store & Validate ─────────────────────────────
 
+
 class TestEntityPhase:
     def test_store_entities(self, flow: AppConfiguratorFlow, sample_entities: dict):
         """POST /store-entities succeeds."""
         flow.state.entities_jsonl = sample_entities
         result = flow.post(
             "/store-entities",
-            {"conversation_id": flow.conversation_id, "entities": flow.state.entities_jsonl},
+            {
+                "conversation_id": flow.conversation_id,
+                "entities": flow.state.entities_jsonl,
+            },
         )
         assert result.get("ok") is True
 
@@ -83,7 +90,10 @@ class TestEntityPhase:
         # Store first
         flow.post(
             "/store-entities",
-            {"conversation_id": flow.conversation_id, "entities": flow.state.entities_jsonl},
+            {
+                "conversation_id": flow.conversation_id,
+                "entities": flow.state.entities_jsonl,
+            },
         )
         # Validate
         result = flow.post(
@@ -95,9 +105,15 @@ class TestEntityPhase:
         assert "warning_count" in result
         assert "has_errors" in result
         assert "entities" in result
-        logger.info("Validation: %d errors, %d warnings", result["error_count"], result["warning_count"])
+        logger.info(
+            "Validation: %d errors, %d warnings",
+            result["error_count"],
+            result["warning_count"],
+        )
 
-    def test_store_and_validate_combined(self, flow: AppConfiguratorFlow, sample_entities: dict):
+    def test_store_and_validate_combined(
+        self, flow: AppConfiguratorFlow, sample_entities: dict
+    ):
         """store_and_validate_entities() method works end-to-end."""
         flow.state.entities_jsonl = sample_entities
         validation = flow.store_and_validate_entities()
@@ -106,6 +122,7 @@ class TestEntityPhase:
 
 
 # ── Phase C: Spec Generation ─────────────────────────────────────
+
 
 class TestSpecPhase:
     def test_generate_spec(self, flow: AppConfiguratorFlow, sample_entities: dict):
@@ -157,6 +174,7 @@ class TestSpecPhase:
 
 # ── Phase D: Bundle Patch & Upload ───────────────────────────────
 
+
 class TestBundlePhase:
     def test_download_existing_bundle(self, flow: AppConfiguratorFlow):
         """GET /download-bundle-b64 returns a b64 ZIP."""
@@ -179,11 +197,16 @@ class TestBundlePhase:
         # Setup: generate spec first
         flow.state.entities_jsonl = sample_entities
         flow.store_and_validate_entities()
-        gen = flow.post("/generate-spec", {"conversation_id": flow.conversation_id, "org_name": flow.state.org_name})
+        gen = flow.post(
+            "/generate-spec",
+            {"conversation_id": flow.conversation_id, "org_name": flow.state.org_name},
+        )
         spec_yaml = gen["spec_yaml"]
 
         # Download existing
-        resp = flow.get("/download-bundle-b64", auth=True, params={"includeLocations": "false"})
+        resp = flow.get(
+            "/download-bundle-b64", auth=True, params={"includeLocations": "false"}
+        )
         existing_b64 = resp.json()["bundle_zip_b64"]
 
         # Patch
@@ -202,6 +225,7 @@ class TestBundlePhase:
 
 
 # ── Full PEV Loop ────────────────────────────────────────────────
+
 
 class TestFullFlow:
     def test_happy_path(self, flow: AppConfiguratorFlow, sample_entities: dict):
@@ -244,20 +268,28 @@ class TestFullFlow:
 
 # ── Individual Endpoint Tests ────────────────────────────────────
 
+
 class TestEndpoints:
     """Test individual endpoints in isolation for debugging."""
 
-    def test_apply_entity_corrections(self, flow: AppConfiguratorFlow, sample_entities: dict):
+    def test_apply_entity_corrections(
+        self, flow: AppConfiguratorFlow, sample_entities: dict
+    ):
         """POST /apply-entity-corrections updates stored entities."""
         flow.state.entities_jsonl = sample_entities
         flow.post(
             "/store-entities",
-            {"conversation_id": flow.conversation_id, "entities": flow.state.entities_jsonl},
+            {
+                "conversation_id": flow.conversation_id,
+                "entities": flow.state.entities_jsonl,
+            },
         )
 
         # Add a new encounter type via correction — must reference a known program/subject_type
         durga_programs = [p["name"] for p in sample_entities.get("programs", [])]
-        durga_subject_types = [s["name"] for s in sample_entities.get("subject_types", [])]
+        durga_subject_types = [
+            s["name"] for s in sample_entities.get("subject_types", [])
+        ]
         prog_ref = durga_programs[0] if durga_programs else "Work With Women"
         st_ref = durga_subject_types[0] if durga_subject_types else "Cohort"
 
@@ -290,6 +322,7 @@ class TestEndpoints:
 
 # ── Durga Ground-Truth Tests (no staging server needed) ──────────
 
+
 class TestDurgaEntities:
     """
     Unit tests that verify the scoping parser produces entities
@@ -308,12 +341,20 @@ class TestDurgaEntities:
         entities = load_durga_entities()
         names = {s["name"] for s in entities["subject_types"]}
         assert "Cohort" in names, f"Expected 'Cohort' in subject types, got: {names}"
-        assert "Participant" in names, f"Expected 'Participant' in subject types, got: {names}"
+        assert "Participant" in names, (
+            f"Expected 'Participant' in subject types, got: {names}"
+        )
 
         cohort = next(s for s in entities["subject_types"] if s["name"] == "Cohort")
-        participant = next(s for s in entities["subject_types"] if s["name"] == "Participant")
-        assert cohort["type"] == "Group", f"Cohort type should be Group, got: {cohort['type']}"
-        assert participant["type"] == "Person", f"Participant type should be Person, got: {participant['type']}"
+        participant = next(
+            s for s in entities["subject_types"] if s["name"] == "Participant"
+        )
+        assert cohort["type"] == "Group", (
+            f"Cohort type should be Group, got: {cohort['type']}"
+        )
+        assert participant["type"] == "Person", (
+            f"Participant type should be Person, got: {participant['type']}"
+        )
 
     def test_durga_location_hierarchy(self):
         """Durga location hierarchy has State and City levels."""
@@ -326,7 +367,9 @@ class TestDurgaEntities:
         """Durga encounter types have no duplicates — fixes the 5x repetition bug."""
         entities = load_durga_entities()
         names = [e["name"] for e in entities["encounter_types"]]
-        assert len(names) == len(set(names)), f"Duplicate encounter types found: {names}"
+        assert len(names) == len(set(names)), (
+            f"Duplicate encounter types found: {names}"
+        )
 
     def test_durga_entities_pass_pydantic_validation(self):
         """Parsed Durga entities pass EntitySpec cross-ref validation."""
@@ -343,13 +386,20 @@ class TestDurgaEntities:
             | {p["name"] for p in entities["programs"]}
             | {e["name"] for e in entities["encounter_types"]}
         )
-        placeholder_names = {"Maternal Health", "Child Health", "ANC Visit", "PNC Visit", "Child Growth Monitoring"}
+        placeholder_names = {
+            "Maternal Health",
+            "Child Health",
+            "ANC Visit",
+            "PNC Visit",
+            "Child Growth Monitoring",
+        }
         leaked = placeholder_names & all_names
         assert not leaked, f"Old placeholder entities found in Durga config: {leaked}"
 
     def test_flow_state_from_env_has_defaults(self):
         """FlowState.from_env() sets correct defaults for non-configured env."""
         from src.schemas.flow_state import FlowState
+
         state = FlowState.from_env()
         assert state.max_cycles == 3
         assert state.poll_interval_secs == 3.0
@@ -360,10 +410,16 @@ class TestDurgaEntities:
     def test_flow_state_mirrors_dify_conv_vars(self):
         """FlowState fields map 1:1 to Dify conversation variable names."""
         from src.schemas.flow_state import FlowState
-        state = FlowState()
+
+        FlowState()
         dify_conv_var_names = {
-            "auth_token", "avni_mcp_server_url", "entities_jsonl",
-            "spec_yaml", "existing_bundle_b64", "bundle_zip_b64", "upload_task_id",
+            "auth_token",
+            "avni_mcp_server_url",
+            "entities_jsonl",
+            "spec_yaml",
+            "existing_bundle_b64",
+            "bundle_zip_b64",
+            "upload_task_id",
         }
         state_fields = set(FlowState.model_fields.keys())
         missing = dify_conv_var_names - state_fields
@@ -372,11 +428,14 @@ class TestDurgaEntities:
     def test_org_name_always_in_spec_yaml(self):
         """entities_to_spec always emits org: even when org_name is empty."""
         from src.bundle.spec_generator import entities_to_spec
+
         entities = load_durga_entities()
 
         # Without org_name
         spec_no_org = entities_to_spec(entities, org_name="")
-        assert "org:" in spec_no_org, "spec_yaml must contain org: even when org_name is empty"
+        assert "org:" in spec_no_org, (
+            "spec_yaml must contain org: even when org_name is empty"
+        )
         assert "Unknown Organization" in spec_no_org
 
         # With explicit org_name
@@ -387,6 +446,7 @@ class TestDurgaEntities:
         """org_name written by spec_generator is recoverable by spec_parser for patch-bundle."""
         from src.bundle.spec_generator import entities_to_spec
         from src.bundle.spec_parser import spec_to_entities
+
         entities = load_durga_entities()
 
         spec_yaml = entities_to_spec(entities, org_name="Durga India")
@@ -421,8 +481,16 @@ class TestDurgaEntities:
             "subject_types": [{"name": "Cohort", "type": "Group"}],
             "programs": [],
             "encounter_types": [
-                {"name": "Session", "subject_type": "Cohort", "is_program_encounter": False},
-                {"name": "Session", "subject_type": "Cohort", "is_program_encounter": False},
+                {
+                    "name": "Session",
+                    "subject_type": "Cohort",
+                    "is_program_encounter": False,
+                },
+                {
+                    "name": "Session",
+                    "subject_type": "Cohort",
+                    "is_program_encounter": False,
+                },
             ],
             "address_levels": [{"name": "State", "level": 1, "parent": None}],
             "groups": [],
@@ -436,7 +504,6 @@ class TestDurgaEntities:
         the PEV loop catches it, records the cycle as failed, and increments cycle_count.
         No network required — we mock the POST call.
         """
-        from unittest.mock import MagicMock, patch
         from src.schemas.flow_state import FlowState
 
         state = FlowState(
@@ -470,11 +537,19 @@ class TestDurgaEntities:
             if "store-entities" in path:
                 return {"ok": True}
             if "validate-entities" in path:
-                return {"error_count": 0, "warning_count": 0, "has_errors": False,
-                        "issues_summary": "No issues found.", "issues": [], "entities": body}
+                return {
+                    "error_count": 0,
+                    "warning_count": 0,
+                    "has_errors": False,
+                    "issues_summary": "No issues found.",
+                    "issues": [],
+                    "entities": body,
+                }
             if "generate-spec" in path:
                 # Force EntitySpec validation failure by returning spec with bad cross-ref
-                raise ValueError("EntitySpec validation failed:\n  - EncounterType 'Session' references unknown program 'BadProgram'")
+                raise ValueError(
+                    "EntitySpec validation failed:\n  - EncounterType 'Session' references unknown program 'BadProgram'"
+                )
             return {}
 
         flow.post = _fake_post  # type: ignore[method-assign]
@@ -485,4 +560,6 @@ class TestDurgaEntities:
         assert result.total_cycles == 2, f"Expected 2 cycles, got {result.total_cycles}"
         assert result.success is False
         assert all(c.phase_failed == "spec" for c in result.cycles)
-        assert state.error_diagnosis != "", "error_diagnosis should be set after failure"
+        assert state.error_diagnosis != "", (
+            "error_diagnosis should be set after failure"
+        )

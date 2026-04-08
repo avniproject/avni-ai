@@ -5,7 +5,6 @@ A4 (groupPrivilege filename), C1 (form field extraction from scoping docs).
 
 from __future__ import annotations
 
-import json
 import zipfile
 from io import BytesIO
 from pathlib import Path
@@ -22,8 +21,15 @@ from src.bundle.scoping_parser import (
 )
 from src.bundle.uuid_utils import generate_deterministic_uuid
 
-_SCOPING_DOC = Path(__file__).parent / "resources" / "scoping" / "Durga India Scoping Document.xlsx"
-_MODELLING_DOC = Path(__file__).parent / "resources" / "scoping" / "Durga India Modelling.xlsx"
+_SCOPING_DOC = (
+    Path(__file__).parent
+    / "resources"
+    / "scoping"
+    / "Durga India Scoping Document.xlsx"
+)
+_MODELLING_DOC = (
+    Path(__file__).parent / "resources" / "scoping" / "Durga India Modelling.xlsx"
+)
 
 
 # ── A10: UUID determinism ────────────────────────────────────────────────────
@@ -57,7 +63,10 @@ class TestUUIDDeterminism:
         gen1.process_subject_types([{"name": "Person"}])
         gen2 = BundleGenerator("TestOrg")
         gen2.process_subject_types([{"name": "Person"}])
-        assert gen1.bundle["subjectTypes"][0]["uuid"] == gen2.bundle["subjectTypes"][0]["uuid"]
+        assert (
+            gen1.bundle["subjectTypes"][0]["uuid"]
+            == gen2.bundle["subjectTypes"][0]["uuid"]
+        )
 
 
 # ── A3: Cancellation concepts ───────────────────────────────────────────────
@@ -69,33 +78,36 @@ class TestCancellationConcepts:
         gen = BundleGenerator("TestOrg")
         gen.process_subject_types([{"name": "Person"}])
         gen.process_encounter_types([{"name": "Visit", "programEncounter": False}])
-        gen.process_forms([
-            {
-                "name": "Visit",
-                "formType": "Encounter",
-                "subjectType": "Person",
-                "encounterType": "Visit",
-                "fields": [],
-            }
-        ])
+        gen.process_forms(
+            [
+                {
+                    "name": "Visit",
+                    "formType": "Encounter",
+                    "subjectType": "Person",
+                    "encounterType": "Visit",
+                    "fields": [],
+                }
+            ]
+        )
         concept_names = [c["name"] for c in gen.bundle["concepts"]]
         assert "Visit cancellation reason" in concept_names
 
     def test_cancellation_concept_has_uuid(self):
         gen = BundleGenerator("TestOrg")
         gen.process_encounter_types([{"name": "Checkup", "programEncounter": False}])
-        gen.process_forms([
-            {
-                "name": "Checkup",
-                "formType": "Encounter",
-                "subjectType": "Person",
-                "encounterType": "Checkup",
-                "fields": [],
-            }
-        ])
+        gen.process_forms(
+            [
+                {
+                    "name": "Checkup",
+                    "formType": "Encounter",
+                    "subjectType": "Person",
+                    "encounterType": "Checkup",
+                    "fields": [],
+                }
+            ]
+        )
         cancel_concepts = [
-            c for c in gen.bundle["concepts"]
-            if "cancellation" in c["name"].lower()
+            c for c in gen.bundle["concepts"] if "cancellation" in c["name"].lower()
         ]
         assert len(cancel_concepts) == 1
         assert cancel_concepts[0]["uuid"]
@@ -119,8 +131,12 @@ class TestGroupPrivilegeFilename:
 
         with zipfile.ZipFile(BytesIO(zip_bytes)) as zf:
             names = zf.namelist()
-            assert "groupPrivilege.json" in names, f"Expected groupPrivilege.json, got {names}"
-            assert "groupPrivileges.json" not in names, "groupPrivileges.json should NOT exist"
+            assert "groupPrivilege.json" in names, (
+                f"Expected groupPrivilege.json, got {names}"
+            )
+            assert "groupPrivileges.json" not in names, (
+                "groupPrivileges.json should NOT exist"
+            )
 
 
 # ── C1: Form field extraction ────────────────────────────────────────────────
@@ -130,6 +146,7 @@ class TestFormSheetDetection:
     @pytest.mark.skipif(not _SCOPING_DOC.exists(), reason="Scoping doc not available")
     def test_scoping_doc_form_sheets_detected(self):
         import pandas as pd
+
         xf = pd.ExcelFile(_SCOPING_DOC)
         form_sheets = [s for s in xf.sheet_names if _is_form_sheet(xf, s)]
         assert len(form_sheets) >= 7
@@ -139,9 +156,12 @@ class TestFormSheetDetection:
         assert any("baseline for women" in n for n in form_names_lower)
         assert any("participant" in n for n in form_names_lower)
 
-    @pytest.mark.skipif(not _MODELLING_DOC.exists(), reason="Modelling doc not available")
+    @pytest.mark.skipif(
+        not _MODELLING_DOC.exists(), reason="Modelling doc not available"
+    )
     def test_modelling_doc_no_form_sheets(self):
         import pandas as pd
+
         xf = pd.ExcelFile(_MODELLING_DOC)
         form_sheets = [s for s in xf.sheet_names if _is_form_sheet(xf, s)]
         assert len(form_sheets) == 0
@@ -162,17 +182,27 @@ class TestFormFieldParsing:
         for form in spec.forms:
             for field in form.fields:
                 assert field.dataType in (
-                    "Text", "Numeric", "Date", "Coded", "Subject",
-                    "Duration", "Notes", "ImageV2", "PhoneNumber", "Location",
-                    "DateTime", "File", "Audio", "Video",
+                    "Text",
+                    "Numeric",
+                    "Date",
+                    "Coded",
+                    "Subject",
+                    "Duration",
+                    "Notes",
+                    "ImageV2",
+                    "PhoneNumber",
+                    "Location",
+                    "DateTime",
+                    "File",
+                    "Audio",
+                    "Video",
                 ), f"Unexpected dataType '{field.dataType}' for field '{field.name}'"
 
     @pytest.mark.skipif(not _SCOPING_DOC.exists(), reason="Scoping doc not available")
     def test_coded_fields_have_options(self):
         spec = parse_scoping_doc(str(_SCOPING_DOC))
         coded_fields = [
-            f for form in spec.forms for f in form.fields
-            if f.dataType == "Coded"
+            f for form in spec.forms for f in form.fields if f.dataType == "Coded"
         ]
         # At least some Coded fields should have options
         with_options = [f for f in coded_fields if f.options]
@@ -184,7 +214,9 @@ class TestFormFieldParsing:
         for form in spec.forms:
             assert len(form.sections) > 0, f"Form '{form.name}' has no sections"
 
-    @pytest.mark.skipif(not _MODELLING_DOC.exists(), reason="Modelling doc not available")
+    @pytest.mark.skipif(
+        not _MODELLING_DOC.exists(), reason="Modelling doc not available"
+    )
     def test_modelling_doc_backward_compat(self):
         """Modelling-only doc should still work — returns 0 forms."""
         spec = parse_scoping_doc(str(_MODELLING_DOC))

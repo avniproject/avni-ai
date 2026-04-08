@@ -152,7 +152,10 @@ class EntitySpec(BaseModel):
                 )
 
         if errors:
-            raise ValueError("EntitySpec validation failed:\n" + "\n".join(f"  - {e}" for e in errors))
+            raise ValueError(
+                "EntitySpec validation failed:\n"
+                + "\n".join(f"  - {e}" for e in errors)
+            )
 
         return self
 

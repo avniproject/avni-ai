@@ -168,9 +168,13 @@ class FlowState(BaseModel):
             "auth_token": os.environ.get("AVNI_AUTH_TOKEN", ""),
             "avni_mcp_server_url": os.environ.get(
                 "AVNI_MCP_SERVER_URL",
-                os.environ.get("AVNI_AI_SERVER_URL", "https://staging-ai.avniproject.org/"),
+                os.environ.get(
+                    "AVNI_AI_SERVER_URL", "https://staging-ai.avniproject.org/"
+                ),
             ),
-            "avni_base_url": os.environ.get("AVNI_BASE_URL", "https://staging.avniproject.org"),
+            "avni_base_url": os.environ.get(
+                "AVNI_BASE_URL", "https://staging.avniproject.org"
+            ),
             "org_name": os.environ.get("AVNI_ORG_NAME", ""),
             "scoping_doc_path": os.environ.get("SCOPING_DOC_PATH", ""),
         }
@@ -213,7 +217,9 @@ class FlowState(BaseModel):
             "upload_status": self.upload_status,
             "upload_task_id": self.upload_task_id,
             "upload_error": self.upload_error,
-            "error_diagnosis": self.error_diagnosis[:200] if self.error_diagnosis else "",
+            "error_diagnosis": self.error_diagnosis[:200]
+            if self.error_diagnosis
+            else "",
             "spec_yaml_len": len(self.spec_yaml),
             "bundle_zip_b64_len": len(self.bundle_zip_b64),
             "existing_bundle_b64_len": len(self.existing_bundle_b64),

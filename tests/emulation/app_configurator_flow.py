@@ -110,7 +110,9 @@ class AppConfiguratorFlow:
         resp.raise_for_status()
         return resp.json()
 
-    def get(self, path: str, *, auth: bool = False, params: dict | None = None) -> httpx.Response:
+    def get(
+        self, path: str, *, auth: bool = False, params: dict | None = None
+    ) -> httpx.Response:
         """GET from a backend endpoint. Returns raw httpx.Response."""
         headers = self._auth_headers() if auth else self._no_auth_headers()
         url = self._url(path)
@@ -129,7 +131,9 @@ class AppConfiguratorFlow:
         Returns the validation result dict.
         """
         if not self.state.entities_jsonl:
-            raise ValueError("No entities loaded. Set state.entities_jsonl before calling run().")
+            raise ValueError(
+                "No entities loaded. Set state.entities_jsonl before calling run()."
+            )
 
         logger.info("=== Phase A: Store & Validate Entities ===")
         logger.info(
@@ -143,7 +147,10 @@ class AppConfiguratorFlow:
         # A1: Store entities server-side (requires auth for Dify, but endpoint itself doesn't)
         self.post(
             "/store-entities",
-            {"conversation_id": self.conversation_id, "entities": self.state.entities_jsonl},
+            {
+                "conversation_id": self.conversation_id,
+                "entities": self.state.entities_jsonl,
+            },
         )
         logger.info("  Entities stored with conversation_id=%s", self.conversation_id)
 
@@ -179,9 +186,11 @@ class AppConfiguratorFlow:
         # If retrying after a failed cycle, apply corrections based on diagnosis
         if self.state.error_diagnosis:
             logger.info("  Applying corrections from previous failure diagnosis...")
-            corrections = self._derive_corrections_from_diagnosis(self.state.error_diagnosis)
+            corrections = self._derive_corrections_from_diagnosis(
+                self.state.error_diagnosis
+            )
             if corrections:
-                result = self.post(
+                self.post(
                     "/apply-entity-corrections",
                     {
                         "conversation_id": self.conversation_id,
@@ -198,7 +207,10 @@ class AppConfiguratorFlow:
             # Generate spec from entities
             resp = self.post(
                 "/generate-spec",
-                {"conversation_id": self.conversation_id, "org_name": self.state.org_name},
+                {
+                    "conversation_id": self.conversation_id,
+                    "org_name": self.state.org_name,
+                },
             )
             self.state.spec_yaml = resp.get("spec_yaml", "")
             if not self.state.spec_yaml:
@@ -252,13 +264,19 @@ class AppConfiguratorFlow:
                             "corrections": corrections,
                         },
                     )
-                    logger.info("  Applied %d auto-corrections, retrying...", len(corrections))
+                    logger.info(
+                        "  Applied %d auto-corrections, retrying...", len(corrections)
+                    )
                 else:
-                    logger.warning("  Could not derive corrections, proceeding with current spec")
+                    logger.warning(
+                        "  Could not derive corrections, proceeding with current spec"
+                    )
                     return True  # Proceed with warnings/minor errors
 
         # Exhausted internal retries — proceed anyway (bundle validation will catch issues)
-        logger.warning("  Spec agent exhausted 3 internal retries. Proceeding with current spec.")
+        logger.warning(
+            "  Spec agent exhausted 3 internal retries. Proceeding with current spec."
+        )
         return True
 
     # ── Phase D: Bundle Generation & Upload (Executor) ───────────
@@ -273,7 +291,10 @@ class AppConfiguratorFlow:
 
         Returns CycleResult with outcome.
         """
-        logger.info("=== Phase D: Bundle Generation & Upload (cycle %d) ===", self.state.cycle_count)
+        logger.info(
+            "=== Phase D: Bundle Generation & Upload (cycle %d) ===",
+            self.state.cycle_count,
+        )
 
         cycle = CycleResult(cycle=self.state.cycle_count, phase_failed="", status="")
 
@@ -332,7 +353,11 @@ class AppConfiguratorFlow:
                     logger.info("  Patch validation warnings: %s", val_warnings)
 
         except httpx.HTTPStatusError as e:
-            logger.error("  D2 FAILED: HTTP %d: %s", e.response.status_code, e.response.text[:500])
+            logger.error(
+                "  D2 FAILED: HTTP %d: %s",
+                e.response.status_code,
+                e.response.text[:500],
+            )
             cycle.phase_failed = "bundle_patch"
             cycle.status = "error"
             cycle.errors = [f"Patch bundle failed: HTTP {e.response.status_code}"]
@@ -364,10 +389,16 @@ class AppConfiguratorFlow:
             self.state.plan_status = "uploading"
             logger.info("  Upload started: task_id=%s", self.state.upload_task_id)
         except httpx.HTTPStatusError as e:
-            logger.error("  D3 FAILED: HTTP %d: %s", e.response.status_code, e.response.text[:500])
+            logger.error(
+                "  D3 FAILED: HTTP %d: %s",
+                e.response.status_code,
+                e.response.text[:500],
+            )
             cycle.phase_failed = "upload"
             cycle.status = "error"
-            cycle.errors = [f"Upload bundle failed: HTTP {e.response.status_code}: {e.response.text[:200]}"]
+            cycle.errors = [
+                f"Upload bundle failed: HTTP {e.response.status_code}: {e.response.text[:200]}"
+            ]
             return cycle
         except Exception as e:
             logger.error("  D3 FAILED: %s", e)
@@ -377,8 +408,11 @@ class AppConfiguratorFlow:
             return cycle
 
         # D4: Poll upload status
-        logger.info("  D4: Polling upload status (max %d attempts, %ds interval)...",
-                     self.state.poll_max_attempts, self.state.poll_interval_secs)
+        logger.info(
+            "  D4: Polling upload status (max %d attempts, %ds interval)...",
+            self.state.poll_max_attempts,
+            self.state.poll_interval_secs,
+        )
         for poll_attempt in range(1, self.state.poll_max_attempts + 1):
             time.sleep(self.state.poll_interval_secs)
             try:
@@ -386,8 +420,13 @@ class AppConfiguratorFlow:
                 status_data = status_resp.json()
                 status = status_data.get("status", "unknown")
                 progress = status_data.get("progress", "")
-                logger.info("  Poll %d/%d: status=%s progress=%s",
-                            poll_attempt, self.state.poll_max_attempts, status, progress)
+                logger.info(
+                    "  Poll %d/%d: status=%s progress=%s",
+                    poll_attempt,
+                    self.state.poll_max_attempts,
+                    status,
+                    progress,
+                )
 
                 if status == "completed":
                     self.state.upload_status = "completed"
@@ -415,7 +454,9 @@ class AppConfiguratorFlow:
         self.state.upload_status = "timeout"
         cycle.phase_failed = "poll"
         cycle.status = "timeout"
-        cycle.errors = [f"Upload polling timed out after {self.state.poll_max_attempts} attempts"]
+        cycle.errors = [
+            f"Upload polling timed out after {self.state.poll_max_attempts} attempts"
+        ]
         logger.error("  Upload polling TIMED OUT")
         return cycle
 
@@ -480,7 +521,9 @@ class AppConfiguratorFlow:
             self.state.cycle_count += 1
             result.total_cycles = self.state.cycle_count
             logger.info("\n" + "=" * 60)
-            logger.info("PEV CYCLE %d/%d", self.state.cycle_count, self.state.max_cycles)
+            logger.info(
+                "PEV CYCLE %d/%d", self.state.cycle_count, self.state.max_cycles
+            )
             logger.info("=" * 60)
 
             # PLAN: Generate/fix spec
@@ -576,7 +619,9 @@ class AppConfiguratorFlow:
         #   {"entity_type": "subject_type", "name": "Individual", "type": "Person"}
         #   {"entity_type": "encounter_type", "name": "Bad Encounter", "_delete": true}
         logger.info("  Deriving corrections from diagnosis (heuristic)...")
-        logger.info("  (No automatic corrections in emulation — Dify Diagnose Agent handles this)")
+        logger.info(
+            "  (No automatic corrections in emulation — Dify Diagnose Agent handles this)"
+        )
         return corrections
 
     def _derive_corrections_from_spec_errors(self, errors: list[str]) -> list[dict]:
@@ -619,7 +664,9 @@ class AppConfiguratorFlow:
             logger.error("Health check failed: %s", e)
             return False
 
-    def delete_config(self, delete_metadata: bool = True, delete_admin_config: bool = True) -> bool:
+    def delete_config(
+        self, delete_metadata: bool = True, delete_admin_config: bool = True
+    ) -> bool:
         """
         Wipe the entire org configuration via DELETE /api/implementation.
 
@@ -707,6 +754,7 @@ if __name__ == "__main__":
             return val
         if secret:
             import getpass
+
             val = getpass.getpass(f"{prompt_text}: ").strip()
         else:
             val = input(f"{prompt_text}: ").strip()
@@ -714,18 +762,26 @@ if __name__ == "__main__":
             os.environ[env_key] = val
         return val
 
-    server_url = _prompt("AVNI_MCP_SERVER_URL", "Avni MCP server URL [https://staging-ai.avniproject.org/]")
+    server_url = _prompt(
+        "AVNI_MCP_SERVER_URL",
+        "Avni MCP server URL [https://staging-ai.avniproject.org/]",
+    )
     if not server_url:
         server_url = "https://staging-ai.avniproject.org/"
         os.environ["AVNI_MCP_SERVER_URL"] = server_url
 
-    auth_token = _prompt("AVNI_AUTH_TOKEN", "Auth token (avni-auth-token header)", secret=True)
+    auth_token = _prompt(
+        "AVNI_AUTH_TOKEN", "Auth token (avni-auth-token header)", secret=True
+    )
     if not auth_token:
         print("ERROR: AVNI_AUTH_TOKEN is required.")
         sys.exit(1)
 
     org_name = _prompt("AVNI_ORG_NAME", "Organisation name (e.g. 'Durga India')")
-    scoping_doc = _prompt("SCOPING_DOC_PATH", "Path to scoping Excel file [tests/resources/scoping/Durga India Modelling.xlsx]")
+    scoping_doc = _prompt(
+        "SCOPING_DOC_PATH",
+        "Path to scoping Excel file [tests/resources/scoping/Durga India Modelling.xlsx]",
+    )
     if not scoping_doc:
         os.environ["SCOPING_DOC_PATH"] = ""
 
@@ -742,8 +798,12 @@ if __name__ == "__main__":
     entities = flow.state.entities_jsonl
     print(f"  Subject types : {[s['name'] for s in entities.get('subject_types', [])]}")
     print(f"  Programs      : {[p['name'] for p in entities.get('programs', [])]}")
-    print(f"  Encounter types: {[e['name'] for e in entities.get('encounter_types', [])]}")
-    print(f"  Address levels: {[a['name'] for a in entities.get('address_levels', [])]}")
+    print(
+        f"  Encounter types: {[e['name'] for e in entities.get('encounter_types', [])]}"
+    )
+    print(
+        f"  Address levels: {[a['name'] for a in entities.get('address_levels', [])]}"
+    )
 
     # ── Confirm before proceeding ─────────────────────────────────
     print("\nOptions:")
@@ -759,7 +819,9 @@ if __name__ == "__main__":
         print("\nDeleting existing org configuration...")
         ok = flow.delete_config()
         if not ok:
-            print("WARNING: delete_config failed — proceeding with patch-bundle void approach instead.")
+            print(
+                "WARNING: delete_config failed — proceeding with patch-bundle void approach instead."
+            )
 
     # ── Run the full PEV loop ─────────────────────────────────────
     result = flow.run()

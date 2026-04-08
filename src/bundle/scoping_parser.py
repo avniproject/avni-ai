@@ -76,7 +76,11 @@ def parse_location_hierarchy(df: pd.DataFrame) -> list[AddressLevelSpec]:
     Rows are listed top-down (highest → lowest), so we assign descending levels.
     """
     levels: list[AddressLevelSpec] = []
-    rows = [(str(r[0]).strip(), str(r[1]).strip()) for r in df.itertuples(index=False) if _clean(r[0])]
+    rows = [
+        (str(r[0]).strip(), str(r[1]).strip())
+        for r in df.itertuples(index=False)
+        if _clean(r[0])
+    ]
 
     total = len(rows)
     prev_name: str | None = None
@@ -186,7 +190,10 @@ def parse_encounters(
             subject_type = _resolve_subject_type(raw_subject, subject_type_names)
 
         enc_type_raw = _clean(
-            row.get("Encounter Type (Scheduled/Unscheduled)", row.get("Encounter Type", "Scheduled"))
+            row.get(
+                "Encounter Type (Scheduled/Unscheduled)",
+                row.get("Encounter Type", "Scheduled"),
+            )
         ).lower()
         is_scheduled = "unscheduled" not in enc_type_raw
 
@@ -209,7 +216,11 @@ def _resolve_subject_type(raw: str, known: set[str]) -> str:
         return ""
     raw_lower = raw.strip().lower()
     for name in known:
-        if name.lower() == raw_lower or name.lower() in raw_lower or raw_lower in name.lower():
+        if (
+            name.lower() == raw_lower
+            or name.lower() in raw_lower
+            or raw_lower in name.lower()
+        ):
             return name
     return raw
 
@@ -235,10 +246,22 @@ _SCOPING_DATA_TYPE_MAP: dict[str, str] = {
 
 # Sheets that are modelling/metadata — never form sheets
 _MODELLING_SHEET_PREFIXES = (
-    "location", "subject", "program", "encounter",
-    "help", "project summary", "user persona", "w3h",
-    "proposed process", "cost", "permissions", "report",
-    "dashboard", "review", "question", "summary",
+    "location",
+    "subject",
+    "program",
+    "encounter",
+    "help",
+    "project summary",
+    "user persona",
+    "w3h",
+    "proposed process",
+    "cost",
+    "permissions",
+    "report",
+    "dashboard",
+    "review",
+    "question",
+    "summary",
 )
 
 
@@ -322,7 +345,9 @@ def parse_w3h_sheet(
             break
 
     if not w3h_actual:
-        logger.info("No W3H sheet found — form-entity mapping will be deferred to Spec Agent")
+        logger.info(
+            "No W3H sheet found — form-entity mapping will be deferred to Spec Agent"
+        )
         return {}
 
     try:
@@ -348,7 +373,14 @@ def parse_w3h_sheet(
     enc_names_lower = {n.lower(): n for n in encounter_type_names}
 
     # Registration-related keywords
-    _REG_KEYWORDS = ("registration", "register", "details", "profile", "enrolment", "enrollment")
+    _REG_KEYWORDS = (
+        "registration",
+        "register",
+        "details",
+        "profile",
+        "enrolment",
+        "enrollment",
+    )
 
     mapping: dict[str, dict[str, str | None]] = {}
     for _, row in df.iterrows():
@@ -381,7 +413,11 @@ def parse_w3h_sheet(
             # Try to match an encounter type
             matched_enc = None
             for enc_lower, enc_name in enc_names_lower.items():
-                if enc_lower == activity_lower or enc_lower in activity_lower or activity_lower in enc_lower:
+                if (
+                    enc_lower == activity_lower
+                    or enc_lower in activity_lower
+                    or activity_lower in enc_lower
+                ):
                     matched_enc = enc_name
                     break
             if matched_enc:
@@ -557,13 +593,23 @@ def parse_form_sheet(
         sec_name = f.group or "General Information"
         if sec_name != current_sec_name:
             if current_sec_fields:
-                sections.append(SectionSpec(name=current_sec_name or "General Information", fields=current_sec_fields))
+                sections.append(
+                    SectionSpec(
+                        name=current_sec_name or "General Information",
+                        fields=current_sec_fields,
+                    )
+                )
             current_sec_name = sec_name
             current_sec_fields = [f]
         else:
             current_sec_fields.append(f)
     if current_sec_fields:
-        sections.append(SectionSpec(name=current_sec_name or "General Information", fields=current_sec_fields))
+        sections.append(
+            SectionSpec(
+                name=current_sec_name or "General Information",
+                fields=current_sec_fields,
+            )
+        )
 
     form_spec = FormSpec(
         name=sheet_name.strip(),
@@ -577,7 +623,10 @@ def parse_form_sheet(
 
     logger.info(
         "Parsed form sheet '%s': %d fields, %d sections, formType=%s",
-        sheet_name, len(fields), len(sections), form_type,
+        sheet_name,
+        len(fields),
+        len(sections),
+        form_type,
     )
     return form_spec
 
@@ -597,8 +646,11 @@ def parse_form_sheets(
     """
     # Stage 1: Parse W3H for form-entity mapping
     w3h_mapping = parse_w3h_sheet(
-        xf, sheet_names_lower, subject_type_names,
-        encounter_type_names, program_encounter_map,
+        xf,
+        sheet_names_lower,
+        subject_type_names,
+        encounter_type_names,
+        program_encounter_map,
     )
     logger.info("W3H mapping: %d activities mapped", len(w3h_mapping))
 
@@ -613,7 +665,10 @@ def parse_form_sheets(
         if entity_mapping:
             logger.info("Matched form sheet '%s' to W3H entity", sheet_name)
         else:
-            logger.info("Form sheet '%s' has no W3H match — unlinked (Spec Agent will resolve)", sheet_name)
+            logger.info(
+                "Form sheet '%s' has no W3H match — unlinked (Spec Agent will resolve)",
+                sheet_name,
+            )
 
         form = parse_form_sheet(xf, sheet_name, entity_mapping)
         if form:
@@ -674,12 +729,25 @@ def parse_scoping_doc(xlsx_path: str | Path | None = None) -> EntitySpec:
 
     enc_types: list[EncounterTypeSpec] = []
     if not enc_df.empty:
-        enc_types.extend(parse_encounters(enc_df, subject_type_names, program_names, is_program_encounter=False))
+        enc_types.extend(
+            parse_encounters(
+                enc_df, subject_type_names, program_names, is_program_encounter=False
+            )
+        )
     if not prog_enc_df.empty:
-        enc_types.extend(parse_encounters(prog_enc_df, subject_type_names, program_names, is_program_encounter=True))
+        enc_types.extend(
+            parse_encounters(
+                prog_enc_df,
+                subject_type_names,
+                program_names,
+                is_program_encounter=True,
+            )
+        )
 
     if not address_levels:
-        logger.warning("No location hierarchy found in scoping doc — using default State/District/Village")
+        logger.warning(
+            "No location hierarchy found in scoping doc — using default State/District/Village"
+        )
         address_levels = [
             AddressLevelSpec(name="State", level=3, parent=None),
             AddressLevelSpec(name="District", level=2, parent="State"),
@@ -695,8 +763,11 @@ def parse_scoping_doc(xlsx_path: str | Path | None = None) -> EntitySpec:
 
     # Parse form sheets (columns A–R) with W3H mapping
     forms = parse_form_sheets(
-        xf, sheet_names_lower, subject_type_names,
-        encounter_type_names, program_encounter_map,
+        xf,
+        sheet_names_lower,
+        subject_type_names,
+        encounter_type_names,
+        program_encounter_map,
     )
 
     logger.info(

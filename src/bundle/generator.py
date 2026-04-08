@@ -622,7 +622,12 @@ class BundleGenerator:
 
         # Validate through EntitySpec before generating — catches duplicates and bad cross-refs
         from ..schemas.bundle_models import EntitySpec as _EntitySpec
-        _reverse_map = {"subjectTypes": "subject_types", "encounterTypes": "encounter_types", "addressLevels": "address_levels"}
+
+        _reverse_map = {
+            "subjectTypes": "subject_types",
+            "encounterTypes": "encounter_types",
+            "addressLevels": "address_levels",
+        }
         _norm = {_reverse_map.get(k, k): v for k, v in entities.items()}
         try:
             _EntitySpec(
@@ -633,7 +638,9 @@ class BundleGenerator:
                 groups=_norm.get("groups", []),
             )
         except ValueError as exc:
-            logger.warning("BundleGenerator.generate: EntitySpec validation failed: %s", exc)
+            logger.warning(
+                "BundleGenerator.generate: EntitySpec validation failed: %s", exc
+            )
             raise
 
         # Process in server-expected order
