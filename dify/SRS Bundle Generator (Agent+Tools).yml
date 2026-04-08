@@ -460,8 +460,16 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Generate a complete Avni bundle ZIP from entities
+                description: Generate a complete Avni bundle ZIP from entities. Pass
+                  conversation_id so the bundle is stored server-side and never returned
+                  to the LLM. Call validate_bundle and upload_bundle with the same
+                  conversation_id afterwards.
               parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
                 entities:
                   auto: 1
                   value: null
@@ -479,14 +487,15 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Validate a generated bundle for structural correctness
+                description: Validate the generated bundle for structural correctness.
+                  Pass conversation_id to fetch the bundle from server-side store (no
+                  large payload sent to LLM).
               parameters:
-                bundle:
-                  auto: 1
-                  value: null
-                bundle_zip_b64:
-                  auto: 1
-                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
               provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
               provider_show_name: Avni AI Staging NoAuth openapi
               settings: {}
@@ -496,12 +505,16 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Decodes the existing bundle, generates a fresh bundle
-                  from the spec, and applies patches (voiding stale forms/mappings).
+                description: Patch the existing org bundle with the new spec. Pass
+                  conversation_id (existing bundle fetched from server store) and
+                  spec_yaml. The patched result is stored under conversation_id for
+                  validate_bundle and upload_bundle to use.
               parameters:
-                existing_bundle_b64:
-                  auto: 1
-                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
                 spec_yaml:
                   auto: 1
                   value: null
@@ -515,13 +528,10 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Auth is resolved automatically if conversation_id is
-                  provided and a token was stored via /store-auth-token. Otherwise
-                  pass avni-auth-token header.
+                description: Upload the generated bundle to Avni. Auth and bundle are
+                  both resolved automatically from server-side store using conversation_id.
+                  No bundle_zip_b64 needed.
               parameters:
-                bundle_zip_b64:
-                  auto: 1
-                  value: null
                 conversation_id:
                   auto: 0
                   value:
@@ -568,8 +578,11 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Auth is resolved automatically if conversation_id is
-                  provided and a token was stored via /store-auth-token.
+                description: Download the current org bundle from Avni and store it
+                  server-side under conversation_id (bundle_type='existing'). Pass
+                  conversation_id so the bundle ZIP never reaches the LLM. Afterwards
+                  use get_bundle_files/get_bundle_file to inspect it, or patch_bundle
+                  to apply spec changes.
               parameters:
                 conversation_id:
                   auto: 0
@@ -603,6 +616,54 @@ workflow:
               tool_description: Execute Python code in a sandboxed environment
               tool_label: execute_python
               tool_name: execute_python
+              type: api
+            - enabled: true
+              extra:
+                description: List all files in a stored bundle with their sizes. Use
+                  bundle_type='generated' (default) for the newly generated bundle
+                  or 'existing' for the org's current bundle downloaded from Avni.
+                  Returns file names and sizes so you can choose which file to inspect.
+              parameters:
+                bundle_type:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: List all files in a stored bundle with their sizes.
+              tool_label: get_bundle_files
+              tool_name: get_bundle_files
+              type: api
+            - enabled: true
+              extra:
+                description: Read the content of a specific file from a stored bundle.
+                  filename examples are 'forms/MCH Registration.json', 'concepts.json',
+                  'subjectTypes.json', 'formMappings.json'. Use bundle_type='existing'
+                  to inspect the org's current config for comparison or diagnosis.
+              parameters:
+                bundle_type:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                filename:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Read the content of a specific file from a stored
+                bundle by filename.
+              tool_label: get_bundle_file
+              tool_name: get_bundle_file
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling

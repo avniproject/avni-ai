@@ -28,6 +28,8 @@ from .handlers.bundle_handlers import (
     handle_download_bundle,
     handle_download_bundle_b64,
     handle_patch_bundle,
+    handle_get_bundle_files,
+    handle_get_bundle_file,
 )
 from .handlers.upload_handlers import handle_upload_bundle, handle_upload_status
 from .handlers.config_handlers import handle_get_existing_config
@@ -223,6 +225,15 @@ async def create_server():
     @server.custom_route("/patch-bundle", methods=["POST"])
     async def patch_bundle_endpoint(request: Request):
         return await handle_patch_bundle(request)
+
+    # --- Bundle File Inspection ---
+    @server.custom_route("/bundle-files", methods=["GET"])
+    async def get_bundle_files_endpoint(request: Request):
+        return await handle_get_bundle_files(request)
+
+    @server.custom_route("/bundle-file", methods=["GET"])
+    async def get_bundle_file_endpoint(request: Request):
+        return await handle_get_bundle_file(request)
 
     # --- Bundle Upload ---
     @server.custom_route("/upload-bundle", methods=["POST"])

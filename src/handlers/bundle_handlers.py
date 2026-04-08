@@ -9,6 +9,7 @@ from __future__ import annotations
 import base64
 import json
 import logging
+import time
 
 import httpx
 from starlette.requests import Request
@@ -22,12 +23,59 @@ from ..utils.env import AVNI_BASE_URL
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# In-memory bundle store keyed by conversation_id (TTL = 6 hours)
+# Allows agent tool calls to pass only conversation_id instead of bundle_zip_b64,
+# keeping large binary payloads off the LLM context entirely.
+# ---------------------------------------------------------------------------
+_BUNDLE_STORE_TTL = 6 * 3600  # seconds
+
+
+class _BundleStore:
+    def __init__(self) -> None:
+        self._store: dict[str, tuple[dict, float]] = {}  # id -> (data, expiry)
+
+    def put(self, conversation_id: str, zip_b64: str, bundle_dict: dict) -> None:
+        self._store[conversation_id] = (
+            {"zip_b64": zip_b64, "bundle": bundle_dict},
+            time.time() + _BUNDLE_STORE_TTL,
+        )
+
+    def get(self, conversation_id: str) -> dict | None:
+        entry = self._store.get(conversation_id)
+        if entry is None:
+            return None
+        data, expiry = entry
+        if time.time() > expiry:
+            del self._store[conversation_id]
+            return None
+        return data
+
+    def cleanup(self) -> int:
+        now = time.time()
+        expired = [k for k, (_, exp) in self._store.items() if now > exp]
+        for k in expired:
+            del self._store[k]
+        return len(expired)
+
+
+_bundle_store = _BundleStore()
+
+
+def get_bundle_store() -> _BundleStore:
+    """Return the global bundle store (used by upload_handlers)."""
+    return _bundle_store
+
 
 async def handle_generate_bundle(request: Request) -> JSONResponse:
     """
     POST /generate-bundle
-    Body: { "entities": {...}, "org_name": "MyOrg" }
-    Returns: { "bundle": {...}, "validation": {...}, "confidence": {...}, "bundle_zip_b64": "..." }
+    Body: { "entities": {...}, "org_name": "MyOrg", "conversation_id": "..." }
+
+    When conversation_id is provided: stores bundle server-side in _bundle_store
+    and returns summary ONLY (no bundle_zip_b64 in response — keeps LLM context small).
+
+    Without conversation_id: legacy behaviour, returns full bundle_zip_b64.
     """
     try:
         body = await request.json()
@@ -49,6 +97,7 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
     entities = {_key_map.get(k, k): v for k, v in entities.items()}
 
     org_name = body.get("org_name", "Unknown Organization")
+    conversation_id = body.get("conversation_id")
 
     try:
         generator = BundleGenerator(org_name)
@@ -58,6 +107,35 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
         zip_bytes = generator.to_zip_bytes()
         zip_b64 = base64.b64encode(zip_bytes).decode("ascii")
 
+        summary = {
+            "concepts": len(result["bundle"]["concepts"]),
+            "forms": len(result["bundle"]["forms"]),
+            "subjectTypes": len(result["bundle"]["subjectTypes"]),
+            "programs": len(result["bundle"]["programs"]),
+            "encounterTypes": len(result["bundle"]["encounterTypes"]),
+            "formMappings": len(result["bundle"]["formMappings"]),
+            "groups": len(result["bundle"]["groups"]),
+        }
+
+        if conversation_id:
+            # Store bundle server-side; do NOT return bundle_zip_b64 to LLM
+            _bundle_store.put(conversation_id, zip_b64, result["bundle"])
+            logger.info(
+                "generate-bundle: stored bundle for conversation_id=%s zip_b64_len=%d",
+                conversation_id,
+                len(zip_b64),
+            )
+            return JSONResponse(
+                {
+                    "success": True,
+                    "stored": True,
+                    "validation": result["validation"],
+                    "confidence": result["confidence"],
+                    "summary": summary,
+                }
+            )
+
+        # Legacy: return full bundle_zip_b64 when no conversation_id
         return JSONResponse(
             {
                 "success": True,
@@ -65,15 +143,7 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
                 "validation": result["validation"],
                 "confidence": result["confidence"],
                 "bundle_zip_b64": zip_b64,
-                "summary": {
-                    "concepts": len(result["bundle"]["concepts"]),
-                    "forms": len(result["bundle"]["forms"]),
-                    "subjectTypes": len(result["bundle"]["subjectTypes"]),
-                    "programs": len(result["bundle"]["programs"]),
-                    "encounterTypes": len(result["bundle"]["encounterTypes"]),
-                    "formMappings": len(result["bundle"]["formMappings"]),
-                    "groups": len(result["bundle"]["groups"]),
-                },
+                "summary": summary,
             }
         )
     except Exception as e:
@@ -84,8 +154,10 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
 async def handle_validate_bundle(request: Request) -> JSONResponse:
     """
     POST /validate-bundle
-    Body: { "bundle": {...} }   (the bundle dict, not a ZIP)
+    Body: { "bundle": {...} } OR { "bundle_zip_b64": "..." } OR { "conversation_id": "..." }
     Returns: { "valid": bool, "errors": [...], "warnings": [...] }
+
+    When conversation_id is provided: fetches bundle from _bundle_store (no LLM payload).
     """
     try:
         body = await request.json()
@@ -93,6 +165,26 @@ async def handle_validate_bundle(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
     bundle = body.get("bundle")
+
+    # Prefer conversation_id lookup (server-side store, nothing large on LLM)
+    if not bundle:
+        conversation_id = body.get("conversation_id")
+        if conversation_id:
+            stored = _bundle_store.get(conversation_id)
+            if stored:
+                bundle = stored["bundle"]
+                logger.info(
+                    "validate-bundle: resolved bundle from store for conversation_id=%s",
+                    conversation_id,
+                )
+            else:
+                return JSONResponse(
+                    {
+                        "error": f"No stored bundle for conversation_id={conversation_id!r}. Call generate_bundle first."
+                    },
+                    status_code=404,
+                )
+
     if not bundle:
         b64 = body.get("bundle_zip_b64", "")
         if b64:
@@ -201,7 +293,10 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
     GET /download-bundle-b64?includeLocations=true|false&conversation_id=...
     Headers: avni-auth-token (or conversation_id query param)
     Same as /download-bundle but returns base64-encoded ZIP in JSON.
-    Useful for Dify code nodes that can't handle binary responses.
+
+    When conversation_id is provided: stores downloaded bundle server-side under
+    '{conversation_id}:existing' key and returns summary only (no bundle_zip_b64).
+    Without conversation_id: legacy behaviour, returns full bundle_zip_b64.
     """
     from ..auth_store import resolve_auth_token
 
@@ -218,6 +313,7 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
         request.query_params.get("includeLocations", "false").lower() == "true"
     )
     base_url = request.query_params.get("baseUrl", AVNI_BASE_URL)
+    conversation_id = request.query_params.get("conversation_id")
 
     url = (
         f"{base_url.rstrip('/')}/implementation/export/{str(include_locations).lower()}"
@@ -235,6 +331,26 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
             response.raise_for_status()
 
         zip_b64 = base64.b64encode(response.content).decode("ascii")
+
+        if conversation_id:
+            # Store under '{cid}:existing' — keeps large b64 off the LLM
+            _bundle_store.put(f"{conversation_id}:existing", zip_b64, {})
+            logger.info(
+                "download-bundle-b64: stored existing bundle for conversation_id=%s size_bytes=%d",
+                conversation_id,
+                len(response.content),
+            )
+            return JSONResponse(
+                {
+                    "success": True,
+                    "stored": True,
+                    "bundle_type": "existing",
+                    "size_bytes": len(response.content),
+                    "include_locations": include_locations,
+                }
+            )
+
+        # Legacy: return full b64 when no conversation_id
         return JSONResponse(
             {
                 "success": True,
@@ -259,8 +375,12 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
 async def handle_patch_bundle(request: Request) -> JSONResponse:
     """
     POST /patch-bundle
-    Body: multipart/form-data with fields existing_bundle_b64 and spec_yaml
+    Body: JSON { "conversation_id": "...", "spec_yaml": "..." }
+       OR multipart/form-data { existing_bundle_b64, spec_yaml }  (legacy)
     No auth needed — deterministic local processing.
+
+    When conversation_id is provided: fetches existing bundle from
+    _bundle_store['{cid}:existing'] and stores patched result under conversation_id.
 
     Flow:
       1. Decode existing bundle ZIP from base64
@@ -269,26 +389,60 @@ async def handle_patch_bundle(request: Request) -> JSONResponse:
       4. Generate a fresh bundle from those entities
       5. Merge: overwrite only the files that the spec touches
       6. Re-zip using canonical order
-      7. Return patched ZIP as base64
+      7. Return patched bundle summary (stored server-side) or full b64 (legacy)
     """
     content_type = request.headers.get("content-type", "")
     logger.info("patch-bundle: content-type=%r", content_type)
-    try:
-        form = await request.form()
-    except Exception as e:
-        logger.error("patch-bundle: form parse failed: %s", e)
-        return JSONResponse({"error": f"Form parse failed: {e}"}, status_code=400)
-    existing_b64 = form.get("existing_bundle_b64")
-    spec_yaml = form.get("spec_yaml")
+
+    existing_b64: str | None = None
+    spec_yaml: str | None = None
+    conversation_id: str | None = None
+
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+        except Exception as e:
+            return JSONResponse({"error": f"JSON parse failed: {e}"}, status_code=400)
+        conversation_id = body.get("conversation_id")
+        spec_yaml = body.get("spec_yaml")
+        if conversation_id:
+            stored = _bundle_store.get(f"{conversation_id}:existing")
+            if stored:
+                existing_b64 = stored["zip_b64"]
+                logger.info(
+                    "patch-bundle: resolved existing bundle from store for conversation_id=%s",
+                    conversation_id,
+                )
+            else:
+                return JSONResponse(
+                    {
+                        "error": f"No stored existing bundle for conversation_id={conversation_id!r}. Call download_bundle_b64 first."
+                    },
+                    status_code=404,
+                )
+        else:
+            existing_b64 = body.get("existing_bundle_b64")
+    else:
+        try:
+            form = await request.form()
+        except Exception as e:
+            logger.error("patch-bundle: form parse failed: %s", e)
+            return JSONResponse({"error": f"Form parse failed: {e}"}, status_code=400)
+        existing_b64 = form.get("existing_bundle_b64")
+        spec_yaml = form.get("spec_yaml")
+
     logger.info(
-        "patch-bundle: existing_b64 len=%s spec_yaml len=%s",
+        "patch-bundle: existing_b64 len=%s spec_yaml len=%s conversation_id=%s",
         len(existing_b64) if existing_b64 else "MISSING",
         len(spec_yaml) if spec_yaml else "MISSING",
+        conversation_id,
     )
 
     if not existing_b64:
         return JSONResponse(
-            {"error": "Missing 'existing_bundle_b64' in request body"},
+            {
+                "error": "Missing 'existing_bundle_b64': pass it directly or provide conversation_id after calling download_bundle_b64"
+            },
             status_code=400,
         )
     if not spec_yaml:
@@ -416,6 +570,27 @@ async def handle_patch_bundle(request: Request) -> JSONResponse:
         # 7. Return result
         patched_b64 = base64.b64encode(patched_zip).decode("ascii")
 
+        if conversation_id:
+            # Store patched bundle under conversation_id (overwrites generated bundle)
+            _bundle_store.put(conversation_id, patched_b64, fresh_bundle)
+            logger.info(
+                "patch-bundle: stored patched bundle for conversation_id=%s size_bytes=%d files_patched=%d",
+                conversation_id,
+                len(patched_zip),
+                len(patches),
+            )
+            return JSONResponse(
+                {
+                    "success": True,
+                    "stored": True,
+                    "size_bytes": len(patched_zip),
+                    "files_patched": len(patches),
+                    "validation": result.get("validation"),
+                    "confidence": result.get("confidence"),
+                }
+            )
+
+        # Legacy: return full b64 when no conversation_id
         return JSONResponse(
             {
                 "success": True,
@@ -432,3 +607,127 @@ async def handle_patch_bundle(request: Request) -> JSONResponse:
     except Exception as e:
         logger.exception("Bundle patching failed")
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)
+
+
+def _resolve_bundle_zip(
+    conversation_id: str, bundle_type: str
+) -> tuple[bytes | None, str | None]:
+    """Fetch ZIP bytes from store. Returns (zip_bytes, error_message)."""
+    store_key = (
+        f"{conversation_id}:{bundle_type}"
+        if bundle_type == "existing"
+        else conversation_id
+    )
+    stored = _bundle_store.get(store_key)
+    if not stored:
+        label = (
+            "existing bundle (call download_bundle_b64 first)"
+            if bundle_type == "existing"
+            else "generated bundle (call generate_bundle first)"
+        )
+        return None, f"No stored {label} for conversation_id={conversation_id!r}."
+    try:
+        zip_bytes = base64.b64decode(stored["zip_b64"])
+        return zip_bytes, None
+    except Exception as e:
+        return None, f"Failed to decode stored bundle: {e}"
+
+
+async def handle_get_bundle_files(request: Request) -> JSONResponse:
+    """
+    GET /bundle-files?conversation_id=<id>&bundle_type=generated|existing
+    Lists all files in a stored bundle with their sizes.
+    Returns: { "files": [{"name": "...", "size_bytes": N}, ...], "total_files": N, "bundle_type": "..." }
+    """
+    conversation_id = request.query_params.get("conversation_id")
+    bundle_type = request.query_params.get("bundle_type", "generated")
+
+    if not conversation_id:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' query param"}, status_code=400
+        )
+    if bundle_type not in ("generated", "existing"):
+        return JSONResponse(
+            {"error": "bundle_type must be 'generated' or 'existing'"}, status_code=400
+        )
+
+    zip_bytes, err = _resolve_bundle_zip(conversation_id, bundle_type)
+    if err:
+        return JSONResponse({"error": err}, status_code=404)
+
+    try:
+        file_map = unzip_to_map(zip_bytes)
+        files = [
+            {"name": name, "size_bytes": len(content)}
+            for name, content in sorted(file_map.items())
+        ]
+        return JSONResponse(
+            {
+                "files": files,
+                "total_files": len(files),
+                "bundle_type": bundle_type,
+                "conversation_id": conversation_id,
+            }
+        )
+    except Exception as e:
+        logger.exception("get-bundle-files failed")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+async def handle_get_bundle_file(request: Request) -> JSONResponse:
+    """
+    GET /bundle-file?conversation_id=<id>&filename=<path>&bundle_type=generated|existing
+    Returns the content of a specific file in a stored bundle.
+    Returns: { "filename": "...", "bundle_type": "...", "size_bytes": N, "content": {...} }
+    """
+    conversation_id = request.query_params.get("conversation_id")
+    filename = request.query_params.get("filename")
+    bundle_type = request.query_params.get("bundle_type", "generated")
+
+    if not conversation_id:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' query param"}, status_code=400
+        )
+    if not filename:
+        return JSONResponse(
+            {"error": "Missing 'filename' query param"}, status_code=400
+        )
+    if bundle_type not in ("generated", "existing"):
+        return JSONResponse(
+            {"error": "bundle_type must be 'generated' or 'existing'"}, status_code=400
+        )
+
+    zip_bytes, err = _resolve_bundle_zip(conversation_id, bundle_type)
+    if err:
+        return JSONResponse({"error": err}, status_code=404)
+
+    try:
+        file_map = unzip_to_map(zip_bytes)
+        content_bytes = file_map.get(filename)
+        if content_bytes is None:
+            available = sorted(file_map.keys())
+            return JSONResponse(
+                {
+                    "error": f"File '{filename}' not found in bundle.",
+                    "available_files": available,
+                },
+                status_code=404,
+            )
+
+        # Try to parse as JSON; fall back to raw string
+        try:
+            content = json.loads(content_bytes)
+        except Exception:
+            content = content_bytes.decode("utf-8", errors="replace")
+
+        return JSONResponse(
+            {
+                "filename": filename,
+                "bundle_type": bundle_type,
+                "size_bytes": len(content_bytes),
+                "content": content,
+            }
+        )
+    except Exception as e:
+        logger.exception("get-bundle-file failed")
+        return JSONResponse({"error": str(e)}, status_code=500)

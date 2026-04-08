@@ -274,6 +274,12 @@ paths:
     post:
       operationId: generate_bundle
       summary: Generate a complete Avni bundle ZIP from entities
+      description: |
+        When conversation_id is provided the bundle is stored server-side (TTL 6h)
+        and only a lightweight summary is returned — bundle_zip_b64 is never sent
+        to the LLM. Pass the same conversation_id to validate_bundle and
+        upload_bundle afterwards. Without conversation_id the full bundle_zip_b64
+        is returned (legacy behaviour).
       requestBody:
         required: true
         content:
@@ -287,23 +293,42 @@ paths:
                 org_name:
                   type: string
                   description: Organisation name
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID — bundle stored server-side, summary returned only
               required:
                 - entities
       responses:
         '200':
-          description: Generated bundle as base64 ZIP
+          description: Bundle summary (conversation_id path) or full bundle_zip_b64 (legacy)
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                  stored:
+                    type: boolean
+                    description: true when bundle was saved server-side via conversation_id
+                  summary:
+                    type: object
+                    description: Counts of concepts, forms, subjectTypes, etc.
+                  validation:
+                    type: object
+                  confidence:
+                    type: object
                   bundle_zip_b64:
                     type: string
+                    description: Present only in legacy mode (no conversation_id)
 
   /validate-bundle:
     post:
       operationId: validate_bundle
       summary: Validate a generated bundle for structural correctness
+      description: |
+        Preferred: pass conversation_id to fetch bundle from server-side store
+        (no large payload on LLM). Fallback: pass bundle dict or bundle_zip_b64 directly.
       requestBody:
         required: true
         content:
@@ -311,12 +336,15 @@ paths:
             schema:
               type: object
               properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID — server fetches bundle from store (preferred)
                 bundle:
                   type: object
-                  description: Bundle JSON dict to validate (not base64, not a ZIP)
+                  description: Bundle JSON dict to validate (legacy)
                 bundle_zip_b64:
                   type: string
-                  description: Base64 encoded bundle ZIP — alternative to bundle dict; server decodes internally
+                  description: Base64 encoded bundle ZIP (legacy)
       responses:
         '200':
           description: Validation result
@@ -335,12 +363,19 @@ paths:
                     type: array
                     items:
                       type: string
+        '404':
+          description: No stored bundle found for conversation_id
 
   /patch-bundle:
     post:
       operationId: patch_bundle
       summary: Patch an existing bundle ZIP with a new spec
-      description: Decodes the existing bundle, generates a fresh bundle from the spec, and applies patches (voiding stale forms/mappings).
+      description: |
+        Preferred (JSON body): pass conversation_id + spec_yaml. The existing bundle
+        is fetched from server-side store (must have called download_bundle_b64 with
+        conversation_id first). The patched result is stored under conversation_id
+        ready for validate_bundle and upload_bundle — no bundle_zip_b64 on the LLM.
+        Legacy (multipart/form-data): pass existing_bundle_b64 + spec_yaml directly.
       requestBody:
         required: true
         content:
@@ -348,35 +383,45 @@ paths:
             schema:
               type: object
               properties:
-                existing_bundle_b64:
+                conversation_id:
                   type: string
-                  description: Base64 encoded existing bundle ZIP
+                  description: Dify conversation ID — fetches existing bundle from store, stores patched result
                 spec_yaml:
                   type: string
                   description: Approved YAML spec string to generate the patched bundle from
+                existing_bundle_b64:
+                  type: string
+                  description: Base64 encoded existing bundle ZIP (legacy, when no conversation_id)
               required:
-                - existing_bundle_b64
                 - spec_yaml
       responses:
         '200':
-          description: Patched bundle
+          description: Patched bundle summary (conversation_id path) or full b64 (legacy)
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  patched_bundle_b64:
-                    type: string
+                  success:
+                    type: boolean
+                  stored:
+                    type: boolean
+                    description: true when patched bundle was saved server-side
+                  size_bytes:
+                    type: integer
                   files_patched:
                     type: integer
+                  validation:
+                    type: object
+                  confidence:
+                    type: object
+                  patched_bundle_b64:
+                    type: string
+                    description: Present only in legacy mode (no conversation_id)
         '400':
           description: Bad request — malformed body or invalid spec
-        '401':
-          description: Unauthorized — missing or expired auth token
-        '403':
-          description: Forbidden — insufficient permissions
         '404':
-          description: Not found
+          description: No stored existing bundle for conversation_id
         '500':
           description: Internal server error
 
@@ -384,7 +429,11 @@ paths:
     post:
       operationId: upload_bundle
       summary: Upload a bundle ZIP to Avni server for import
-      description: Auth is resolved automatically if conversation_id is provided and a token was stored via /store-auth-token. Otherwise pass avni-auth-token header.
+      description: |
+        Auth and bundle are both resolved from server-side store using conversation_id.
+        Pass conversation_id (after calling generate_bundle or patch_bundle with it)
+        and neither bundle_zip_b64 nor an auth header is needed.
+        Legacy: pass bundle_zip_b64 directly with avni-auth-token header.
       requestBody:
         required: true
         content:
@@ -392,14 +441,12 @@ paths:
             schema:
               type: object
               properties:
-                bundle_zip_b64:
-                  type: string
-                  description: Base64 encoded bundle ZIP to upload
                 conversation_id:
                   type: string
-                  description: Dify conversation ID — used to look up stored auth token
-              required:
-                - bundle_zip_b64
+                  description: Dify conversation ID — resolves both stored auth token and stored bundle
+                bundle_zip_b64:
+                  type: string
+                  description: Base64 encoded bundle ZIP (legacy, when no conversation_id)
       responses:
         '200':
           description: Upload task created
@@ -473,8 +520,14 @@ paths:
   /download-bundle-b64:
     get:
       operationId: download_bundle_b64
-      summary: Download existing org bundle as base64 encoded ZIP
-      description: Auth is resolved automatically if conversation_id is provided and a token was stored via /store-auth-token.
+      summary: Download existing org bundle from Avni and store server-side
+      description: |
+        When conversation_id is provided: downloads the org's current bundle, stores
+        it server-side under '{conversation_id}:existing' (TTL 6h), and returns a
+        summary only — bundle_zip_b64 never reaches the LLM. Afterwards use
+        get_bundle_files/get_bundle_file to inspect it, or patch_bundle to apply
+        spec changes.
+        Without conversation_id: legacy behaviour, returns full bundle_zip_b64.
       parameters:
         - name: includeLocations
           in: query
@@ -486,27 +539,152 @@ paths:
           required: false
           schema:
             type: string
-          description: Dify conversation ID — used to look up stored auth token
+          description: Dify conversation ID — resolves auth token and stores bundle server-side
+        - name: baseUrl
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Override Avni base URL
       responses:
         '200':
-          description: Bundle as base64
+          description: Bundle stored summary (conversation_id path) or full bundle_zip_b64 (legacy)
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                  stored:
+                    type: boolean
+                    description: true when bundle was saved server-side
+                  bundle_type:
+                    type: string
+                    enum: [existing]
+                  size_bytes:
+                    type: integer
+                  include_locations:
+                    type: boolean
                   bundle_zip_b64:
                     type: string
-        '400':
-          description: Bad request
+                    description: Present only in legacy mode (no conversation_id)
         '401':
           description: Unauthorized — missing or expired auth token
-        '403':
-          description: Forbidden — insufficient permissions
-        '404':
-          description: Not found
         '500':
           description: Internal server error
+
+  /bundle-files:
+    get:
+      operationId: get_bundle_files
+      summary: List all files in a stored bundle with their sizes
+      description: |
+        Use bundle_type='generated' (default) to inspect the bundle produced by
+        generate_bundle or patch_bundle. Use bundle_type='existing' for the org's
+        current bundle downloaded via download_bundle_b64. Returns filenames and
+        byte sizes so you can choose which file to read with get_bundle_file.
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID
+        - name: bundle_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [generated, existing]
+            default: generated
+          description: Which bundle to inspect
+      responses:
+        '200':
+          description: List of files in the bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        size_bytes:
+                          type: integer
+                  total_files:
+                    type: integer
+                  bundle_type:
+                    type: string
+                  conversation_id:
+                    type: string
+        '404':
+          description: No stored bundle found for conversation_id
+
+  /bundle-file:
+    get:
+      operationId: get_bundle_file
+      summary: Read the content of a specific file from a stored bundle
+      description: |
+        Returns parsed JSON content (or raw text) for the requested filename.
+        filename examples: 'forms/MCH Registration.json', 'concepts.json',
+        'subjectTypes.json', 'formMappings.json', 'programs.json'.
+        If the file is not found, available_files is included in the error response
+        so you can correct the filename. Use bundle_type='existing' to inspect the
+        org's current config for comparison or post-upload diagnosis.
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID
+        - name: filename
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Path within the ZIP, e.g. 'forms/MCH Registration.json' or 'concepts.json'
+        - name: bundle_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [generated, existing]
+            default: generated
+          description: Which bundle to read from
+      responses:
+        '200':
+          description: File content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  filename:
+                    type: string
+                  bundle_type:
+                    type: string
+                  size_bytes:
+                    type: integer
+                  content:
+                    description: Parsed JSON object/array or raw string
+        '404':
+          description: File not found in bundle or no stored bundle for conversation_id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  available_files:
+                    type: array
+                    items:
+                      type: string
 
   /execute-python:
     post:

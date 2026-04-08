@@ -80,7 +80,25 @@ async def handle_upload_bundle(request: Request) -> JSONResponse:
 
     zip_b64 = body.get("bundle_zip_b64")
     if not zip_b64:
-        return JSONResponse({"error": "Missing 'bundle_zip_b64'"}, status_code=400)
+        # Try to resolve from server-side bundle store using conversation_id
+        conversation_id = body.get("conversation_id")
+        if conversation_id:
+            from ..handlers.bundle_handlers import get_bundle_store
+
+            stored = get_bundle_store().get(conversation_id)
+            if stored:
+                zip_b64 = stored["zip_b64"]
+                logger.info(
+                    "upload-bundle: resolved bundle_zip_b64 from store for conversation_id=%s",
+                    conversation_id,
+                )
+    if not zip_b64:
+        return JSONResponse(
+            {
+                "error": "Missing 'bundle_zip_b64' — pass either bundle_zip_b64 directly or conversation_id after calling generate_bundle"
+            },
+            status_code=400,
+        )
 
     logger.info(
         "upload-bundle: b64 len=%d first30=%r last10=%r",
