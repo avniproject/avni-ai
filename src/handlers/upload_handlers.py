@@ -62,16 +62,18 @@ async def handle_upload_bundle(request: Request) -> JSONResponse:
     Body: { "bundle_zip_b64": "base64-encoded-zip" }
     Returns: { "task_id": "...", "status": "pending" }
     """
-    auth_token = request.headers.get("avni-auth-token")
-    if not auth_token:
-        return JSONResponse(
-            {"error": "Missing avni-auth-token header"}, status_code=401
-        )
-
     try:
         body = await request.json()
     except Exception:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    from ..auth_store import resolve_auth_token
+    auth_token = resolve_auth_token(request, body)
+    if not auth_token:
+        return JSONResponse(
+            {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+            status_code=401,
+        )
 
     zip_b64 = body.get("bundle_zip_b64")
     if not zip_b64:

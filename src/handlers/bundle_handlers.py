@@ -135,14 +135,16 @@ async def handle_validate_bundle(request: Request) -> JSONResponse:
 async def handle_download_bundle(request: Request) -> Response:
     """
     GET /download-bundle?includeLocations=true|false
-    Headers: avni-auth-token
+    Headers: avni-auth-token (or conversation_id query param)
     Proxies Avni server's /implementation/export/{includeLocations} endpoint.
     Returns the raw ZIP bytes with appropriate content-type.
     """
-    auth_token = request.headers.get("avni-auth-token")
+    from ..auth_store import resolve_auth_token
+    auth_token = resolve_auth_token(request)
     if not auth_token:
         return JSONResponse(
-            {"error": "Missing avni-auth-token header"}, status_code=401
+            {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+            status_code=401,
         )
 
     include_locations = (
@@ -193,15 +195,17 @@ async def handle_download_bundle(request: Request) -> Response:
 
 async def handle_download_bundle_b64(request: Request) -> JSONResponse:
     """
-    GET /download-bundle-b64?includeLocations=true|false
-    Headers: avni-auth-token
+    GET /download-bundle-b64?includeLocations=true|false&conversation_id=...
+    Headers: avni-auth-token (or conversation_id query param)
     Same as /download-bundle but returns base64-encoded ZIP in JSON.
     Useful for Dify code nodes that can't handle binary responses.
     """
-    auth_token = request.headers.get("avni-auth-token")
+    from ..auth_store import resolve_auth_token
+    auth_token = resolve_auth_token(request)
     if not auth_token:
         return JSONResponse(
-            {"error": "Missing avni-auth-token header"}, status_code=401
+            {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+            status_code=401,
         )
 
     include_locations = (

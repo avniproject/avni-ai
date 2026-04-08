@@ -6,6 +6,40 @@ info:
 servers:
   - url: https://staging-ai.avniproject.org
 paths:
+  /store-auth-token:
+    post:
+      operationId: store_auth_token
+      summary: Store an Avni auth token by conversation_id for automatic resolution
+      description: Call this once at the start of a conversation. All subsequent tool calls that need auth can just pass conversation_id instead of the avni-auth-token header.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID (sys.conversation_id)
+                auth_token:
+                  type: string
+                  description: Avni authentication token
+              required:
+                - conversation_id
+                - auth_token
+      responses:
+        '200':
+          description: Token stored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  conversation_id:
+                    type: string
+
   /store-entities:
     post:
       operationId: store_entities
@@ -350,13 +384,7 @@ paths:
     post:
       operationId: upload_bundle
       summary: Upload a bundle ZIP to Avni server for import
-      parameters:
-        - name: avni-auth-token
-          in: header
-          required: true
-          schema:
-            type: string
-          description: Avni authentication token
+      description: Auth is resolved automatically if conversation_id is provided and a token was stored via /store-auth-token. Otherwise pass avni-auth-token header.
       requestBody:
         required: true
         content:
@@ -367,6 +395,9 @@ paths:
                 bundle_zip_b64:
                   type: string
                   description: Base64 encoded bundle ZIP to upload
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID — used to look up stored auth token
               required:
                 - bundle_zip_b64
       responses:
@@ -443,12 +474,19 @@ paths:
     get:
       operationId: download_bundle_b64
       summary: Download existing org bundle as base64 encoded ZIP
+      description: Auth is resolved automatically if conversation_id is provided and a token was stored via /store-auth-token.
       parameters:
         - name: includeLocations
           in: query
           required: false
           schema:
             type: boolean
+        - name: conversation_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Dify conversation ID — used to look up stored auth token
       responses:
         '200':
           description: Bundle as base64

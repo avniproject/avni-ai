@@ -36,6 +36,7 @@ from .handlers.entity_handlers import (
     handle_validate_entities,
     handle_apply_entity_corrections,
 )
+from .auth_store import handle_store_auth_token
 from .handlers.spec_handlers import (
     handle_generate_spec,
     handle_validate_spec,
@@ -166,6 +167,11 @@ async def create_server():
     @server.custom_route("/api/existing-config", methods=["GET"])
     async def get_existing_config_endpoint(request: Request):
         return await handle_get_existing_config(request)
+
+    # --- Auth Token Store ---
+    @server.custom_route("/store-auth-token", methods=["POST"])
+    async def store_auth_token_endpoint(request: Request):
+        return await handle_store_auth_token(request)
 
     # --- Entity Validation ---
     @server.custom_route("/store-entities", methods=["POST"])

@@ -58,8 +58,8 @@ check_cookies() {
     fi
     # Check if cookies are expired by examining the access token expiry
     local exp
-    exp=$(grep "__Host-access_token" "$COOKIE_FILE" 2>/dev/null | head -1 | awk '{print $5}' | tr -d '[:space:]')
-    if [[ -n "$exp" && "$exp" =~ ^[0-9]+$ ]] && (( exp < $(date +%s) )); then
+    exp=$(grep "__Host-access_token" "$COOKIE_FILE" 2>/dev/null | awk '{print $5}')
+    if [[ -n "$exp" && "$exp" -lt "$(date +%s)" ]]; then
         yellow "Cookies expired. Run '$0 login' to refresh."
         exit 1
     fi
@@ -75,11 +75,10 @@ api() {
     check_cookies
     local csrf
     csrf=$(get_csrf_token)
-    curl -s --max-time 30 -X "$method" "${DIFY_HOST}/console/api${path}" \
+    curl -s -X "$method" "${DIFY_HOST}/console/api${path}" \
         -b "$COOKIE_FILE" \
         -H "X-Csrf-Token: ${csrf}" \
         -H "Content-Type: application/json" \
-        -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
         "$@"
 }
 
@@ -201,29 +200,20 @@ do_import() {
 
     bold "Importing ${file}..."
 
-    # Read YAML content and create JSON payload using temp file to avoid arg length limits
-    local temp_json
-    temp_json=$(mktemp)
-    
-    jq -n \
-        --rawfile yaml "$file" \
-        --arg name "$name" \
-        '{
-            mode: "yaml-content",
-            yaml_content: $yaml,
-            name: (if $name != "" then $name else null end)
-        }' > "$temp_json"
-    
+    # Build JSON payload using --rawfile to handle large YAML files
     local json_payload
-    json_payload=$(cat "$temp_json")
-    rm -f "$temp_json"
+    json_payload=$(jq -n --rawfile yaml "$file" --arg name "$name" '{
+        mode: "yaml-content",
+        yaml_content: $yaml,
+        name: (if $name != "" then $name else null end)
+    }')
 
     check_cookies
     local csrf
     csrf=$(get_csrf_token)
 
     local response
-    response=$(curl -s -X POST "${DIFY_HOST}/console/api/apps/import" \
+    response=$(curl -s -X POST "${DIFY_HOST}/console/api/apps/imports" \
         -b "$COOKIE_FILE" \
         -H "X-Csrf-Token: ${csrf}" \
         -H "Content-Type: application/json" \
@@ -263,78 +253,13 @@ do_import() {
     fi
 }
 
-do_overwrite() {
-    local app_id="${1:-}"
-    local file="${2:-}"
-
-    if [[ -z "$app_id" || -z "$file" || ! -f "$file" ]]; then
-        red "Usage: $0 overwrite <app_id> <file.yml>"
-        exit 1
-    fi
-
-    bold "Overwriting app ${app_id} DSL from ${file}..."
-
-    local temp_json
-    temp_json=$(mktemp)
-
-    python3 -c "
-import json, sys
-with open('${file}') as f:
-    yaml_content = f.read()
-payload = {'mode': 'yaml-content', 'yaml_content': yaml_content, 'app_id': '${app_id}'}
-json.dump(payload, sys.stdout)
-" > "$temp_json"
-
-    check_cookies
-    local csrf
-    csrf=$(get_csrf_token)
-
-    local response
-    response=$(curl -s --max-time 60 -X POST "${DIFY_HOST}/console/api/apps/import" \
-        -b "$COOKIE_FILE" \
-        -H "X-Csrf-Token: ${csrf}" \
-        -H "Content-Type: application/json" \
-        -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
-        -d @"$temp_json")
-
-    rm -f "$temp_json"
-
-    local status import_id
-    status=$(echo "$response" | jq -r '.status // empty')
-    import_id=$(echo "$response" | jq -r '.id // empty')
-
-    if [[ "$status" == "pending" && -n "$import_id" ]]; then
-        yellow "Import pending — confirming..."
-        local confirm
-        confirm=$(curl -s --max-time 30 -X POST "${DIFY_HOST}/console/api/apps/imports/${import_id}/confirm" \
-            -b "$COOKIE_FILE" \
-            -H "X-Csrf-Token: ${csrf}" \
-            -H "Content-Type: application/json" \
-            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
-            -d '{}')
-        response="$confirm"
-    fi
-
-    local result_app_id
-    result_app_id=$(echo "$response" | jq -r '.app_id // .id // empty')
-
-    if [[ -n "$result_app_id" ]]; then
-        green "Overwrite successful!"
-        echo "  App ID:  ${result_app_id}"
-        echo "  URL:     ${DIFY_HOST}/app/${result_app_id}/workflow"
-    else
-        yellow "Overwrite response:"
-        echo "$response" | jq . 2>/dev/null || echo "$response"
-    fi
-}
-
 do_publish() {
     local app_id
     app_id=$(resolve_app_id "${1:-}")
 
     bold "Publishing workflow for ${app_id}..."
     local response
-    response=$(api POST "/apps/${app_id}/workflows/publish" -d '{}')
+    response=$(api POST "/apps/${app_id}/workflows/publish")
 
     local result
     result=$(echo "$response" | jq -r '.result // empty')
@@ -388,84 +313,6 @@ do_push() {
     do_import "$file"
 }
 
-do_update() {
-    local app_id="${1:-}"
-    local file="${2:-}"
-
-    if [[ -z "$app_id" ]]; then
-        red "Usage: $0 update <app_id> <file.yml>"
-        exit 1
-    fi
-
-    if [[ -z "$file" || ! -f "$file" ]]; then
-        red "File not found: ${file}"
-        exit 1
-    fi
-
-    bold "Updating workflow for app ${app_id}..."
-
-    # Convert YAML to JSON structure that Dify expects
-    local temp_yaml temp_json
-    temp_yaml=$(mktemp)
-    temp_json=$(mktemp)
-    
-    # Parse YAML to JSON
-    python3 -c "import yaml, json, sys; print(json.dumps(yaml.safe_load(open('$file'))))" > "$temp_yaml" 2>/dev/null || {
-        red "Failed to parse YAML. Make sure Python3 with PyYAML is installed."
-        rm -f "$temp_yaml" "$temp_json"
-        exit 1
-    }
-    
-    # Extract graph and features from parsed YAML
-    jq '{
-        graph: .workflow.graph,
-        features: .workflow.features,
-        environment_variables: (.workflow.environment_variables // []),
-        conversation_variables: (.workflow.conversation_variables // [])
-    }' "$temp_yaml" > "$temp_json"
-
-    check_cookies
-    local csrf
-    csrf=$(get_csrf_token)
-
-    # Fetch current draft hash to avoid 409 conflict
-    local draft_hash
-    draft_hash=$(curl -s --max-time 30 -X GET "${DIFY_HOST}/console/api/apps/${app_id}/workflows/draft" \
-        -b "$COOKIE_FILE" \
-        -H "X-Csrf-Token: ${csrf}" \
-        -H "Content-Type: application/json" \
-        -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
-        | jq -r '.hash // empty')
-    if [[ -n "$draft_hash" ]]; then
-        jq --arg hash "$draft_hash" '. + {hash: $hash}' "$temp_json" > "${temp_json}.hashed" && mv "${temp_json}.hashed" "$temp_json"
-        yellow "Using draft hash: ${draft_hash}"
-    fi
-
-    # Update the workflow DSL
-    local response
-    response=$(curl -s --max-time 60 -X POST "${DIFY_HOST}/console/api/apps/${app_id}/workflows/draft" \
-        -b "$COOKIE_FILE" \
-        -H "X-Csrf-Token: ${csrf}" \
-        -H "Content-Type: application/json" \
-        -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
-        -d @"$temp_json")
-
-    rm -f "$temp_yaml" "$temp_json"
-
-    # Check if update was successful
-    if echo "$response" | jq -e '.result == "success"' >/dev/null 2>&1; then
-        green "Workflow updated successfully!"
-        echo "  App ID:  ${app_id}"
-        echo "  URL:     ${DIFY_HOST}/app/${app_id}/workflow"
-        echo ""
-        yellow "Don't forget to publish the changes!"
-    else
-        red "Update failed:"
-        echo "$response" | jq . 2>/dev/null || echo "$response"
-        exit 1
-    fi
-}
-
 # ── Main ──────────────────────────────────────────────────
 
 check_deps
@@ -499,20 +346,6 @@ case "${1:-help}" in
     push)
         do_push "${2:-}"
         ;;
-    update)
-        if [[ -z "${2:-}" || -z "${3:-}" ]]; then
-            red "Usage: $0 update <app_id> <file.yml>"
-            exit 1
-        fi
-        do_update "$2" "$3"
-        ;;
-    overwrite)
-        if [[ -z "${2:-}" || -z "${3:-}" ]]; then
-            red "Usage: $0 overwrite <app_id> <file.yml>"
-            exit 1
-        fi
-        do_overwrite "$2" "$3"
-        ;;
     help|--help|-h)
         bold "dify-manage.sh — Manage Dify workflows from the terminal"
         echo ""
@@ -523,7 +356,6 @@ case "${1:-help}" in
         echo "  import <file> [name]     Import DSL as new app"
         echo "  publish, pub [app_id]    Publish a workflow"
         echo "  diff [app_id]            Diff remote vs local DSL"
-        echo "  update <app_id> <file>   Update existing app's workflow DSL"
         echo "  pull [app_id]            Download remote DSL to local file"
         echo "  push [file]              Upload local DSL to Dify"
         echo ""

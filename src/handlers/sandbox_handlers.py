@@ -14,16 +14,18 @@ _executor = PlaygroundExecutor()
 
 async def handle_execute_python(request: Request) -> JSONResponse:
     """POST /execute-python — run an LLM-generated Python script in a conversation silo."""
-    auth_token = request.headers.get("avni-auth-token")
-    if not auth_token:
-        return JSONResponse(
-            {"error": "avni-auth-token header is required"}, status_code=401
-        )
-
     try:
         body = await request.json()
     except Exception:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    from ..auth_store import resolve_auth_token
+    auth_token = resolve_auth_token(request, body)
+    if not auth_token:
+        return JSONResponse(
+            {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+            status_code=401,
+        )
 
     conversation_id = body.get("conversation_id")
     code = body.get("code")

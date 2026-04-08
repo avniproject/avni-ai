@@ -46,13 +46,15 @@ from ..schemas.implementation_contract import ImplementationDeleteContract
 logger = logging.getLogger(__name__)
 
 
-def _get_auth_token(request: Request) -> str | None:
-    return request.headers.get("avni-auth-token")
+def _get_auth_token(request: Request, body: dict | None = None) -> str | None:
+    from ..auth_store import resolve_auth_token
+    return resolve_auth_token(request, body)
 
 
 def _auth_error() -> JSONResponse:
     return JSONResponse(
-        {"error": "avni-auth-token header is required"}, status_code=401
+        {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+        status_code=401,
     )
 
 
