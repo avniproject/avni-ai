@@ -763,7 +763,7 @@ workflow:
           max_write_timeout: 0
         title: BUNDLE_AGENT_PROMPT_FETCH
         type: http-request
-        url: https://raw.githubusercontent.com/avniproject/avni-ai/main/bundle-agent-prompt.txt
+        url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/bundle-agent-prompt.txt
         variables: []
       height: 185
       id: '1775646587226'
