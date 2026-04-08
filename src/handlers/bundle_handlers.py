@@ -70,23 +70,51 @@ def get_bundle_store() -> _BundleStore:
 async def handle_generate_bundle(request: Request) -> JSONResponse:
     """
     POST /generate-bundle
-    Body: { "entities": {...}, "org_name": "MyOrg", "conversation_id": "..." }
+    Body: { "conversation_id": "...", "org_name": "MyOrg" }
+       OR { "entities": {...}, "org_name": "MyOrg", "conversation_id": "..." }  (legacy)
 
-    When conversation_id is provided: stores bundle server-side in _bundle_store
-    and returns summary ONLY (no bundle_zip_b64 in response — keeps LLM context small).
+    Preferred: pass conversation_id only. Entities are fetched from _entity_store
+    (populated by a prior store_entities call). Bundle is stored server-side and
+    only a lightweight summary is returned — nothing large reaches the LLM.
 
-    Without conversation_id: legacy behaviour, returns full bundle_zip_b64.
+    Legacy: pass entities directly. When conversation_id is also present the bundle
+    is still stored server-side (no bundle_zip_b64 in response).
+    Without conversation_id: full bundle_zip_b64 returned (legacy).
     """
+    from ..handlers.entity_handlers import get_entity_store
+
     try:
         body = await request.json()
     except Exception:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
+    conversation_id = body.get("conversation_id")
     entities = body.get("entities")
+
     if not entities:
-        return JSONResponse(
-            {"error": "Missing 'entities' in request body"}, status_code=400
-        )
+        # Try to resolve from entity store via conversation_id
+        if conversation_id:
+            entities = get_entity_store().get(conversation_id)
+            if entities:
+                logger.info(
+                    "generate-bundle: resolved entities from entity store for conversation_id=%s",
+                    conversation_id,
+                )
+            else:
+                return JSONResponse(
+                    {
+                        "error": f"No stored entities for conversation_id={conversation_id!r}. "
+                        "Call store_entities first."
+                    },
+                    status_code=404,
+                )
+        else:
+            return JSONResponse(
+                {
+                    "error": "Provide 'entities' in the body or 'conversation_id' after calling store_entities"
+                },
+                status_code=400,
+            )
 
     # Normalise snake_case keys (sent by Dify) to camelCase (used internally)
     _key_map = {
@@ -97,7 +125,6 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
     entities = {_key_map.get(k, k): v for k, v in entities.items()}
 
     org_name = body.get("org_name", "Unknown Organization")
-    conversation_id = body.get("conversation_id")
 
     try:
         generator = BundleGenerator(org_name)

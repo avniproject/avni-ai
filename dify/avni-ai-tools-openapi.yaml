@@ -275,11 +275,12 @@ paths:
       operationId: generate_bundle
       summary: Generate a complete Avni bundle ZIP from entities
       description: |
-        When conversation_id is provided the bundle is stored server-side (TTL 6h)
-        and only a lightweight summary is returned — bundle_zip_b64 is never sent
-        to the LLM. Pass the same conversation_id to validate_bundle and
-        upload_bundle afterwards. Without conversation_id the full bundle_zip_b64
-        is returned (legacy behaviour).
+        Preferred: pass conversation_id only (no entities). Entities are fetched
+        automatically from the server-side entity store populated by store_entities.
+        Bundle is stored server-side (TTL 6h) and only a lightweight summary is
+        returned — nothing large reaches the LLM. Pass the same conversation_id to
+        validate_bundle and upload_bundle afterwards.
+        Legacy: pass entities directly (with or without conversation_id).
       requestBody:
         required: true
         content:
@@ -287,17 +288,15 @@ paths:
             schema:
               type: object
               properties:
-                entities:
-                  type: object
-                  description: Full entities dict
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID — entities fetched from store, bundle stored server-side
                 org_name:
                   type: string
                   description: Organisation name
-                conversation_id:
-                  type: string
-                  description: Dify conversation ID — bundle stored server-side, summary returned only
-              required:
-                - entities
+                entities:
+                  type: object
+                  description: Full entities dict (legacy — omit when using conversation_id)
       responses:
         '200':
           description: Bundle summary (conversation_id path) or full bundle_zip_b64 (legacy)

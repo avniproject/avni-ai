@@ -53,6 +53,12 @@ class _EntityStore:
 
 _entity_store = _EntityStore()
 
+
+def get_entity_store() -> _EntityStore:
+    """Return the global entity store (used by bundle_handlers for generate_bundle)."""
+    return _entity_store
+
+
 SECTION_MAP = {
     "subject_type": "subject_types",
     "program": "programs",

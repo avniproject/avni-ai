@@ -280,16 +280,36 @@ workflow:
               tool calls that need it.
 
 
+              CRITICAL TOOL-CALL RULES (these override any conflicting instructions
+              below):
+
+              RULE 1 — CALL TOOLS IMMEDIATELY IN TURN 1: When you extract entities
+              from an SRS, do NOT show the entities as a text plan and wait for
+              the user. In that SAME response, call store_entities(conversation_id,
+              entities), then validate_entities(conversation_id), then generate_spec(conversation_id).
+              Only after generate_spec returns do you show the spec to the user and
+              ask for approval.
+
+              RULE 2 — generate_bundle uses conversation_id ONLY: When the user
+              approves the spec, call generate_bundle(conversation_id) without any
+              entities field. Entities are already in the server store from RULE 1.
+
+              RULE 3 — validate_bundle uses conversation_id ONLY: Call validate_bundle(conversation_id).
+              Do NOT pass bundle_zip_b64.
+
+              RULE 4 — upload_bundle uses conversation_id ONLY: Call upload_bundle(conversation_id).
+              Do NOT pass bundle_zip_b64.
+
+
               {{#1775646587226.body#}}'
           maximum_iterations:
             type: constant
-            value: 11
+            value: 8
           model:
             type: constant
             value:
               completion_params:
-                context_1m: true
-                max_tokens: 128000
+                max_tokens: 8192
                 prompt_caching_tool_definitions: true
                 prompt_caching_tool_results: true
                 temperature: 0.2
@@ -460,19 +480,16 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Generate a complete Avni bundle ZIP from entities. Pass
-                  conversation_id so the bundle is stored server-side and never returned
-                  to the LLM. Call validate_bundle and upload_bundle with the same
-                  conversation_id afterwards.
+                description: Generate a complete Avni bundle ZIP. Pass conversation_id
+                  only — entities are fetched automatically from the server-side entity
+                  store (populated by store_entities). Bundle is stored server-side;
+                  no large payload is returned to the LLM.
               parameters:
                 conversation_id:
                   auto: 0
                   value:
                     type: mixed
                     value: '{{#sys.conversation_id#}}'
-                entities:
-                  auto: 1
-                  value: null
                 org_name:
                   auto: 0
                   value:
@@ -679,7 +696,7 @@ workflow:
             {{#sys.files#}}'
           window:
             enabled: true
-            size: 50
+            size: 10
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
         selected: false
