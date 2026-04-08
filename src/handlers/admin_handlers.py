@@ -48,6 +48,7 @@ logger = logging.getLogger(__name__)
 
 def _get_auth_token(request: Request, body: dict | None = None) -> str | None:
     from ..auth_store import resolve_auth_token
+
     return resolve_auth_token(request, body)
 
 

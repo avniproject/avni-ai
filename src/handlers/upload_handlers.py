@@ -68,10 +68,13 @@ async def handle_upload_bundle(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
     from ..auth_store import resolve_auth_token
+
     auth_token = resolve_auth_token(request, body)
     if not auth_token:
         return JSONResponse(
-            {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+            {
+                "error": "Missing auth: provide avni-auth-token header or conversation_id"
+            },
             status_code=401,
         )
 

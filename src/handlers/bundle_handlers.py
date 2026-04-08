@@ -140,10 +140,13 @@ async def handle_download_bundle(request: Request) -> Response:
     Returns the raw ZIP bytes with appropriate content-type.
     """
     from ..auth_store import resolve_auth_token
+
     auth_token = resolve_auth_token(request)
     if not auth_token:
         return JSONResponse(
-            {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+            {
+                "error": "Missing auth: provide avni-auth-token header or conversation_id"
+            },
             status_code=401,
         )
 
@@ -201,10 +204,13 @@ async def handle_download_bundle_b64(request: Request) -> JSONResponse:
     Useful for Dify code nodes that can't handle binary responses.
     """
     from ..auth_store import resolve_auth_token
+
     auth_token = resolve_auth_token(request)
     if not auth_token:
         return JSONResponse(
-            {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+            {
+                "error": "Missing auth: provide avni-auth-token header or conversation_id"
+            },
             status_code=401,
         )
 

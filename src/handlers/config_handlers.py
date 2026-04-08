@@ -14,10 +14,13 @@ _config_fetcher = ConfigFetcher()
 async def handle_get_existing_config(request: Request) -> JSONResponse:
     """Return the complete existing configuration from the Avni server."""
     from ..auth_store import resolve_auth_token
+
     auth_token = resolve_auth_token(request)
     if not auth_token:
         return JSONResponse(
-            {"error": "Missing auth: provide avni-auth-token header or conversation_id"},
+            {
+                "error": "Missing auth: provide avni-auth-token header or conversation_id"
+            },
             status_code=401,
         )
     try:

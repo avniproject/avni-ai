@@ -19,7 +19,9 @@ _AUTH_STORE_TTL = 6 * 3600  # 6 hours, same as entity store
 
 class _AuthTokenStore:
     def __init__(self) -> None:
-        self._store: dict[str, tuple[str, float]] = {}  # conversation_id -> (token, expiry)
+        self._store: dict[
+            str, tuple[str, float]
+        ] = {}  # conversation_id -> (token, expiry)
 
     def put(self, conversation_id: str, token: str) -> None:
         self._store[conversation_id] = (token, time.time() + _AUTH_STORE_TTL)
@@ -65,7 +67,9 @@ def resolve_auth_token(request: Request, body: dict | None = None) -> str | None
     if conversation_id:
         token = _auth_store.get(conversation_id)
         if token:
-            logger.debug("Resolved auth token from store for conversation %s", conversation_id)
+            logger.debug(
+                "Resolved auth token from store for conversation %s", conversation_id
+            )
     return token
 
 
