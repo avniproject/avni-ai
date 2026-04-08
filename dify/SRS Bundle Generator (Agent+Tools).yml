@@ -283,12 +283,13 @@ workflow:
               CRITICAL TOOL-CALL RULES (these override any conflicting instructions
               below):
 
-              RULE 1 — CALL TOOLS IMMEDIATELY IN TURN 1: When you extract entities
-              from an SRS, do NOT show the entities as a text plan and wait for
-              the user. In that SAME response, call store_entities(conversation_id,
-              entities), then validate_entities(conversation_id), then generate_spec(conversation_id).
-              Only after generate_spec returns do you show the spec to the user and
-              ask for approval.
+              RULE 1 — CALL TOOLS IMMEDIATELY, NO USER PAUSE: When you extract
+              entities from an SRS, do NOT show entities as a text plan and wait
+              for the user. Call store_entities(conversation_id, entities), then
+              validate_entities(conversation_id), then generate_spec(conversation_id)
+              IN SEQUENCE — each as its own iteration, one after the other. Do NOT
+              pause between these calls to show text or ask the user anything. Only
+              after generate_spec returns do you show the spec and ask for approval.
 
               RULE 2 — generate_bundle uses conversation_id ONLY: When the user
               approves the spec, call generate_bundle(conversation_id) without any
@@ -309,7 +310,8 @@ workflow:
             type: constant
             value:
               completion_params:
-                max_tokens: 8192
+                context_1m: true
+                max_tokens: 16384
                 prompt_caching_tool_definitions: true
                 prompt_caching_tool_results: true
                 temperature: 0.2
