@@ -43,7 +43,7 @@ from .handlers.entity_handlers import (
     handle_store_srs_text,
     handle_get_srs_text,
 )
-from .handlers.extraction_handlers import handle_parse_srs_file
+from .handlers.extraction_handlers import handle_parse_srs_file, handle_parse_srs_files
 from .auth_store import handle_store_auth_token
 from .handlers.spec_handlers import (
     handle_generate_spec,
@@ -197,6 +197,10 @@ async def create_server():
     @server.custom_route("/parse-srs-file", methods=["POST"])
     async def parse_srs_file_endpoint(request: Request):
         return await handle_parse_srs_file(request)
+
+    @server.custom_route("/parse-srs-files", methods=["POST"])
+    async def parse_srs_files_endpoint(request: Request):
+        return await handle_parse_srs_files(request)
 
     # --- Entity Validation ---
     @server.custom_route("/store-entities", methods=["POST"])

@@ -1011,6 +1011,88 @@ paths:
         '404':
           description: No stored bundle for conversation_id
 
+  /parse-srs-files:
+    post:
+      operationId: parse_srs_files
+      summary: Parse multiple SRS/scoping/modelling files and consolidate into a YAML spec
+      description: |
+        Accepts multiple base64-encoded files or server-side file paths.
+        Auto-classifies each sheet by content (location hierarchy, subject types,
+        programs, encounters, W3H mapping, form fields). Merges entities across
+        files with deduplication, resolves form-entity links, generates a
+        consolidated YAML spec (source of truth), and stores entities server-side.
+        Returns the spec, audit report, and entities dict.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID — entities are stored under this key
+                org_name:
+                  type: string
+                  description: Organisation name for the spec header
+                files:
+                  type: array
+                  description: Base64-encoded files to parse
+                  items:
+                    type: object
+                    properties:
+                      file_b64:
+                        type: string
+                        description: Base64-encoded file content
+                      filename:
+                        type: string
+                        description: Original filename (used to detect format)
+                file_paths:
+                  type: array
+                  description: Server-side file paths to parse (alternative to base64)
+                  items:
+                    type: string
+              required:
+                - conversation_id
+      responses:
+        '200':
+          description: Consolidated parse result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  spec_yaml:
+                    type: string
+                    description: Consolidated YAML spec — source of truth for bundle generation
+                  audit:
+                    type: object
+                    description: Audit report with entity_counts, warnings, errors, and coverage
+                    properties:
+                      files_parsed:
+                        type: array
+                        items:
+                          type: string
+                      entity_counts:
+                        type: object
+                      warnings:
+                        type: array
+                        items:
+                          type: string
+                      errors:
+                        type: array
+                        items:
+                          type: string
+                      coverage:
+                        type: object
+                  entities:
+                    type: object
+                    description: Consolidated entities dict (also stored server-side)
+        '404':
+          description: File not found (server-side path)
+
   /execute-python:
     post:
       operationId: execute_python

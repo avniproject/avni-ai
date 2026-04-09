@@ -182,37 +182,95 @@ def _find_form(
 
 
 def _form_to_spec(form: dict) -> dict:
-    """Convert internal form dict to spec-format form dict."""
+    """Convert internal form dict to spec-format form dict.
+
+    Handles two input formats:
+    1. Bundle format: form has 'formElementGroups' with 'formElements'
+    2. Parser format: form has 'sections' with 'fields' (from scoping_parser)
+       or flat 'fields' list with optional 'group' on each field
+    """
     form_spec: dict[str, Any] = {}
     sections: list[dict] = []
-    for group in form.get("formElementGroups", []):
-        section: dict[str, Any] = {
-            "name": group.get("name", "Details"),
-        }
-        fields = []
-        for fe in group.get("formElements", []):
-            field: dict[str, Any] = {"name": fe["name"]}
-            if fe.get("dataType"):
-                field["dataType"] = fe["dataType"]
-            if fe.get("mandatory"):
-                field["mandatory"] = fe["mandatory"]
-            if fe.get("unit"):
-                field["unit"] = fe["unit"]
-            concept = fe.get("concept", {})
-            if isinstance(concept, dict):
-                if concept.get("lowAbsolute") is not None:
-                    field["min"] = concept["lowAbsolute"]
-                if concept.get("hiAbsolute") is not None:
-                    field["max"] = concept["hiAbsolute"]
-                if concept.get("answers"):
-                    field["options"] = [
-                        a["name"] if isinstance(a, dict) else a
-                        for a in concept["answers"]
-                    ]
-            fields.append(field)
-        if fields:
-            section["fields"] = fields
-        sections.append(section)
+
+    # Format 1: Bundle format (formElementGroups)
+    if form.get("formElementGroups"):
+        for group in form["formElementGroups"]:
+            section: dict[str, Any] = {"name": group.get("name", "Details")}
+            fields = []
+            for fe in group.get("formElements", []):
+                field: dict[str, Any] = {"name": fe["name"]}
+                if fe.get("dataType"):
+                    field["dataType"] = fe["dataType"]
+                if fe.get("mandatory"):
+                    field["mandatory"] = fe["mandatory"]
+                if fe.get("unit"):
+                    field["unit"] = fe["unit"]
+                concept = fe.get("concept", {})
+                if isinstance(concept, dict):
+                    if concept.get("lowAbsolute") is not None:
+                        field["min"] = concept["lowAbsolute"]
+                    if concept.get("hiAbsolute") is not None:
+                        field["max"] = concept["hiAbsolute"]
+                    if concept.get("answers"):
+                        field["options"] = [
+                            a["name"] if isinstance(a, dict) else a
+                            for a in concept["answers"]
+                        ]
+                fields.append(field)
+            if fields:
+                section["fields"] = fields
+            sections.append(section)
+
+    # Format 2: Parser format (sections with fields, or flat fields)
+    elif form.get("sections"):
+        for sec in form["sections"]:
+            section = {"name": sec.get("name", "Details")}
+            fields = []
+            for f in sec.get("fields", []):
+                field = _field_dict_to_spec(f)
+                if field:
+                    fields.append(field)
+            if fields:
+                section["fields"] = fields
+                sections.append(section)
+
+    elif form.get("fields"):
+        # Flat fields — group by 'group' attribute
+        grouped: dict[str, list] = {}
+        for f in form["fields"]:
+            group_name = f.get("group", "Details") or "Details"
+            grouped.setdefault(group_name, []).append(f)
+        for group_name, field_list in grouped.items():
+            section = {"name": group_name}
+            fields = [_field_dict_to_spec(f) for f in field_list]
+            fields = [f for f in fields if f]
+            if fields:
+                section["fields"] = fields
+                sections.append(section)
+
     if sections:
         form_spec["sections"] = sections
     return form_spec
+
+
+def _field_dict_to_spec(f: dict) -> dict | None:
+    """Convert a raw field dict (from scoping parser) to spec field format."""
+    name = f.get("name", "")
+    if not name:
+        return None
+    field: dict[str, Any] = {"name": name}
+    if f.get("dataType"):
+        field["dataType"] = f["dataType"]
+    if f.get("mandatory"):
+        field["mandatory"] = f["mandatory"]
+    if f.get("unit"):
+        field["unit"] = f["unit"]
+    if f.get("min") is not None:
+        field["min"] = f["min"]
+    if f.get("max") is not None:
+        field["max"] = f["max"]
+    if f.get("options"):
+        field["options"] = f["options"]
+    if f.get("selectionType"):
+        field["selectionType"] = f["selectionType"]
+    return field

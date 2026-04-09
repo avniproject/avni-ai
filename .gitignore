@@ -81,4 +81,6 @@ fix_missing_edges.py
 
 # Generated/exported DSL artifacts in root
 AppConfigV3_*.yml
-App\ Configurator*.yml
+App\ Configurator*.ymltools/agent-debugger/node_modules/
+extract.txt
+tools/agent-debugger/package-lock.json
