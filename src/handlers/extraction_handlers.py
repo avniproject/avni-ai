@@ -2,12 +2,11 @@
 Extraction handlers — server-side Excel SRS parsing.
 
 Endpoint:
-  POST /parse-srs-file  — decode base64 Excel, parse via scoping_parser, store entities
+  POST /parse-srs-file  — multipart/form-data with conversation_id + file field
 """
 
 from __future__ import annotations
 
-import base64
 import logging
 import os
 import tempfile
@@ -23,40 +22,37 @@ logger = logging.getLogger(__name__)
 
 async def handle_parse_srs_file(request: Request) -> JSONResponse:
     """
-    POST /parse-srs-file
-    Body: { "conversation_id": "...", "file_b64": "...", "filename": "..." }
-    Decodes the base64-encoded Excel file, runs scoping_parser, stores the resulting
-    entities in the entity store under conversation_id.
+    POST /parse-srs-file  (multipart/form-data)
+    Fields: conversation_id (text), file (file upload)
+    Runs scoping_parser on the uploaded file, stores entities under conversation_id.
     Returns:
-      { ok: true, summary: {forms, encounter_types, subject_types, programs, address_levels} }
+      { ok: true, summary: {...}, warnings: [...], errors: [...], coverage: {...} }
       { ok: false, error: "..." }  on parse failure (HTTP 200 so Dify can inspect ok flag)
     """
     try:
-        body = await request.json()
+        form = await request.form()
     except Exception:
         return JSONResponse(
-            {"ok": False, "error": "Invalid JSON body"}, status_code=400
+            {"ok": False, "error": "Expected multipart/form-data"}, status_code=400
         )
 
-    conversation_id = body.get("conversation_id")
-    file_b64 = body.get("file_b64", "")
-    filename = body.get("filename", "document.xlsx")
+    conversation_id = form.get("conversation_id")
+    upload = form.get("file")
 
     if not conversation_id:
         return JSONResponse(
-            {"ok": False, "error": "Missing 'conversation_id'"}, status_code=400
+            {"ok": False, "error": "Missing 'conversation_id' form field"},
+            status_code=400,
         )
-    if not file_b64:
+    if upload is None:
         return JSONResponse(
-            {"ok": False, "error": "Missing 'file_b64'"}, status_code=400
+            {"ok": False, "error": "Missing 'file' form field"}, status_code=400
         )
+
+    filename = getattr(upload, "filename", None) or "document.xlsx"
+    raw = await upload.read()
 
     tmp_path = None
-    try:
-        raw = base64.b64decode(file_b64)
-    except Exception as exc:
-        return JSONResponse({"ok": False, "error": f"base64 decode failed: {exc}"})
-
     try:
         suffix = os.path.splitext(filename)[1] or ".xlsx"
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:

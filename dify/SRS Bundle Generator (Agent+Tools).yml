@@ -181,6 +181,7 @@ workflow:
         sourceType: if-else
         targetType: http-request
       id: 1775719228711-false-1775648480416-target
+      selected: false
       source: '1775719228711'
       sourceHandle: 'false'
       target: '1775648480416'
@@ -215,6 +216,50 @@ workflow:
         targetType: answer
       id: 1775646587226-fail-branch-1775658332808-target
       source: '1775646587226'
+      sourceHandle: fail-branch
+      target: '1775658332808'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1775719228711-true-1775800000001-target
+      source: '1775719228711'
+      sourceHandle: 'true'
+      target: '1775800000001'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: 1775800000001-source-1775800000002-target
+      source: '1775800000001'
+      sourceHandle: source
+      target: '1775800000002'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: http-request
+      id: 1775800000002-source-1775648480416-target
+      source: '1775800000002'
+      sourceHandle: source
+      target: '1775648480416'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1775800000002-fail-branch-1775658332808-target
+      source: '1775800000002'
       sourceHandle: fail-branch
       target: '1775658332808'
       targetHandle: target
@@ -274,48 +319,11 @@ workflow:
       id: n-start
       position:
         x: 0
-        y: 0
+        y: 114
       positionAbsolute:
         x: 0
-        y: 0
+        y: 114
       selected: false
-      type: custom
-      width: 242
-    - data:
-        code: "import base64\nimport urllib.request\n\ndef main(files: list) -> dict:\n\
-          \    if not files:\n        return {\"file_b64\": \"\", \"filename\": \"\
-          \"}\n    f = files[0]\n    url = f.get(\"url\", \"\")\n    filename = f.get(\"\
-          filename\", \"document.xlsx\")\n    with urllib.request.urlopen(url) as\
-          \ r:\n        content = r.read()\n    return {\n        \"file_b64\": base64.b64encode(content).decode(\"\
-          utf-8\"),\n        \"filename\": filename,\n    }\n"
-        code_language: python3
-        desc: Base64-encode the uploaded Excel SRS file for server-side parsing
-        inputs:
-          files:
-            type: array[file]
-            value:
-            - variable_selector:
-              - sys
-              - files
-        outputs:
-          file_b64:
-            type: string
-          filename:
-            type: string
-        selected: false
-        title: Encode SRS File
-        type: code
-      height: 200
-      id: '1775800000001'
-      position:
-        x: 1046
-        y: 89
-      positionAbsolute:
-        x: 1046
-        y: 89
-      selected: false
-      sourcePosition: right
-      targetPosition: left
       type: custom
       width: 242
     - data:
@@ -324,12 +332,17 @@ workflow:
           type: no-auth
         body:
           data:
-          - id: parse-srs-file-body
-            key: ''
+          - id: parse-srs-file-cid
+            key: conversation_id
             type: text
-            value: '{"conversation_id": "{{#sys.conversation_id#}}", "file_b64": "{{#1775800000001.file_b64#}}",
-              "filename": "{{#1775800000001.filename#}}"}'
-          type: json
+            value: '{{#sys.conversation_id#}}'
+          - id: parse-srs-file-file
+            key: file
+            type: file
+            value:
+            - - sys
+              - files
+          type: form-data
         error_strategy: fail-branch
         headers: ''
         method: post
@@ -351,11 +364,11 @@ workflow:
       height: 177
       id: '1775800000002'
       position:
-        x: 1386
-        y: 89
+        x: 1046
+        y: 347
       positionAbsolute:
-        x: 1386
-        y: 89
+        x: 1046
+        y: 347
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1086,6 +1099,32 @@ workflow:
               tool_label: update_spec_section
               tool_name: update_spec_section
               type: api
+            - enabled: false
+              extra:
+                description: Decodes a base64-encoded Excel SRS file, runs the deterministic
+                  scoping_parser server-side, and stores the resulting entities under
+                  conversation_id. Returns ok=true with entity counts on success,
+                  ok=false with error on parse failure.
+              parameters:
+                conversation_id:
+                  auto: 1
+                  value: null
+                file_b64:
+                  auto: 1
+                  value: null
+                filename:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Decodes a base64-encoded Excel SRS file, runs the
+                deterministic scoping_parser server-side, and stores the resulting
+                entities under conversation_id. Returns ok=true with entity counts
+                on success, ok=false with error on parse failure.
+              tool_label: parse_srs_file
+              tool_name: parse_srs_file
+              type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
         agent_strategy_provider_name: langgenius/agent/agent
@@ -1110,12 +1149,12 @@ workflow:
       height: 312
       id: '17756450495350'
       position:
-        x: 2436.857142857143
-        y: -52.42857142857144
+        x: 2474
+        y: 0
       positionAbsolute:
-        x: 2436.857142857143
-        y: -52.42857142857144
-      selected: true
+        x: 2474
+        y: 0
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1133,11 +1172,11 @@ workflow:
       height: 103
       id: '17756450495361'
       position:
-        x: 2776
-        y: 61
+        x: 2816
+        y: 52
       positionAbsolute:
-        x: 2776
-        y: 61
+        x: 2816
+        y: 52
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1171,11 +1210,11 @@ workflow:
       height: 205
       id: '1775646587226'
       position:
-        x: 2092
-        y: 80
+        x: 2112
+        y: 138
       positionAbsolute:
-        x: 2092
-        y: 80
+        x: 2112
+        y: 138
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1214,11 +1253,11 @@ workflow:
       height: 177
       id: '1775648480416'
       position:
-        x: 1744.2857142857142
-        y: 102.57142857142856
+        x: 1750
+        y: 197
       positionAbsolute:
-        x: 1744.2857142857142
-        y: 102.57142857142856
+        x: 1750
+        y: 197
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1261,10 +1300,10 @@ workflow:
       id: '1775657870619'
       position:
         x: 342
-        y: 74
+        y: 175
       positionAbsolute:
         x: 342
-        y: 74
+        y: 175
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1282,11 +1321,11 @@ workflow:
       height: 137
       id: '1775658332808'
       position:
-        x: 2753.1428571428573
-        y: 376.8571428571429
+        x: 2836
+        y: 311
       positionAbsolute:
-        x: 2753.1428571428573
-        y: 376.8571428571429
+        x: 2836
+        y: 311
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1312,17 +1351,17 @@ workflow:
       id: '1775719228711'
       position:
         x: 684
-        y: 67
+        y: 181
       positionAbsolute:
         x: 684
-        y: 67
+        y: 181
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: -1472.3999999999999
-      y: 389.25
-      zoom: 0.7
+      x: -6.59376650688597
+      y: 277.74546892011995
+      zoom: 0.48165704070855697
   rag_pipeline_variables: []

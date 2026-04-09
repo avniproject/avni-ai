@@ -48,22 +48,20 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               required:
                 - conversation_id
-                - file_b64
+                - file
               properties:
                 conversation_id:
                   type: string
                   description: Dify conversation ID (sys.conversation_id)
-                file_b64:
+                file:
                   type: string
-                  description: Base64-encoded Excel file content
-                filename:
-                  type: string
-                  description: Original filename (used to determine file extension)
+                  format: binary
+                  description: Excel (or CSV/TXT/JSON) SRS file to parse
       responses:
         '200':
           description: Parse result (ok=false does not use 4xx so Dify can inspect the flag)
