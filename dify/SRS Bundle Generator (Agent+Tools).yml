@@ -690,7 +690,7 @@ workflow:
             - enabled: true
               extra:
                 description: Retrieve the full stored spec YAML for display. Call
-                  this after generate_spec confirms {stored: true}. Shows spec_yaml
+                  this after generate_spec confirms stored=true. Shows spec_yaml
                   in the agent response for user review.
               parameters:
                 conversation_id:

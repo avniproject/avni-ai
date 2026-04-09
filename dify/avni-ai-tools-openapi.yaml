@@ -185,7 +185,7 @@ paths:
                     type: integer
                   summary:
                     type: object
-                    description: Section-level counts (e.g. {encounterTypes: 5, programs: 3})
+                    description: "Section-level counts (e.g. {encounterTypes: 5, programs: 3})"
                   next_step:
                     type: string
                   spec_yaml:
