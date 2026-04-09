@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # keeping large YAML off the LLM context window entirely.
 # ---------------------------------------------------------------------------
 _SPEC_STORE_TTL = int(os.getenv("SPEC_STORE_TTL_HOURS", "6")) * 3600
-_MAX_SPEC_RESPONSE_CHARS = int(os.getenv("MAX_SPEC_RESPONSE_CHARS", "8000"))
+_MAX_SPEC_RESPONSE_CHARS = int(os.getenv("MAX_SPEC_RESPONSE_CHARS", "40000"))
 
 
 class _SpecStore:

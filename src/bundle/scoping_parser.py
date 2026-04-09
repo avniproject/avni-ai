@@ -952,9 +952,10 @@ def parse_scoping_docs(
                 # Unknown — capture for agent inspection
                 cols = [str(c) for c in df_with_header.columns.tolist()]
                 rows = (
-                    df_with_header.head(20)
+                    df_with_header.head(3)
                     .dropna(how="all")
                     .fillna("")
+                    .infer_objects(copy=False)
                     .to_dict(orient="records")
                 )
                 misc_sheets.append(
@@ -1164,6 +1165,35 @@ def consolidate_and_audit(
 
 
 # ── Backward-compatible wrappers ─────────────────────────────────────────────
+
+
+def _is_form_sheet(excel_file: Any, sheet_name: str) -> bool:
+    """Backward-compatible helper: returns True if the sheet classifies as a form."""
+    try:
+        df_raw = excel_file.parse(sheet_name, header=None)
+        if df_raw.empty or df_raw.shape[1] < 2:
+            return False
+        # Try row 0 as header
+        df = df_raw.copy()
+        df.columns = [
+            str(df_raw.iloc[0, c]).strip() if df_raw.shape[0] > 0 else f"col{c}"
+            for c in range(df_raw.shape[1])
+        ]
+        df = df.iloc[1:].reset_index(drop=True).dropna(how="all")
+        if _classify_sheet(df, sheet_name) == "form":
+            return True
+        # Try row 1 as header (scoping doc pattern)
+        if df_raw.shape[0] >= 3:
+            df_alt = df_raw.copy()
+            df_alt.columns = [
+                str(df_raw.iloc[1, c]).strip() if df_raw.shape[0] > 1 else f"col{c}"
+                for c in range(df_raw.shape[1])
+            ]
+            if _classify_sheet(df_alt, sheet_name) in ("form", "form_offset1"):
+                return True
+        return False
+    except Exception:
+        return False
 
 
 def parse_scoping_doc(xlsx_path: str | Path | None = None) -> EntitySpec:
