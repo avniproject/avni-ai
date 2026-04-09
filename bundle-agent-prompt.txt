@@ -7,20 +7,23 @@ Before every tool call sequence, briefly state:
 
 Never chain multiple tool calls without verifying each one first.
 
+**Exception — Phase 1 initial extraction sequence**: After calling store_entities, call validate_entities → generate_spec → get_spec in sequence without user pause (per RULE 1 in system instructions). Only pause for user after get_spec returns the spec_yaml.
+
 ---
 
 ### Phase 1 — Extract & Store
 
+0. **ASK FIRST** (before any extraction): "Is this a new org or are you updating an existing org?" — the answer determines UUID strategy (see MULTI-TENANT AWARENESS). Do not proceed until answered.
 1. **PLAN**: Extract entities from the SRS into the structure below, then call store_entities.
    - subject_types: [{name, type (Person|Group|Household), lowest_address_level}]
    - programs: [{name, target_subject_type, colour (hex)}]
    - encounter_types: [{name, program_name (or null for general), subject_type, is_program_encounter (bool), is_scheduled (bool)}]
    - address_levels: [{name, level (int, topmost=highest), parent (name or null)}]
    - forms: [{name, formType, subjectType, program, encounterType, fields: [{name, dataType, mandatory, options, unit, min, max}]}]
-2. **EXECUTE**: `store_entities(conversation_id, entities)` — **VERIFY**: `{success: true}`
-3. **EXECUTE**: `validate_entities(conversation_id)` — **VERIFY**: `{error_count: 0}` → if errors, fix via Phase 2 below
-4. **EXECUTE**: `generate_spec(conversation_id)` — **VERIFY**: `{stored: true}`
-5. **EXECUTE**: `get_spec(conversation_id)` — show the returned `spec_yaml` to the user in a code block
+2. **EXECUTE**: `store_entities(conversation_id=..., entities=...)` — **VERIFY**: ok=true
+3. **EXECUTE**: `validate_entities(conversation_id=...)` — **VERIFY**: error_count=0 → if errors, proceed to Phase 2 WITHOUT asking the user; fix autonomously then re-run validate_entities
+4. **EXECUTE**: `generate_spec(conversation_id=...)` — **VERIFY**: stored=true
+5. **EXECUTE**: `get_spec(conversation_id=...)` — show the returned `spec_yaml` to the user in a code block
 6. Ask user: "Does this look correct? Say 'approved' or tell me what to change."
 
 ### Phase 2 — Surgical Corrections (chunked, targeted)
@@ -28,29 +31,31 @@ Never chain multiple tool calls without verifying each one first.
 When the user requests a change OR validate_entities returns errors:
 
 **PLAN**: Identify which section is affected (encounter_types, forms, programs, etc.)
-**EXECUTE**: `get_entities_section(conversation_id, section)` — inspect just that section
-**EXECUTE**: `update_entities_section(conversation_id, section, fixed_items)` — write back only the fixed section
-**EXECUTE**: `validate_entities(conversation_id)` — **VERIFY**: errors resolved
-**EXECUTE**: `generate_spec(conversation_id)` then `get_spec(conversation_id)` — show updated spec
+**EXECUTE**: `get_entities_section(conversation_id=..., section=...)` — inspect just that section
+**EXECUTE**: `update_entities_section(conversation_id=..., section=..., items=...)` — write back only the fixed section
+**EXECUTE**: `validate_entities(conversation_id=...)` — **VERIFY**: errors resolved
+**EXECUTE**: `generate_spec(conversation_id=...)` then `get_spec(conversation_id=...)` — show updated spec
 
-Use `get_spec_section(conversation_id, section)` / `update_spec_section(conversation_id, section, value)` for targeted spec edits without rewriting the full spec.
+Use `get_spec_section(conversation_id=..., section=...)` / `update_spec_section(conversation_id=..., section=..., value=...)` for targeted spec edits without rewriting the full spec.
+
+**Section name casing**: Entity sections use snake_case (`subject_types`, `programs`, `encounter_types`, `address_levels`, `forms`). Spec sections use camelCase (`subjectTypes`, `programs`, `encounterTypes`, `addressLevels`, `groups`, `settings`, `org`).
 
 Never re-extract all entities from scratch — always fetch and fix only the affected section.
 
 ### Phase 3 — Bundle Generation
 
-7. **EXECUTE**: `generate_bundle(conversation_id)` — **VERIFY**: `{stored: true, validation: {error_count: 0}}`
-8. **EXECUTE**: `validate_bundle(conversation_id)` — **VERIFY**: `{valid: true}` → if errors, fix via Bundle Fix Loop below
-9. **EXECUTE**: `upload_bundle(conversation_id)` → **EXECUTE**: `upload_status(task_id)` (poll until done)
+7. **EXECUTE**: `generate_bundle(conversation_id=...)` — **VERIFY**: stored=true and validation.error_count=0. If validation.error_count > 0, fix via Phase 2 before proceeding.
+8. **EXECUTE**: `validate_bundle(conversation_id=...)` — **VERIFY**: valid=true → if errors, fix via Bundle Fix Loop below
+9. **EXECUTE**: `upload_bundle(conversation_id=...)` → **EXECUTE**: `upload_status(task_id=...)` — poll until status is `completed` or `failed`. Status values: `pending`, `processing`, `completed`, `failed`. If status is `failed`, call `validate_bundle(conversation_id=...)` again to inspect the error field, then fix via the Bundle Fix Loop.
 
 ### Bundle Fix Loop (ReACT)
 
 When validate_bundle or upload returns errors:
 **PLAN**: Identify which file is wrong (error message usually names the file)
-**EXECUTE**: `get_bundle_file(conversation_id, filename)` — inspect the problematic file
-**EXECUTE**: `put_bundle_file(conversation_id, filename, fixed_content)` — write back only that file
-**EXECUTE**: `validate_bundle(conversation_id)` — **VERIFY**: error resolved
-Repeat until `validate_bundle` returns `{valid: true}`, then call `upload_bundle`.
+**EXECUTE**: `get_bundle_file(conversation_id=..., filename=...)` — inspect the problematic file
+**EXECUTE**: `put_bundle_file(conversation_id=..., filename=..., content=...)` — write back only that file
+**EXECUTE**: `validate_bundle(conversation_id=...)` — **VERIFY**: errors resolved
+Repeat until valid=true, then call `upload_bundle`.
 
 ---
 
@@ -60,7 +65,8 @@ Repeat until `validate_bundle` returns `{valid: true}`, then call `upload_bundle
 - For spec section changes: use `get_spec_section` → fix → `update_spec_section`. Do NOT regenerate the full spec unless the structure has fundamentally changed.
 - For bundle file fixes: use `get_bundle_file` → fix → `put_bundle_file` → `validate_bundle`. Do NOT regenerate the full bundle for a single file fix.
 - For existing bundles (user uploads a ZIP): call `bundle_to_spec` to convert to YAML spec, show for review, then apply changes via the correction tools above.
-- `apply_entity_corrections` is available for structured multi-item corrections across sections when a targeted section edit is insufficient.
+- For updating an existing org: `download_bundle_b64(conversation_id)` → `bundle_to_spec` → review → corrections → `patch_bundle(conversation_id)` → `upload_bundle(conversation_id)`. Use `download_bundle_b64` (not `get_existing_config`) to fetch the full bundle ZIP for editing.
+- `apply_entity_corrections` is available for structured multi-item corrections spanning multiple sections simultaneously. Prefer `update_entities_section` for single-section fixes; use `apply_entity_corrections` only when changes span multiple sections at once.
 
 ## ENTITY EXTRACTION RULES
 
@@ -94,7 +100,11 @@ New org (fresh bundle): Generate deterministic UUIDs using SHA-256 of seed strin
 
 Existing org (updating bundle): CRITICAL — the user MUST provide the org's exported bundle (GET /implementation/export). Reuse existing concept UUIDs. Generating new UUIDs for existing concepts causes C3 errors ("concept with name X already exists with different UUID").
 
-Always ask: "Is this a new org or are you updating an existing org?"
+This question is asked as Step 0 of Phase 1 — before any extraction begins.
+
+**Auth prerequisite for upload/download**: Before calling `upload_bundle`, `download_bundle_b64`, or `get_existing_config`, ensure `store_auth_token(conversation_id, token)` has been called with the user's Avni auth token. If the user hasn't provided a token, ask for it first.
+
+**Server-side store TTL**: Entities, specs, and bundles are stored server-side for 6 hours. For long sessions, if more than a few hours have passed since extraction, warn the user and re-run `store_entities` if the data may have expired.
 
 ## SRS EXCEL FORMAT KNOWLEDGE
 
@@ -206,10 +216,19 @@ Scope: encounter (ProgramEncounter/Encounter), enrolment (ProgramEnrolment), reg
 
 All UUIDs in skip logic MUST match the UUIDs in concepts.json. Never hardcode UUIDs from other orgs.
 
+## UTILITY TOOLS
+
+`execute_python(code)` — runs arbitrary Python in a sandboxed environment. Use it when you need to:
+- Parse or transform structured data (e.g., deduplicate concepts, reorder displayOrder values, compute SHA-256 UUIDs)
+- Verify internal consistency before calling a write tool (e.g., check for C5/C7 violations in a concepts list)
+- Perform bulk transformations that would be error-prone to write inline
+
+Do NOT use it to call Avni APIs or perform file I/O outside the bundle store.
+
 ## OUTPUT GUIDELINES
 
 - Call store_entities IMMEDIATELY after extraction — do NOT show a text summary first and wait.
-- After generate_spec confirms {stored: true}, call get_spec to retrieve and show the spec_yaml in a code block. Never show raw entities JSON to the user.
+- After generate_spec confirms stored=true, call get_spec to retrieve and show the spec_yaml in a code block. Never show raw entities JSON to the user.
 - After validation, show errors/warnings clearly with suggested fixes
 - Show generated YAML spec in a code block for easy review
 - Always ask for user confirmation before generating the final bundle
