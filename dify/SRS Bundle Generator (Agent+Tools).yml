@@ -13,6 +13,22 @@ version: 0.6.0
 workflow:
   conversation_variables:
   - description: ''
+    id: c6cba07c-9187-4228-842f-42a0e3f2f709
+    name: org_name
+    selector:
+    - conversation
+    - org_name
+    value: durga_test
+    value_type: string
+  - description: ''
+    id: 40c13e3c-089e-4def-ac61-ba7bfa172e31
+    name: avni_base_url
+    selector:
+    - conversation
+    - avni_base_url
+    value: https://staging.avniproject.org
+    value_type: string
+  - description: ''
     id: a1d26303-4267-47ef-8662-2b246b1079f1
     name: uploaded_files
     selector:
@@ -51,17 +67,6 @@ workflow:
       allowed_file_upload_methods:
       - local_file
       enabled: true
-      fileUploadConfig:
-        attachment_image_file_size_limit: 2
-        audio_file_size_limit: 50
-        batch_count_limit: 5
-        file_size_limit: 15
-        file_upload_limit: 50
-        image_file_batch_limit: 10
-        image_file_size_limit: 10
-        single_chunk_attachment_limit: 10
-        video_file_size_limit: 100
-        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -208,12 +213,45 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: start
+        sourceType: assigner
         targetType: if-else
-      id: n-start-source-1775719228711-target
-      source: n-start
+      id: 1775657870619-source-1775719228711-target
+      source: '1775657870619'
       sourceHandle: source
       target: '1775719228711'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1775644994030-fail-branch-1775658332808-target
+      source: '1775644994030'
+      sourceHandle: fail-branch
+      target: '1775658332808'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1775648480416-fail-branch-1775658332808-target
+      source: '1775648480416'
+      sourceHandle: fail-branch
+      target: '1775658332808'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1775646587226-fail-branch-1775658332808-target
+      source: '1775646587226'
+      sourceHandle: fail-branch
+      target: '1775658332808'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -289,11 +327,11 @@ workflow:
       height: 104
       id: '1775644994029'
       position:
-        x: 724
-        y: 243
+        x: 1046
+        y: 89
       positionAbsolute:
-        x: 724
-        y: 243
+        x: 1046
+        y: 89
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -310,6 +348,7 @@ workflow:
             type: text
             value: '{"conversation_id": "{{#sys.conversation_id#}}", "srs_text": "{{#1775644994029.text#}}"}'
           type: json
+        error_strategy: fail-branch
         headers: ''
         method: post
         params: ''
@@ -327,14 +366,14 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}store-srs-text'
         variables: []
-      height: 141
+      height: 177
       id: '1775644994030'
       position:
-        x: 1066
-        y: 224
+        x: 1386.5714285714287
+        y: 200
       positionAbsolute:
-        x: 1066
-        y: 224
+        x: 1386.5714285714287
+        y: 200
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1089,11 +1128,11 @@ workflow:
       height: 312
       id: '17756450495350'
       position:
-        x: 2112
-        y: 163
+        x: 2436.857142857143
+        y: -52.42857142857144
       positionAbsolute:
-        x: 2112
-        y: 163
+        x: 2436.857142857143
+        y: -52.42857142857144
       selected: true
       sourcePosition: right
       targetPosition: left
@@ -1112,11 +1151,11 @@ workflow:
       height: 103
       id: '17756450495361'
       position:
-        x: 2454
-        y: 215
+        x: 2776
+        y: 61
       positionAbsolute:
-        x: 2454
-        y: 215
+        x: 2776
+        y: 61
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1129,6 +1168,7 @@ workflow:
         body:
           data: []
           type: none
+        error_strategy: fail-branch
         headers: ''
         method: get
         params: ''
@@ -1146,14 +1186,14 @@ workflow:
         type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/bundle-agent-prompt.txt
         variables: []
-      height: 169
+      height: 205
       id: '1775646587226'
       position:
-        x: 1770
-        y: 234
+        x: 2092
+        y: 80
       positionAbsolute:
-        x: 1770
-        y: 234
+        x: 2092
+        y: 80
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1171,6 +1211,7 @@ workflow:
             value: '{"conversation_id": "{{#sys.conversation_id#}}", "auth_token":
               "{{#conversation.auth_token#}}"}'
           type: json
+        error_strategy: fail-branch
         headers: ''
         method: post
         params: ''
@@ -1188,14 +1229,14 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_mcp_server_url#}}store-auth-token'
         variables: []
-      height: 141
+      height: 177
       id: '1775648480416'
       position:
-        x: 1428
-        y: 248
+        x: 1744.2857142857142
+        y: 102.57142857142856
       positionAbsolute:
-        x: 1428
-        y: 248
+        x: 1744.2857142857142
+        y: 102.57142857142856
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1221,18 +1262,27 @@ workflow:
           - conversation
           - avni_mcp_server_url
           write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - n-start
+          - org_name
+          variable_selector:
+          - conversation
+          - org_name
+          write_mode: over-write
         selected: false
         title: Conversation Variables Assigner
         type: assigner
         version: '2'
-      height: 110
+      height: 136
       id: '1775657870619'
       position:
         x: 342
-        y: 31
+        y: 74
       positionAbsolute:
         x: 342
-        y: 31
+        y: 74
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1250,11 +1300,11 @@ workflow:
       height: 137
       id: '1775658332808'
       position:
-        x: 2474
-        y: 398
+        x: 2753.1428571428573
+        y: 376.8571428571429
       positionAbsolute:
-        x: 2474
-        y: 398
+        x: 2753.1428571428573
+        y: 376.8571428571429
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1267,10 +1317,10 @@ workflow:
           - comparison_operator: not empty
             id: 3066368b-a96a-4f38-ad75-aa53556e44f8
             value: ''
-            varType: array[object]
+            varType: array[file]
             variable_selector:
-            - conversation
-            - uploaded_files
+            - sys
+            - files
           id: 'true'
           logical_operator: and
         selected: false
@@ -1279,18 +1329,18 @@ workflow:
       height: 124
       id: '1775719228711'
       position:
-        x: 362
-        y: 221
+        x: 684
+        y: 67
       positionAbsolute:
-        x: 362
-        y: 221
+        x: 684
+        y: 67
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: -143.55686419251435
-      y: 155.3937964902155
-      zoom: 0.48700213427162026
+      x: -623.5
+      y: 161.5
+      zoom: 0.7
   rag_pipeline_variables: []
