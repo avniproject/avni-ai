@@ -433,12 +433,12 @@ workflow:
               do you show spec_yaml and ask for approval.
 
               RULE 1A — ALREADY PARSED SHORTCUT: If get_srs_text returns already_parsed=true,
-              the Excel file was parsed server-side. Skip store_entities entirely. Call
-              validate_entities → generate_spec → get_spec IN SEQUENCE WITHOUT DEVIATION.
-              Even if validate_entities returns warnings, call generate_spec IMMEDIATELY —
-              do NOT call get_entities_section or any inspection tool. Warnings are not
-              blocking in this path. After showing the spec to the user, if the parse
-              summary had misc_sheets > 0, call get_entities_section(section=misc_sheets)
+              the Excel file was parsed server-side. Skip store_entities entirely.
+              Call validate_entities → generate_spec → get_spec IN SEQUENCE WITHOUT
+              DEVIATION. Even if validate_entities returns warnings, call generate_spec
+              IMMEDIATELY — do NOT call get_entities_section or any inspection tool.
+              Warnings are not blocking in this path. After showing the spec to the
+              user, if the parse summary had misc_sheets > 0, call get_entities_section(section=misc_sheets)
               to inspect unclassified sheets and patch any missing entities.
 
               RULE 2 — generate_bundle uses conversation_id ONLY: When the user approves
@@ -650,22 +650,6 @@ workflow:
               tool_description: Check the status of a bundle upload task
               tool_label: upload_status
               tool_name: upload_status
-              type: api
-            - enabled: true
-              extra:
-                description: Download the current organisation configuration from
-                  Avni
-              parameters:
-                includeLocations:
-                  auto: 1
-                  value: null
-              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
-              provider_show_name: Avni AI Staging NoAuth openapi
-              settings: {}
-              tool_description: Download the current organisation configuration from
-                Avni
-              tool_label: get_existing_config
-              tool_name: get_existing_config
               type: api
             - enabled: true
               extra:
@@ -1154,14 +1138,15 @@ workflow:
                   ok=false with error on parse failure.
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
-                file_b64:
-                  auto: 1
-                  value: null
-                filename:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                file_infos:
+                  auto: 0
+                  value:
+                    type: constant
+                    value: null
               provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
               provider_show_name: Avni AI Staging NoAuth openapi
               settings: {}
@@ -1171,6 +1156,49 @@ workflow:
                 on success, ok=false with error on parse failure.
               tool_label: parse_srs_file
               tool_name: parse_srs_file
+              type: api
+            - enabled: true
+              extra:
+                description: 'Fetches up to six resource arrays from the Avni server.
+                  Use the optional
+
+                  query params to limit what is returned and avoid large context payloads.
+
+                  Default cap per array: MAX_CONFIG_ITEMS env var (100 items). Pass
+                  max_items=0
+
+                  for unlimited. Truncated arrays include a companion ''{key}_truncated''
+                  object
+
+                  with {truncated: true, total: N, returned: M}.
+
+                  '
+              parameters:
+                max_items:
+                  auto: 1
+                  value: null
+                sections:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'Fetches up to six resource arrays from the Avni server.
+                Use the optional
+
+                query params to limit what is returned and avoid large context payloads.
+
+                Default cap per array: MAX_CONFIG_ITEMS env var (100 items). Pass
+                max_items=0
+
+                for unlimited. Truncated arrays include a companion ''{key}_truncated''
+                object
+
+                with {truncated: true, total: N, returned: M}.
+
+                '
+              tool_label: get_existing_config
+              tool_name: get_existing_config
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
@@ -1408,7 +1436,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -1386.5240546367402
+      x: -1385.52405463674
       y: 218.7615391495966
       zoom: 0.6567548375504701
   rag_pipeline_variables: []
