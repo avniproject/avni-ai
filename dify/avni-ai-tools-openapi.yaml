@@ -40,6 +40,56 @@ paths:
                   conversation_id:
                     type: string
 
+  /parse-srs-file:
+    post:
+      operationId: parse_srs_file
+      summary: Parse uploaded Excel SRS file into entities using structured parser
+      description: Decodes a base64-encoded Excel SRS file, runs the deterministic scoping_parser server-side, and stores the resulting entities under conversation_id. Returns ok=true with entity counts on success, ok=false with error on parse failure.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - file_b64
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID (sys.conversation_id)
+                file_b64:
+                  type: string
+                  description: Base64-encoded Excel file content
+                filename:
+                  type: string
+                  description: Original filename (used to determine file extension)
+      responses:
+        '200':
+          description: Parse result (ok=false does not use 4xx so Dify can inspect the flag)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  summary:
+                    type: object
+                    properties:
+                      forms:
+                        type: integer
+                      encounter_types:
+                        type: integer
+                      subject_types:
+                        type: integer
+                      programs:
+                        type: integer
+                      address_levels:
+                        type: integer
+                  error:
+                    type: string
+
   /get-srs-text:
     get:
       operationId: get_srs_text

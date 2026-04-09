@@ -130,6 +130,11 @@ async def handle_get_srs_text(request: Request) -> JSONResponse:
             {"error": "Missing 'conversation_id' query param"}, status_code=400
         )
 
+    # If entities were already stored via parse_srs_file (Excel upload path),
+    # signal the agent to skip LLM extraction and go straight to validate_entities.
+    if _entity_store.get(conversation_id) is not None:
+        return JSONResponse({"already_parsed": True, "text": None})
+
     text = _srs_text_store.get(conversation_id)
     if text is None:
         return JSONResponse(
