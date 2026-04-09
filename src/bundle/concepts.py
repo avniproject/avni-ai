@@ -52,6 +52,9 @@ class ConceptGenerator:
 
     def generate_coded_concept(self, field: dict) -> str:
         concept_uuid = self.get_concept_uuid(field["name"])
+        # Deduplicate — same field name across forms produces same UUID
+        if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
+            return concept_uuid
         answers = []
         for idx, option in enumerate(field.get("options", [])):
             answer_uuid = self.generate_answer_concept(option)
@@ -69,6 +72,8 @@ class ConceptGenerator:
 
     def generate_numeric_concept(self, field: dict) -> str:
         concept_uuid = self.get_concept_uuid(field["name"])
+        if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
+            return concept_uuid
         concept: dict = {
             "name": field["name"],
             "uuid": concept_uuid,
@@ -85,6 +90,8 @@ class ConceptGenerator:
 
     def _generate_simple_concept(self, field: dict, data_type: str) -> str:
         concept_uuid = self.get_concept_uuid(field["name"])
+        if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
+            return concept_uuid
         concept: dict = {
             "name": field["name"],
             "uuid": concept_uuid,

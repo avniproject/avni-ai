@@ -4,7 +4,7 @@ import os
 
 from fastmcp import FastMCP
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from .handlers.admin_handlers import (
     handle_create_location_type,
@@ -193,10 +193,26 @@ async def create_server():
     async def get_srs_text_endpoint(request: Request):
         return await handle_get_srs_text(request)
 
-    # --- SRS File Parser ---
-    @server.custom_route("/parse-srs-file", methods=["POST"])
-    async def parse_srs_file_endpoint(request: Request):
-        return await handle_parse_srs_file(request)
+    # --- Scoping Parser ---
+    @server.custom_route("/parse-scoping-docs", methods=["POST"])
+    async def parse_scoping_docs_endpoint(request: Request):
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+        file_paths = body.get("file_paths", [])
+        org_name = body.get("org_name", "")
+        if not file_paths:
+            return JSONResponse({"error": "No file_paths provided"}, status_code=400)
+        try:
+            from .bundle.scoping_parser import consolidate_and_audit
+            result = consolidate_and_audit(file_paths, org_name=org_name)
+            return JSONResponse(result)
+        except FileNotFoundError as e:
+            return JSONResponse({"error": str(e)}, status_code=404)
+        except Exception as e:
+            logger.exception("parse-scoping-docs failed")
+            return JSONResponse({"error": str(e)}, status_code=500)
 
     # --- Entity Validation ---
     @server.custom_route("/store-entities", methods=["POST"])
@@ -282,6 +298,24 @@ async def create_server():
     @server.custom_route("/bundle-file", methods=["PUT"])
     async def put_bundle_file_endpoint(request: Request):
         return await handle_put_bundle_file(request)
+
+    # --- Bundle ZIP Download (for debugger UI) ---
+    @server.custom_route("/download-bundle-zip", methods=["GET"])
+    async def download_bundle_zip_endpoint(request: Request):
+        import base64
+        from .handlers.bundle_handlers import get_bundle_store
+        cid = request.query_params.get("conversation_id")
+        if not cid:
+            return JSONResponse({"error": "Missing conversation_id"}, status_code=400)
+        stored = get_bundle_store().get(cid)
+        if not stored:
+            return JSONResponse({"error": "No stored bundle"}, status_code=404)
+        zip_bytes = base64.b64decode(stored["zip_b64"])
+        return Response(
+            content=zip_bytes, status_code=200,
+            media_type="application/zip",
+            headers={"Content-Disposition": "attachment; filename=bundle.zip"},
+        )
 
     # --- Bundle Upload ---
     @server.custom_route("/upload-bundle", methods=["POST"])

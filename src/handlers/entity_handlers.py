@@ -509,7 +509,18 @@ async def handle_validate_entities(request: Request) -> JSONResponse:
         return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
 
     result = _validate(entities)
-    result["entities"] = entities
+
+    # When using conversation_id, don't return the full entities dict — it can
+    # exceed Dify's 64KB tool response buffer and get silently truncated.
+    # Instead return a compact summary so the agent knows what's stored.
+    if conversation_id:
+        result["entity_counts"] = {
+            k: len(v) if isinstance(v, list) else 1
+            for k, v in entities.items()
+        }
+    else:
+        # Legacy: return full entities for callers that need them
+        result["entities"] = entities
 
     logger.info(
         "validate-entities: %d errors, %d warnings",
@@ -563,6 +574,19 @@ async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
         _entity_store.put(conversation_id, updated)
 
     logger.info("apply-entity-corrections: applied %d corrections", len(corrections))
+
+    # When using conversation_id, return compact summary instead of full entities
+    if conversation_id:
+        return JSONResponse({
+            "ok": True,
+            "corrections_applied": len(corrections),
+            "entity_counts": {
+                k: len(v) if isinstance(v, list) else 1
+                for k, v in updated.items()
+            },
+        })
+
+    # Legacy: return full entities
     return JSONResponse({"result": updated})
 
 

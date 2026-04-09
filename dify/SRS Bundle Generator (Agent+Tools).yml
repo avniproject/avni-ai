@@ -264,7 +264,7 @@ workflow:
           hide: true
           hint: ''
           label: avni_mcp_server_url
-          max_length: 48
+          max_length: 256
           options: []
           placeholder: ''
           required: false
@@ -402,7 +402,7 @@ workflow:
               {{#1775646587226.body#}}'
           maximum_iterations:
             type: constant
-            value: 8
+            value: 20
           model:
             type: constant
             value:

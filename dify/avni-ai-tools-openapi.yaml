@@ -76,19 +76,38 @@ paths:
                     type: boolean
                   summary:
                     type: object
+                    description: Entity counts from the parsed file
                     properties:
-                      forms:
-                        type: integer
-                      encounter_types:
+                      address_levels:
                         type: integer
                       subject_types:
                         type: integer
                       programs:
                         type: integer
-                      address_levels:
+                      encounter_types:
                         type: integer
+                      forms:
+                        type: integer
+                      groups:
+                        type: integer
+                      total_fields:
+                        type: integer
+                  warnings:
+                    type: array
+                    description: Non-fatal issues (missing forms, empty fields, etc.)
+                    items:
+                      type: string
+                  errors:
+                    type: array
+                    description: Fatal issues that may cause bundle generation to fail
+                    items:
+                      type: string
+                  coverage:
+                    type: object
+                    description: Flags indicating what was found in the parsed file
                   error:
                     type: string
+                    description: Present only when ok=false — reason the parse failed
 
   /get-srs-text:
     get:

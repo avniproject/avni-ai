@@ -15,7 +15,7 @@ import tempfile
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from ..bundle.scoping_parser import parse_scoping_doc
+from ..bundle.scoping_parser import consolidate_and_audit
 from .entity_handlers import get_entity_store
 
 logger = logging.getLogger(__name__)
@@ -63,23 +63,23 @@ async def handle_parse_srs_file(request: Request) -> JSONResponse:
             tmp.write(raw)
             tmp_path = tmp.name
 
-        entity_spec = parse_scoping_doc(tmp_path)
-        entities = entity_spec.to_entities_dict()
+        result = consolidate_and_audit([tmp_path])
+        entities = result["entities"]
+        audit = result["audit"]
         get_entity_store().put(conversation_id, entities)
 
-        summary = {
-            "forms": len(entities.get("forms", [])),
-            "encounter_types": len(entities.get("encounter_types", [])),
-            "subject_types": len(entities.get("subject_types", [])),
-            "programs": len(entities.get("programs", [])),
-            "address_levels": len(entities.get("address_levels", [])),
-        }
         logger.info(
-            "parse-srs-file: stored entities for conversation_id=%s, summary=%s",
+            "parse-srs-file: stored entities for conversation_id=%s, counts=%s",
             conversation_id,
-            summary,
+            audit["entity_counts"],
         )
-        return JSONResponse({"ok": True, "summary": summary})
+        return JSONResponse({
+            "ok": True,
+            "summary": audit["entity_counts"],
+            "warnings": audit["warnings"],
+            "errors": audit["errors"],
+            "coverage": audit["coverage"],
+        })
 
     except Exception as exc:
         logger.warning(
