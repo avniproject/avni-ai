@@ -187,7 +187,7 @@ def _find_col(df: pd.DataFrame, *candidates: str) -> str | None:
 # ── Sheet Classification ─────────────────────────────────────────────────────
 
 
-def _classify_sheet(df: pd.DataFrame) -> str:
+def _classify_sheet(df: pd.DataFrame, sheet_name: str = "") -> str:
     """
     Classify a DataFrame by its column headers into one of:
     location, subject_type, program, encounter, program_encounter,
@@ -195,6 +195,7 @@ def _classify_sheet(df: pd.DataFrame) -> str:
 
     Uses the FIRST column as the strongest signal — it's usually the primary
     entity name (e.g. "Encounter Name", "Subject Type Name", "Program Name").
+    Falls back to sheet_name pattern matching when content headers are ambiguous.
     """
     if df.empty or df.shape[1] < 2:
         return "unknown"
@@ -215,8 +216,12 @@ def _classify_sheet(df: pd.DataFrame) -> str:
     if has_field_name and has_data_type:
         return "form"
 
-    # Encounters — first col contains "encounter name"
-    if "encounter name" in first_col or first_col == "encounter":
+    # Encounters — first col contains "encounter name" or "encounter type"
+    if (
+        "encounter name" in first_col
+        or "encounter type" in first_col
+        or first_col in ("encounter", "encounter type")
+    ):
         # Program encounters have a "program" column too
         if any("program" in c for c in cols_lower[1:]):
             return "program_encounter"
@@ -226,10 +231,16 @@ def _classify_sheet(df: pd.DataFrame) -> str:
     if "subject type name" in first_col or first_col == "subject type":
         return "subject_type"
 
-    # Programs — first col is "program name"
-    if "program name" in first_col or (
-        first_col == "program"
-        and any("target" in c or "subject" in c or "enrolment" in c for c in cols_lower)
+    # Programs — first col is "program name" or standalone "program" with structural cols
+    if "program name" in first_col or first_col == "program name":
+        return "program"
+    if first_col == "program" and any(
+        "target" in c
+        or "subject" in c
+        or "enrolment" in c
+        or "colour" in c
+        or "color" in c
+        for c in cols_lower
     ):
         return "program"
 
@@ -240,6 +251,24 @@ def _classify_sheet(df: pd.DataFrame) -> str:
         return "location"
     if first_col == "location type":
         return "location"
+
+    # ── Sheet-name fallback (when column headers are ambiguous) ─────────────
+    if sheet_name:
+        sn = sheet_name.strip().lower()
+        if "program encounter" in sn:
+            return "program_encounter"
+        if sn in ("program", "programs"):
+            return "program"
+        if "encounter" in sn and "program" not in sn:
+            return "encounter"
+        if "subject type" in sn or sn in ("subject types", "subjects"):
+            return "subject_type"
+        if "location hierarchy" in sn or sn in (
+            "location",
+            "locations",
+            "address levels",
+        ):
+            return "location"
 
     return "unknown"
 
@@ -805,7 +834,9 @@ def _resolve_form_subject_types(
 # ── Main Entry Point ─────────────────────────────────────────────────────────
 
 
-def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
+def parse_scoping_docs(
+    file_paths: list[str | Path],
+) -> tuple["EntitySpec", list[dict]]:
     """
     Parse one or more SRS/scoping/modelling files of any supported format
     and consolidate into a validated EntitySpec.
@@ -813,6 +844,11 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
     Accepts .xlsx, .csv, .txt, .json files in any combination.
     Each sheet/file is auto-classified by its content and parsed accordingly.
     All results are merged with deduplication.
+
+    Returns:
+        (EntitySpec, misc_sheets) where misc_sheets is a list of dicts for
+        sheets that could not be classified, each containing:
+        {name, file, columns, rows (first 20 non-empty rows as list-of-dicts)}
     """
     all_address: list[AddressLevelSpec] = []
     all_subjects: list[SubjectTypeSpec] = []
@@ -821,6 +857,7 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
     all_forms: list[FormSpec] = []
     w3h_dfs: list[pd.DataFrame] = []
     form_sheets: list[tuple[str, pd.DataFrame, int]] = []  # (name, df, header_offset)
+    misc_sheets: list[dict] = []
 
     seen: dict[str, set[str]] = {
         "address": set(),
@@ -852,7 +889,7 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
             df_with_header = df_with_header.iloc[1:].reset_index(drop=True)
             df_with_header = df_with_header.dropna(how="all")
 
-            classification = _classify_sheet(df_with_header)
+            classification = _classify_sheet(df_with_header, sheet_name)
 
             # If unknown, try with row 1 as headers (scoping doc pattern)
             if classification == "unknown" and df.shape[0] >= 3:
@@ -861,7 +898,7 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
                     str(df.iloc[1, c]).strip() if df.shape[0] > 1 else f"col{c}"
                     for c in range(df.shape[1])
                 ]
-                alt_class = _classify_sheet(df_alt)
+                alt_class = _classify_sheet(df_alt, sheet_name)
                 if alt_class in ("form", "form_offset1"):
                     classification = "form_offset1"
                 elif alt_class != "unknown":
@@ -910,6 +947,24 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
 
             elif classification == "form":
                 form_sheets.append((sheet_name, df, 1))  # offset=1 for scoping format
+
+            else:
+                # Unknown — capture for agent inspection
+                cols = [str(c) for c in df_with_header.columns.tolist()]
+                rows = (
+                    df_with_header.head(20)
+                    .dropna(how="all")
+                    .fillna("")
+                    .to_dict(orient="records")
+                )
+                misc_sheets.append(
+                    {
+                        "name": sheet_name,
+                        "file": path.name,
+                        "columns": cols,
+                        "rows": rows,
+                    }
+                )
 
     # Default address levels if none found
     if not all_address:
@@ -975,7 +1030,7 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
         address_levels=all_address,
         groups=groups,
         forms=all_forms,
-    )
+    ), misc_sheets
 
 
 # ── Consolidation + Audit ────────────────────────────────────────────────────
@@ -1004,8 +1059,10 @@ def consolidate_and_audit(
     """
     from .spec_generator import entities_to_spec
 
-    entity_spec = parse_scoping_docs(file_paths)
+    entity_spec, misc_sheets = parse_scoping_docs(file_paths)
     entities = entity_spec.to_entities_dict()
+    if misc_sheets:
+        entities["misc_sheets"] = misc_sheets
 
     # Generate the YAML spec — this is the source of truth
     spec_yaml = entities_to_spec(entities, org_name=org_name)
@@ -1092,6 +1149,7 @@ def consolidate_and_audit(
             "forms": len(entities["forms"]),
             "groups": len(entities["groups"]),
             "total_fields": sum(len(f.get("fields", [])) for f in entities["forms"]),
+            "misc_sheets": len(misc_sheets),
         },
         "warnings": warnings,
         "errors": errors,
@@ -1114,7 +1172,8 @@ def parse_scoping_doc(xlsx_path: str | Path | None = None) -> EntitySpec:
 
     if xlsx_path is None:
         xlsx_path = os.environ.get("SCOPING_DOC_PATH", str(_DEFAULT_SCOPING_DOC))
-    return parse_scoping_docs([xlsx_path])
+    entity_spec, _ = parse_scoping_docs([xlsx_path])
+    return entity_spec
 
 
 def load_durga_entities(xlsx_path: str | Path | None = None) -> dict:

@@ -319,18 +319,23 @@ workflow:
       id: n-start
       position:
         x: 0
-        y: 114
+        y: 101
       positionAbsolute:
         x: 0
-        y: 114
+        y: 101
       selected: false
       type: custom
       width: 242
     - data:
-        code: "import json\n\ndef main(files: list) -> dict:\n    infos = [\n    \
+        code: "import json\n\ndef main(files: list) -> dict:\n    if not files:\n\
+          \        return {\"file_infos_json\": \"[]\"}\n    infos = [           \
+          \                                                                \n    \
           \    {\"url\": f.get(\"url\", \"\"), \"filename\": f.get(\"filename\", \"\
-          document.xlsx\")}\n        for f in files\n        if f.get(\"url\")\n \
-          \   ]\n    return {\"file_infos_json\": json.dumps(infos)}\n"
+          document.xlsx\")}\n        for f in files                              \
+          \                                    \n        if f.get(\"url\")       \
+          \                            \n    ]                                   \
+          \                                                \n    return {\"file_infos_json\"\
+          : json.dumps(infos)}"
         code_language: python3
         desc: Extract pre-signed URLs and filenames — backend downloads the files
         outputs:
@@ -344,7 +349,7 @@ workflow:
           - sys
           - files
           variable: files
-      height: 96
+      height: 112
       id: '1775800000001'
       position:
         x: 1046
@@ -390,11 +395,11 @@ workflow:
       height: 177
       id: '1775800000002'
       position:
-        x: 1046
-        y: 347
+        x: 1388
+        y: 306
       positionAbsolute:
-        x: 1046
-        y: 347
+        x: 1388
+        y: 306
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -426,6 +431,15 @@ workflow:
               the text, call store_entities, then validate_entities, then generate_spec,
               then get_spec IN SEQUENCE without pausing. Only after get_spec returns
               do you show spec_yaml and ask for approval.
+
+              RULE 1A — ALREADY PARSED SHORTCUT: If get_srs_text returns already_parsed=true,
+              the Excel file was parsed server-side. Skip store_entities entirely. Call
+              validate_entities → generate_spec → get_spec IN SEQUENCE WITHOUT DEVIATION.
+              Even if validate_entities returns warnings, call generate_spec IMMEDIATELY —
+              do NOT call get_entities_section or any inspection tool. Warnings are not
+              blocking in this path. After showing the spec to the user, if the parse
+              summary had misc_sheets > 0, call get_entities_section(section=misc_sheets)
+              to inspect unclassified sheets and patch any missing entities.
 
               RULE 2 — generate_bundle uses conversation_id ONLY: When the user approves
               the spec, call generate_bundle(conversation_id) without any entities
@@ -1180,7 +1194,7 @@ workflow:
       positionAbsolute:
         x: 2474
         y: 0
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -1387,7 +1401,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -6.59376650688597
-      y: 277.74546892011995
-      zoom: 0.48165704070855697
+      x: -1386.5240546367402
+      y: 218.7615391495966
+      zoom: 0.6567548375504701
   rag_pipeline_variables: []

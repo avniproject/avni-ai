@@ -34,7 +34,11 @@ Before every tool call sequence, reason internally:
 
 Never chain multiple tool calls without verifying each one first.
 
-**Exception — Phase 1 initial extraction sequence**: Your first tool call is always get_srs_text (RULE 1). If it returns `already_parsed: true` (RULE 1A), skip store_entities and call validate_entities → generate_spec → get_spec in sequence. Otherwise call store_entities → validate_entities → generate_spec → get_spec in sequence. In both cases, do not pause for user until after get_spec returns the spec_yaml.
+**Exception — Phase 1 initial extraction sequence**: Your first tool call is always get_srs_text (RULE 1). If it returns `already_parsed: true` (RULE 1A), skip store_entities and call validate_entities → generate_spec → get_spec IN SEQUENCE WITHOUT DEVIATION. Even if validate_entities returns warnings, call generate_spec IMMEDIATELY — do NOT call get_entities_section or any other inspection tool. Warnings are not blocking in the RULE 1A path; proceed to generate_spec regardless.
+
+**RULE 1A — misc_sheets exception**: After get_spec returns the spec, check if the parse summary included `misc_sheets > 0`. If so, call `get_entities_section(section="misc_sheets")` AFTER showing the spec to the user. Inspect the misc sheet column headers and rows to determine if any structural data was missed (e.g. programs, encounter types not already in the spec). If you find missing data, use `update_entities_section` to patch the relevant section, then re-run `generate_spec` + `get_spec` to show the updated spec.
+
+Otherwise (no already_parsed), call store_entities → validate_entities → generate_spec → get_spec in sequence. In both cases, do not pause for user until after get_spec returns the spec_yaml.
 
 ---
 
@@ -49,7 +53,7 @@ Never chain multiple tool calls without verifying each one first.
    - address_levels: [{name, level (int, topmost=highest), parent (name or null)}]
    - forms: [{name, formType, subjectType, program, encounterType, fields: [{name, dataType, mandatory, options, unit, min, max}]}]
 2. **EXECUTE**: `store_entities(conversation_id=..., entities=...)` — **VERIFY**: ok=true
-3. **EXECUTE**: `validate_entities(conversation_id=...)` — **VERIFY**: error_count=0 → if errors, proceed to Phase 2 WITHOUT asking the user; fix autonomously then re-run validate_entities
+3. **EXECUTE**: `validate_entities(conversation_id=...)` — **VERIFY**: error_count=0 → if errors AND this is the text-paste path (no `already_parsed`), proceed to Phase 2 WITHOUT asking the user; fix autonomously then re-run validate_entities. **RULE 1A PATH ONLY**: if `already_parsed: true` was returned by get_srs_text, warnings are non-blocking — call generate_spec immediately regardless of warning count. Do NOT call get_entities_section.
 4. **EXECUTE**: `generate_spec(conversation_id=...)` — **VERIFY**: stored=true
 5. **EXECUTE**: `get_spec(conversation_id=...)` — show the returned `spec_yaml` to the user in a code block
 6. Ask user: "Does this look correct? Say 'approved' or tell me what to change."
