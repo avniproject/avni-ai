@@ -124,18 +124,6 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: start
-        targetType: document-extractor
-      id: n-start-source-1775644994029-target
-      selected: false
-      source: n-start
-      sourceHandle: source
-      target: '1775644994029'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
         sourceType: document-extractor
         targetType: http-request
       id: 1775644994029-source-1775644994030-target
@@ -193,6 +181,39 @@ workflow:
       source: '17756450495350'
       sourceHandle: fail-branch
       target: '1775658332808'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: 1775719228711-true-1775644994029-target
+      source: '1775719228711'
+      sourceHandle: 'true'
+      target: '1775644994029'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1775719228711-false-1775648480416-target
+      source: '1775719228711'
+      sourceHandle: 'false'
+      target: '1775648480416'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: if-else
+      id: n-start-source-1775719228711-target
+      source: n-start
+      sourceHandle: source
+      target: '1775719228711'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -268,11 +289,11 @@ workflow:
       height: 104
       id: '1775644994029'
       position:
-        x: 355.42857142857144
-        y: 52.71428571428571
+        x: 724
+        y: 243
       positionAbsolute:
-        x: 355.42857142857144
-        y: 52.71428571428571
+        x: 724
+        y: 243
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -309,11 +330,11 @@ workflow:
       height: 141
       id: '1775644994030'
       position:
-        x: 597.4285714285714
-        y: 52.71428571428571
+        x: 1066
+        y: 224
       positionAbsolute:
-        x: 597.4285714285714
-        y: 52.71428571428571
+        x: 1066
+        y: 224
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -336,20 +357,19 @@ workflow:
               CRITICAL TOOL-CALL RULES (these override any conflicting instructions
               below):
 
-              RULE 1 — FIRST TOOL CALL IS ALWAYS get_srs_text: At the very start
-              of EVERY new SRS processing task, your first tool call MUST be
-              get_srs_text(conversation_id). Do not show a plan, do not ask the
-              user anything, do not say "let me retrieve" — just call the tool
-              immediately. If it returns ok (200), use the srs_text field as your
-              SRS input. If it returns 404 (no file uploaded), only then ask the
-              user to paste the SRS text. After retrieving the text, call
-              store_entities, then validate_entities, then generate_spec, then
-              get_spec IN SEQUENCE without pausing. Only after get_spec returns do
-              you show spec_yaml and ask for approval.
+              RULE 1 — FIRST TOOL CALL IS ALWAYS get_srs_text: At the very start of
+              EVERY new SRS processing task, your first tool call MUST be get_srs_text(conversation_id).
+              Do not show a plan, do not ask the user anything, do not say "let me
+              retrieve" — just call the tool immediately. If it returns ok (200),
+              use the srs_text field as your SRS input. If it returns 404 (no file
+              uploaded), only then ask the user to paste the SRS text. After retrieving
+              the text, call store_entities, then validate_entities, then generate_spec,
+              then get_spec IN SEQUENCE without pausing. Only after get_spec returns
+              do you show spec_yaml and ask for approval.
 
-              RULE 2 — generate_bundle uses conversation_id ONLY: When the user
-              approves the spec, call generate_bundle(conversation_id) without any
-              entities field. Entities are already in the server store from RULE 1.
+              RULE 2 — generate_bundle uses conversation_id ONLY: When the user approves
+              the spec, call generate_bundle(conversation_id) without any entities
+              field. Entities are already in the server store from RULE 1.
 
               RULE 3 — validate_bundle uses conversation_id ONLY: Call validate_bundle(conversation_id).
               Do NOT pass bundle_zip_b64.
@@ -378,7 +398,7 @@ workflow:
               type: model-selector
           query:
             type: constant
-            value: "{{#sys.query#}}"
+            value: '{{#sys.query#}}'
           tools:
             type: constant
             value:
@@ -538,91 +558,6 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Generate a complete Avni bundle ZIP. Pass conversation_id
-                  only — entities are fetched automatically from the server-side entity
-                  store (populated by store_entities). Bundle is stored server-side;
-                  no large payload is returned to the LLM.
-              parameters:
-                conversation_id:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#sys.conversation_id#}}'
-                org_name:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#n-start.org_name#}}'
-              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
-              provider_show_name: Avni AI Staging NoAuth openapi
-              settings: {}
-              tool_description: Generate a complete Avni bundle ZIP from entities
-              tool_label: generate_bundle
-              tool_name: generate_bundle
-              type: api
-            - enabled: true
-              extra:
-                description: Validate the generated bundle for structural correctness.
-                  Pass conversation_id to fetch the bundle from server-side store (no
-                  large payload sent to LLM).
-              parameters:
-                conversation_id:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#sys.conversation_id#}}'
-              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
-              provider_show_name: Avni AI Staging NoAuth openapi
-              settings: {}
-              tool_description: Validate a generated bundle for structural correctness
-              tool_label: validate_bundle
-              tool_name: validate_bundle
-              type: api
-            - enabled: true
-              extra:
-                description: Patch the existing org bundle with the new spec. Pass
-                  conversation_id (existing bundle fetched from server store) and
-                  spec_yaml. The patched result is stored under conversation_id for
-                  validate_bundle and upload_bundle to use.
-              parameters:
-                conversation_id:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#sys.conversation_id#}}'
-                spec_yaml:
-                  auto: 1
-                  value: null
-              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
-              provider_show_name: Avni AI Staging NoAuth openapi
-              settings: {}
-              tool_description: Decodes the existing bundle, generates a fresh bundle
-                from the spec, and applies patches (voiding stale forms/mappings).
-              tool_label: patch_bundle
-              tool_name: patch_bundle
-              type: api
-            - enabled: true
-              extra:
-                description: Upload the generated bundle to Avni. Auth and bundle are
-                  both resolved automatically from server-side store using conversation_id.
-                  No bundle_zip_b64 needed.
-              parameters:
-                conversation_id:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#sys.conversation_id#}}'
-              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
-              provider_show_name: Avni AI Staging NoAuth openapi
-              settings: {}
-              tool_description: Auth is resolved automatically if conversation_id
-                is provided and a token was stored via /store-auth-token. Otherwise
-                pass avni-auth-token header.
-              tool_label: upload_bundle
-              tool_name: upload_bundle
-              type: api
-            - enabled: true
-              extra:
                 description: Check the status of a bundle upload task
               parameters:
                 task_id:
@@ -650,30 +585,6 @@ workflow:
                 Avni
               tool_label: get_existing_config
               tool_name: get_existing_config
-              type: api
-            - enabled: true
-              extra:
-                description: Download the current org bundle from Avni and store it
-                  server-side under conversation_id (bundle_type='existing'). Pass
-                  conversation_id so the bundle ZIP never reaches the LLM. Afterwards
-                  use get_bundle_files/get_bundle_file to inspect it, or patch_bundle
-                  to apply spec changes.
-              parameters:
-                conversation_id:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#sys.conversation_id#}}'
-                includeLocations:
-                  auto: 1
-                  value: null
-              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
-              provider_show_name: Avni AI Staging NoAuth openapi
-              settings: {}
-              tool_description: Auth is resolved automatically if conversation_id
-                is provided and a token was stored via /store-auth-token.
-              tool_label: download_bundle_b64
-              tool_name: download_bundle_b64
               type: api
             - enabled: true
               extra:
@@ -743,8 +654,8 @@ workflow:
             - enabled: true
               extra:
                 description: Retrieve the full stored spec YAML for display. Call
-                  this after generate_spec confirms stored=true. Shows spec_yaml
-                  in the agent response for user review.
+                  this after generate_spec confirms stored=true. Shows spec_yaml in
+                  the agent response for user review.
               parameters:
                 conversation_id:
                   auto: 0
@@ -761,10 +672,10 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Fetch one section array from stored entities (e.g.
-                  encounter_types, forms). Use for targeted review or edit of one
-                  section without loading all entities. Valid sections — subject_types,
-                  programs, encounter_types, address_levels, forms.
+                description: Fetch one section array from stored entities (e.g. encounter_types,
+                  forms). Use for targeted review or edit of one section without loading
+                  all entities. Valid sections — subject_types, programs, encounter_types,
+                  address_levels, forms.
               parameters:
                 conversation_id:
                   auto: 0
@@ -777,27 +688,27 @@ workflow:
               provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
               provider_show_name: Avni AI Staging NoAuth openapi
               settings: {}
-              tool_description: Fetch one section array from the stored entities
-                dict for targeted inspection or edit.
+              tool_description: Fetch one section array from the stored entities dict
+                for targeted inspection or edit.
               tool_label: get_entities_section
               tool_name: get_entities_section
               type: api
             - enabled: true
               extra:
-                description: Replace one section in the stored entities dict and
-                  re-store it. Use to fix just encounter_types, forms, or any other
-                  section without re-extracting all entities. Always validate_entities
-                  after this call.
+                description: Replace one section in the stored entities dict and re-store
+                  it. Use to fix just encounter_types, forms, or any other section
+                  without re-extracting all entities. Always validate_entities after
+                  this call.
               parameters:
                 conversation_id:
                   auto: 0
                   value:
                     type: mixed
                     value: '{{#sys.conversation_id#}}'
-                section:
+                items:
                   auto: 1
                   value: null
-                items:
+                section:
                   auto: 1
                   value: null
               provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
@@ -811,8 +722,8 @@ workflow:
             - enabled: true
               extra:
                 description: Fetch one top-level section from the stored spec YAML
-                  (e.g. encounterTypes, programs, subjectTypes). Allows targeted
-                  review or edit of one section without retrieving the full spec.
+                  (e.g. encounterTypes, programs, subjectTypes). Allows targeted review
+                  or edit of one section without retrieving the full spec.
               parameters:
                 conversation_id:
                   auto: 0
@@ -825,17 +736,304 @@ workflow:
               provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
               provider_show_name: Avni AI Staging NoAuth openapi
               settings: {}
-              tool_description: Fetch one top-level YAML section from the stored
-                spec for targeted inspection or edit.
+              tool_description: Fetch one top-level YAML section from the stored spec
+                for targeted inspection or edit.
               tool_label: get_spec_section
               tool_name: get_spec_section
               type: api
             - enabled: true
               extra:
-                description: Replace one top-level section in the stored spec YAML
-                  and re-store it. Use to fix just one section (e.g. encounterTypes)
-                  without rewriting the full spec. Provide value (object) or yaml_fragment
-                  (string).
+                description: Replace one file in the stored generated bundle ZIP and
+                  re-store it. Use for surgical bundle fixes after validate_bundle
+                  reports errors — fix one file then re-validate, no full bundle regeneration
+                  needed. filename examples — 'forms/ANCForm.json', 'concepts.json',
+                  'formMappings.json'.
+              parameters:
+                content:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                filename:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Replace one file in the stored generated bundle ZIP
+                for surgical fixes without regenerating the full bundle.
+              tool_label: put_bundle_file
+              tool_name: put_bundle_file
+              type: api
+            - enabled: true
+              extra:
+                description: The SRS document text is pre-stored server-side by the
+                  Dify workflow before the agent starts. Call this to fetch the full
+                  text for entity extraction instead of reading it from the query
+                  field.
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: The SRS document text is pre-stored server-side by
+                the Dify workflow before the agent starts. Call this to fetch the
+                full text for entity extraction instead of reading it from the query
+                field.
+              tool_label: get_srs_text
+              tool_name: get_srs_text
+              type: api
+            - enabled: true
+              extra:
+                description: 'Preferred: pass conversation_id only (no entities).
+                  Entities are fetched
+
+                  automatically from the server-side entity store populated by store_entities.
+
+                  Bundle is stored server-side (TTL 6h) and only a lightweight summary
+                  is
+
+                  returned — nothing large reaches the LLM. Pass the same conversation_id
+                  to
+
+                  validate_bundle and upload_bundle afterwards.
+
+                  Legacy: pass entities directly (with or without conversation_id).
+
+                  '
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                entities:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#n-start.org_name#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'Preferred: pass conversation_id only (no entities).
+                Entities are fetched
+
+                automatically from the server-side entity store populated by store_entities.
+
+                Bundle is stored server-side (TTL 6h) and only a lightweight summary
+                is
+
+                returned — nothing large reaches the LLM. Pass the same conversation_id
+                to
+
+                validate_bundle and upload_bundle afterwards.
+
+                Legacy: pass entities directly (with or without conversation_id).
+
+                '
+              tool_label: generate_bundle
+              tool_name: generate_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: 'Preferred: pass conversation_id to fetch bundle from
+                  server-side store
+
+                  (no large payload on LLM). Fallback: pass bundle dict or bundle_zip_b64
+                  directly.
+
+                  '
+              parameters:
+                bundle:
+                  auto: 1
+                  value: null
+                bundle_zip_b64:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'Preferred: pass conversation_id to fetch bundle from
+                server-side store
+
+                (no large payload on LLM). Fallback: pass bundle dict or bundle_zip_b64
+                directly.
+
+                '
+              tool_label: validate_bundle
+              tool_name: validate_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: 'Preferred (JSON body): pass conversation_id + spec_yaml.
+                  The existing bundle
+
+                  is fetched from server-side store (must have called download_bundle_b64
+                  with
+
+                  conversation_id first). The patched result is stored under conversation_id
+
+                  ready for validate_bundle and upload_bundle — no bundle_zip_b64
+                  on the LLM.
+
+                  Legacy (multipart/form-data): pass existing_bundle_b64 + spec_yaml
+                  directly.
+
+                  '
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                existing_bundle_b64:
+                  auto: 1
+                  value: null
+                spec_yaml:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'Preferred (JSON body): pass conversation_id + spec_yaml.
+                The existing bundle
+
+                is fetched from server-side store (must have called download_bundle_b64
+                with
+
+                conversation_id first). The patched result is stored under conversation_id
+
+                ready for validate_bundle and upload_bundle — no bundle_zip_b64 on
+                the LLM.
+
+                Legacy (multipart/form-data): pass existing_bundle_b64 + spec_yaml
+                directly.
+
+                '
+              tool_label: patch_bundle
+              tool_name: patch_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: 'Auth and bundle are both resolved from server-side store
+                  using conversation_id.
+
+                  Pass conversation_id (after calling generate_bundle or patch_bundle
+                  with it)
+
+                  and neither bundle_zip_b64 nor an auth header is needed.
+
+                  Legacy: pass bundle_zip_b64 directly with avni-auth-token header.
+
+                  '
+              parameters:
+                bundle_zip_b64:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'Auth and bundle are both resolved from server-side
+                store using conversation_id.
+
+                Pass conversation_id (after calling generate_bundle or patch_bundle
+                with it)
+
+                and neither bundle_zip_b64 nor an auth header is needed.
+
+                Legacy: pass bundle_zip_b64 directly with avni-auth-token header.
+
+                '
+              tool_label: upload_bundle
+              tool_name: upload_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: 'When conversation_id is provided: downloads the org''s
+                  current bundle, stores
+
+                  it server-side under ''{conversation_id}:existing'' (TTL 6h), and
+                  returns a
+
+                  summary only — bundle_zip_b64 never reaches the LLM. Afterwards
+                  use
+
+                  get_bundle_files/get_bundle_file to inspect it, or patch_bundle
+                  to apply
+
+                  spec changes.
+
+                  Without conversation_id: legacy behaviour, returns full bundle_zip_b64.
+
+                  '
+              parameters:
+                baseUrl:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: https://staging.avniproject.org
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                includeLocations:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'When conversation_id is provided: downloads the org''s
+                current bundle, stores
+
+                it server-side under ''{conversation_id}:existing'' (TTL 6h), and
+                returns a
+
+                summary only — bundle_zip_b64 never reaches the LLM. Afterwards use
+
+                get_bundle_files/get_bundle_file to inspect it, or patch_bundle to
+                apply
+
+                spec changes.
+
+                Without conversation_id: legacy behaviour, returns full bundle_zip_b64.
+
+                '
+              tool_label: download_bundle_b64
+              tool_name: download_bundle_b64
+              type: api
+            - enabled: true
+              extra:
+                description: 'Surgical edit — replaces a single top-level YAML key
+                  and re-stores the spec.
+
+                  Use to fix one section (e.g. encounterTypes) without rewriting the
+                  whole spec.
+
+                  Provide either ''value'' (parsed object) or ''yaml_fragment'' (YAML
+                  string).
+
+                  '
               parameters:
                 conversation_id:
                   auto: 0
@@ -848,40 +1046,24 @@ workflow:
                 value:
                   auto: 1
                   value: null
+                yaml_fragment:
+                  auto: 1
+                  value: null
               provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
               provider_show_name: Avni AI Staging NoAuth openapi
               settings: {}
-              tool_description: Replace one top-level section in the stored spec
-                YAML (surgical edit without regenerating the full spec).
+              tool_description: 'Surgical edit — replaces a single top-level YAML
+                key and re-stores the spec.
+
+                Use to fix one section (e.g. encounterTypes) without rewriting the
+                whole spec.
+
+                Provide either ''value'' (parsed object) or ''yaml_fragment'' (YAML
+                string).
+
+                '
               tool_label: update_spec_section
               tool_name: update_spec_section
-              type: api
-            - enabled: true
-              extra:
-                description: Replace one file in the stored generated bundle ZIP
-                  and re-store it. Use for surgical bundle fixes after validate_bundle
-                  reports errors — fix one file then re-validate, no full bundle
-                  regeneration needed. filename examples — 'forms/ANCForm.json',
-                  'concepts.json', 'formMappings.json'.
-              parameters:
-                conversation_id:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#sys.conversation_id#}}'
-                filename:
-                  auto: 1
-                  value: null
-                content:
-                  auto: 1
-                  value: null
-              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
-              provider_show_name: Avni AI Staging NoAuth openapi
-              settings: {}
-              tool_description: Replace one file in the stored generated bundle ZIP
-                for surgical fixes without regenerating the full bundle.
-              tool_label: put_bundle_file
-              tool_name: put_bundle_file
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
@@ -904,14 +1086,14 @@ workflow:
         title: Bundle Agent
         tool_node_version: '2'
         type: agent
-      height: 290
+      height: 312
       id: '17756450495350'
       position:
-        x: 1368
-        y: 2
+        x: 2112
+        y: 163
       positionAbsolute:
-        x: 1368
-        y: 2
+        x: 2112
+        y: 163
       selected: true
       sourcePosition: right
       targetPosition: left
@@ -930,11 +1112,11 @@ workflow:
       height: 103
       id: '17756450495361'
       position:
-        x: 1710
-        y: 77
+        x: 2454
+        y: 215
       positionAbsolute:
-        x: 1710
-        y: 77
+        x: 2454
+        y: 215
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -964,14 +1146,14 @@ workflow:
         type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/bundle-agent-prompt.txt
         variables: []
-      height: 185
+      height: 169
       id: '1775646587226'
       position:
-        x: 1026
-        y: 36
+        x: 1770
+        y: 234
       positionAbsolute:
-        x: 1026
-        y: 36
+        x: 1770
+        y: 234
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1009,11 +1191,11 @@ workflow:
       height: 141
       id: '1775648480416'
       position:
-        x: 719.1428571428571
-        y: 36
+        x: 1428
+        y: 248
       positionAbsolute:
-        x: 719.1428571428571
-        y: 36
+        x: 1428
+        y: 248
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1046,11 +1228,11 @@ workflow:
       height: 110
       id: '1775657870619'
       position:
-        x: 355.42857142857144
-        y: 195.71428571428572
+        x: 342
+        y: 31
       positionAbsolute:
-        x: 355.42857142857144
-        y: 195.71428571428572
+        x: 342
+        y: 31
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1068,18 +1250,47 @@ workflow:
       height: 137
       id: '1775658332808'
       position:
-        x: 1710
-        y: 219
+        x: 2474
+        y: 398
       positionAbsolute:
-        x: 1710
-        y: 219
+        x: 2474
+        y: 398
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: 3066368b-a96a-4f38-ad75-aa53556e44f8
+            value: ''
+            varType: array[object]
+            variable_selector:
+            - conversation
+            - uploaded_files
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: IF/ELSE
+        type: if-else
+      height: 124
+      id: '1775719228711'
+      position:
+        x: 362
+        y: 221
+      positionAbsolute:
+        x: 362
+        y: 221
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: -726.2
-      y: 266.75
-      zoom: 0.7
+      x: -143.55686419251435
+      y: 155.3937964902155
+      zoom: 0.48700213427162026
   rag_pipeline_variables: []
