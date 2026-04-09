@@ -138,9 +138,21 @@ workflow:
         isInLoop: false
         sourceType: document-extractor
         targetType: http-request
-      id: 1775644994029-source-1775648480416-target
+      id: 1775644994029-source-1775644994030-target
       selected: false
       source: '1775644994029'
+      sourceHandle: source
+      target: '1775644994030'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: http-request
+      id: 1775644994030-source-1775648480416-target
+      selected: false
+      source: '1775644994030'
       sourceHandle: source
       target: '1775648480416'
       targetHandle: target
@@ -324,16 +336,16 @@ workflow:
               CRITICAL TOOL-CALL RULES (these override any conflicting instructions
               below):
 
-              RULE 1 — CALL TOOLS IMMEDIATELY, NO USER PAUSE: When you extract
-              entities from an SRS, do NOT show entities as a text plan and wait
-              for the user. Call store_entities(conversation_id, entities), then
-              validate_entities(conversation_id), then generate_spec(conversation_id),
-              then get_spec(conversation_id) IN SEQUENCE — each as its own iteration,
-              one after the other. Do NOT pause between these calls. Only after
-              get_spec returns do you show the spec_yaml in a code block and ask
-              for approval. For corrections, use get_entities_section /
-              update_entities_section for targeted section fixes instead of
-              re-extracting all entities.
+              RULE 1 — FIRST TOOL CALL IS ALWAYS get_srs_text: At the very start
+              of EVERY new SRS processing task, your first tool call MUST be
+              get_srs_text(conversation_id). Do not show a plan, do not ask the
+              user anything, do not say "let me retrieve" — just call the tool
+              immediately. If it returns ok (200), use the srs_text field as your
+              SRS input. If it returns 404 (no file uploaded), only then ask the
+              user to paste the SRS text. After retrieving the text, call
+              store_entities, then validate_entities, then generate_spec, then
+              get_spec IN SEQUENCE without pausing. Only after get_spec returns do
+              you show spec_yaml and ask for approval.
 
               RULE 2 — generate_bundle uses conversation_id ONLY: When the user
               approves the spec, call generate_bundle(conversation_id) without any
@@ -344,12 +356,6 @@ workflow:
 
               RULE 4 — upload_bundle uses conversation_id ONLY: Call upload_bundle(conversation_id).
               Do NOT pass bundle_zip_b64.
-
-              RULE 5 — SRS DOCUMENT IS PRE-STORED: When the user uploads an SRS
-              file, the document text has already been stored server-side before
-              you start. Call get_srs_text(conversation_id) to retrieve it. Do NOT
-              read the document text from the query field — it is not included
-              there to avoid request size limits.
 
 
               {{#1775646587226.body#}}'

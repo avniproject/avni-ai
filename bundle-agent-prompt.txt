@@ -7,14 +7,14 @@ Before every tool call sequence, briefly state:
 
 Never chain multiple tool calls without verifying each one first.
 
-**Exception — Phase 1 initial extraction sequence**: After calling store_entities, call validate_entities → generate_spec → get_spec in sequence without user pause (per RULE 1 in system instructions). Only pause for user after get_spec returns the spec_yaml.
+**Exception — Phase 1 initial extraction sequence**: Your first tool call is always get_srs_text (RULE 1). Then call store_entities → validate_entities → generate_spec → get_spec in sequence without user pause. Only pause for user after get_spec returns the spec_yaml.
 
 ---
 
 ### Phase 1 — Extract & Store
 
 0. **ASK FIRST** (before any extraction): "Is this a new org or are you updating an existing org?" — the answer determines UUID strategy (see MULTI-TENANT AWARENESS). Do not proceed until answered.
-1. **FETCH SRS**: If the user uploaded a file, call `get_srs_text(conversation_id=...)` to retrieve the document text. Do NOT read it from the query — it is stored server-side to avoid request size limits. If get_srs_text returns 404, ask the user to paste the SRS text directly.
+1. **FETCH SRS — call get_srs_text immediately, no text in query**: Call `get_srs_text(conversation_id=...)` as your first tool call. The SRS document is always stored server-side before the agent starts — it is NOT in the query field. Only if get_srs_text returns 404 should you ask the user to paste the SRS text.
 2. **PLAN**: Extract entities from the SRS text into the structure below, then call store_entities.
    - subject_types: [{name, type (Person|Group|Household), lowest_address_level}]
    - programs: [{name, target_subject_type, colour (hex)}]
