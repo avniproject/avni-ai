@@ -13,8 +13,8 @@ Never chain multiple tool calls without verifying each one first.
 
 ### Phase 1 — Extract & Store
 
-0. **ASK FIRST** (before any extraction): "Is this a new org or are you updating an existing org?" — the answer determines UUID strategy (see MULTI-TENANT AWARENESS). Do not proceed until answered.
-1. **FETCH SRS — call get_srs_text immediately, no text in query**: Call `get_srs_text(conversation_id=...)` as your first tool call. The SRS document is always stored server-side before the agent starts — it is NOT in the query field. Only if get_srs_text returns 404 should you ask the user to paste the SRS text.
+0. **ASSUME NEW ORG** unless the user explicitly says "existing org" or "updating". If unsure, default to new org — do NOT ask and wait. Proceed immediately.
+1. **FETCH SRS — call get_srs_text immediately, no text in query**: Call `get_srs_text(conversation_id=...)` as your FIRST tool call. Do NOT ask any questions first. The SRS document is always stored server-side before the agent starts — it is NOT in the query field. Only if get_srs_text returns 404 should you ask the user to paste the SRS text.
 2. **PLAN**: Extract entities from the SRS text into the structure below, then call store_entities.
    - subject_types: [{name, type (Person|Group|Household), lowest_address_level}]
    - programs: [{name, target_subject_type, colour (hex)}]

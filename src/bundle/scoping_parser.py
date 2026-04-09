@@ -1,30 +1,21 @@
 """
-scoping_parser.py — Parse Avni scoping/modelling Excel files into validated EntitySpec.
+scoping_parser.py — Parse any combination of SRS/scoping/modelling files into
+a validated AVNI EntitySpec.
 
-Handles two kinds of sheets generically:
+Accepts: .xlsx (multi-sheet), .csv, .txt, .json — any number of files.
+Each sheet/file is auto-classified by its content (column headers, data patterns)
+into one of: location_hierarchy, subject_types, programs, encounters,
+program_encounters, w3h_mapping, form_fields, or ignored.
 
-**Modelling sheets** (entity definitions):
-  - Location Hierarchy   : Location Type | Count
-  - Subject Types        : Subject Type Name | Type | Lowest Address Level | ...
-  - Program              : Program Name | Target Subject Type | ...
-  - Encounters           : Encounter Name | Subject Type | Encounter Type | ...
-  - Program Encounters   : Encounter Name | Program name | Encounter Type | ...
-
-**Form sheets** (columns A–R, detected by header signature):
-  Page Name | Field Name | Data Type | Mandatory | User entered/System generated |
-  Allow Negative | Allow Decimal | Max and Min Limit | Unit |
-  Allow Current Date | Allow Future Date | Allow Past Date |
-  Selection Type | OPTIONS | Unique option | Option condition |
-  When to show | When NOT to show
-
-**W3H sheet** (form-to-entity mapping):
-  What | When | Who | How | Forms to be scheduled | Notes
-
-Returns a validated EntitySpec (Pydantic model) or raises ValueError on failures.
+The parser is content-driven, not name-driven — it works regardless of sheet
+names or column header variations.
 """
 
 from __future__ import annotations
 
+import csv
+import io
+import json
 import logging
 import re
 from pathlib import Path
@@ -38,6 +29,7 @@ from ..schemas.bundle_models import (
     EntitySpec,
     FieldSpec,
     FormSpec,
+    GroupSpec,
     ProgramSpec,
     SectionSpec,
     SkipLogicSpec,
@@ -54,6 +46,8 @@ _DEFAULT_SCOPING_DOC = (
     / "Durga India Modelling.xlsx"
 )
 
+# ── Constants ────────────────────────────────────────────────────────────────
+
 _SUBJECT_TYPE_MAP = {
     "individual": "Person",
     "person": "Person",
@@ -61,100 +55,252 @@ _SUBJECT_TYPE_MAP = {
     "household": "Household",
 }
 
+_DATA_TYPE_MAP: dict[str, str] = {
+    "text": "Text",
+    "string": "Text",
+    "varchar": "Text",
+    "numeric": "Numeric",
+    "number": "Numeric",
+    "integer": "Numeric",
+    "int": "Numeric",
+    "decimal": "Numeric",
+    "float": "Numeric",
+    "date": "Date",
+    "datetime": "DateTime",
+    "pre added options": "Coded",
+    "coded": "Coded",
+    "single select": "Coded",
+    "single-select": "Coded",
+    "multi select": "Coded",
+    "multi-select": "Coded",
+    "dropdown": "Coded",
+    "radio": "Coded",
+    "checkbox": "Coded",
+    "boolean": "Coded",
+    "bool": "Coded",
+    "yes/no": "Coded",
+    "subject": "Subject",
+    "duration": "Duration",
+    "notes": "Notes",
+    "image": "ImageV2",
+    "imagev2": "ImageV2",
+    "photo": "ImageV2",
+    "phone number": "PhoneNumber",
+    "phonenumber": "PhoneNumber",
+    "phone": "PhoneNumber",
+    "mobile": "PhoneNumber",
+    "location": "Location",
+    "file": "File",
+    "audio": "Audio",
+    "video": "Video",
+    "questiongroup": "QuestionGroup",
+    "question group": "QuestionGroup",
+    "repeatable": "QuestionGroup",
+}
+
+# Header patterns for auto-classification (lowercase, checked via substring)
+_LOCATION_HEADERS = {"location type", "location", "address level", "hierarchy"}
+_SUBJECT_HEADERS = {"subject type", "subject type name", "entity type", "type"}
+_PROGRAM_HEADERS = {"program name", "program", "target subject"}
+_ENCOUNTER_HEADERS = {"encounter name", "encounter type", "scheduled", "unscheduled"}
+_FORM_HEADERS = {"field name", "data type", "mandatory", "page name"}
+_W3H_HEADERS = {"what", "when", "who", "how"}
+
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
 
 def _clean(val: Any) -> str:
-    """Return stripped string or empty string for NaN/None."""
     if val is None or (isinstance(val, float) and pd.isna(val)):
         return ""
     return str(val).strip()
 
 
+def _parse_yes_no(val: Any) -> bool:
+    return _clean(val).lower() in ("yes", "y", "true", "1")
+
+
+def _parse_options(val: Any) -> list[str]:
+    raw = _clean(val)
+    if not raw:
+        return []
+    if "\n" in raw:
+        parts = raw.split("\n")
+    elif ";" in raw:
+        parts = raw.split(";")
+    else:
+        parts = raw.split(",")
+    return [p.strip().rstrip(",").strip() for p in parts if p.strip() and p.strip().lower() != "nan"]
+
+
+def _parse_min_max(val: Any) -> tuple[float | None, float | None]:
+    raw = _clean(val)
+    if not raw:
+        return None, None
+    m = re.match(r"(-?[\d.]+)\s*[-–to]+\s*(-?[\d.]+)", raw, re.IGNORECASE)
+    if m:
+        try:
+            return float(m.group(1)), float(m.group(2))
+        except ValueError:
+            pass
+    return None, None
+
+
+def _resolve_subject_type(raw: str, known: set[str]) -> str:
+    if not raw:
+        return ""
+    raw_lower = raw.strip().lower()
+    # Exact match first
+    for name in known:
+        if name.lower() == raw_lower:
+            return name
+    # Substring match
+    for name in known:
+        if name.lower() in raw_lower or raw_lower in name.lower():
+            return name
+    return raw
+
+
+def _map_data_type(raw: str) -> str:
+    lower = raw.strip().lower()
+    return _DATA_TYPE_MAP.get(lower, "Text")
+
+
+def _find_col(df: pd.DataFrame, *candidates: str) -> str | None:
+    """Find a column in df by fuzzy matching against candidate names."""
+    cols_lower = {str(c).strip().lower(): str(c) for c in df.columns}
+    for cand in candidates:
+        cand_lower = cand.lower()
+        # Exact
+        if cand_lower in cols_lower:
+            return cols_lower[cand_lower]
+        # Substring
+        for col_lower, col_orig in cols_lower.items():
+            if cand_lower in col_lower or col_lower in cand_lower:
+                return col_orig
+    return None
+
+
+# ── Sheet Classification ─────────────────────────────────────────────────────
+
+def _classify_sheet(df: pd.DataFrame) -> str:
+    """
+    Classify a DataFrame by its column headers into one of:
+    location, subject_type, program, encounter, program_encounter,
+    w3h, form, or unknown.
+
+    Uses the FIRST column as the strongest signal — it's usually the primary
+    entity name (e.g. "Encounter Name", "Subject Type Name", "Program Name").
+    """
+    if df.empty or df.shape[1] < 2:
+        return "unknown"
+
+    cols_lower = [str(c).strip().lower() for c in df.columns]
+    cols_set = set(cols_lower)
+    first_col = cols_lower[0] if cols_lower else ""
+
+    # W3H — "what" as first column + "when"/"who"/"how"
+    if first_col in ("what", "activity") and any(c in cols_set for c in ("when", "who", "how")):
+        return "w3h"
+
+    # Form fields — "field name" or "page name" + "data type"
+    has_field_name = any("field name" in c for c in cols_lower)
+    has_data_type = any("data type" in c or "datatype" in c for c in cols_lower)
+    if has_field_name and has_data_type:
+        return "form"
+
+    # Encounters — first col contains "encounter name"
+    if "encounter name" in first_col or first_col == "encounter":
+        # Program encounters have a "program" column too
+        if any("program" in c for c in cols_lower[1:]):
+            return "program_encounter"
+        return "encounter"
+
+    # Subject types — first col is "subject type name" or similar
+    if "subject type name" in first_col or first_col == "subject type":
+        return "subject_type"
+
+    # Programs — first col is "program name"
+    if "program name" in first_col or (first_col == "program" and any("target" in c or "subject" in c or "enrolment" in c for c in cols_lower)):
+        return "program"
+
+    # Location hierarchy — first col is "location type" or similar
+    if "location" in first_col and ("type" in first_col or "hierarchy" in first_col or "level" in first_col):
+        return "location"
+    if first_col == "location type":
+        return "location"
+
+    return "unknown"
+
+
+# ── Entity Parsers ───────────────────────────────────────────────────────────
+
 def parse_location_hierarchy(df: pd.DataFrame) -> list[AddressLevelSpec]:
-    """
-    Parse 'Location Hierarchy' sheet.
-    Expected columns: Location Type | Count
-    Rows are listed top-down (highest → lowest), so we assign descending levels.
-    """
     levels: list[AddressLevelSpec] = []
     rows = [
-        (str(r[0]).strip(), str(r[1]).strip())
+        (_clean(r[0]),)
         for r in df.itertuples(index=False)
         if _clean(r[0])
     ]
-
     total = len(rows)
     prev_name: str | None = None
-    for i, (loc_type, _count) in enumerate(rows):
+    for i, (loc_type,) in enumerate(rows):
         level = total - i
-        levels.append(
-            AddressLevelSpec(
-                name=loc_type,
-                level=level,
-                parent=prev_name,
-            )
-        )
+        levels.append(AddressLevelSpec(name=loc_type, level=level, parent=prev_name))
         prev_name = loc_type
-
     return levels
 
 
 def parse_subject_types(df: pd.DataFrame) -> list[SubjectTypeSpec]:
-    """
-    Parse 'Subject Types' sheet.
-    Expected columns: Subject Type Name | Type | ...
-    """
     subject_types: list[SubjectTypeSpec] = []
     seen: set[str] = set()
 
-    for _, row in df.iterrows():
-        name = _clean(row.get("Subject Type Name", ""))
-        if not name or name in seen:
-            continue
-        seen.add(name)
+    name_col = _find_col(df, "Subject Type Name", "Subject Type", "Name", "Entity Name")
+    type_col = _find_col(df, "Type", "Subject Type", "Entity Type")
 
-        raw_type = _clean(row.get("Type", "Person")).lower()
+    if not name_col:
+        return []
+
+    for _, row in df.iterrows():
+        name = _clean(row.get(name_col, ""))
+        if not name or name.lower() in seen:
+            continue
+        seen.add(name.lower())
+
+        raw_type = _clean(row.get(type_col, "Person")).lower() if type_col else "person"
         avni_type = _SUBJECT_TYPE_MAP.get(raw_type, "Person")
 
         subject_types.append(
             SubjectTypeSpec(
-                name=name,
-                type=avni_type,
-                allowProfilePicture=False,
-                uniqueName=False,
-                lastNameOptional=True,
+                name=name, type=avni_type,
+                allowProfilePicture=False, uniqueName=False, lastNameOptional=True,
             )
         )
-
     return subject_types
 
 
 def parse_programs(df: pd.DataFrame, subject_type_names: set[str]) -> list[ProgramSpec]:
-    """
-    Parse 'Program' sheet.
-    Expected columns: Program Name | Target Subject Type | ...
-    """
     programs: list[ProgramSpec] = []
     seen: set[str] = set()
 
-    for _, row in df.iterrows():
-        name = _clean(row.get("Program Name", ""))
-        if not name or name in seen:
-            continue
-        seen.add(name)
+    name_col = _find_col(df, "Program Name", "Program", "Name")
+    target_col = _find_col(df, "Target Subject Type", "Target Subject", "Subject Type")
 
-        target = _clean(row.get("Target Subject Type", ""))
+    if not name_col:
+        return []
+
+    for _, row in df.iterrows():
+        name = _clean(row.get(name_col, ""))
+        if not name or name.lower() in seen:
+            continue
+        seen.add(name.lower())
+
+        target = _clean(row.get(target_col, "")) if target_col else ""
         if not target and subject_type_names:
             target = next(iter(subject_type_names))
 
         programs.append(
-            ProgramSpec(
-                name=name,
-                target_subject_type=target,
-                colour="#4A148C",
-                allow_multiple_enrolments=False,
-            )
+            ProgramSpec(name=name, target_subject_type=target, colour="#4A148C")
         )
-
     return programs
 
 
@@ -164,37 +310,40 @@ def parse_encounters(
     program_names: set[str],
     is_program_encounter: bool = False,
 ) -> list[EncounterTypeSpec]:
-    """
-    Parse 'Encounters' or 'Program Encounters' sheet.
-
-    For 'Encounters':
-      Columns: Encounter Name | Subject Type | Encounter Type (Scheduled/Unscheduled) | ...
-    For 'Program Encounters':
-      Columns: Encounter Name | Program name | Encounter Type (Scheduled/Unscheduled) | ...
-    """
     encounter_types: list[EncounterTypeSpec] = []
     seen: set[str] = set()
 
-    for _, row in df.iterrows():
-        name = _clean(row.get("Encounter Name", ""))
-        if not name or name in seen:
-            continue
-        seen.add(name)
+    name_col = _find_col(df, "Encounter Name", "Encounter", "Name")
+    if not name_col:
+        return []
 
-        if is_program_encounter:
-            program_name = _clean(row.get("Program name", row.get("Program Name", "")))
-            subject_type = ""
-        else:
-            program_name = ""
-            raw_subject = _clean(row.get("Subject Type", ""))
+    sched_col = _find_col(df, "Encounter Type (Scheduled/Unscheduled)", "Encounter Type", "Scheduled", "Type")
+
+    if is_program_encounter:
+        prog_col = _find_col(df, "Program name", "Program Name", "Program")
+        st_col = None
+    else:
+        prog_col = None
+        st_col = _find_col(df, "Subject Type", "Subject", "Entity")
+
+    for _, row in df.iterrows():
+        name = _clean(row.get(name_col, ""))
+        if not name or name.lower() in seen:
+            continue
+        seen.add(name.lower())
+
+        program_name = ""
+        subject_type = ""
+
+        if is_program_encounter and prog_col:
+            program_name = _clean(row.get(prog_col, ""))
+        elif st_col:
+            raw_subject = _clean(row.get(st_col, ""))
             subject_type = _resolve_subject_type(raw_subject, subject_type_names)
 
-        enc_type_raw = _clean(
-            row.get(
-                "Encounter Type (Scheduled/Unscheduled)",
-                row.get("Encounter Type", "Scheduled"),
-            )
-        ).lower()
+        enc_type_raw = ""
+        if sched_col:
+            enc_type_raw = _clean(row.get(sched_col, "")).lower()
         is_scheduled = "unscheduled" not in enc_type_raw
 
         encounter_types.append(
@@ -206,181 +355,28 @@ def parse_encounters(
                 is_scheduled=is_scheduled,
             )
         )
-
     return encounter_types
 
 
-def _resolve_subject_type(raw: str, known: set[str]) -> str:
-    """Fuzzy-match raw subject type name against known names."""
-    if not raw:
-        return ""
-    raw_lower = raw.strip().lower()
-    for name in known:
-        if (
-            name.lower() == raw_lower
-            or name.lower() in raw_lower
-            or raw_lower in name.lower()
-        ):
-            return name
-    return raw
+# ── W3H Parser ───────────────────────────────────────────────────────────────
 
-
-# ── Data type mapping from scoping doc to Avni ──────────────────────────────
-
-_SCOPING_DATA_TYPE_MAP: dict[str, str] = {
-    "text": "Text",
-    "numeric": "Numeric",
-    "date": "Date",
-    "pre added options": "Coded",
-    "subject": "Subject",
-    "duration": "Duration",
-    "notes": "Notes",
-    "image": "ImageV2",
-    "phone number": "PhoneNumber",
-    "location": "Location",
-    "datetime": "DateTime",
-    "file": "File",
-    "audio": "Audio",
-    "video": "Video",
-}
-
-# Sheets that are modelling/metadata — never form sheets
-_MODELLING_SHEET_PREFIXES = (
-    "location",
-    "subject",
-    "program",
-    "encounter",
-    "help",
-    "project summary",
-    "user persona",
-    "w3h",
-    "proposed process",
-    "cost",
-    "permissions",
-    "report",
-    "dashboard",
-    "review",
-    "question",
-    "summary",
-)
-
-
-def _is_form_sheet(xf: pd.ExcelFile, sheet_name: str) -> bool:
-    """
-    Detect whether a sheet is a form sheet by checking its header row.
-    Form sheets have 'Page Name' in col A and 'Field Name' in col B of row 1.
-    """
-    # Skip known modelling/metadata sheets
-    lower = sheet_name.strip().lower()
-    for prefix in _MODELLING_SHEET_PREFIXES:
-        if lower.startswith(prefix):
-            return False
-
-    try:
-        df = pd.read_excel(xf, sheet_name=sheet_name, header=None, nrows=2)
-        if df.shape[0] < 2 or df.shape[1] < 3:
-            return False
-        # Row 1 (0-indexed) should contain the actual column headers
-        row1 = [_clean(df.iloc[1, c]).lower() for c in range(min(3, df.shape[1]))]
-        return row1[0].startswith("page name") and row1[1].startswith("field name")
-    except Exception:
-        return False
-
-
-def _parse_yes_no(val: Any) -> bool:
-    """Parse a Yes/No cell value to bool."""
-    return _clean(val).lower() in ("yes", "y", "true", "1")
-
-
-def _parse_options(val: Any) -> list[str]:
-    """Parse options from a cell (newline, semicolon, or comma separated)."""
-    raw = _clean(val)
-    if not raw:
-        return []
-    # Split by newlines first, then semicolons, then commas
-    if "\n" in raw:
-        parts = raw.split("\n")
-    elif ";" in raw:
-        parts = raw.split(";")
-    else:
-        parts = raw.split(",")
-    return [p.strip() for p in parts if p.strip()]
-
-
-def _parse_min_max(val: Any) -> tuple[float | None, float | None]:
-    """Parse a 'Min and Max Limit' cell like '0-100' or '18 to 99'."""
-    raw = _clean(val)
-    if not raw:
-        return None, None
-    # Try patterns: "0-100", "0 - 100", "0 to 100", "min:0,max:100"
-    m = re.match(r"(-?[\d.]+)\s*[-–to]+\s*(-?[\d.]+)", raw, re.IGNORECASE)
-    if m:
-        try:
-            return float(m.group(1)), float(m.group(2))
-        except ValueError:
-            pass
-    return None, None
-
-
-def parse_w3h_sheet(
-    xf: pd.ExcelFile,
-    sheet_names_lower: dict[str, str],
+def parse_w3h(
+    df: pd.DataFrame,
     subject_type_names: set[str],
     encounter_type_names: set[str],
     program_encounter_map: dict[str, str],
 ) -> dict[str, dict[str, str | None]]:
-    """
-    Parse 'W3H' sheet to build form-to-entity mapping.
-
-    Returns:
-        { "Session": {"formType": "Encounter", "subjectType": "Participant",
-                       "encounterType": "Session", "program": None},
-          "Participant Details": {"formType": "IndividualProfile",
-                                   "subjectType": "Participant", ...}, ... }
-    """
-    w3h_actual = None
-    for lower_name, actual_name in sheet_names_lower.items():
-        if lower_name.startswith("w3h"):
-            w3h_actual = actual_name
-            break
-
-    if not w3h_actual:
-        logger.info(
-            "No W3H sheet found — form-entity mapping will be deferred to Spec Agent"
-        )
-        return {}
-
-    try:
-        df = pd.read_excel(xf, sheet_name=w3h_actual)
-        df = df.dropna(how="all")
-    except Exception as e:
-        logger.warning("Failed to read W3H sheet: %s", e)
-        return {}
-
-    # Find 'What' column (usually col A)
-    what_col = None
-    for col in df.columns:
-        if "what" in str(col).lower():
-            what_col = col
-            break
-    if what_col is None and len(df.columns) > 0:
-        what_col = df.columns[0]
-
-    if what_col is None:
+    """Parse W3H sheet to build form → entity mapping."""
+    what_col = _find_col(df, "What", "Activity", "Form")
+    if not what_col:
+        what_col = str(df.columns[0]) if len(df.columns) > 0 else None
+    if not what_col:
         return {}
 
     st_names_lower = {n.lower(): n for n in subject_type_names}
     enc_names_lower = {n.lower(): n for n in encounter_type_names}
 
-    # Registration-related keywords
-    _REG_KEYWORDS = (
-        "registration",
-        "register",
-        "details",
-        "profile",
-        "enrolment",
-        "enrollment",
-    )
+    _REG_KEYWORDS = ("registration", "register", "details", "profile", "enrolment", "enrollment")
 
     mapping: dict[str, dict[str, str | None]] = {}
     for _, row in df.iterrows():
@@ -390,34 +386,23 @@ def parse_w3h_sheet(
 
         activity_lower = activity.lower()
         entry: dict[str, str | None] = {
-            "formType": None,
-            "subjectType": None,
-            "encounterType": None,
-            "program": None,
+            "formType": None, "subjectType": None, "encounterType": None, "program": None,
         }
 
-        # Check if this is a registration form
         is_registration = any(kw in activity_lower for kw in _REG_KEYWORDS)
 
         if is_registration:
             entry["formType"] = "IndividualProfile"
-            # Try to match a subject type from the activity name
             for st_lower, st_name in st_names_lower.items():
                 if st_lower in activity_lower or activity_lower in st_lower:
                     entry["subjectType"] = st_name
                     break
-            # If no subject type matched and there's only one, use it
             if not entry["subjectType"] and len(subject_type_names) == 1:
                 entry["subjectType"] = next(iter(subject_type_names))
         else:
-            # Try to match an encounter type
             matched_enc = None
             for enc_lower, enc_name in enc_names_lower.items():
-                if (
-                    enc_lower == activity_lower
-                    or enc_lower in activity_lower
-                    or activity_lower in enc_lower
-                ):
+                if enc_lower == activity_lower or enc_lower in activity_lower or activity_lower in enc_lower:
                     matched_enc = enc_name
                     break
             if matched_enc:
@@ -428,153 +413,158 @@ def parse_w3h_sheet(
                     entry["program"] = prog
                 else:
                     entry["formType"] = "Encounter"
-                # Resolve subject type for the encounter
-                for enc in []:
-                    pass  # subject type resolution happens later
-            else:
-                # Unmatched — leave formType as None for Spec Agent
-                logger.info("W3H activity '%s' not matched to any entity", activity)
 
         mapping[activity] = entry
 
     return mapping
 
 
+# ── Form Sheet Parser ────────────────────────────────────────────────────────
+
 def _match_sheet_to_w3h(
     sheet_name: str, w3h_mapping: dict[str, dict[str, str | None]]
 ) -> dict[str, str | None] | None:
-    """Try to match a form sheet name to a W3H activity entry."""
+    """Match a form sheet name to a W3H activity. Picks best scored match."""
     sheet_lower = sheet_name.strip().lower()
+
     # Exact match
     for activity, entry in w3h_mapping.items():
         if activity.lower() == sheet_lower:
             return entry
-    # Fuzzy: sheet name contained in activity or vice versa
+
+    # Scored matching
+    sheet_tokens = set(sheet_lower.split())
+    best_score = 0.0
+    best_entry = None
+
     for activity, entry in w3h_mapping.items():
         act_lower = activity.lower()
+
         if act_lower in sheet_lower or sheet_lower in act_lower:
-            return entry
-    # Token overlap — at least 50% of tokens must match
-    sheet_tokens = set(sheet_lower.split())
-    for activity, entry in w3h_mapping.items():
-        act_tokens = set(activity.lower().split())
-        if not sheet_tokens or not act_tokens:
-            continue
-        overlap = len(sheet_tokens & act_tokens)
-        if overlap / max(len(sheet_tokens), len(act_tokens)) >= 0.5:
-            return entry
+            score = min(len(act_lower), len(sheet_lower)) / max(len(act_lower), len(sheet_lower))
+            score += 1.0
+        else:
+            act_tokens = set(act_lower.split())
+            if not sheet_tokens or not act_tokens:
+                continue
+            overlap = len(sheet_tokens & act_tokens)
+            score = overlap / max(len(sheet_tokens), len(act_tokens))
+
+        if score > best_score:
+            best_score = score
+            best_entry = entry
+
+    if best_score >= 0.5:
+        return best_entry
     return None
 
 
-def parse_form_sheet(
-    xf: pd.ExcelFile,
+def parse_form_df(
+    df: pd.DataFrame,
     sheet_name: str,
     entity_mapping: dict[str, str | None] | None,
+    header_offset: int = 0,
 ) -> FormSpec | None:
     """
-    Parse a single form sheet (columns A–R) into a FormSpec.
-    Row 0 = category headers (skip), Row 1 = column headers, Row 2+ = data.
+    Parse a form DataFrame into a FormSpec.
+    header_offset=0: headers in row 0 (standard CSV/clean Excel)
+    header_offset=1: headers in row 1 (scoping Excel with category row in row 0)
     """
-    try:
-        df = pd.read_excel(xf, sheet_name=sheet_name, header=None)
-    except Exception as e:
-        logger.warning("Failed to read form sheet '%s': %s", sheet_name, e)
+    if header_offset == 1:
+        # Re-read with row 1 as header
+        if df.shape[0] < 3:
+            return None
+        # Use raw positional access — row 0 = categories, row 1 = headers, row 2+ = data
+        data_start = 2
+    else:
+        data_start = 0
+
+    # Find columns by fuzzy matching on the header row
+    if header_offset == 1:
+        header_row = {str(df.iloc[1, c]).strip().lower(): c for c in range(df.shape[1])}
+    else:
+        header_row = {str(c).strip().lower(): i for i, c in enumerate(df.columns)}
+
+    def _col_idx(*names: str) -> int | None:
+        for n in names:
+            n_lower = n.lower()
+            for h, idx in header_row.items():
+                if n_lower == h or n_lower in h or h in n_lower:
+                    return idx
         return None
 
-    if df.shape[0] < 3:  # Need at least header + 1 data row
+    page_idx = _col_idx("page name", "page", "section")
+    field_idx = _col_idx("field name", "field", "question", "name")
+    dtype_idx = _col_idx("data type", "datatype", "type")
+    mand_idx = _col_idx("mandatory")
+    options_idx = _col_idx("options", "option")
+    selection_idx = _col_idx("selection type", "selection")
+    min_max_idx = _col_idx("max and min", "min and max", "limit", "range")
+    unit_idx = _col_idx("unit")
+    skip_idx = _col_idx("when to show", "skip logic", "condition", "visibility")
+
+    if field_idx is None:
         return None
 
-    # Data rows start at row index 2 (row 0 = category, row 1 = headers)
     current_section = "General Information"
     fields: list[FieldSpec] = []
 
-    for row_idx in range(2, df.shape[0]):
+    for row_idx in range(data_start, df.shape[0]):
         row = df.iloc[row_idx]
-        field_name = _clean(row.iloc[1]) if df.shape[1] > 1 else ""
+        field_name = _clean(row.iloc[field_idx]) if field_idx is not None else ""
         if not field_name:
             continue
 
-        # Column A: Page Name (section name) — carries forward if empty
-        page_name = _clean(row.iloc[0]) if df.shape[1] > 0 else ""
-        if page_name:
-            current_section = page_name
+        if page_idx is not None:
+            page = _clean(row.iloc[page_idx])
+            if page:
+                current_section = page
 
-        # Column C: Data Type
-        raw_dtype = _clean(row.iloc[2]).lower().strip() if df.shape[1] > 2 else "text"
-        avni_dtype = _SCOPING_DATA_TYPE_MAP.get(raw_dtype, "Text")
+        raw_dtype = _clean(row.iloc[dtype_idx]).lower() if dtype_idx is not None else "text"
+        avni_dtype = _map_data_type(raw_dtype)
 
-        # Column D: Mandatory
-        mandatory = _parse_yes_no(row.iloc[3]) if df.shape[1] > 3 else False
+        mandatory = _parse_yes_no(row.iloc[mand_idx]) if mand_idx is not None else False
 
-        # Columns F-L: numeric/date key-values
-        kv: dict[str, Any] = {}
-        if df.shape[1] > 5 and _parse_yes_no(row.iloc[5]):
-            kv["allowNegativeValue"] = True
-        if df.shape[1] > 6 and _parse_yes_no(row.iloc[6]):
-            kv["allowDecimalValue"] = True
-        if df.shape[1] > 10 and _parse_yes_no(row.iloc[10]):
-            kv["allowFutureDate"] = True
+        options = None
+        if options_idx is not None:
+            options = _parse_options(row.iloc[options_idx]) or None
 
-        # Column H: Min/Max
-        min_val, max_val = None, None
-        if df.shape[1] > 7:
-            min_val, max_val = _parse_min_max(row.iloc[7])
+        # If boolean/yes-no type detected, auto-add options
+        if avni_dtype == "Coded" and not options and raw_dtype in ("boolean", "bool", "yes/no"):
+            options = ["Yes", "No"]
 
-        # Column I: Unit
-        unit = _clean(row.iloc[8]) if df.shape[1] > 8 else None
-        if not unit:
-            unit = None
-
-        # Column M: Selection type (Single Select / Multi Select)
         selection_type = None
-        if df.shape[1] > 12:
-            sel_raw = _clean(row.iloc[12]).lower()
+        if selection_idx is not None:
+            sel_raw = _clean(row.iloc[selection_idx]).lower()
             if "multi" in sel_raw:
                 selection_type = "MultiSelect"
             elif "single" in sel_raw:
                 selection_type = "SingleSelect"
 
-        # For Coded data type, override based on selection type
-        if avni_dtype == "Coded" and selection_type:
-            pass  # Keep Coded, selection_type stored separately
+        min_val, max_val = None, None
+        if min_max_idx is not None:
+            min_val, max_val = _parse_min_max(row.iloc[min_max_idx])
 
-        # Column N: Options
-        options = None
-        if df.shape[1] > 13:
-            options = _parse_options(row.iloc[13]) or None
+        unit = _clean(row.iloc[unit_idx]) if unit_idx is not None else None
+        if not unit:
+            unit = None
 
-        # Columns Q/R: Skip logic (when to show / when not to show)
         skip_logic = None
-        if df.shape[1] > 16:
-            when_to_show = _clean(row.iloc[16])
+        if skip_idx is not None:
+            when_to_show = _clean(row.iloc[skip_idx])
             if when_to_show:
-                skip_logic = SkipLogicSpec(
-                    dependsOn=when_to_show,
-                    condition="raw",
-                    value=when_to_show,
-                )
+                skip_logic = SkipLogicSpec(dependsOn=when_to_show, condition="raw", value=when_to_show)
 
-        field = FieldSpec(
-            name=field_name,
-            dataType=avni_dtype,
-            mandatory=mandatory,
-            group=current_section,
-            unit=unit,
-            min=min_val,
-            max=max_val,
-            options=options,
-            selectionType=selection_type,
-            skipLogic=skip_logic,
-            keyValues=kv if kv else None,
-        )
-        fields.append(field)
+        fields.append(FieldSpec(
+            name=field_name, dataType=avni_dtype, mandatory=mandatory,
+            group=current_section, unit=unit, min=min_val, max=max_val,
+            options=options, selectionType=selection_type, skipLogic=skip_logic,
+        ))
 
     if not fields:
-        logger.info("Form sheet '%s' has no data rows — skipping", sheet_name)
         return None
 
-    # Build FormSpec from entity mapping (if available) or leave unlinked
-    form_type = "Encounter"  # default
+    form_type = "Encounter"
     subject_type = None
     program = None
     encounter_type = None
@@ -585,217 +575,448 @@ def parse_form_sheet(
         program = entity_mapping.get("program")
         encounter_type = entity_mapping.get("encounterType")
 
-    # Build sections from grouped fields
+    # Build sections
     sections: list[SectionSpec] = []
-    current_sec_name = None
-    current_sec_fields: list[FieldSpec] = []
+    cur_name: str | None = None
+    cur_fields: list[FieldSpec] = []
     for f in fields:
         sec_name = f.group or "General Information"
-        if sec_name != current_sec_name:
-            if current_sec_fields:
-                sections.append(
-                    SectionSpec(
-                        name=current_sec_name or "General Information",
-                        fields=current_sec_fields,
-                    )
-                )
-            current_sec_name = sec_name
-            current_sec_fields = [f]
+        if sec_name != cur_name:
+            if cur_fields:
+                sections.append(SectionSpec(name=cur_name or "General Information", fields=cur_fields))
+            cur_name = sec_name
+            cur_fields = [f]
         else:
-            current_sec_fields.append(f)
-    if current_sec_fields:
-        sections.append(
-            SectionSpec(
-                name=current_sec_name or "General Information",
-                fields=current_sec_fields,
-            )
-        )
+            cur_fields.append(f)
+    if cur_fields:
+        sections.append(SectionSpec(name=cur_name or "General Information", fields=cur_fields))
 
-    form_spec = FormSpec(
-        name=sheet_name.strip(),
-        formType=form_type,
-        subjectType=subject_type,
-        program=program,
-        encounterType=encounter_type,
-        fields=fields,
-        sections=sections,
+    return FormSpec(
+        name=sheet_name.strip(), formType=form_type, subjectType=subject_type,
+        program=program, encounterType=encounter_type, fields=fields, sections=sections,
     )
 
-    logger.info(
-        "Parsed form sheet '%s': %d fields, %d sections, formType=%s",
-        sheet_name,
-        len(fields),
-        len(sections),
-        form_type,
-    )
-    return form_spec
 
+# ── File Loaders ─────────────────────────────────────────────────────────────
 
-def parse_form_sheets(
-    xf: pd.ExcelFile,
-    sheet_names_lower: dict[str, str],
-    subject_type_names: set[str],
-    encounter_type_names: set[str],
-    program_encounter_map: dict[str, str],
-) -> list[FormSpec]:
-    """
-    Detect and parse all form sheets in the scoping document.
-
-    Uses W3H sheet for form-entity mapping, falls back to unlinked forms
-    for the Dify Spec Agent to resolve.
-    """
-    # Stage 1: Parse W3H for form-entity mapping
-    w3h_mapping = parse_w3h_sheet(
-        xf,
-        sheet_names_lower,
-        subject_type_names,
-        encounter_type_names,
-        program_encounter_map,
-    )
-    logger.info("W3H mapping: %d activities mapped", len(w3h_mapping))
-
-    # Stage 2: Find and parse form sheets
-    forms: list[FormSpec] = []
-    for sheet_name in xf.sheet_names:
-        if not _is_form_sheet(xf, sheet_name):
-            continue
-
-        # Match sheet to W3H entity mapping
-        entity_mapping = _match_sheet_to_w3h(sheet_name, w3h_mapping)
-        if entity_mapping:
-            logger.info("Matched form sheet '%s' to W3H entity", sheet_name)
-        else:
-            logger.info(
-                "Form sheet '%s' has no W3H match — unlinked (Spec Agent will resolve)",
-                sheet_name,
-            )
-
-        form = parse_form_sheet(xf, sheet_name, entity_mapping)
-        if form:
-            forms.append(form)
-
-    logger.info("Parsed %d form sheets total", len(forms))
-    return forms
-
-
-def parse_scoping_doc(xlsx_path: str | Path | None = None) -> EntitySpec:
-    """
-    Parse the Avni modelling workbook and return a validated EntitySpec.
-
-    Args:
-        xlsx_path: Path to the .xlsx file. Defaults to SCOPING_DOC_PATH env var
-                   or the bundled Durga India Modelling.xlsx test fixture.
-
-    Returns:
-        EntitySpec — validated Pydantic model.
-
-    Raises:
-        FileNotFoundError: if the file doesn't exist.
-        ValueError: if the parsed entities fail Pydantic cross-ref validation.
-    """
-    import os
-
-    if xlsx_path is None:
-        xlsx_path = os.environ.get("SCOPING_DOC_PATH", str(_DEFAULT_SCOPING_DOC))
-
-    path = Path(xlsx_path)
-    if not path.exists():
-        raise FileNotFoundError(f"Scoping document not found: {path}")
-
-    logger.info("Parsing scoping document: %s", path)
+def _load_xlsx(path: Path) -> list[tuple[str, pd.DataFrame]]:
+    """Load all sheets from an Excel file. Returns [(sheet_name, df), ...]."""
     xf = pd.ExcelFile(path)
-    sheet_names_lower = {s.strip().lower(): s for s in xf.sheet_names}
+    sheets = []
+    for name in xf.sheet_names:
+        try:
+            df = pd.read_excel(xf, sheet_name=name, header=None)
+            if not df.empty:
+                sheets.append((name, df))
+        except Exception as e:
+            logger.warning("Failed to read sheet '%s' in %s: %s", name, path, e)
+    return sheets
 
-    def _read(key: str) -> pd.DataFrame:
-        """Read sheet by case-insensitive key prefix match."""
-        for lower_name, actual_name in sheet_names_lower.items():
-            if lower_name.startswith(key.lower()):
-                df = pd.read_excel(xf, sheet_name=actual_name)
-                return df.dropna(how="all")
-        return pd.DataFrame()
 
-    loc_df = _read("location")
-    st_df = _read("subject")
-    prog_df = _read("program")
-    enc_df = _read("encounter")
-    prog_enc_df = _read("program encounter")
+def _load_csv(path: Path) -> list[tuple[str, pd.DataFrame]]:
+    """Load a CSV file as a single 'sheet'."""
+    try:
+        df = pd.read_csv(path)
+        return [(path.stem, df)]
+    except Exception as e:
+        logger.warning("Failed to read CSV %s: %s", path, e)
+        return []
 
-    address_levels = parse_location_hierarchy(loc_df) if not loc_df.empty else []
-    subject_types = parse_subject_types(st_df) if not st_df.empty else []
-    subject_type_names = {st.name for st in subject_types}
 
-    programs = parse_programs(prog_df, subject_type_names) if not prog_df.empty else []
-    program_names = {p.name for p in programs}
+def _load_txt(path: Path) -> list[tuple[str, pd.DataFrame]]:
+    """Load a text file. Try JSON first, then CSV, then as single-column text."""
+    text = path.read_text(encoding="utf-8", errors="replace")
 
-    enc_types: list[EncounterTypeSpec] = []
-    if not enc_df.empty:
-        enc_types.extend(
-            parse_encounters(
-                enc_df, subject_type_names, program_names, is_program_encounter=False
-            )
-        )
-    if not prog_enc_df.empty:
-        enc_types.extend(
-            parse_encounters(
-                prog_enc_df,
-                subject_type_names,
-                program_names,
-                is_program_encounter=True,
-            )
-        )
+    # Try JSON
+    try:
+        data = json.loads(text)
+        if isinstance(data, dict) and "text" in data:
+            # Dify-extracted format: {"text": ["sheet1 content", "sheet2 content"]}
+            sheets = []
+            for i, t in enumerate(data["text"]):
+                # Try to parse as markdown tables
+                df = _parse_markdown_tables(t)
+                if df is not None and not df.empty:
+                    sheets.append((f"text_{i}", df))
+            if sheets:
+                return sheets
+        elif isinstance(data, dict):
+            # Direct entities dict
+            return [("json_data", pd.DataFrame([data]))]
+        elif isinstance(data, list):
+            return [("json_data", pd.DataFrame(data))]
+    except (json.JSONDecodeError, ValueError):
+        pass
 
-    if not address_levels:
-        logger.warning(
-            "No location hierarchy found in scoping doc — using default State/District/Village"
-        )
-        address_levels = [
+    # Try CSV
+    try:
+        df = pd.read_csv(io.StringIO(text))
+        if df.shape[1] > 1:
+            return [(path.stem, df)]
+    except Exception:
+        pass
+
+    # Plain text — return as single column
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    if lines:
+        return [(path.stem, pd.DataFrame({"content": lines}))]
+    return []
+
+
+def _parse_markdown_tables(text: str) -> pd.DataFrame | None:
+    """Extract the first markdown table from text and return as DataFrame."""
+    lines = text.split("\n")
+    table_lines = []
+    in_table = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("|") and "|" in stripped[1:]:
+            if "---" in stripped:
+                continue  # separator row
+            in_table = True
+            cells = [c.strip() for c in stripped.split("|")[1:-1]]
+            table_lines.append(cells)
+        elif in_table:
+            break  # end of table
+
+    if len(table_lines) < 2:
+        return None
+
+    headers = table_lines[0]
+    data = table_lines[1:]
+    # Pad rows to match header length
+    data = [row + [""] * (len(headers) - len(row)) for row in data]
+    return pd.DataFrame(data, columns=headers)
+
+
+def _load_file(path: Path) -> list[tuple[str, pd.DataFrame]]:
+    """Load any supported file format."""
+    suffix = path.suffix.lower()
+    if suffix in (".xlsx", ".xls"):
+        return _load_xlsx(path)
+    elif suffix == ".csv":
+        return _load_csv(path)
+    elif suffix in (".txt", ".json"):
+        return _load_txt(path)
+    else:
+        logger.warning("Unsupported file type: %s", path)
+        return []
+
+
+# ── Post-processing ──────────────────────────────────────────────────────────
+
+def _resolve_form_subject_types(
+    forms: list[FormSpec],
+    encounter_types: list[EncounterTypeSpec],
+    subject_types: list[SubjectTypeSpec],
+) -> None:
+    """Fill missing subjectType on forms using encounter/subject context. Mutates in place."""
+    enc_to_subject: dict[str, str] = {}
+    for et in encounter_types:
+        if et.subject_type:
+            enc_to_subject[et.name.lower()] = et.subject_type
+
+    for form in forms:
+        if form.subjectType:
+            continue
+        if form.encounterType:
+            subject = enc_to_subject.get(form.encounterType.lower())
+            if subject:
+                form.subjectType = subject
+                continue
+        if form.formType == "IndividualProfile":
+            for st in subject_types:
+                if st.name.lower() in form.name.lower() or form.name.lower() in st.name.lower():
+                    form.subjectType = st.name
+                    break
+        if not form.subjectType and len(subject_types) == 1:
+            form.subjectType = subject_types[0].name
+
+
+# ── Main Entry Point ─────────────────────────────────────────────────────────
+
+def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
+    """
+    Parse one or more SRS/scoping/modelling files of any supported format
+    and consolidate into a validated EntitySpec.
+
+    Accepts .xlsx, .csv, .txt, .json files in any combination.
+    Each sheet/file is auto-classified by its content and parsed accordingly.
+    All results are merged with deduplication.
+    """
+    all_address: list[AddressLevelSpec] = []
+    all_subjects: list[SubjectTypeSpec] = []
+    all_programs: list[ProgramSpec] = []
+    all_encounters: list[EncounterTypeSpec] = []
+    all_forms: list[FormSpec] = []
+    w3h_dfs: list[pd.DataFrame] = []
+    form_sheets: list[tuple[str, pd.DataFrame, int]] = []  # (name, df, header_offset)
+
+    seen: dict[str, set[str]] = {
+        "address": set(), "subject": set(), "program": set(), "encounter": set(), "form": set(),
+    }
+
+    # Phase 1: Load all files and classify each sheet
+    for file_path in file_paths:
+        path = Path(file_path)
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {path}")
+
+        logger.info("Loading file: %s", path)
+        sheets = _load_file(path)
+
+        for sheet_name, df in sheets:
+            if df.empty or df.shape[1] < 2:
+                continue
+
+            # Try classifying with row 0 as headers
+            df_with_header = df.copy()
+            df_with_header.columns = [str(df.iloc[0, c]).strip() if df.shape[0] > 0 else f"col{c}" for c in range(df.shape[1])]
+            df_with_header = df_with_header.iloc[1:].reset_index(drop=True)
+            df_with_header = df_with_header.dropna(how="all")
+
+            classification = _classify_sheet(df_with_header)
+
+            # If unknown, try with row 1 as headers (scoping doc pattern)
+            if classification == "unknown" and df.shape[0] >= 3:
+                df_alt = df.copy()
+                df_alt.columns = [str(df.iloc[1, c]).strip() if df.shape[0] > 1 else f"col{c}" for c in range(df.shape[1])]
+                alt_class = _classify_sheet(df_alt)
+                if alt_class in ("form", "form_offset1"):
+                    classification = "form_offset1"
+                elif alt_class != "unknown":
+                    classification = alt_class
+                    df_with_header = df_alt.iloc[2:].reset_index(drop=True).dropna(how="all")
+
+            if classification == "form_offset1":
+                classification = "form"
+
+            logger.info("  Sheet '%s': classified as %s", sheet_name, classification)
+
+            subject_type_names = {st.name for st in all_subjects}
+            program_names = {p.name for p in all_programs}
+
+            if classification == "location":
+                for al in parse_location_hierarchy(df_with_header):
+                    if al.name.lower() not in seen["address"]:
+                        all_address.append(al)
+                        seen["address"].add(al.name.lower())
+
+            elif classification == "subject_type":
+                for st in parse_subject_types(df_with_header):
+                    if st.name.lower() not in seen["subject"]:
+                        all_subjects.append(st)
+                        seen["subject"].add(st.name.lower())
+
+            elif classification == "program":
+                for prog in parse_programs(df_with_header, subject_type_names):
+                    if prog.name.lower() not in seen["program"]:
+                        all_programs.append(prog)
+                        seen["program"].add(prog.name.lower())
+
+            elif classification in ("encounter", "program_encounter"):
+                is_prog = classification == "program_encounter"
+                for et in parse_encounters(df_with_header, subject_type_names, program_names, is_prog):
+                    if et.name.lower() not in seen["encounter"]:
+                        all_encounters.append(et)
+                        seen["encounter"].add(et.name.lower())
+
+            elif classification == "w3h":
+                w3h_dfs.append(df_with_header)
+
+            elif classification == "form":
+                form_sheets.append((sheet_name, df, 1))  # offset=1 for scoping format
+
+    # Default address levels if none found
+    if not all_address:
+        logger.warning("No location hierarchy found — using default State/District/Village")
+        all_address = [
             AddressLevelSpec(name="State", level=3, parent=None),
             AddressLevelSpec(name="District", level=2, parent="State"),
             AddressLevelSpec(name="Village", level=1, parent="District"),
         ]
 
-    # Build encounter → program lookup for form-entity mapping
-    encounter_type_names = {et.name for et in enc_types}
-    program_encounter_map: dict[str, str] = {}
-    for et in enc_types:
-        if et.program_name:
-            program_encounter_map[et.name] = et.program_name
+    # Phase 2: Build consolidated context
+    subject_type_names = {st.name for st in all_subjects}
+    encounter_type_names = {et.name for et in all_encounters}
+    program_encounter_map: dict[str, str] = {
+        et.name: et.program_name for et in all_encounters if et.program_name
+    }
 
-    # Parse form sheets (columns A–R) with W3H mapping
-    forms = parse_form_sheets(
-        xf,
-        sheet_names_lower,
-        subject_type_names,
-        encounter_type_names,
-        program_encounter_map,
-    )
+    # Phase 3: Parse W3H for form-entity mapping
+    w3h_mapping: dict[str, dict[str, str | None]] = {}
+    for w3h_df in w3h_dfs:
+        w3h_mapping.update(
+            parse_w3h(w3h_df, subject_type_names, encounter_type_names, program_encounter_map)
+        )
+    logger.info("W3H mapping: %d activities", len(w3h_mapping))
+
+    # Phase 4: Parse form sheets using consolidated context
+    for sheet_name, df, offset in form_sheets:
+        if sheet_name.lower() in seen["form"]:
+            continue
+
+        entity_mapping = _match_sheet_to_w3h(sheet_name, w3h_mapping)
+        form = parse_form_df(df, sheet_name, entity_mapping, header_offset=offset)
+        if form:
+            all_forms.append(form)
+            seen["form"].add(sheet_name.lower())
+
+    # Phase 5: Resolve missing subjectType on forms
+    _resolve_form_subject_types(all_forms, all_encounters, all_subjects)
+
+    # Phase 6: Always include default group
+    groups = [GroupSpec(name="Everyone", has_all_privileges=True)]
 
     logger.info(
-        "Parsed: %d address levels, %d subject types, %d programs, %d encounter types, %d forms",
-        len(address_levels),
-        len(subject_types),
-        len(programs),
-        len(enc_types),
-        len(forms),
+        "Consolidated: %d addresses, %d subjects, %d programs, "
+        "%d encounters, %d forms, %d groups from %d file(s)",
+        len(all_address), len(all_subjects), len(all_programs),
+        len(all_encounters), len(all_forms), len(groups), len(file_paths),
     )
 
     return EntitySpec(
-        subject_types=subject_types,
-        programs=programs,
-        encounter_types=enc_types,
-        address_levels=address_levels,
-        groups=[],
-        forms=forms,
+        subject_types=all_subjects,
+        programs=all_programs,
+        encounter_types=all_encounters,
+        address_levels=all_address,
+        groups=groups,
+        forms=all_forms,
     )
 
 
-def load_durga_entities(xlsx_path: str | Path | None = None) -> dict:
-    """
-    Parse the Durga India scoping document and return a plain dict
-    suitable for use with the AppConfiguratorFlow emulation.
+# ── Consolidation + Audit ────────────────────────────────────────────────────
 
-    This is the replacement for load_sample_entities() — it reads real
-    Durga data instead of hardcoded Maternal Health placeholders.
+def consolidate_and_audit(
+    file_paths: list[str | Path],
+    org_name: str = "",
+) -> dict[str, Any]:
     """
+    Parse input files, consolidate into a YAML spec (source of truth),
+    and produce an audit report.
+
+    Returns:
+        {
+            "spec_yaml": str,          # The consolidated YAML — edit this, then generate bundle
+            "audit": {
+                "files_parsed": [...],
+                "entity_counts": {...},
+                "warnings": [...],
+                "errors": [...],
+                "coverage": {...},     # What's present vs missing
+            },
+            "entities": dict,          # Raw entities dict for direct use
+        }
+    """
+    from .spec_generator import entities_to_spec
+
+    entity_spec = parse_scoping_docs(file_paths)
+    entities = entity_spec.to_entities_dict()
+
+    # Generate the YAML spec — this is the source of truth
+    spec_yaml = entities_to_spec(entities, org_name=org_name)
+
+    # Build audit report
+    warnings: list[str] = []
+    errors: list[str] = []
+
+    # Check completeness
+    subject_names = {st["name"] for st in entities["subject_types"]}
+    encounter_names = {et["name"] for et in entities["encounter_types"]}
+    form_names = {f["name"] for f in entities["forms"]}
+    form_encounter_links = {f.get("encounterType") for f in entities["forms"] if f.get("encounterType")}
+
+    # Every subject type should have a registration form
+    for st in entities["subject_types"]:
+        has_reg = any(
+            f.get("formType") == "IndividualProfile" and f.get("subjectType") == st["name"]
+            for f in entities["forms"]
+        )
+        if not has_reg:
+            warnings.append(f"Subject type '{st['name']}' has no registration form")
+
+    # Every encounter type should have a form linked
+    for et in entities["encounter_types"]:
+        if et["name"] not in form_encounter_links:
+            warnings.append(f"Encounter type '{et['name']}' has no form linked to it")
+
+    # Forms with no subjectType
+    for f in entities["forms"]:
+        if not f.get("subjectType"):
+            warnings.append(f"Form '{f['name']}' has no subjectType — bundle may fail")
+
+    # Forms with 0 or very few fields
+    for f in entities["forms"]:
+        field_count = len(f.get("fields", []))
+        if field_count == 0:
+            errors.append(f"Form '{f['name']}' has 0 fields — will be empty")
+        elif field_count <= 2:
+            warnings.append(f"Form '{f['name']}' has only {field_count} field(s) — may be incomplete")
+
+    # Coded fields without options
+    for f in entities["forms"]:
+        for field in f.get("fields", []):
+            if field.get("dataType") == "Coded" and not field.get("options"):
+                warnings.append(f"Coded field '{field['name']}' in form '{f['name']}' has no options")
+
+    # Groups check
+    if not entities["groups"]:
+        errors.append("No groups defined — bundle will fail without at least one group")
+
+    # Coverage summary
+    coverage = {
+        "has_address_levels": len(entities["address_levels"]) > 0,
+        "has_subject_types": len(entities["subject_types"]) > 0,
+        "has_encounter_types": len(entities["encounter_types"]) > 0,
+        "has_forms": len(entities["forms"]) > 0,
+        "has_groups": len(entities["groups"]) > 0,
+        "has_programs": len(entities["programs"]) > 0,
+        "all_encounters_have_forms": all(
+            et["name"] in form_encounter_links for et in entities["encounter_types"]
+        ),
+        "all_subjects_have_registration": all(
+            any(
+                f.get("formType") == "IndividualProfile" and f.get("subjectType") == st["name"]
+                for f in entities["forms"]
+            )
+            for st in entities["subject_types"]
+        ),
+    }
+
+    audit = {
+        "files_parsed": [str(p) for p in file_paths],
+        "entity_counts": {
+            "address_levels": len(entities["address_levels"]),
+            "subject_types": len(entities["subject_types"]),
+            "programs": len(entities["programs"]),
+            "encounter_types": len(entities["encounter_types"]),
+            "forms": len(entities["forms"]),
+            "groups": len(entities["groups"]),
+            "total_fields": sum(len(f.get("fields", [])) for f in entities["forms"]),
+        },
+        "warnings": warnings,
+        "errors": errors,
+        "coverage": coverage,
+    }
+
+    return {
+        "spec_yaml": spec_yaml,
+        "audit": audit,
+        "entities": entities,
+    }
+
+
+# ── Backward-compatible wrappers ─────────────────────────────────────────────
+
+def parse_scoping_doc(xlsx_path: str | Path | None = None) -> EntitySpec:
+    """Parse a single file. Backward-compatible wrapper."""
+    import os
+    if xlsx_path is None:
+        xlsx_path = os.environ.get("SCOPING_DOC_PATH", str(_DEFAULT_SCOPING_DOC))
+    return parse_scoping_docs([xlsx_path])
+
+
+def load_durga_entities(xlsx_path: str | Path | None = None) -> dict:
+    """Parse and return plain dict for AppConfiguratorFlow."""
     entity_spec = parse_scoping_doc(xlsx_path)
     return entity_spec.to_entities_dict()
