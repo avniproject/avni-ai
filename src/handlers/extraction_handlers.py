@@ -2,7 +2,8 @@
 Extraction handlers — server-side Excel SRS parsing.
 
 Endpoint:
-  POST /parse-srs-file  — multipart/form-data with conversation_id + file field
+  POST /parse-srs-file  — JSON body: {conversation_id, file_infos: [{url, filename}]}
+  The Dify Code node passes pre-signed file URLs. The backend downloads and parses them.
 """
 
 from __future__ import annotations
@@ -11,6 +12,7 @@ import logging
 import os
 import tempfile
 
+import httpx
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -22,51 +24,62 @@ logger = logging.getLogger(__name__)
 
 async def handle_parse_srs_file(request: Request) -> JSONResponse:
     """
-    POST /parse-srs-file  (multipart/form-data)
-    Fields: conversation_id (text), file (file upload)
-    Runs scoping_parser on the uploaded file, stores entities under conversation_id.
+    POST /parse-srs-file
+    Body: { "conversation_id": "...", "file_infos": [{"url": "...", "filename": "..."}] }
+    Downloads each file from its pre-signed Dify storage URL and runs scoping_parser.
     Returns:
       { ok: true, summary: {...}, warnings: [...], errors: [...], coverage: {...} }
       { ok: false, error: "..." }  on parse failure (HTTP 200 so Dify can inspect ok flag)
     """
     try:
-        form = await request.form()
+        body = await request.json()
     except Exception:
         return JSONResponse(
-            {"ok": False, "error": "Expected multipart/form-data"}, status_code=400
+            {"ok": False, "error": "Invalid JSON body"}, status_code=400
         )
 
-    conversation_id = form.get("conversation_id")
-    upload = form.get("file")
+    conversation_id = body.get("conversation_id")
+    file_infos = body.get("file_infos", [])
 
     if not conversation_id:
         return JSONResponse(
-            {"ok": False, "error": "Missing 'conversation_id' form field"},
-            status_code=400,
+            {"ok": False, "error": "Missing 'conversation_id'"}, status_code=400
         )
-    if upload is None:
+    if not file_infos:
         return JSONResponse(
-            {"ok": False, "error": "Missing 'file' form field"}, status_code=400
+            {"ok": False, "error": "Missing 'file_infos'"}, status_code=400
         )
 
-    filename = getattr(upload, "filename", None) or "document.xlsx"
-    raw = await upload.read()
-
-    tmp_path = None
+    tmp_paths: list[str] = []
     try:
-        suffix = os.path.splitext(filename)[1] or ".xlsx"
-        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-            tmp.write(raw)
-            tmp_path = tmp.name
+        async with httpx.AsyncClient(verify=False, timeout=30) as client:
+            for info in file_infos:
+                url = info.get("url", "")
+                filename = info.get("filename", "document.xlsx")
+                if not url:
+                    continue
+                # URLs are pre-signed — no auth header needed
+                resp = await client.get(url)
+                resp.raise_for_status()
+                suffix = os.path.splitext(filename)[1] or ".xlsx"
+                with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+                    tmp.write(resp.content)
+                    tmp_paths.append(tmp.name)
 
-        result = consolidate_and_audit([tmp_path])
+        if not tmp_paths:
+            return JSONResponse(
+                {"ok": False, "error": "No valid file URLs in file_infos"}
+            )
+
+        result = consolidate_and_audit(tmp_paths)
         entities = result["entities"]
         audit = result["audit"]
         get_entity_store().put(conversation_id, entities)
 
         logger.info(
-            "parse-srs-file: stored entities for conversation_id=%s, counts=%s",
+            "parse-srs-file: stored entities for conversation_id=%s, files=%d, counts=%s",
             conversation_id,
+            len(tmp_paths),
             audit["entity_counts"],
         )
         return JSONResponse(
@@ -81,15 +94,15 @@ async def handle_parse_srs_file(request: Request) -> JSONResponse:
 
     except Exception as exc:
         logger.warning(
-            "parse-srs-file: parse failed for conversation_id=%s: %s",
+            "parse-srs-file: failed for conversation_id=%s: %s",
             conversation_id,
             exc,
         )
         return JSONResponse({"ok": False, "error": str(exc)})
 
     finally:
-        if tmp_path and os.path.exists(tmp_path):
+        for path in tmp_paths:
             try:
-                os.unlink(tmp_path)
+                os.unlink(path)
             except OSError:
                 pass

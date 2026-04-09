@@ -43,6 +43,7 @@ from .handlers.entity_handlers import (
     handle_store_srs_text,
     handle_get_srs_text,
 )
+from .handlers.extraction_handlers import handle_parse_srs_file
 from .auth_store import handle_store_auth_token
 from .handlers.spec_handlers import (
     handle_generate_spec,
@@ -182,6 +183,11 @@ async def create_server():
     @server.custom_route("/store-auth-token", methods=["POST"])
     async def store_auth_token_endpoint(request: Request):
         return await handle_store_auth_token(request)
+
+    # --- SRS File Parse ---
+    @server.custom_route("/parse-srs-file", methods=["POST"])
+    async def parse_srs_file_endpoint(request: Request):
+        return await handle_parse_srs_file(request)
 
     # --- SRS Text Store ---
     @server.custom_route("/store-srs-text", methods=["POST"])

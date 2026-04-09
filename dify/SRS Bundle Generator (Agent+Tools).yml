@@ -327,22 +327,48 @@ workflow:
       type: custom
       width: 242
     - data:
+        code: "import json\n\ndef main(files: list) -> dict:\n    infos = [\n    \
+          \    {\"url\": f.get(\"url\", \"\"), \"filename\": f.get(\"filename\", \"\
+          document.xlsx\")}\n        for f in files\n        if f.get(\"url\")\n \
+          \   ]\n    return {\"file_infos_json\": json.dumps(infos)}\n"
+        code_language: python3
+        desc: Extract pre-signed URLs and filenames — backend downloads the files
+        outputs:
+          file_infos_json:
+            type: string
+        selected: false
+        title: Extract File Infos
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - files
+          variable: files
+      height: 96
+      id: '1775800000001'
+      position:
+        x: 1046
+        y: 347
+      positionAbsolute:
+        x: 1046
+        y: 347
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
         authorization:
           config: null
           type: no-auth
         body:
           data:
-          - id: parse-srs-file-cid
-            key: conversation_id
+          - id: parse-srs-file-body
+            key: ''
             type: text
-            value: '{{#sys.conversation_id#}}'
-          - id: parse-srs-file-file
-            key: file
-            type: file
-            value:
-            - - sys
-              - files
-          type: form-data
+            value: '{"conversation_id": "{{#sys.conversation_id#}}", "file_infos":
+              {{#1775800000001.file_infos_json#}}}'
+          type: json
         error_strategy: fail-branch
         headers: ''
         method: post
