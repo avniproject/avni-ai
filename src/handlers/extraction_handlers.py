@@ -73,13 +73,15 @@ async def handle_parse_srs_file(request: Request) -> JSONResponse:
             conversation_id,
             audit["entity_counts"],
         )
-        return JSONResponse({
-            "ok": True,
-            "summary": audit["entity_counts"],
-            "warnings": audit["warnings"],
-            "errors": audit["errors"],
-            "coverage": audit["coverage"],
-        })
+        return JSONResponse(
+            {
+                "ok": True,
+                "summary": audit["entity_counts"],
+                "warnings": audit["warnings"],
+                "errors": audit["errors"],
+                "coverage": audit["coverage"],
+            }
+        )
 
     except Exception as exc:
         logger.warning(

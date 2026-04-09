@@ -43,7 +43,6 @@ from .handlers.entity_handlers import (
     handle_store_srs_text,
     handle_get_srs_text,
 )
-from .handlers.extraction_handlers import handle_parse_srs_file
 from .auth_store import handle_store_auth_token
 from .handlers.spec_handlers import (
     handle_generate_spec,
@@ -206,6 +205,7 @@ async def create_server():
             return JSONResponse({"error": "No file_paths provided"}, status_code=400)
         try:
             from .bundle.scoping_parser import consolidate_and_audit
+
             result = consolidate_and_audit(file_paths, org_name=org_name)
             return JSONResponse(result)
         except FileNotFoundError as e:
@@ -304,6 +304,7 @@ async def create_server():
     async def download_bundle_zip_endpoint(request: Request):
         import base64
         from .handlers.bundle_handlers import get_bundle_store
+
         cid = request.query_params.get("conversation_id")
         if not cid:
             return JSONResponse({"error": "Missing conversation_id"}, status_code=400)
@@ -312,7 +313,8 @@ async def create_server():
             return JSONResponse({"error": "No stored bundle"}, status_code=404)
         zip_bytes = base64.b64decode(stored["zip_b64"])
         return Response(
-            content=zip_bytes, status_code=200,
+            content=zip_bytes,
+            status_code=200,
             media_type="application/zip",
             headers={"Content-Disposition": "attachment; filename=bundle.zip"},
         )

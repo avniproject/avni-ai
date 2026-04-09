@@ -13,7 +13,6 @@ names or column header variations.
 
 from __future__ import annotations
 
-import csv
 import io
 import json
 import logging
@@ -109,6 +108,7 @@ _W3H_HEADERS = {"what", "when", "who", "how"}
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
+
 def _clean(val: Any) -> str:
     if val is None or (isinstance(val, float) and pd.isna(val)):
         return ""
@@ -129,7 +129,11 @@ def _parse_options(val: Any) -> list[str]:
         parts = raw.split(";")
     else:
         parts = raw.split(",")
-    return [p.strip().rstrip(",").strip() for p in parts if p.strip() and p.strip().lower() != "nan"]
+    return [
+        p.strip().rstrip(",").strip()
+        for p in parts
+        if p.strip() and p.strip().lower() != "nan"
+    ]
 
 
 def _parse_min_max(val: Any) -> tuple[float | None, float | None]:
@@ -182,6 +186,7 @@ def _find_col(df: pd.DataFrame, *candidates: str) -> str | None:
 
 # ── Sheet Classification ─────────────────────────────────────────────────────
 
+
 def _classify_sheet(df: pd.DataFrame) -> str:
     """
     Classify a DataFrame by its column headers into one of:
@@ -199,7 +204,9 @@ def _classify_sheet(df: pd.DataFrame) -> str:
     first_col = cols_lower[0] if cols_lower else ""
 
     # W3H — "what" as first column + "when"/"who"/"how"
-    if first_col in ("what", "activity") and any(c in cols_set for c in ("when", "who", "how")):
+    if first_col in ("what", "activity") and any(
+        c in cols_set for c in ("when", "who", "how")
+    ):
         return "w3h"
 
     # Form fields — "field name" or "page name" + "data type"
@@ -220,11 +227,16 @@ def _classify_sheet(df: pd.DataFrame) -> str:
         return "subject_type"
 
     # Programs — first col is "program name"
-    if "program name" in first_col or (first_col == "program" and any("target" in c or "subject" in c or "enrolment" in c for c in cols_lower)):
+    if "program name" in first_col or (
+        first_col == "program"
+        and any("target" in c or "subject" in c or "enrolment" in c for c in cols_lower)
+    ):
         return "program"
 
     # Location hierarchy — first col is "location type" or similar
-    if "location" in first_col and ("type" in first_col or "hierarchy" in first_col or "level" in first_col):
+    if "location" in first_col and (
+        "type" in first_col or "hierarchy" in first_col or "level" in first_col
+    ):
         return "location"
     if first_col == "location type":
         return "location"
@@ -234,13 +246,10 @@ def _classify_sheet(df: pd.DataFrame) -> str:
 
 # ── Entity Parsers ───────────────────────────────────────────────────────────
 
+
 def parse_location_hierarchy(df: pd.DataFrame) -> list[AddressLevelSpec]:
     levels: list[AddressLevelSpec] = []
-    rows = [
-        (_clean(r[0]),)
-        for r in df.itertuples(index=False)
-        if _clean(r[0])
-    ]
+    rows = [(_clean(r[0]),) for r in df.itertuples(index=False) if _clean(r[0])]
     total = len(rows)
     prev_name: str | None = None
     for i, (loc_type,) in enumerate(rows):
@@ -271,8 +280,11 @@ def parse_subject_types(df: pd.DataFrame) -> list[SubjectTypeSpec]:
 
         subject_types.append(
             SubjectTypeSpec(
-                name=name, type=avni_type,
-                allowProfilePicture=False, uniqueName=False, lastNameOptional=True,
+                name=name,
+                type=avni_type,
+                allowProfilePicture=False,
+                uniqueName=False,
+                lastNameOptional=True,
             )
         )
     return subject_types
@@ -317,7 +329,13 @@ def parse_encounters(
     if not name_col:
         return []
 
-    sched_col = _find_col(df, "Encounter Type (Scheduled/Unscheduled)", "Encounter Type", "Scheduled", "Type")
+    sched_col = _find_col(
+        df,
+        "Encounter Type (Scheduled/Unscheduled)",
+        "Encounter Type",
+        "Scheduled",
+        "Type",
+    )
 
     if is_program_encounter:
         prog_col = _find_col(df, "Program name", "Program Name", "Program")
@@ -360,6 +378,7 @@ def parse_encounters(
 
 # ── W3H Parser ───────────────────────────────────────────────────────────────
 
+
 def parse_w3h(
     df: pd.DataFrame,
     subject_type_names: set[str],
@@ -376,7 +395,14 @@ def parse_w3h(
     st_names_lower = {n.lower(): n for n in subject_type_names}
     enc_names_lower = {n.lower(): n for n in encounter_type_names}
 
-    _REG_KEYWORDS = ("registration", "register", "details", "profile", "enrolment", "enrollment")
+    _REG_KEYWORDS = (
+        "registration",
+        "register",
+        "details",
+        "profile",
+        "enrolment",
+        "enrollment",
+    )
 
     mapping: dict[str, dict[str, str | None]] = {}
     for _, row in df.iterrows():
@@ -386,7 +412,10 @@ def parse_w3h(
 
         activity_lower = activity.lower()
         entry: dict[str, str | None] = {
-            "formType": None, "subjectType": None, "encounterType": None, "program": None,
+            "formType": None,
+            "subjectType": None,
+            "encounterType": None,
+            "program": None,
         }
 
         is_registration = any(kw in activity_lower for kw in _REG_KEYWORDS)
@@ -402,7 +431,11 @@ def parse_w3h(
         else:
             matched_enc = None
             for enc_lower, enc_name in enc_names_lower.items():
-                if enc_lower == activity_lower or enc_lower in activity_lower or activity_lower in enc_lower:
+                if (
+                    enc_lower == activity_lower
+                    or enc_lower in activity_lower
+                    or activity_lower in enc_lower
+                ):
                     matched_enc = enc_name
                     break
             if matched_enc:
@@ -420,6 +453,7 @@ def parse_w3h(
 
 
 # ── Form Sheet Parser ────────────────────────────────────────────────────────
+
 
 def _match_sheet_to_w3h(
     sheet_name: str, w3h_mapping: dict[str, dict[str, str | None]]
@@ -441,7 +475,9 @@ def _match_sheet_to_w3h(
         act_lower = activity.lower()
 
         if act_lower in sheet_lower or sheet_lower in act_lower:
-            score = min(len(act_lower), len(sheet_lower)) / max(len(act_lower), len(sheet_lower))
+            score = min(len(act_lower), len(sheet_lower)) / max(
+                len(act_lower), len(sheet_lower)
+            )
             score += 1.0
         else:
             act_tokens = set(act_lower.split())
@@ -520,7 +556,9 @@ def parse_form_df(
             if page:
                 current_section = page
 
-        raw_dtype = _clean(row.iloc[dtype_idx]).lower() if dtype_idx is not None else "text"
+        raw_dtype = (
+            _clean(row.iloc[dtype_idx]).lower() if dtype_idx is not None else "text"
+        )
         avni_dtype = _map_data_type(raw_dtype)
 
         mandatory = _parse_yes_no(row.iloc[mand_idx]) if mand_idx is not None else False
@@ -530,7 +568,11 @@ def parse_form_df(
             options = _parse_options(row.iloc[options_idx]) or None
 
         # If boolean/yes-no type detected, auto-add options
-        if avni_dtype == "Coded" and not options and raw_dtype in ("boolean", "bool", "yes/no"):
+        if (
+            avni_dtype == "Coded"
+            and not options
+            and raw_dtype in ("boolean", "bool", "yes/no")
+        ):
             options = ["Yes", "No"]
 
         selection_type = None
@@ -553,13 +595,24 @@ def parse_form_df(
         if skip_idx is not None:
             when_to_show = _clean(row.iloc[skip_idx])
             if when_to_show:
-                skip_logic = SkipLogicSpec(dependsOn=when_to_show, condition="raw", value=when_to_show)
+                skip_logic = SkipLogicSpec(
+                    dependsOn=when_to_show, condition="raw", value=when_to_show
+                )
 
-        fields.append(FieldSpec(
-            name=field_name, dataType=avni_dtype, mandatory=mandatory,
-            group=current_section, unit=unit, min=min_val, max=max_val,
-            options=options, selectionType=selection_type, skipLogic=skip_logic,
-        ))
+        fields.append(
+            FieldSpec(
+                name=field_name,
+                dataType=avni_dtype,
+                mandatory=mandatory,
+                group=current_section,
+                unit=unit,
+                min=min_val,
+                max=max_val,
+                options=options,
+                selectionType=selection_type,
+                skipLogic=skip_logic,
+            )
+        )
 
     if not fields:
         return None
@@ -583,21 +636,33 @@ def parse_form_df(
         sec_name = f.group or "General Information"
         if sec_name != cur_name:
             if cur_fields:
-                sections.append(SectionSpec(name=cur_name or "General Information", fields=cur_fields))
+                sections.append(
+                    SectionSpec(
+                        name=cur_name or "General Information", fields=cur_fields
+                    )
+                )
             cur_name = sec_name
             cur_fields = [f]
         else:
             cur_fields.append(f)
     if cur_fields:
-        sections.append(SectionSpec(name=cur_name or "General Information", fields=cur_fields))
+        sections.append(
+            SectionSpec(name=cur_name or "General Information", fields=cur_fields)
+        )
 
     return FormSpec(
-        name=sheet_name.strip(), formType=form_type, subjectType=subject_type,
-        program=program, encounterType=encounter_type, fields=fields, sections=sections,
+        name=sheet_name.strip(),
+        formType=form_type,
+        subjectType=subject_type,
+        program=program,
+        encounterType=encounter_type,
+        fields=fields,
+        sections=sections,
     )
 
 
 # ── File Loaders ─────────────────────────────────────────────────────────────
+
 
 def _load_xlsx(path: Path) -> list[tuple[str, pd.DataFrame]]:
     """Load all sheets from an Excel file. Returns [(sheet_name, df), ...]."""
@@ -657,7 +722,7 @@ def _load_txt(path: Path) -> list[tuple[str, pd.DataFrame]]:
         pass
 
     # Plain text — return as single column
-    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
     if lines:
         return [(path.stem, pd.DataFrame({"content": lines}))]
     return []
@@ -705,6 +770,7 @@ def _load_file(path: Path) -> list[tuple[str, pd.DataFrame]]:
 
 # ── Post-processing ──────────────────────────────────────────────────────────
 
+
 def _resolve_form_subject_types(
     forms: list[FormSpec],
     encounter_types: list[EncounterTypeSpec],
@@ -726,7 +792,10 @@ def _resolve_form_subject_types(
                 continue
         if form.formType == "IndividualProfile":
             for st in subject_types:
-                if st.name.lower() in form.name.lower() or form.name.lower() in st.name.lower():
+                if (
+                    st.name.lower() in form.name.lower()
+                    or form.name.lower() in st.name.lower()
+                ):
                     form.subjectType = st.name
                     break
         if not form.subjectType and len(subject_types) == 1:
@@ -734,6 +803,7 @@ def _resolve_form_subject_types(
 
 
 # ── Main Entry Point ─────────────────────────────────────────────────────────
+
 
 def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
     """
@@ -753,7 +823,11 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
     form_sheets: list[tuple[str, pd.DataFrame, int]] = []  # (name, df, header_offset)
 
     seen: dict[str, set[str]] = {
-        "address": set(), "subject": set(), "program": set(), "encounter": set(), "form": set(),
+        "address": set(),
+        "subject": set(),
+        "program": set(),
+        "encounter": set(),
+        "form": set(),
     }
 
     # Phase 1: Load all files and classify each sheet
@@ -771,7 +845,10 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
 
             # Try classifying with row 0 as headers
             df_with_header = df.copy()
-            df_with_header.columns = [str(df.iloc[0, c]).strip() if df.shape[0] > 0 else f"col{c}" for c in range(df.shape[1])]
+            df_with_header.columns = [
+                str(df.iloc[0, c]).strip() if df.shape[0] > 0 else f"col{c}"
+                for c in range(df.shape[1])
+            ]
             df_with_header = df_with_header.iloc[1:].reset_index(drop=True)
             df_with_header = df_with_header.dropna(how="all")
 
@@ -780,13 +857,18 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
             # If unknown, try with row 1 as headers (scoping doc pattern)
             if classification == "unknown" and df.shape[0] >= 3:
                 df_alt = df.copy()
-                df_alt.columns = [str(df.iloc[1, c]).strip() if df.shape[0] > 1 else f"col{c}" for c in range(df.shape[1])]
+                df_alt.columns = [
+                    str(df.iloc[1, c]).strip() if df.shape[0] > 1 else f"col{c}"
+                    for c in range(df.shape[1])
+                ]
                 alt_class = _classify_sheet(df_alt)
                 if alt_class in ("form", "form_offset1"):
                     classification = "form_offset1"
                 elif alt_class != "unknown":
                     classification = alt_class
-                    df_with_header = df_alt.iloc[2:].reset_index(drop=True).dropna(how="all")
+                    df_with_header = (
+                        df_alt.iloc[2:].reset_index(drop=True).dropna(how="all")
+                    )
 
             if classification == "form_offset1":
                 classification = "form"
@@ -816,7 +898,9 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
 
             elif classification in ("encounter", "program_encounter"):
                 is_prog = classification == "program_encounter"
-                for et in parse_encounters(df_with_header, subject_type_names, program_names, is_prog):
+                for et in parse_encounters(
+                    df_with_header, subject_type_names, program_names, is_prog
+                ):
                     if et.name.lower() not in seen["encounter"]:
                         all_encounters.append(et)
                         seen["encounter"].add(et.name.lower())
@@ -829,7 +913,9 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
 
     # Default address levels if none found
     if not all_address:
-        logger.warning("No location hierarchy found — using default State/District/Village")
+        logger.warning(
+            "No location hierarchy found — using default State/District/Village"
+        )
         all_address = [
             AddressLevelSpec(name="State", level=3, parent=None),
             AddressLevelSpec(name="District", level=2, parent="State"),
@@ -847,7 +933,9 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
     w3h_mapping: dict[str, dict[str, str | None]] = {}
     for w3h_df in w3h_dfs:
         w3h_mapping.update(
-            parse_w3h(w3h_df, subject_type_names, encounter_type_names, program_encounter_map)
+            parse_w3h(
+                w3h_df, subject_type_names, encounter_type_names, program_encounter_map
+            )
         )
     logger.info("W3H mapping: %d activities", len(w3h_mapping))
 
@@ -871,8 +959,13 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
     logger.info(
         "Consolidated: %d addresses, %d subjects, %d programs, "
         "%d encounters, %d forms, %d groups from %d file(s)",
-        len(all_address), len(all_subjects), len(all_programs),
-        len(all_encounters), len(all_forms), len(groups), len(file_paths),
+        len(all_address),
+        len(all_subjects),
+        len(all_programs),
+        len(all_encounters),
+        len(all_forms),
+        len(groups),
+        len(file_paths),
     )
 
     return EntitySpec(
@@ -886,6 +979,7 @@ def parse_scoping_docs(file_paths: list[str | Path]) -> EntitySpec:
 
 
 # ── Consolidation + Audit ────────────────────────────────────────────────────
+
 
 def consolidate_and_audit(
     file_paths: list[str | Path],
@@ -921,15 +1015,15 @@ def consolidate_and_audit(
     errors: list[str] = []
 
     # Check completeness
-    subject_names = {st["name"] for st in entities["subject_types"]}
-    encounter_names = {et["name"] for et in entities["encounter_types"]}
-    form_names = {f["name"] for f in entities["forms"]}
-    form_encounter_links = {f.get("encounterType") for f in entities["forms"] if f.get("encounterType")}
+    form_encounter_links = {
+        f.get("encounterType") for f in entities["forms"] if f.get("encounterType")
+    }
 
     # Every subject type should have a registration form
     for st in entities["subject_types"]:
         has_reg = any(
-            f.get("formType") == "IndividualProfile" and f.get("subjectType") == st["name"]
+            f.get("formType") == "IndividualProfile"
+            and f.get("subjectType") == st["name"]
             for f in entities["forms"]
         )
         if not has_reg:
@@ -951,13 +1045,17 @@ def consolidate_and_audit(
         if field_count == 0:
             errors.append(f"Form '{f['name']}' has 0 fields — will be empty")
         elif field_count <= 2:
-            warnings.append(f"Form '{f['name']}' has only {field_count} field(s) — may be incomplete")
+            warnings.append(
+                f"Form '{f['name']}' has only {field_count} field(s) — may be incomplete"
+            )
 
     # Coded fields without options
     for f in entities["forms"]:
         for field in f.get("fields", []):
             if field.get("dataType") == "Coded" and not field.get("options"):
-                warnings.append(f"Coded field '{field['name']}' in form '{f['name']}' has no options")
+                warnings.append(
+                    f"Coded field '{field['name']}' in form '{f['name']}' has no options"
+                )
 
     # Groups check
     if not entities["groups"]:
@@ -976,7 +1074,8 @@ def consolidate_and_audit(
         ),
         "all_subjects_have_registration": all(
             any(
-                f.get("formType") == "IndividualProfile" and f.get("subjectType") == st["name"]
+                f.get("formType") == "IndividualProfile"
+                and f.get("subjectType") == st["name"]
                 for f in entities["forms"]
             )
             for st in entities["subject_types"]
@@ -1008,9 +1107,11 @@ def consolidate_and_audit(
 
 # ── Backward-compatible wrappers ─────────────────────────────────────────────
 
+
 def parse_scoping_doc(xlsx_path: str | Path | None = None) -> EntitySpec:
     """Parse a single file. Backward-compatible wrapper."""
     import os
+
     if xlsx_path is None:
         xlsx_path = os.environ.get("SCOPING_DOC_PATH", str(_DEFAULT_SCOPING_DOC))
     return parse_scoping_docs([xlsx_path])

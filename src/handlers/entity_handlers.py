@@ -515,8 +515,7 @@ async def handle_validate_entities(request: Request) -> JSONResponse:
     # Instead return a compact summary so the agent knows what's stored.
     if conversation_id:
         result["entity_counts"] = {
-            k: len(v) if isinstance(v, list) else 1
-            for k, v in entities.items()
+            k: len(v) if isinstance(v, list) else 1 for k, v in entities.items()
         }
     else:
         # Legacy: return full entities for callers that need them
@@ -577,14 +576,15 @@ async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
 
     # When using conversation_id, return compact summary instead of full entities
     if conversation_id:
-        return JSONResponse({
-            "ok": True,
-            "corrections_applied": len(corrections),
-            "entity_counts": {
-                k: len(v) if isinstance(v, list) else 1
-                for k, v in updated.items()
-            },
-        })
+        return JSONResponse(
+            {
+                "ok": True,
+                "corrections_applied": len(corrections),
+                "entity_counts": {
+                    k: len(v) if isinstance(v, list) else 1 for k, v in updated.items()
+                },
+            }
+        )
 
     # Legacy: return full entities
     return JSONResponse({"result": updated})
