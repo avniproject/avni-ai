@@ -32,6 +32,7 @@ OPENAPI_FILE = Path(__file__).parent / "dify" / "avni-ai-tools-openapi.yaml"
 # Tool executor — calls local server endpoints
 # ---------------------------------------------------------------------------
 
+
 def _call(method: str, path: str, **kwargs) -> dict:
     url = f"{SERVER_URL}{path}"
     r = httpx.request(method, url, timeout=120, **kwargs)
@@ -107,9 +108,11 @@ def execute_tool(name: str, args: dict) -> str:
 # Build tool definitions from OpenAPI spec
 # ---------------------------------------------------------------------------
 
+
 def _build_tools() -> list[dict]:
     """Build Anthropic tool definitions from the OpenAPI spec."""
     import yaml
+
     spec = yaml.safe_load(OPENAPI_FILE.read_text())
 
     tools = []
@@ -139,23 +142,23 @@ def _build_tools() -> list[dict]:
 
             body = op.get("requestBody", {})
             body_schema = (
-                body.get("content", {})
-                    .get("application/json", {})
-                    .get("schema", {})
+                body.get("content", {}).get("application/json", {}).get("schema", {})
             )
             for prop, pdef in body_schema.get("properties", {}).items():
                 props[prop] = {k: v for k, v in pdef.items() if k != "required"}
             required += body_schema.get("required", [])
 
-            tools.append({
-                "name": op_id,
-                "description": desc.strip(),
-                "input_schema": {
-                    "type": "object",
-                    "properties": props,
-                    "required": list(dict.fromkeys(required)),  # dedup
-                },
-            })
+            tools.append(
+                {
+                    "name": op_id,
+                    "description": desc.strip(),
+                    "input_schema": {
+                        "type": "object",
+                        "properties": props,
+                        "required": list(dict.fromkeys(required)),  # dedup
+                    },
+                }
+            )
     return tools
 
 
@@ -163,7 +166,10 @@ def _build_tools() -> list[dict]:
 # Agentic loop
 # ---------------------------------------------------------------------------
 
-def run_agent(conversation_id: str, messages: list[dict], system: str, tools: list[dict]) -> str:
+
+def run_agent(
+    conversation_id: str, messages: list[dict], system: str, tools: list[dict]
+) -> str:
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     turn = 0
 
@@ -200,14 +206,19 @@ def run_agent(conversation_id: str, messages: list[dict], system: str, tools: li
         for block in response.content:
             if block.type != "tool_use":
                 continue
-            print(f"\n[tool] {block.name}({json.dumps(block.input, indent=2)[:300]})", flush=True)
+            print(
+                f"\n[tool] {block.name}({json.dumps(block.input, indent=2)[:300]})",
+                flush=True,
+            )
             result = execute_tool(block.name, block.input)
             print(f"[result] {result[:500]}", flush=True)
-            tool_results.append({
-                "type": "tool_result",
-                "tool_use_id": block.id,
-                "content": result,
-            })
+            tool_results.append(
+                {
+                    "type": "tool_result",
+                    "tool_use_id": block.id,
+                    "content": result,
+                }
+            )
 
         if not tool_results:
             break
@@ -221,8 +232,11 @@ def run_agent(conversation_id: str, messages: list[dict], system: str, tools: li
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Test bundle agent prompt interactively")
+    parser = argparse.ArgumentParser(
+        description="Test bundle agent prompt interactively"
+    )
     parser.add_argument("--srs", help="Path to SRS text file to pre-load")
     args = parser.parse_args()
 
@@ -235,19 +249,27 @@ def main():
     print(f"Server: {SERVER_URL}")
 
     # Store auth token
-    r = _call("POST", "/store-auth-token", json={
-        "conversation_id": conversation_id,
-        "auth_token": AUTH_TOKEN,
-    })
+    r = _call(
+        "POST",
+        "/store-auth-token",
+        json={
+            "conversation_id": conversation_id,
+            "auth_token": AUTH_TOKEN,
+        },
+    )
     print(f"Auth stored: {r}")
 
     # Pre-load SRS text if provided
     if args.srs:
         srs_text = Path(args.srs).read_text()
-        r = _call("POST", "/store-srs-text", json={
-            "conversation_id": conversation_id,
-            "srs_text": srs_text,
-        })
+        r = _call(
+            "POST",
+            "/store-srs-text",
+            json={
+                "conversation_id": conversation_id,
+                "srs_text": srs_text,
+            },
+        )
         print(f"SRS text stored: {r}")
 
     # Build system prompt
