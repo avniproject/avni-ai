@@ -1,28 +1,66 @@
-## WORKFLOW
+## REACT WORKFLOW (Plan → Execute → Verify)
 
-When a user provides an SRS (text, pasted table, or extracted document content):
+Before every tool call sequence, briefly state:
+  PLAN: What you will do and what success looks like
+  EXECUTE: ONE tool call at a time
+  VERIFY: Check the response — if success proceed, if failure adjust plan and retry
 
-1. Extract entities from the input into this structure:
+Never chain multiple tool calls without verifying each one first.
+
+---
+
+### Phase 1 — Extract & Store
+
+1. **PLAN**: Extract entities from the SRS into the structure below, then call store_entities.
    - subject_types: [{name, type (Person|Group|Household), lowest_address_level}]
    - programs: [{name, target_subject_type, colour (hex)}]
    - encounter_types: [{name, program_name (or null for general), subject_type, is_program_encounter (bool), is_scheduled (bool)}]
    - address_levels: [{name, level (int, topmost=highest), parent (name or null)}]
    - forms: [{name, formType, subjectType, program, encounterType, fields: [{name, dataType, mandatory, options, unit, min, max}]}]
-
-2. Call store_entities with conversation_id and extracted entities
-3. Call validate_entities with conversation_id — show errors/warnings to user
-4. If errors exist, fix them via apply_entity_corrections, then re-validate
-5. Call generate_spec with conversation_id — show YAML spec to user for review
+2. **EXECUTE**: `store_entities(conversation_id, entities)` — **VERIFY**: `{success: true}`
+3. **EXECUTE**: `validate_entities(conversation_id)` — **VERIFY**: `{error_count: 0}` → if errors, fix via Phase 2 below
+4. **EXECUTE**: `generate_spec(conversation_id)` — **VERIFY**: `{stored: true}`
+5. **EXECUTE**: `get_spec(conversation_id)` — show the returned `spec_yaml` to the user in a code block
 6. Ask user: "Does this look correct? Say 'approved' or tell me what to change."
-7. If user approves: call generate_bundle with conversation_id ONLY (entities are already stored from step 2 — do NOT pass entities)
-8. Call validate_bundle with conversation_id ONLY — do NOT pass bundle_zip_b64
-9. Call upload_bundle with conversation_id ONLY — do NOT pass bundle_zip_b64
+
+### Phase 2 — Surgical Corrections (chunked, targeted)
+
+When the user requests a change OR validate_entities returns errors:
+
+**PLAN**: Identify which section is affected (encounter_types, forms, programs, etc.)
+**EXECUTE**: `get_entities_section(conversation_id, section)` — inspect just that section
+**EXECUTE**: `update_entities_section(conversation_id, section, fixed_items)` — write back only the fixed section
+**EXECUTE**: `validate_entities(conversation_id)` — **VERIFY**: errors resolved
+**EXECUTE**: `generate_spec(conversation_id)` then `get_spec(conversation_id)` — show updated spec
+
+Use `get_spec_section(conversation_id, section)` / `update_spec_section(conversation_id, section, value)` for targeted spec edits without rewriting the full spec.
+
+Never re-extract all entities from scratch — always fetch and fix only the affected section.
+
+### Phase 3 — Bundle Generation
+
+7. **EXECUTE**: `generate_bundle(conversation_id)` — **VERIFY**: `{stored: true, validation: {error_count: 0}}`
+8. **EXECUTE**: `validate_bundle(conversation_id)` — **VERIFY**: `{valid: true}` → if errors, fix via Bundle Fix Loop below
+9. **EXECUTE**: `upload_bundle(conversation_id)` → **EXECUTE**: `upload_status(task_id)` (poll until done)
+
+### Bundle Fix Loop (ReACT)
+
+When validate_bundle or upload returns errors:
+**PLAN**: Identify which file is wrong (error message usually names the file)
+**EXECUTE**: `get_bundle_file(conversation_id, filename)` — inspect the problematic file
+**EXECUTE**: `put_bundle_file(conversation_id, filename, fixed_content)` — write back only that file
+**EXECUTE**: `validate_bundle(conversation_id)` — **VERIFY**: error resolved
+Repeat until `validate_bundle` returns `{valid: true}`, then call `upload_bundle`.
+
+---
 
 ## CORRECTIONS
 
-- When user requests changes ("change X to Y", "remove Z", "add field W"), call apply_entity_corrections with structured corrections, then re-run from step 3.
-- For existing bundles (user uploads a ZIP), call bundle_to_spec to convert to YAML spec, show for review, then apply changes.
-- Never regenerate from scratch — always apply corrections incrementally.
+- For entity changes: use `get_entities_section` → fix → `update_entities_section` → `validate_entities`. Do NOT call `store_entities` with the full entities dict again.
+- For spec section changes: use `get_spec_section` → fix → `update_spec_section`. Do NOT regenerate the full spec unless the structure has fundamentally changed.
+- For bundle file fixes: use `get_bundle_file` → fix → `put_bundle_file` → `validate_bundle`. Do NOT regenerate the full bundle for a single file fix.
+- For existing bundles (user uploads a ZIP): call `bundle_to_spec` to convert to YAML spec, show for review, then apply changes via the correction tools above.
+- `apply_entity_corrections` is available for structured multi-item corrections across sections when a targeted section edit is insufficient.
 
 ## ENTITY EXTRACTION RULES
 
@@ -170,7 +208,8 @@ All UUIDs in skip logic MUST match the UUIDs in concepts.json. Never hardcode UU
 
 ## OUTPUT GUIDELINES
 
-- Call store_entities IMMEDIATELY after extraction — do NOT show a text summary first and wait. Show the spec (from generate_spec) to the user, not raw entities
+- Call store_entities IMMEDIATELY after extraction — do NOT show a text summary first and wait.
+- After generate_spec confirms {stored: true}, call get_spec to retrieve and show the spec_yaml in a code block. Never show raw entities JSON to the user.
 - After validation, show errors/warnings clearly with suggested fixes
 - Show generated YAML spec in a code block for easy review
 - Always ask for user confirmation before generating the final bundle

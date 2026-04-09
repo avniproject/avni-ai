@@ -286,10 +286,13 @@ workflow:
               RULE 1 — CALL TOOLS IMMEDIATELY, NO USER PAUSE: When you extract
               entities from an SRS, do NOT show entities as a text plan and wait
               for the user. Call store_entities(conversation_id, entities), then
-              validate_entities(conversation_id), then generate_spec(conversation_id)
-              IN SEQUENCE — each as its own iteration, one after the other. Do NOT
-              pause between these calls to show text or ask the user anything. Only
-              after generate_spec returns do you show the spec and ask for approval.
+              validate_entities(conversation_id), then generate_spec(conversation_id),
+              then get_spec(conversation_id) IN SEQUENCE — each as its own iteration,
+              one after the other. Do NOT pause between these calls. Only after
+              get_spec returns do you show the spec_yaml in a code block and ask
+              for approval. For corrections, use get_entities_section /
+              update_entities_section for targeted section fixes instead of
+              re-extracting all entities.
 
               RULE 2 — generate_bundle uses conversation_id ONLY: When the user
               approves the spec, call generate_bundle(conversation_id) without any
@@ -683,6 +686,149 @@ workflow:
                 bundle by filename.
               tool_label: get_bundle_file
               tool_name: get_bundle_file
+              type: api
+            - enabled: true
+              extra:
+                description: Retrieve the full stored spec YAML for display. Call
+                  this after generate_spec confirms {stored: true}. Shows spec_yaml
+                  in the agent response for user review.
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Retrieve the full stored spec YAML for display to
+                the user after generate_spec confirms stored=true.
+              tool_label: get_spec
+              tool_name: get_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Fetch one section array from stored entities (e.g.
+                  encounter_types, forms). Use for targeted review or edit of one
+                  section without loading all entities. Valid sections — subject_types,
+                  programs, encounter_types, address_levels, forms.
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                section:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Fetch one section array from the stored entities
+                dict for targeted inspection or edit.
+              tool_label: get_entities_section
+              tool_name: get_entities_section
+              type: api
+            - enabled: true
+              extra:
+                description: Replace one section in the stored entities dict and
+                  re-store it. Use to fix just encounter_types, forms, or any other
+                  section without re-extracting all entities. Always validate_entities
+                  after this call.
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                section:
+                  auto: 1
+                  value: null
+                items:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Replace one section in the stored entities dict (surgical
+                edit without full re-extraction).
+              tool_label: update_entities_section
+              tool_name: update_entities_section
+              type: api
+            - enabled: true
+              extra:
+                description: Fetch one top-level section from the stored spec YAML
+                  (e.g. encounterTypes, programs, subjectTypes). Allows targeted
+                  review or edit of one section without retrieving the full spec.
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                section:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Fetch one top-level YAML section from the stored
+                spec for targeted inspection or edit.
+              tool_label: get_spec_section
+              tool_name: get_spec_section
+              type: api
+            - enabled: true
+              extra:
+                description: Replace one top-level section in the stored spec YAML
+                  and re-store it. Use to fix just one section (e.g. encounterTypes)
+                  without rewriting the full spec. Provide value (object) or yaml_fragment
+                  (string).
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                section:
+                  auto: 1
+                  value: null
+                value:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Replace one top-level section in the stored spec
+                YAML (surgical edit without regenerating the full spec).
+              tool_label: update_spec_section
+              tool_name: update_spec_section
+              type: api
+            - enabled: true
+              extra:
+                description: Replace one file in the stored generated bundle ZIP
+                  and re-store it. Use for surgical bundle fixes after validate_bundle
+                  reports errors — fix one file then re-validate, no full bundle
+                  regeneration needed. filename examples — 'forms/ANCForm.json',
+                  'concepts.json', 'formMappings.json'.
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                filename:
+                  auto: 1
+                  value: null
+                content:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Replace one file in the stored generated bundle ZIP
+                for surgical fixes without regenerating the full bundle.
+              tool_label: put_bundle_file
+              tool_name: put_bundle_file
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling

@@ -10,6 +10,7 @@ Endpoints:
 
 from __future__ import annotations
 
+import os
 import logging
 import time
 from typing import Any
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 # In-memory entity store keyed by conversation_id (TTL = 6 hours)
 # Allows agent tool calls to pass only conversation_id instead of full entities
 # ---------------------------------------------------------------------------
-_ENTITY_STORE_TTL = 6 * 3600  # seconds
+_ENTITY_STORE_TTL = int(os.getenv("ENTITY_STORE_TTL_HOURS", "6")) * 3600  # seconds
 
 
 class _EntityStore:
@@ -477,3 +478,102 @@ async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
 
     logger.info("apply-entity-corrections: applied %d corrections", len(corrections))
     return JSONResponse({"result": updated})
+
+
+_VALID_ENTITY_SECTIONS = {
+    "subject_types",
+    "programs",
+    "encounter_types",
+    "address_levels",
+    "forms",
+}
+
+
+async def handle_get_entities_section(request: Request) -> JSONResponse:
+    """
+    GET /entities-section?conversation_id=...&section=encounter_types
+    Returns one section array from the stored entities dict.
+    Valid sections: subject_types, programs, encounter_types, address_levels, forms
+    """
+    conversation_id = request.query_params.get("conversation_id")
+    section = request.query_params.get("section")
+    if not conversation_id or not section:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' or 'section' query param"},
+            status_code=400,
+        )
+
+    if section not in _VALID_ENTITY_SECTIONS:
+        return JSONResponse(
+            {
+                "error": f"Invalid section '{section}'. Valid: {sorted(_VALID_ENTITY_SECTIONS)}"
+            },
+            status_code=400,
+        )
+
+    entities = _entity_store.get(conversation_id)
+    if entities is None:
+        return JSONResponse(
+            {
+                "error": f"No entities found for conversation_id={conversation_id!r}. Call /store-entities first."
+            },
+            status_code=404,
+        )
+
+    items = entities.get(section, [])
+    logger.info(
+        "get-entities-section: conversation_id=%s section=%s count=%d",
+        conversation_id,
+        section,
+        len(items),
+    )
+    return JSONResponse({"section": section, "items": items, "count": len(items)})
+
+
+async def handle_put_entities_section(request: Request) -> JSONResponse:
+    """
+    PUT /entities-section
+    Body: { "conversation_id": "...", "section": "encounter_types", "items": [...] }
+    Replaces one section in the stored entities dict and re-stores it.
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    conversation_id = body.get("conversation_id")
+    section = body.get("section")
+    items = body.get("items")
+
+    if not conversation_id or not section:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' or 'section'"}, status_code=400
+        )
+    if section not in _VALID_ENTITY_SECTIONS:
+        return JSONResponse(
+            {
+                "error": f"Invalid section '{section}'. Valid: {sorted(_VALID_ENTITY_SECTIONS)}"
+            },
+            status_code=400,
+        )
+    if not isinstance(items, list):
+        return JSONResponse({"error": "'items' must be an array"}, status_code=400)
+
+    entities = _entity_store.get(conversation_id)
+    if entities is None:
+        return JSONResponse(
+            {
+                "error": f"No entities found for conversation_id={conversation_id!r}. Call /store-entities first."
+            },
+            status_code=404,
+        )
+
+    entities[section] = items
+    _entity_store.put(conversation_id, entities)
+    logger.info(
+        "put-entities-section: updated section=%s count=%d for conversation_id=%s",
+        section,
+        len(items),
+        conversation_id,
+    )
+    return JSONResponse({"updated": True, "section": section, "count": len(items)})

@@ -30,6 +30,7 @@ from .handlers.bundle_handlers import (
     handle_patch_bundle,
     handle_get_bundle_files,
     handle_get_bundle_file,
+    handle_put_bundle_file,
 )
 from .handlers.upload_handlers import handle_upload_bundle, handle_upload_status
 from .handlers.config_handlers import handle_get_existing_config
@@ -37,10 +38,15 @@ from .handlers.entity_handlers import (
     handle_store_entities,
     handle_validate_entities,
     handle_apply_entity_corrections,
+    handle_get_entities_section,
+    handle_put_entities_section,
 )
 from .auth_store import handle_store_auth_token
 from .handlers.spec_handlers import (
     handle_generate_spec,
+    handle_get_spec,
+    handle_get_spec_section,
+    handle_put_spec_section,
     handle_validate_spec,
     handle_spec_to_entities,
     handle_bundle_to_spec,
@@ -193,6 +199,18 @@ async def create_server():
     async def generate_spec_endpoint(request: Request):
         return await handle_generate_spec(request)
 
+    @server.custom_route("/get-spec", methods=["GET"])
+    async def get_spec_endpoint(request: Request):
+        return await handle_get_spec(request)
+
+    @server.custom_route("/spec-section", methods=["GET"])
+    async def get_spec_section_endpoint(request: Request):
+        return await handle_get_spec_section(request)
+
+    @server.custom_route("/spec-section", methods=["PUT"])
+    async def put_spec_section_endpoint(request: Request):
+        return await handle_put_spec_section(request)
+
     @server.custom_route("/validate-spec", methods=["POST"])
     async def validate_spec_endpoint(request: Request):
         return await handle_validate_spec(request)
@@ -226,6 +244,15 @@ async def create_server():
     async def patch_bundle_endpoint(request: Request):
         return await handle_patch_bundle(request)
 
+    # --- Entity Section Access ---
+    @server.custom_route("/entities-section", methods=["GET"])
+    async def get_entities_section_endpoint(request: Request):
+        return await handle_get_entities_section(request)
+
+    @server.custom_route("/entities-section", methods=["PUT"])
+    async def put_entities_section_endpoint(request: Request):
+        return await handle_put_entities_section(request)
+
     # --- Bundle File Inspection ---
     @server.custom_route("/bundle-files", methods=["GET"])
     async def get_bundle_files_endpoint(request: Request):
@@ -234,6 +261,10 @@ async def create_server():
     @server.custom_route("/bundle-file", methods=["GET"])
     async def get_bundle_file_endpoint(request: Request):
         return await handle_get_bundle_file(request)
+
+    @server.custom_route("/bundle-file", methods=["PUT"])
+    async def put_bundle_file_endpoint(request: Request):
+        return await handle_put_bundle_file(request)
 
     # --- Bundle Upload ---
     @server.custom_route("/upload-bundle", methods=["POST"])

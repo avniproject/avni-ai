@@ -2,16 +2,22 @@
 spec_handlers.py — HTTP handlers for the spec stage
 
 Endpoints:
-  POST /generate-spec      entities dict → YAML spec string
-  POST /validate-spec      YAML spec string → validation result
-  POST /spec-to-entities   YAML spec string → full entities dict
-  POST /bundle-to-spec     existing bundle JSON → YAML spec string
+  POST /generate-spec        entities dict → YAML spec string (stores server-side when conversation_id given)
+  GET  /get-spec             retrieve stored spec YAML by conversation_id
+  GET  /spec-section         fetch one top-level YAML section from stored spec
+  PUT  /spec-section         replace one top-level YAML section in stored spec
+  POST /validate-spec        YAML spec string → validation result
+  POST /spec-to-entities     YAML spec string → full entities dict
+  POST /bundle-to-spec       existing bundle JSON → YAML spec string
 """
 
 from __future__ import annotations
 
 import logging
+import os
+import time
 
+import yaml
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -22,13 +28,76 @@ from .entity_handlers import _entity_store
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# In-memory spec store keyed by conversation_id (TTL configurable via env)
+# generate_spec stores the full YAML here and returns only a compact summary,
+# keeping large YAML off the LLM context window entirely.
+# ---------------------------------------------------------------------------
+_SPEC_STORE_TTL = int(os.getenv("SPEC_STORE_TTL_HOURS", "6")) * 3600
+_MAX_SPEC_RESPONSE_CHARS = int(os.getenv("MAX_SPEC_RESPONSE_CHARS", "8000"))
+
+
+class _SpecStore:
+    def __init__(self) -> None:
+        self._store: dict[str, tuple[str, float]] = {}  # id -> (spec_yaml, expiry)
+
+    def put(self, conversation_id: str, spec_yaml: str) -> None:
+        self._store[conversation_id] = (spec_yaml, time.time() + _SPEC_STORE_TTL)
+
+    def get(self, conversation_id: str) -> str | None:
+        entry = self._store.get(conversation_id)
+        if entry is None:
+            return None
+        spec_yaml, expiry = entry
+        if time.time() > expiry:
+            del self._store[conversation_id]
+            return None
+        return spec_yaml
+
+    def put_section(self, conversation_id: str, section: str, value: object) -> bool:
+        """Replace one top-level key in the stored YAML. Returns False if not found."""
+        spec_yaml = self.get(conversation_id)
+        if spec_yaml is None:
+            return False
+        try:
+            data = yaml.safe_load(spec_yaml) or {}
+        except Exception:
+            return False
+        data[section] = value
+        new_yaml = yaml.dump(
+            data, allow_unicode=True, default_flow_style=False, sort_keys=False
+        )
+        self._store[conversation_id] = (new_yaml, time.time() + _SPEC_STORE_TTL)
+        return True
+
+    def cleanup(self) -> int:
+        now = time.time()
+        expired = [k for k, (_, exp) in self._store.items() if now > exp]
+        for k in expired:
+            del self._store[k]
+        return len(expired)
+
+
+_spec_store = _SpecStore()
+
+
+def get_spec_store() -> _SpecStore:
+    """Return the global spec store."""
+    return _spec_store
+
 
 async def handle_generate_spec(request: Request) -> JSONResponse:
     """
     POST /generate-spec
-    Body: { "entities": {...}, "org_name": "..." }
-      OR: { "conversation_id": "...", "org_name": "..." }  — looks up entities from store
-    Returns: { "spec_yaml": "..." }
+    Body: { "conversation_id": "...", "org_name": "..." }  — preferred
+      OR: { "entities": {...}, "org_name": "..." }           — legacy
+
+    When conversation_id is provided:
+      - Entities are fetched from the entity store.
+      - Generated spec is stored server-side in _spec_store.
+      - Returns a compact summary only — spec_yaml never reaches the LLM.
+      - Call GET /get-spec to retrieve the full YAML for display.
+    Legacy (no conversation_id): returns spec_yaml directly.
     """
     try:
         body = await request.json()
@@ -62,8 +131,173 @@ async def handle_generate_spec(request: Request) -> JSONResponse:
         logger.exception("generate-spec error")
         return JSONResponse({"error": str(exc)}, status_code=500)
 
-    logger.info("generate-spec: produced spec for org='%s'", org_name)
+    if conversation_id:
+        # Store spec server-side; return compact summary only — no large YAML to LLM
+        _spec_store.put(conversation_id, spec_yaml)
+        try:
+            parsed = yaml.safe_load(spec_yaml) or {}
+        except Exception:
+            parsed = {}
+        summary = {
+            k: (len(v) if isinstance(v, list) else ("present" if v else "empty"))
+            for k, v in parsed.items()
+            if k not in ("org", "settings")
+        }
+        logger.info(
+            "generate-spec: stored spec for conversation_id=%s char_count=%d summary=%s",
+            conversation_id,
+            len(spec_yaml),
+            summary,
+        )
+        return JSONResponse(
+            {
+                "stored": True,
+                "char_count": len(spec_yaml),
+                "summary": summary,
+                "next_step": "Call get_spec(conversation_id) to retrieve and show the full spec to the user.",
+            }
+        )
+
+    # Legacy: return spec_yaml directly (no conversation_id)
+    logger.info("generate-spec: produced spec for org='%s' (legacy mode)", org_name)
     return JSONResponse({"spec_yaml": spec_yaml})
+
+
+async def handle_get_spec(request: Request) -> JSONResponse:
+    """
+    GET /get-spec?conversation_id=...
+    Returns the full stored spec YAML for display to the user.
+    Agent calls this after generate_spec confirms stored=true.
+    Response is capped at MAX_SPEC_RESPONSE_CHARS as a safety fallback.
+    """
+    conversation_id = request.query_params.get("conversation_id")
+    if not conversation_id:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' query param"}, status_code=400
+        )
+
+    spec_yaml = _spec_store.get(conversation_id)
+    if spec_yaml is None:
+        return JSONResponse(
+            {
+                "error": f"No stored spec for conversation_id={conversation_id!r}. Call generate_spec first."
+            },
+            status_code=404,
+        )
+
+    truncated = False
+    if len(spec_yaml) > _MAX_SPEC_RESPONSE_CHARS:
+        spec_yaml = spec_yaml[:_MAX_SPEC_RESPONSE_CHARS]
+        truncated = True
+
+    logger.info(
+        "get-spec: returning spec for conversation_id=%s truncated=%s",
+        conversation_id,
+        truncated,
+    )
+    return JSONResponse({"spec_yaml": spec_yaml, "truncated": truncated})
+
+
+async def handle_get_spec_section(request: Request) -> JSONResponse:
+    """
+    GET /spec-section?conversation_id=...&section=encounterTypes
+    Returns one top-level YAML key from the stored spec.
+    Valid sections: subjectTypes, programs, encounterTypes, addressLevels, groups, settings, org
+    """
+    conversation_id = request.query_params.get("conversation_id")
+    section = request.query_params.get("section")
+    if not conversation_id or not section:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' or 'section' query param"},
+            status_code=400,
+        )
+
+    spec_yaml = _spec_store.get(conversation_id)
+    if spec_yaml is None:
+        return JSONResponse(
+            {
+                "error": f"No stored spec for conversation_id={conversation_id!r}. Call generate_spec first."
+            },
+            status_code=404,
+        )
+
+    try:
+        data = yaml.safe_load(spec_yaml) or {}
+    except Exception as exc:
+        return JSONResponse(
+            {"error": f"Failed to parse stored spec: {exc}"}, status_code=500
+        )
+
+    if section not in data:
+        return JSONResponse(
+            {"error": f"Section '{section}' not found. Available: {list(data.keys())}"},
+            status_code=404,
+        )
+
+    section_value = data[section]
+    section_yaml = yaml.dump(
+        {section: section_value},
+        allow_unicode=True,
+        default_flow_style=False,
+        sort_keys=False,
+    )
+    logger.info(
+        "get-spec-section: conversation_id=%s section=%s", conversation_id, section
+    )
+    return JSONResponse(
+        {"section": section, "value": section_value, "yaml": section_yaml}
+    )
+
+
+async def handle_put_spec_section(request: Request) -> JSONResponse:
+    """
+    PUT /spec-section
+    Body: { "conversation_id": "...", "section": "encounterTypes", "value": [...] }
+      OR: { "conversation_id": "...", "section": "encounterTypes", "yaml_fragment": "encounterTypes:\n  - ..." }
+    Replaces one top-level key in the stored spec and re-stores it.
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    conversation_id = body.get("conversation_id")
+    section = body.get("section")
+    if not conversation_id or not section:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' or 'section'"}, status_code=400
+        )
+
+    # Accept either a parsed value or a YAML fragment string
+    if "value" in body:
+        new_value = body["value"]
+    elif "yaml_fragment" in body:
+        try:
+            fragment = yaml.safe_load(body["yaml_fragment"]) or {}
+            new_value = fragment.get(section, fragment)  # unwrap if keyed
+        except Exception as exc:
+            return JSONResponse(
+                {"error": f"Invalid yaml_fragment: {exc}"}, status_code=400
+            )
+    else:
+        return JSONResponse(
+            {"error": "Provide 'value' or 'yaml_fragment'"}, status_code=400
+        )
+
+    if not _spec_store.put_section(conversation_id, section, new_value):
+        return JSONResponse(
+            {
+                "error": f"No stored spec for conversation_id={conversation_id!r}. Call generate_spec first."
+            },
+            status_code=404,
+        )
+
+    logger.info(
+        "put-spec-section: updated section=%s for conversation_id=%s",
+        section,
+        conversation_id,
+    )
+    return JSONResponse({"updated": True, "section": section})
 
 
 async def handle_validate_spec(request: Request) -> JSONResponse:

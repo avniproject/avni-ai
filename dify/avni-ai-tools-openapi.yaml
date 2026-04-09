@@ -149,7 +149,12 @@ paths:
   /generate-spec:
     post:
       operationId: generate_spec
-      summary: Generate a human-readable YAML spec from entities
+      summary: Generate a YAML spec from stored entities and store it server-side
+      description: |
+        When conversation_id is provided the generated spec is stored server-side
+        and ONLY a compact summary is returned — spec_yaml never reaches the LLM.
+        After this returns {stored: true}, call GET /get-spec to retrieve the full
+        YAML for display to the user. Legacy mode (no conversation_id) returns spec_yaml directly.
       requestBody:
         required: true
         content:
@@ -167,14 +172,25 @@ paths:
                 - conversation_id
       responses:
         '200':
-          description: Generated YAML spec
+          description: Spec stored confirmation with summary (preferred) or spec_yaml (legacy)
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  stored:
+                    type: boolean
+                    description: True when spec was stored server-side
+                  char_count:
+                    type: integer
+                  summary:
+                    type: object
+                    description: Section-level counts (e.g. {encounterTypes: 5, programs: 3})
+                  next_step:
+                    type: string
                   spec_yaml:
                     type: string
+                    description: Only present in legacy mode (no conversation_id)
 
   /validate-spec:
     post:
@@ -623,6 +639,195 @@ paths:
         '404':
           description: No stored bundle found for conversation_id
 
+  /get-spec:
+    get:
+      operationId: get_spec
+      summary: Retrieve the full stored spec YAML for display to the user
+      description: |
+        Call this after generate_spec confirms {stored: true}. Returns the full
+        spec_yaml for the agent to show in a code block. Response is capped at
+        MAX_SPEC_RESPONSE_CHARS (default 8000) as a safety fallback; truncated=true
+        indicates the spec was cut — use get_spec_section to retrieve individual sections.
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID
+      responses:
+        '200':
+          description: Full spec YAML
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  spec_yaml:
+                    type: string
+                  truncated:
+                    type: boolean
+        '404':
+          description: No stored spec for conversation_id
+
+  /spec-section:
+    get:
+      operationId: get_spec_section
+      summary: Fetch one top-level section from the stored spec
+      description: |
+        Returns a single top-level YAML key (e.g. encounterTypes, programs) so the
+        agent can review or edit one section at a time without loading the full spec.
+        Valid sections: subjectTypes, programs, encounterTypes, addressLevels, groups
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: section
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Top-level YAML key to fetch
+      responses:
+        '200':
+          description: Section value and YAML fragment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  section:
+                    type: string
+                  value:
+                    description: Parsed value of the section
+                  yaml:
+                    type: string
+                    description: YAML-formatted fragment for the section
+        '404':
+          description: Section or stored spec not found
+    put:
+      operationId: update_spec_section
+      summary: Replace one top-level section in the stored spec
+      description: |
+        Surgical edit — replaces a single top-level YAML key and re-stores the spec.
+        Use to fix one section (e.g. encounterTypes) without rewriting the whole spec.
+        Provide either 'value' (parsed object) or 'yaml_fragment' (YAML string).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+                section:
+                  type: string
+                  description: Top-level YAML key to replace
+                value:
+                  description: Replacement value (parsed JSON object/array)
+                yaml_fragment:
+                  type: string
+                  description: Replacement as a YAML string fragment
+              required:
+                - conversation_id
+                - section
+      responses:
+        '200':
+          description: Section updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: boolean
+                  section:
+                    type: string
+        '404':
+          description: No stored spec for conversation_id
+
+  /entities-section:
+    get:
+      operationId: get_entities_section
+      summary: Fetch one section from the stored entities dict
+      description: |
+        Returns a single section array (e.g. encounter_types, forms) from the stored
+        entities so the agent can review or fix one section without loading all entities.
+        Valid sections: subject_types, programs, encounter_types, address_levels, forms
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: section
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Entity section key
+      responses:
+        '200':
+          description: Section items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  section:
+                    type: string
+                  items:
+                    type: array
+                  count:
+                    type: integer
+        '404':
+          description: No stored entities for conversation_id
+    put:
+      operationId: update_entities_section
+      summary: Replace one section in the stored entities dict
+      description: |
+        Surgical edit — replaces a single entity section and re-stores it.
+        Use to fix one section (e.g. encounter_types) without re-extracting all entities.
+        Valid sections: subject_types, programs, encounter_types, address_levels, forms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+                section:
+                  type: string
+                  description: Entity section key to replace
+                items:
+                  type: array
+                  description: Replacement array for the section
+              required:
+                - conversation_id
+                - section
+                - items
+      responses:
+        '200':
+          description: Section updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: boolean
+                  section:
+                    type: string
+                  count:
+                    type: integer
+        '404':
+          description: No stored entities for conversation_id
+
   /bundle-file:
     get:
       operationId: get_bundle_file
@@ -684,6 +889,49 @@ paths:
                     type: array
                     items:
                       type: string
+    put:
+      operationId: put_bundle_file
+      summary: Replace one file in the stored generated bundle ZIP
+      description: |
+        Opens the stored generated bundle ZIP, replaces the specified file with the
+        provided content, and re-stores it. Use this for surgical bundle fixes after
+        validate_bundle reports errors — fix one file, re-validate, re-upload.
+        content can be a JSON object (auto-serialised) or a raw string.
+        Only works on bundle_type='generated'.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+                filename:
+                  type: string
+                  description: Path within the ZIP, e.g. 'forms/ANCForm.json'
+                content:
+                  description: Replacement content — JSON object/array or string
+              required:
+                - conversation_id
+                - filename
+                - content
+      responses:
+        '200':
+          description: File updated in bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: boolean
+                  filename:
+                    type: string
+                  size_bytes:
+                    type: integer
+        '404':
+          description: No stored bundle for conversation_id
 
   /execute-python:
     post:

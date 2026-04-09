@@ -25,7 +25,11 @@ class ApiResult:
 
 class AvniClient:
     def __init__(
-        self, base_url=os.getenv("AVNI_BASE_URL"), timeout_seconds: float = 30.0
+        self,
+        base_url=os.getenv("AVNI_BASE_URL"),
+        timeout_seconds: float = float(
+            os.getenv("AVNI_CLIENT_TIMEOUT_SECONDS", "60.0")
+        ),
     ):
         self.base_url = base_url
         self.timeout = timeout_seconds

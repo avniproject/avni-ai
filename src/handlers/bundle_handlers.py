@@ -7,9 +7,12 @@ Endpoints: POST /generate-bundle, POST /validate-bundle, GET /download-bundle,
 from __future__ import annotations
 
 import base64
+import io
 import json
 import logging
+import os
 import time
+import zipfile
 
 import httpx
 from starlette.requests import Request
@@ -28,7 +31,7 @@ logger = logging.getLogger(__name__)
 # Allows agent tool calls to pass only conversation_id instead of bundle_zip_b64,
 # keeping large binary payloads off the LLM context entirely.
 # ---------------------------------------------------------------------------
-_BUNDLE_STORE_TTL = 6 * 3600  # seconds
+_BUNDLE_STORE_TTL = int(os.getenv("BUNDLE_STORE_TTL_HOURS", "6")) * 3600  # seconds
 
 
 class _BundleStore:
@@ -757,4 +760,75 @@ async def handle_get_bundle_file(request: Request) -> JSONResponse:
         )
     except Exception as e:
         logger.exception("get-bundle-file failed")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+async def handle_put_bundle_file(request: Request) -> JSONResponse:
+    """
+    PUT /bundle-file
+    Body: { "conversation_id": "...", "filename": "forms/ANCForm.json", "content": {...} }
+    Replaces one file inside the stored generated bundle ZIP and re-stores it.
+    content can be a JSON object (serialised automatically) or a raw string.
+    Only works on bundle_type='generated' (the agent cannot mutate an existing org bundle).
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    conversation_id = body.get("conversation_id")
+    filename = body.get("filename")
+    content = body.get("content")
+
+    if not conversation_id:
+        return JSONResponse({"error": "Missing 'conversation_id'"}, status_code=400)
+    if not filename:
+        return JSONResponse({"error": "Missing 'filename'"}, status_code=400)
+    if content is None:
+        return JSONResponse({"error": "Missing 'content'"}, status_code=400)
+
+    stored = _bundle_store.get(conversation_id)
+    if stored is None:
+        return JSONResponse(
+            {
+                "error": f"No stored bundle for conversation_id={conversation_id!r}. Call generate_bundle first."
+            },
+            status_code=404,
+        )
+
+    try:
+        zip_bytes = base64.b64decode(stored["zip_b64"])
+        file_map = unzip_to_map(zip_bytes)
+
+        # Serialise content to bytes
+        if isinstance(content, (dict, list)):
+            file_bytes = json.dumps(content, indent=2, ensure_ascii=False).encode(
+                "utf-8"
+            )
+        else:
+            file_bytes = str(content).encode("utf-8")
+
+        file_map[filename] = file_bytes
+
+        # Re-zip
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+            for name, data in file_map.items():
+                zf.writestr(name, data)
+        new_zip_bytes = buf.getvalue()
+        new_zip_b64 = base64.b64encode(new_zip_bytes).decode("ascii")
+
+        # Re-store (keep existing bundle dict, update zip_b64)
+        _bundle_store.put(conversation_id, new_zip_b64, stored["bundle"])
+        logger.info(
+            "put-bundle-file: updated filename=%s for conversation_id=%s new_size=%d",
+            filename,
+            conversation_id,
+            len(file_bytes),
+        )
+        return JSONResponse(
+            {"updated": True, "filename": filename, "size_bytes": len(file_bytes)}
+        )
+    except Exception as e:
+        logger.exception("put-bundle-file failed")
         return JSONResponse({"error": str(e)}, status_code=500)
