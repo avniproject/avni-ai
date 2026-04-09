@@ -267,6 +267,47 @@ workflow:
       type: custom
       width: 242
     - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-srs-text
+            key: ''
+            type: text
+            value: '{"conversation_id": "{{#sys.conversation_id#}}", "srs_text": "{{#1775644994029.text#}}"}'
+          type: json
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: Store SRS Text
+        type: http-request
+        url: '{{#conversation.avni_mcp_server_url#}}store-srs-text'
+        variables: []
+      height: 141
+      id: '1775644994030'
+      position:
+        x: 597.4285714285714
+        y: 52.71428571428571
+      positionAbsolute:
+        x: 597.4285714285714
+        y: 52.71428571428571
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
         agent_parameters:
           instruction:
             type: constant
@@ -304,6 +345,12 @@ workflow:
               RULE 4 — upload_bundle uses conversation_id ONLY: Call upload_bundle(conversation_id).
               Do NOT pass bundle_zip_b64.
 
+              RULE 5 — SRS DOCUMENT IS PRE-STORED: When the user uploads an SRS
+              file, the document text has already been stored server-side before
+              you start. Call get_srs_text(conversation_id) to retrieve it. Do NOT
+              read the document text from the query field — it is not included
+              there to avoid request size limits.
+
 
               {{#1775646587226.body#}}'
           maximum_iterations:
@@ -325,7 +372,7 @@ workflow:
               type: model-selector
           query:
             type: constant
-            value: "{{#sys.query#}}\n\n Uploaded document content:\n {{#1775644994029.text#}}"
+            value: "{{#sys.query#}}"
           tools:
             type: constant
             value:

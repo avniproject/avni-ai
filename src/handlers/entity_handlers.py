@@ -60,6 +60,87 @@ def get_entity_store() -> _EntityStore:
     return _entity_store
 
 
+# ---------------------------------------------------------------------------
+# SRS text store — keeps raw extracted SRS text server-side so the Dify
+# workflow never needs to pass large document blobs through the agent query.
+# ---------------------------------------------------------------------------
+_SRS_TEXT_STORE_TTL = int(os.getenv("ENTITY_STORE_TTL_HOURS", "6")) * 3600
+
+
+class _SrsTextStore:
+    def __init__(self) -> None:
+        self._store: dict[str, tuple[str, float]] = {}
+
+    def put(self, conversation_id: str, text: str) -> None:
+        self._store[conversation_id] = (text, time.time() + _SRS_TEXT_STORE_TTL)
+
+    def get(self, conversation_id: str) -> str | None:
+        entry = self._store.get(conversation_id)
+        if entry is None:
+            return None
+        text, expiry = entry
+        if time.time() > expiry:
+            del self._store[conversation_id]
+            return None
+        return text
+
+
+_srs_text_store = _SrsTextStore()
+
+
+async def handle_store_srs_text(request: Request) -> JSONResponse:
+    """
+    POST /store-srs-text
+    Body: { "conversation_id": "...", "srs_text": "..." }
+    Caches extracted SRS document text server-side to avoid passing large blobs
+    through the agent query field.
+    Returns: { "ok": true, "char_count": N }
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    conversation_id = body.get("conversation_id")
+    srs_text = body.get("srs_text", "")
+
+    if not conversation_id:
+        return JSONResponse({"error": "Missing 'conversation_id'"}, status_code=400)
+    if not isinstance(srs_text, str):
+        return JSONResponse({"error": "'srs_text' must be a string"}, status_code=400)
+
+    _srs_text_store.put(conversation_id, srs_text)
+    logger.info(
+        "store-srs-text: stored %d chars for conversation_id=%s",
+        len(srs_text),
+        conversation_id,
+    )
+    return JSONResponse({"ok": True, "char_count": len(srs_text)})
+
+
+async def handle_get_srs_text(request: Request) -> JSONResponse:
+    """
+    GET /get-srs-text?conversation_id=...
+    Returns the stored SRS document text for the given conversation.
+    Returns: { "srs_text": "...", "char_count": N }
+    """
+    conversation_id = request.query_params.get("conversation_id")
+    if not conversation_id:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' query param"}, status_code=400
+        )
+
+    text = _srs_text_store.get(conversation_id)
+    if text is None:
+        return JSONResponse(
+            {
+                "error": f"No SRS text found for conversation_id={conversation_id}. It may have expired (TTL 6h)."
+            },
+            status_code=404,
+        )
+    return JSONResponse({"srs_text": text, "char_count": len(text)})
+
+
 SECTION_MAP = {
     "subject_type": "subject_types",
     "program": "programs",

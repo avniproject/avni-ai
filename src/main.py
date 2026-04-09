@@ -40,6 +40,8 @@ from .handlers.entity_handlers import (
     handle_apply_entity_corrections,
     handle_get_entities_section,
     handle_put_entities_section,
+    handle_store_srs_text,
+    handle_get_srs_text,
 )
 from .auth_store import handle_store_auth_token
 from .handlers.spec_handlers import (
@@ -180,6 +182,15 @@ async def create_server():
     @server.custom_route("/store-auth-token", methods=["POST"])
     async def store_auth_token_endpoint(request: Request):
         return await handle_store_auth_token(request)
+
+    # --- SRS Text Store ---
+    @server.custom_route("/store-srs-text", methods=["POST"])
+    async def store_srs_text_endpoint(request: Request):
+        return await handle_store_srs_text(request)
+
+    @server.custom_route("/get-srs-text", methods=["GET"])
+    async def get_srs_text_endpoint(request: Request):
+        return await handle_get_srs_text(request)
 
     # --- Entity Validation ---
     @server.custom_route("/store-entities", methods=["POST"])

@@ -40,6 +40,34 @@ paths:
                   conversation_id:
                     type: string
 
+  /get-srs-text:
+    get:
+      operationId: get_srs_text
+      summary: Retrieve the stored SRS document text for this conversation
+      description: The SRS document text is pre-stored server-side by the Dify workflow before the agent starts. Call this to fetch the full text for entity extraction instead of reading it from the query field.
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID (sys.conversation_id)
+      responses:
+        '200':
+          description: SRS text retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  srs_text:
+                    type: string
+                    description: Full extracted SRS document text
+                  char_count:
+                    type: integer
+        '404':
+          description: No SRS text found (not uploaded or expired)
+
   /store-entities:
     post:
       operationId: store_entities
