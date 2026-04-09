@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # keeping large YAML off the LLM context window entirely.
 # ---------------------------------------------------------------------------
 _SPEC_STORE_TTL = int(os.getenv("SPEC_STORE_TTL_HOURS", "6")) * 3600
-_MAX_SPEC_RESPONSE_CHARS = int(os.getenv("MAX_SPEC_RESPONSE_CHARS", "40000"))
+_MAX_SPEC_RESPONSE_CHARS = int(os.getenv("MAX_SPEC_RESPONSE_CHARS", "8000"))
 
 
 class _SpecStore:
@@ -185,12 +185,23 @@ async def handle_get_spec(request: Request) -> JSONResponse:
             status_code=404,
         )
 
-    logger.info(
-        "get-spec: returning spec for conversation_id=%s char_count=%d",
-        conversation_id,
-        len(spec_yaml),
-    )
-    return JSONResponse({"spec_yaml": spec_yaml, "truncated": False})
+    full_len = len(spec_yaml)
+    truncated = full_len > _MAX_SPEC_RESPONSE_CHARS
+    if truncated:
+        spec_yaml = spec_yaml[:_MAX_SPEC_RESPONSE_CHARS]
+        logger.warning(
+            "get-spec: truncating spec for conversation_id=%s from %d to %d chars (set MAX_SPEC_RESPONSE_CHARS env var to increase)",
+            conversation_id,
+            full_len,
+            _MAX_SPEC_RESPONSE_CHARS,
+        )
+    else:
+        logger.info(
+            "get-spec: returning spec for conversation_id=%s char_count=%d",
+            conversation_id,
+            full_len,
+        )
+    return JSONResponse({"spec_yaml": spec_yaml, "truncated": truncated})
 
 
 async def handle_get_spec_section(request: Request) -> JSONResponse:

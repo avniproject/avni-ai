@@ -451,6 +451,13 @@ workflow:
               RULE 4 — upload_bundle uses conversation_id ONLY: Call upload_bundle(conversation_id).
               Do NOT pass bundle_zip_b64.
 
+              RULE 5 — NEVER RE-FETCH DATA YOU ALREADY HAVE: If get_spec, get_entities_section,
+              or get_existing_config was called earlier in this conversation, do NOT
+              call it again unless the data was explicitly changed (e.g., update_spec_section
+              was called). For targeted inspection on subsequent turns, use get_spec_section(section=...)
+              instead of repeating get_spec. This rule exists to keep context size
+              small across turns.
+
 
               {{#1775646587226.body#}}'
           maximum_iterations:
@@ -1179,7 +1186,7 @@ workflow:
             {{#sys.files#}}'
           window:
             enabled: true
-            size: 10
+            size: 5
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
         selected: false

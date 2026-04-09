@@ -512,8 +512,11 @@ async def handle_validate_entities(request: Request) -> JSONResponse:
 
     # When using conversation_id, don't return the full entities dict — it can
     # exceed Dify's 64KB tool response buffer and get silently truncated.
-    # Instead return a compact summary so the agent knows what's stored.
+    # Also drop issues_summary (a formatted multiline copy of the issues array) —
+    # the agent reads has_errors/error_count/warning_count/issues directly, and
+    # the duplicate text contributes ~2 400 chars of unnecessary context per call.
     if conversation_id:
+        result.pop("issues_summary", None)
         result["entity_counts"] = {
             k: len(v) if isinstance(v, list) else 1 for k, v in entities.items()
         }

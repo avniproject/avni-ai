@@ -620,20 +620,68 @@ paths:
     get:
       operationId: get_existing_config
       summary: Download the current organisation configuration from Avni
+      description: |
+        Fetches up to six resource arrays from the Avni server. Use the optional
+        query params to limit what is returned and avoid large context payloads.
+        Default cap per array: MAX_CONFIG_ITEMS env var (100 items). Pass max_items=0
+        for unlimited. Truncated arrays include a companion '{key}_truncated' object
+        with {truncated: true, total: N, returned: M}.
       parameters:
-        - name: includeLocations
+        - name: sections
           in: query
           required: false
           schema:
-            type: boolean
-          description: Whether to include location data
+            type: string
+          description: |
+            Comma-separated list of sections to fetch. Valid values:
+            addressLevelTypes, locations, catchments, subjectTypes, programs, encounterTypes.
+            Default: all sections.
+          example: subjectTypes,programs,encounterTypes
+        - name: max_items
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: |
+            Cap each returned array to this many items. 0 = unlimited.
+            Default: MAX_CONFIG_ITEMS env var (100).
+          example: 50
       responses:
         '200':
-          description: Current organisation bundle
+          description: Requested configuration sections
           content:
             application/json:
               schema:
                 type: object
+                properties:
+                  addressLevelTypes:
+                    type: array
+                    items:
+                      type: object
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                  catchments:
+                    type: array
+                    items:
+                      type: object
+                  subjectTypes:
+                    type: array
+                    items:
+                      type: object
+                  programs:
+                    type: array
+                    items:
+                      type: object
+                  encounterTypes:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          description: Unauthorized — missing or expired auth token
+        '502':
+          description: Upstream Avni server error
 
   /download-bundle-b64:
     get:
