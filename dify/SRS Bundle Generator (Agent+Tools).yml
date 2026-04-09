@@ -67,6 +67,17 @@ workflow:
       allowed_file_upload_methods:
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -431,7 +442,7 @@ workflow:
                 prompt_caching_tool_results: true
                 temperature: 0.2
               mode: chat
-              model: claude-opus-4-6
+              model: claude-sonnet-4-6
               model_type: llm
               provider: langgenius/anthropic/anthropic
               type: model-selector
@@ -1340,7 +1351,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -623.5
-      y: 161.5
+      x: -1472.3999999999999
+      y: 389.25
       zoom: 0.7
   rag_pipeline_variables: []
