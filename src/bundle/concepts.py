@@ -56,7 +56,7 @@ class ConceptGenerator:
         if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
             return concept_uuid
         answers = []
-        for idx, option in enumerate(field.get("options", [])):
+        for idx, option in enumerate(field.get("options") or []):
             answer_uuid = self.generate_answer_concept(option)
             answers.append({"name": option.strip(), "uuid": answer_uuid, "order": idx})
         self.generated_concepts.append(

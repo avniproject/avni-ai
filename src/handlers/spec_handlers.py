@@ -185,17 +185,12 @@ async def handle_get_spec(request: Request) -> JSONResponse:
             status_code=404,
         )
 
-    truncated = False
-    if len(spec_yaml) > _MAX_SPEC_RESPONSE_CHARS:
-        spec_yaml = spec_yaml[:_MAX_SPEC_RESPONSE_CHARS]
-        truncated = True
-
     logger.info(
-        "get-spec: returning spec for conversation_id=%s truncated=%s",
+        "get-spec: returning spec for conversation_id=%s char_count=%d",
         conversation_id,
-        truncated,
+        len(spec_yaml),
     )
-    return JSONResponse({"spec_yaml": spec_yaml, "truncated": truncated})
+    return JSONResponse({"spec_yaml": spec_yaml, "truncated": False})
 
 
 async def handle_get_spec_section(request: Request) -> JSONResponse:
