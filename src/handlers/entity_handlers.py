@@ -596,6 +596,7 @@ _VALID_ENTITY_SECTIONS = {
     "encounter_types",
     "address_levels",
     "forms",
+    "misc_sheets",
 }
 
 
