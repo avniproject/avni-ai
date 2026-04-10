@@ -1155,6 +1155,17 @@ paths:
     post:
       operationId: execute_python
       summary: Execute Python code in a sandboxed environment
+      description: |
+        Runs Python code in a per-conversation silo directory. Always pass conversation_id (required for auth).
+
+        For large inputs: use input_bundle_files to copy bundle files into the silo before execution —
+        the script can then open them as local files (e.g. open("concepts.json")) without any token cost.
+
+        For large outputs: have the script write to files (e.g. open("output.json","w").write(...))
+        and read them back with read_silo_file using offset/limit pagination.
+
+        stdout/stderr are truncated at 2000 chars inline. If truncated, use read_silo_file to read
+        any output files the script wrote.
       requestBody:
         required: true
         content:
@@ -1168,9 +1179,17 @@ paths:
                 code:
                   type: string
                   description: Python code to execute
+                input_bundle_files:
+                  type: array
+                  items:
+                    type: string
+                  description: |
+                    Bundle filenames to copy into the silo before execution (e.g. ["concepts.json",
+                    "forms/MyForm.json"]). The script can then open them as local files.
+                    Use this instead of passing large JSON in code or context.
                 context:
                   type: object
-                  description: Variables available in the execution context
+                  description: Small dict of variables written as _context.json in the silo
               required:
                 - conversation_id
                 - code
@@ -1182,9 +1201,84 @@ paths:
               schema:
                 type: object
                 properties:
-                  output:
+                  success:
+                    type: boolean
+                  stdout:
                     type: string
-                  result:
+                    description: First 2000 chars of stdout (use read_silo_file if truncated)
+                  stdout_total_chars:
+                    type: integer
+                    description: Total stdout length if it was truncated
+                  stderr:
+                    type: string
+                  exit_code:
+                    type: integer
+                  output_files:
                     type: object
-                  error:
+                    description: Map of filename to content for new files written by the script
+                  silo_files:
+                    type: array
+                    items:
+                      type: string
+                    description: All files currently in the silo (use read_silo_file to read them)
+        '422':
+          description: Script ran but exited with non-zero code
+
+  /silo-file:
+    get:
+      operationId: read_silo_file
+      summary: Read a file written by execute_python in chunks
+      description: |
+        Pages through a file in the conversation silo. Use this to read large outputs written by
+        execute_python scripts without flooding the agent context. Repeat with increasing offset
+        while has_more=true.
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Filename in the silo (e.g. "output.json")
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Character offset to start reading from
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 4000
+          description: Max characters to return (capped at 8000)
+      responses:
+        '200':
+          description: File chunk
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  filename:
                     type: string
+                  content:
+                    type: string
+                  offset:
+                    type: integer
+                  limit:
+                    type: integer
+                  chars_returned:
+                    type: integer
+                  total_chars:
+                    type: integer
+                  has_more:
+                    type: boolean
+        '404':
+          description: File not found in silo

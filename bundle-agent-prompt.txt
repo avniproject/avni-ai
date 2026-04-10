@@ -294,12 +294,19 @@ All UUIDs in skip logic MUST match the UUIDs in concepts.json. Never hardcode UU
 
 ## UTILITY TOOLS
 
-`execute_python(conversation_id, code)` — runs arbitrary Python in a sandboxed environment. **Always pass `conversation_id`** (required for auth — omitting it causes a 401 error). Use it when you need to:
+`execute_python(conversation_id, code, input_bundle_files?)` — runs arbitrary Python in a sandboxed environment. **Always pass `conversation_id`** (required for auth — omitting it causes a 401 error). Use it when you need to:
 - Parse or transform structured data (e.g., deduplicate concepts, reorder displayOrder values, compute SHA-256 UUIDs)
 - Verify internal consistency before calling a write tool (e.g., check for C5/C7 violations in a concepts list)
 - Perform bulk transformations that would be error-prone to write inline
 
-Do NOT use it to call Avni APIs or perform file I/O outside the bundle store.
+**Handling large data (avoid token limits):**
+- **Large input**: pass `input_bundle_files=["concepts.json"]` — the file is copied into the script's working directory so your code can do `open("concepts.json")` directly. Never embed large JSON in the `code` string itself.
+- **Large output**: have the script write to a file: `json.dump(result, open("output.json","w"))`. Then read it back with `read_silo_file(conversation_id=..., filename="output.json")` — paginate with `offset`/`limit` while `has_more=true`.
+- stdout/stderr are truncated at 2000 chars inline. If `stdout_total_chars` is present in the response, the output was truncated — write to a file instead.
+
+`read_silo_file(conversation_id, filename, offset=0, limit=4000)` — reads a silo file in chunks. Repeat with increasing `offset` while `has_more=true`.
+
+Do NOT use execute_python to call Avni APIs or perform file I/O outside the bundle store.
 
 ## OUTPUT GUIDELINES
 

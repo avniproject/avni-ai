@@ -54,7 +54,7 @@ from .handlers.spec_handlers import (
     handle_spec_to_entities,
     handle_bundle_to_spec,
 )
-from .handlers.sandbox_handlers import handle_execute_python
+from .handlers.sandbox_handlers import handle_execute_python, handle_read_silo_file
 from .handlers.log_handlers import handle_append_agent_log, handle_get_agent_logs
 from .handlers.debug_handlers import (
     handle_debug_conversation,
@@ -339,6 +339,10 @@ async def create_server():
     @server.custom_route("/execute-python", methods=["POST"])
     async def execute_python_endpoint(request: Request):
         return await handle_execute_python(request)
+
+    @server.custom_route("/silo-file", methods=["GET"])
+    async def read_silo_file_endpoint(request: Request):
+        return await handle_read_silo_file(request)
 
     # --- Agent Activity Log ---
     @server.custom_route("/agent-log", methods=["POST"])
