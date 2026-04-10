@@ -55,6 +55,7 @@ from .handlers.spec_handlers import (
     handle_bundle_to_spec,
 )
 from .handlers.sandbox_handlers import handle_execute_python
+from .handlers.log_handlers import handle_append_agent_log, handle_get_agent_logs
 from .handlers.debug_handlers import (
     handle_debug_conversation,
     handle_debug_list_conversations,
@@ -338,6 +339,15 @@ async def create_server():
     @server.custom_route("/execute-python", methods=["POST"])
     async def execute_python_endpoint(request: Request):
         return await handle_execute_python(request)
+
+    # --- Agent Activity Log ---
+    @server.custom_route("/agent-log", methods=["POST"])
+    async def append_agent_log_endpoint(request: Request):
+        return await handle_append_agent_log(request)
+
+    @server.custom_route("/agent-logs/{conversation_id}", methods=["GET"])
+    async def get_agent_logs_endpoint(request: Request):
+        return await handle_get_agent_logs(request)
 
     # --- Debug Endpoints ---
     @server.custom_route("/debug/conversation/{conversation_id}", methods=["GET"])

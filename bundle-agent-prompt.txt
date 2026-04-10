@@ -23,6 +23,30 @@ Your job is to act as a knowledgeable translator. You ask about their PROGRAM in
 
 ---
 
+## MANDATORY: Log Every Step
+
+**Call `append_agent_log` after every tool call and at every significant decision point.** This is not optional — it enables post-failure tracing.
+
+Rules:
+- Maintain a `step` counter starting at 1; increment by 1 for each log entry.
+- Set `phase` to the current workflow phase: `entity_extraction`, `spec_generation`, `bundle_generation`, `bundle_fix`, `upload`, or `done`.
+- After a **successful** tool call: `status=success`, `summary`=key result fields (e.g. `"stored=true, concepts=45"`)
+- After a **failed** tool call or error: `status=error`, `error`=the error message or response field
+- For decisions or intermediate steps with no tool call: `status=info`
+- Always include `tool` when logging a tool call result.
+- Include `tokens_used` from `sys.model_usage.total_tokens` if accessible in Dify.
+
+Example entries:
+```
+{step:1, phase:"entity_extraction", tool:"get_srs_text", status:"success", summary:"char_count=12400"}
+{step:2, phase:"entity_extraction", tool:"store_entities", status:"success", summary:"ok=true"}
+{step:3, phase:"bundle_generation", tool:"generate_bundle", status:"success", summary:"stored=true, concepts=67, forms=9"}
+{step:4, phase:"upload", tool:"upload_bundle", status:"success", summary:"task_id=abc-123"}
+{step:5, phase:"upload", tool:"upload_status", status:"error", error:"Avni import completed with errors: Duration is not a valid form element type", summary:"skipped=4"}
+```
+
+---
+
 ## INTERNAL REASONING (Plan → Execute → Verify)
 
 *These steps are your internal discipline — never output PLAN/EXECUTE/VERIFY labels to the user.*

@@ -1084,6 +1084,71 @@ paths:
         '404':
           description: No stored bundle for conversation_id
 
+  /agent-log:
+    post:
+      operationId: append_agent_log
+      summary: Append a step trace entry to the agent activity log
+      description: |
+        Call this after every significant action (tool call, decision, error) to build
+        a traceable history for the current conversation. Required by the agent rules.
+        Entries are retained for 24 h and viewable at GET /agent-logs/{conversation_id}.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - action
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID (sys.conversation_id)
+                step:
+                  type: integer
+                  description: Sequential step counter (increment by 1 per log entry)
+                phase:
+                  type: string
+                  description: Current workflow phase
+                  enum: [entity_extraction, spec_generation, bundle_generation, bundle_fix, upload, done]
+                action:
+                  type: string
+                  description: Human-readable description of what was just done
+                tool:
+                  type: string
+                  description: Tool name called (if this log entry is for a tool call)
+                status:
+                  type: string
+                  description: Outcome of this step
+                  enum: [success, error, info]
+                  default: info
+                summary:
+                  type: string
+                  description: Brief key result (e.g. "stored=true, concepts=45, forms=8")
+                error:
+                  type: string
+                  description: Error message when status=error
+                tokens_used:
+                  type: integer
+                  description: Cumulative token count so far (from Dify sys.model_usage if available)
+                model:
+                  type: string
+                  description: Model identifier used for this step
+      responses:
+        '200':
+          description: Log entry appended
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  entry_count:
+                    type: integer
+                    description: Total log entries for this conversation so far
+
   /execute-python:
     post:
       operationId: execute_python
