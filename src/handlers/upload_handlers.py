@@ -133,7 +133,9 @@ async def _upload_processor(
                             len(error_content),
                         )
             except Exception as exc:
-                logger.warning("Failed to fetch error file for job %s: %s", job_uuid, exc)
+                logger.warning(
+                    "Failed to fetch error file for job %s: %s", job_uuid, exc
+                )
 
         raise RuntimeError(
             f"Avni import completed with errors "
