@@ -183,28 +183,72 @@ class BundleValidator:
             if m.get("formUUID") and m["formUUID"] not in form_uuids:
                 self.errors.append(
                     f'Form mapping "{m.get("formName", m["formUUID"])}" references '
-                    f'formUUID {m["formUUID"]} which is not present in the bundle'
+                    f"formUUID {m['formUUID']} which is not present in the bundle"
                 )
 
     # ── Privilege type enum validation ──────────────────────────────
 
     _VALID_AVNI_PRIVILEGE_TYPES: frozenset[str] = frozenset(
         {
-            "ViewSubject", "RegisterSubject", "EditSubject", "VoidSubject", "AssignSubject",
-            "ViewVisit", "ScheduleVisit", "PerformVisit", "EditVisit", "CancelVisit", "VoidVisit",
-            "EnrolSubject", "ViewEnrolmentDetails", "EditEnrolmentDetails", "ExitEnrolment",
-            "ApproveSubject", "ApproveEncounter", "RejectSubject", "RejectEncounter",
-            "ApproveEnrolment", "RejectEnrolment", "ApproveChecklistitem", "RejectChecklistitem",
-            "ViewChecklist", "EditChecklist", "ViewEditEntitiesOnDataEntryApp",
-            "EditEncounterType", "EditProgram", "EditSubjectType", "EditOrganisationConfiguration",
-            "EditConcept", "UploadMetadataAndData", "DownloadBundle", "EditCatchment",
-            "EditLocation", "EditLocationType", "EditUserConfiguration", "EditUserGroup",
-            "EditOfflineDashboardAndReportCard", "AddMember", "EditMember", "RemoveMember",
-            "Analytics", "Messaging", "DeleteTask", "EditTask", "PhoneVerification",
-            "EditRuleFailure", "EditNews", "EditVideo", "EditExtension", "EditDocumentation",
-            "EditIdentifierSource", "EditIdentifierUserAssignment", "EditLanguage",
-            "EditApplicationMenu", "EditChecklistConfiguration",
-            "DeleteOrganisationConfiguration", "MultiTxEntityTypeUpdate",
+            "ViewSubject",
+            "RegisterSubject",
+            "EditSubject",
+            "VoidSubject",
+            "AssignSubject",
+            "ViewVisit",
+            "ScheduleVisit",
+            "PerformVisit",
+            "EditVisit",
+            "CancelVisit",
+            "VoidVisit",
+            "EnrolSubject",
+            "ViewEnrolmentDetails",
+            "EditEnrolmentDetails",
+            "ExitEnrolment",
+            "ApproveSubject",
+            "ApproveEncounter",
+            "RejectSubject",
+            "RejectEncounter",
+            "ApproveEnrolment",
+            "RejectEnrolment",
+            "ApproveChecklistitem",
+            "RejectChecklistitem",
+            "ViewChecklist",
+            "EditChecklist",
+            "ViewEditEntitiesOnDataEntryApp",
+            "EditEncounterType",
+            "EditProgram",
+            "EditSubjectType",
+            "EditOrganisationConfiguration",
+            "EditConcept",
+            "UploadMetadataAndData",
+            "DownloadBundle",
+            "EditCatchment",
+            "EditLocation",
+            "EditLocationType",
+            "EditUserConfiguration",
+            "EditUserGroup",
+            "EditOfflineDashboardAndReportCard",
+            "AddMember",
+            "EditMember",
+            "RemoveMember",
+            "Analytics",
+            "Messaging",
+            "DeleteTask",
+            "EditTask",
+            "PhoneVerification",
+            "EditRuleFailure",
+            "EditNews",
+            "EditVideo",
+            "EditExtension",
+            "EditDocumentation",
+            "EditIdentifierSource",
+            "EditIdentifierUserAssignment",
+            "EditLanguage",
+            "EditApplicationMenu",
+            "EditChecklistConfiguration",
+            "DeleteOrganisationConfiguration",
+            "MultiTxEntityTypeUpdate",
         }
     )
 
@@ -217,8 +261,8 @@ class BundleValidator:
         if invalid:
             unique = sorted(set(invalid))
             self.errors.append(
-                f'Invalid privilegeType values (not in Avni PrivilegeType enum): '
-                f'{unique}. Valid examples: ViewSubject, RegisterSubject, EditSubject.'
+                f"Invalid privilegeType values (not in Avni PrivilegeType enum): "
+                f"{unique}. Valid examples: ViewSubject, RegisterSubject, EditSubject."
             )
 
     # ── Report cards and dashboard reference integrity ──────────────
@@ -262,8 +306,8 @@ class BundleValidator:
                     if ref_uuid and ref_uuid not in card_uuids:
                         self.errors.append(
                             f'Dashboard section "{section.get("name")}" references '
-                            f'reportCardUUID {ref_uuid} not present in bundle '
-                            f'(causes null card_id constraint on server)'
+                            f"reportCardUUID {ref_uuid} not present in bundle "
+                            f"(causes null card_id constraint on server)"
                         )
 
         # Group dashboards must reference dashboards in the bundle
@@ -272,8 +316,8 @@ class BundleValidator:
             if ref_uuid and ref_uuid not in dashboard_uuids:
                 self.errors.append(
                     f'Group dashboard for group "{gd.get("groupName")}" references '
-                    f'dashboardUUID {ref_uuid} not present in bundle '
-                    f'(causes null dashboard_id constraint on server)'
+                    f"dashboardUUID {ref_uuid} not present in bundle "
+                    f"(causes null dashboard_id constraint on server)"
                 )
 
     # ── Required sections ───────────────────────────────────────────

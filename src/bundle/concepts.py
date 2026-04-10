@@ -24,6 +24,7 @@ class ConceptGenerator:
         """Truncate concept/answer names to the Avni DB column limit (VARCHAR 255)."""
         if len(name) > _MAX_CONCEPT_NAME:
             import logging
+
             logging.getLogger(__name__).warning(
                 "Concept name truncated from %d to %d chars: %s...",
                 len(name),
