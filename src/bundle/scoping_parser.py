@@ -592,6 +592,41 @@ def parse_form_df(
         )
         avni_dtype = _map_data_type(raw_dtype)
 
+        # Detect dtype column displacement:
+        # Case A — dtype cell contains comma/newline-separated values (options bled in):
+        #   treat field as Coded and carry those values forward as options candidate.
+        _dtype_displaced_options: list[str] | None = None
+        if dtype_idx is not None and avni_dtype == "Text" and raw_dtype:
+            if "," in raw_dtype or "\n" in raw_dtype or ";" in raw_dtype:
+                _dtype_displaced_options = _parse_options(row.iloc[dtype_idx])
+                if _dtype_displaced_options:
+                    avni_dtype = "Coded"
+                    # Try to recover the real type from adjacent columns
+                    for scan_idx in range(
+                        dtype_idx + 1, min(dtype_idx + 3, row.shape[0])
+                    ):
+                        candidate_type = _clean(row.iloc[scan_idx]).lower()
+                        if candidate_type in _DATA_TYPE_MAP:
+                            avni_dtype = _DATA_TYPE_MAP[candidate_type]
+                            _dtype_displaced_options = (
+                                None  # not displaced options after all
+                            )
+                            break
+
+        # Case B — dtype cell has an unrecognised single token but an adjacent cell has a
+        #   valid type keyword (one-column right-shift of the whole row):
+        if (
+            dtype_idx is not None
+            and avni_dtype == "Text"
+            and raw_dtype
+            and "," not in raw_dtype
+        ):
+            for scan_idx in range(dtype_idx + 1, min(dtype_idx + 3, row.shape[0])):
+                candidate_type = _clean(row.iloc[scan_idx]).lower()
+                if candidate_type in _DATA_TYPE_MAP:
+                    avni_dtype = _DATA_TYPE_MAP[candidate_type]
+                    break
+
         mandatory = _parse_yes_no(row.iloc[mand_idx]) if mand_idx is not None else False
 
         options = None
@@ -612,6 +647,10 @@ def parse_form_df(
                         break
             else:
                 options = _parse_options(row.iloc[options_idx]) or None
+
+        # Use dtype-displaced options as fallback when options column had nothing
+        if not options and _dtype_displaced_options:
+            options = _dtype_displaced_options
 
         # If boolean/yes-no type detected, auto-add options
         if (
