@@ -8,16 +8,35 @@ from __future__ import annotations
 from .uuid_utils import generate_deterministic_uuid, lookup_answer_uuid
 
 
+_MAX_CONCEPT_NAME = 255
+
+
 class ConceptGenerator:
     def __init__(self) -> None:
         self.generated_concepts: list[dict] = []
         self.concept_map: dict[str, str] = {}  # name -> uuid
         self._answer_cache: dict[str, str] = {}  # answer_name -> uuid
 
+    # ── Name safety ─────────────────────────────────────────────────
+
+    @staticmethod
+    def _safe_name(name: str) -> str:
+        """Truncate concept/answer names to the Avni DB column limit (VARCHAR 255)."""
+        if len(name) > _MAX_CONCEPT_NAME:
+            import logging
+            logging.getLogger(__name__).warning(
+                "Concept name truncated from %d to %d chars: %s...",
+                len(name),
+                _MAX_CONCEPT_NAME,
+                name[:60],
+            )
+            return name[:_MAX_CONCEPT_NAME].rstrip()
+        return name
+
     # ── Answer UUID resolution ──────────────────────────────────────
 
     def get_answer_uuid(self, answer_name: str) -> str:
-        cleaned = answer_name.strip().rstrip(",").strip()
+        cleaned = self._safe_name(answer_name.strip().rstrip(",").strip())
         if cleaned in self._answer_cache:
             return self._answer_cache[cleaned]
         # Registry lookup
@@ -31,16 +50,17 @@ class ConceptGenerator:
         return new_uuid
 
     def get_concept_uuid(self, concept_name: str) -> str:
-        if concept_name in self.concept_map:
-            return self.concept_map[concept_name]
-        new_uuid = generate_deterministic_uuid(f"concept:{concept_name}")
-        self.concept_map[concept_name] = new_uuid
+        safe = self._safe_name(concept_name)
+        if safe in self.concept_map:
+            return self.concept_map[safe]
+        new_uuid = generate_deterministic_uuid(f"concept:{safe}")
+        self.concept_map[safe] = new_uuid
         return new_uuid
 
     # ── Generators per data type ────────────────────────────────────
 
     def generate_answer_concept(self, answer_name: str) -> str:
-        cleaned = answer_name.strip().rstrip(",").strip()
+        cleaned = self._safe_name(answer_name.strip().rstrip(",").strip())
         uid = self.get_answer_uuid(cleaned)
         # Avoid duplicates
         if any(c["uuid"] == uid for c in self.generated_concepts):
@@ -51,6 +71,7 @@ class ConceptGenerator:
         return uid
 
     def generate_coded_concept(self, field: dict) -> str:
+        field = {**field, "name": self._safe_name(field["name"])}
         concept_uuid = self.get_concept_uuid(field["name"])
         # Deduplicate — same field name across forms produces same UUID
         if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
@@ -71,6 +92,7 @@ class ConceptGenerator:
         return concept_uuid
 
     def generate_numeric_concept(self, field: dict) -> str:
+        field = {**field, "name": self._safe_name(field["name"])}
         concept_uuid = self.get_concept_uuid(field["name"])
         if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
             return concept_uuid
@@ -89,6 +111,7 @@ class ConceptGenerator:
         return concept_uuid
 
     def _generate_simple_concept(self, field: dict, data_type: str) -> str:
+        field = {**field, "name": self._safe_name(field["name"])}
         concept_uuid = self.get_concept_uuid(field["name"])
         if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
             return concept_uuid

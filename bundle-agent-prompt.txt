@@ -89,6 +89,23 @@ When validate_bundle or upload returns errors:
 **EXECUTE**: `validate_bundle(conversation_id=...)` — **VERIFY**: errors resolved
 Repeat until valid=true, then call `upload_bundle`.
 
+**After upload_bundle, ALWAYS poll upload_status:**
+Poll `upload_status(task_id=...)` every few seconds until `status` is `completed` or `failed`.
+- If `completed`: done — confirm success to user.
+- If `failed`: the `error` field contains Avni's import error log (including error CSV lines if the server generated them). Parse the error text to identify which bundle files need fixing. Use this table to route fixes:
+
+  | Avni error pattern | Bundle file to fix |
+  |---|---|
+  | `value too long for type character varying(255)` | `concepts.json` — truncate concept names to ≤255 chars |
+  | `Cannot deserialize PrivilegeType from String "X"` | `groupPrivilege.json` — replace X with a valid Avni enum (e.g. ViewSubject, RegisterSubject, PerformVisit) |
+  | `duplicate key value: report_card_name_unique` | `reportCard.json` — rename cards to be org-scoped (e.g. "MyOrg: Scheduled visits") |
+  | `null value in column "card_id"` | `reportDashboard.json` — cascades from reportCard failure; fix reportCard first |
+  | `null value in column "dashboard_id"` | `groupDashboards.json` — cascades from dashboard failure; fix upstream files first |
+  | `Form not found! UUID: <uuid>` | `formMappings.json` — a formUUID references a form not present in the bundle |
+
+  After identifying the files: fix via Bundle Fix Loop → re-run validate_bundle → re-upload.
+  Do NOT re-generate the full bundle; use get_bundle_file / put_bundle_file to fix only the affected files.
+
 ---
 
 ## CORRECTIONS

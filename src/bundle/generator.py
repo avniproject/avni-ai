@@ -221,7 +221,20 @@ class BundleGenerator:
                                 }
                             )
 
-            # Generate form mapping
+                # Generate form mapping for the cancellation form
+                cancel_form_type = (
+                    "ProgramEncounterCancellation"
+                    if form_spec["formType"] == "ProgramEncounter"
+                    else "IndividualEncounterCancellation"
+                )
+                cancel_spec = {
+                    **form_spec,
+                    "name": cancel_form["name"],
+                    "formType": cancel_form_type,
+                }
+                self._generate_form_mapping(cancel_spec, cancel_form["uuid"])
+
+            # Generate form mapping for main form
             self._generate_form_mapping(form_spec, form["uuid"])
 
         # Store all concepts
@@ -414,13 +427,20 @@ class BundleGenerator:
         }
 
     def _generate_report_cards(self) -> None:
-        """Generate standard report cards using known type UUIDs."""
+        """Generate standard report cards using known type UUIDs.
+
+        Card names are org-scoped to avoid colliding with Avni's server-default
+        card names (report_card_name_unique constraint).
+        """
+        self._report_card_uuid_by_type: dict[str, str] = {}
         for card_type, card_meta in self.STANDARD_CARD_TYPES.items():
+            card_uuid = generate_deterministic_uuid(
+                f"reportCard:{self.org_name}:{card_type}"
+            )
+            self._report_card_uuid_by_type[card_type] = card_uuid
             card: dict[str, Any] = {
-                "uuid": generate_deterministic_uuid(
-                    f"reportCard:{self.org_name}:{card_type}"
-                ),
-                "name": card_meta["label"],
+                "uuid": card_uuid,
+                "name": f"{self.org_name}: {card_meta['label']}",
                 "color": card_meta["color"],
                 "nested": False,
                 "count": 1,
@@ -437,24 +457,28 @@ class BundleGenerator:
             self.bundle["reportCards"].append(card)
 
     def _generate_report_dashboard(self) -> None:
-        """Generate a default dashboard with three sections."""
+        """Generate a default dashboard with three sections.
+
+        Uses self._report_card_uuid_by_type (keyed by card_type string) instead of
+        name-based lookup, so org-scoped card names don't break the mapping.
+        """
         dashboard_uuid = generate_deterministic_uuid(
             f"reportDashboard:{self.org_name}:Default Dashboard"
         )
-        card_by_type = {c["name"]: c["uuid"] for c in self.bundle["reportCards"]}
+        card_uuid_by_type = getattr(self, "_report_card_uuid_by_type", {})
 
-        def _section(name: str, display_order: float, card_names: list[str]) -> dict:
+        def _section(name: str, display_order: float, card_types: list[str]) -> dict:
             section_uuid = generate_deterministic_uuid(
                 f"dashboardSection:{self.org_name}:{name}"
             )
             mappings = []
-            for idx, card_name in enumerate(card_names, 1):
-                card_uuid = card_by_type.get(card_name)
+            for idx, card_type in enumerate(card_types, 1):
+                card_uuid = card_uuid_by_type.get(card_type)
                 if card_uuid:
                     mappings.append(
                         {
                             "uuid": generate_deterministic_uuid(
-                                f"sectionCardMapping:{self.org_name}:{name}:{card_name}"
+                                f"sectionCardMapping:{self.org_name}:{name}:{card_type}"
                             ),
                             "displayOrder": float(idx),
                             "dashboardSectionUUID": section_uuid,
@@ -478,15 +502,13 @@ class BundleGenerator:
                 "uuid": dashboard_uuid,
                 "name": "Default Dashboard",
                 "sections": [
-                    _section(
-                        "Visit Details", 1.0, ["Scheduled visits", "Overdue visits"]
-                    ),
+                    _section("Visit Details", 1.0, ["scheduledVisits", "overdueVisits"]),
                     _section(
                         "Recent Statistics",
                         2.0,
-                        ["Recent registrations", "Recent enrolments", "Recent visits"],
+                        ["recentRegistrations", "recentEnrolments", "recentVisits"],
                     ),
-                    _section("Registration Overview", 3.0, ["Total"]),
+                    _section("Registration Overview", 3.0, ["total"]),
                 ],
                 "voided": False,
             }
@@ -516,20 +538,34 @@ class BundleGenerator:
                 }
             )
 
-    # Privilege type UUIDs (from production bundles — stable across orgs)
+    # Privilege type UUIDs (from Avni production bundles — stable across orgs)
     PRIVILEGE_TYPES: list[tuple[str, str]] = [
-        ("View", "0fba96c6-04c8-4bd5-8fa1-4b29e0c83c4f"),
-        ("Register", "2f5ade1b-50d5-4c98-8c04-0b9f5f5b5f12"),
-        ("Edit", "5a6c8c7d-1234-4d89-a123-1234567890ab"),
-        ("Enrol", "8a7b9c8d-5678-4e89-b456-567890abcdef"),
-        ("EditEnrolment", "3c4d5e6f-9012-4f89-c789-90abcdef1234"),
-        ("ExitEnrolment", "7e8f9a0b-3456-4a89-d012-34cdef567890"),
-        ("AddVisit", "1b2c3d4e-7890-4b89-e345-78ef901234ab"),
-        ("PerformVisit", "5f6a7b8c-1234-4c89-f678-12ab345678cd"),
-        ("EditVisit", "9d0e1f2a-5678-4d89-a901-56cd789012ef"),
-        ("CancelVisit", "3a4b5c6d-9012-4e89-b234-90ef123456ab"),
-        ("Approve", "7e8f9a0b-3456-4f89-c567-34ab567890cd"),
-        ("Reject", "b2c3d4e5-7890-4a89-d890-78ef901234ab"),
+        ("ViewSubject",                      "67410e50-8b40-4735-bfb4-135b13580027"),
+        ("RegisterSubject",                  "46c3aa38-1ef5-4639-a406-d0b4f9bcb420"),
+        ("EditSubject",                      "db791f27-0c04-4060-8938-6f18fb4069ee"),
+        ("VoidSubject",                      "088a30ca-9ce2-4ab3-a517-e249cc43a4bf"),
+        ("AssignSubject",                    "cac5adae-8d99-4cef-a00b-af7d66e31a09"),
+        ("ViewVisit",                        "9f2a3495-93b7-47c3-8560-d572b6a9fc61"),
+        ("ScheduleVisit",                    "867d5de9-0bf3-434c-9cb1-bd09a05250af"),
+        ("PerformVisit",                     "e3352a23-f478-4166-af11-e949cc69e1cc"),
+        ("EditVisit",                        "85ce5ed4-1490-4980-8c64-63fb423b5f14"),
+        ("CancelVisit",                      "51fa8342-3228-4945-88eb-4b41970fa425"),
+        ("VoidVisit",                        "305d8287-731b-4094-8139-71bc171b242e"),
+        ("ApproveSubject",                   "37ae14f9-e6ac-4d24-951a-e457b0cdcf00"),
+        ("ApproveEncounter",                 "7d725125-6b48-44d2-a53b-bf847ae8a3d0"),
+        ("RejectSubject",                    "8a2e92c2-8af2-4f1c-896e-317c0bb4095f"),
+        ("RejectEncounter",                  "ca4428e7-dc4c-4dad-8190-451d8ccd7402"),
+        ("ViewEditEntitiesOnDataEntryApp",   "a5899d5a-7a9b-4cba-88dd-20167411787c"),
+        ("EditEncounterType",                "c814bcf3-4739-48d8-8dae-375df72ee468"),
+        ("EditProgram",                      "fc03c90d-6dd4-4067-9096-4e1b3c800270"),
+        ("EditSubjectType",                  "e491db17-da8a-4ecd-82b1-9cd9921d7c72"),
+        ("EditConcept",                      "f042823e-dbed-44dc-b3d7-a4dd342d883e"),
+        ("EditOrganisationConfiguration",    "df745841-79e6-4d6e-a04d-f2379449a318"),
+        ("UploadMetadataAndData",            "2ebe6ce5-77fa-491c-a629-f1fc46d87557"),
+        ("DownloadBundle",                   "ee51fb36-8712-4125-8693-5c524bd75327"),
+        ("EditOfflineDashboardAndReportCard","d8ce88f8-c965-42c9-bed1-1f3a188b25b4"),
+        ("EditUserConfiguration",            "31c16b7d-825a-4bfa-b961-128846beb3ef"),
+        ("EditUserGroup",                    "78902b7a-7970-4557-9ffa-ce8e93d20e9a"),
     ]
 
     def _generate_group_privileges(self) -> None:

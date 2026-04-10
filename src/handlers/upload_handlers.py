@@ -5,6 +5,7 @@ Endpoints: POST /upload-bundle, GET /upload-status/{task_id}
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import logging
 from typing import Any, Dict
@@ -17,6 +18,9 @@ from ..utils.env import AVNI_BASE_URL
 
 logger = logging.getLogger(__name__)
 
+# Spring Batch statuses that indicate the job is still running
+_AVNI_IN_PROGRESS_STATUSES = {"STARTING", "STARTED", "STOPPING"}
+
 
 async def _upload_processor(
     config_data: Dict[str, Any],
@@ -24,20 +28,23 @@ async def _upload_processor(
     task_id: str,
     progress_callback,
 ) -> Dict[str, Any]:
-    """Async processor that uploads a bundle ZIP to Avni server."""
+    """Async processor that uploads a bundle ZIP to Avni server and polls job status.
+
+    Avni's POST /import/new returns `true` immediately; the actual bundle import
+    runs as an async Spring Batch job.  We poll GET /import/status until the job
+    completes, then fetch GET /import/errorfile if errors are reported.
+    """
     import httpx
 
     zip_bytes = config_data["zip_bytes"]
-    base_url = config_data.get("base_url", AVNI_BASE_URL)
+    base_url = config_data.get("base_url", AVNI_BASE_URL).rstrip("/")
+    headers = {"AUTH-TOKEN": auth_token}
 
     progress_callback("Uploading bundle to Avni server...")
 
-    url = f"{base_url.rstrip('/')}/import/new"
-    headers = {"AUTH-TOKEN": auth_token}
-
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
-            url,
+            f"{base_url}/import/new",
             headers=headers,
             files={"file": ("bundle.zip", zip_bytes, "application/zip")},
             data={
@@ -48,11 +55,99 @@ async def _upload_processor(
                 "encounterUploadMode": "CREATE_AND_UPDATE",
             },
         )
-        response.raise_for_status()
-        result = response.json() if response.content else {}
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            raise RuntimeError(
+                f"Avni upload rejected: HTTP {e.response.status_code} — {e.response.text[:500]}"
+            ) from e
+
+    progress_callback("Bundle accepted by server, waiting for import to complete...")
+
+    # Poll GET /import/status (most-recent first) until our job finishes.
+    # The server returns a Spring Batch Page<JobStatus>; we take the most recent
+    # metadataZip job (type field may be "metaDataZip" on the server).
+    job_uuid: str | None = None
+    job_status: str = ""
+    exit_status: str = ""
+    skipped: int = 0
+
+    for attempt in range(40):  # up to ~120 s (40 × 3 s)
+        await asyncio.sleep(3)
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                status_resp = await client.get(
+                    f"{base_url}/import/status",
+                    headers=headers,
+                    params={"page": 0, "size": 5, "sort": "createTime,desc"},
+                )
+            if status_resp.status_code != 200:
+                logger.warning("import/status returned %s", status_resp.status_code)
+                continue
+            page = status_resp.json()
+            jobs = page.get("content", [])
+        except Exception as exc:
+            logger.warning("import/status poll failed (attempt %d): %s", attempt, exc)
+            continue
+
+        # Find the most-recent metadataZip job
+        our_job = next(
+            (
+                j
+                for j in jobs
+                if j.get("type") in ("metaDataZip", "metadataZip")
+                or j.get("fileName", "").endswith(".zip")
+            ),
+            jobs[0] if jobs else None,
+        )
+        if not our_job:
+            continue
+
+        job_uuid = our_job.get("uuid")
+        job_status = our_job.get("status", "")
+        exit_status = our_job.get("exitStatus", "")
+        skipped = our_job.get("skipped", 0)
+
+        if job_status not in _AVNI_IN_PROGRESS_STATUSES:
+            break  # Job finished (COMPLETED, FAILED, STOPPED, etc.)
+
+    # Determine if the completed job had errors
+    combined = (job_status + " " + exit_status).lower()
+    has_errors = "error" in combined or job_status == "FAILED" or skipped != 0
+
+    if has_errors:
+        error_content = ""
+        if job_uuid:
+            try:
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    err_resp = await client.get(
+                        f"{base_url}/import/errorfile",
+                        headers=headers,
+                        params={"jobUuid": job_uuid},
+                    )
+                    if err_resp.status_code == 200:
+                        error_content = err_resp.text[:15000]
+                        logger.info(
+                            "Fetched error file for job %s (%d chars)",
+                            job_uuid,
+                            len(error_content),
+                        )
+            except Exception as exc:
+                logger.warning("Failed to fetch error file for job %s: %s", job_uuid, exc)
+
+        raise RuntimeError(
+            f"Avni import completed with errors "
+            f"(jobUuid={job_uuid}, status={job_status}, exitStatus={exit_status}, skipped={skipped}):\n"
+            f"{error_content}"
+        )
 
     progress_callback("Bundle uploaded successfully")
-    return {"upload_response": result, "status_code": response.status_code}
+    return {
+        "upload_response": True,
+        "job_uuid": job_uuid,
+        "job_status": job_status,
+        "exit_status": exit_status,
+    }
 
 
 async def handle_upload_bundle(request: Request) -> JSONResponse:
