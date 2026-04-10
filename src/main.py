@@ -80,15 +80,64 @@ def _create_fastmcp_server() -> FastMCP:
         return FastMCP(name="Avni AI Server")
 
 
+class _SafeErrorMiddleware:
+    """Catch-all ASGI middleware that ensures every request gets a complete HTTP response.
+
+    Without this, unhandled async exceptions can cause the server to close the TCP
+    connection mid-response, producing Dify's 'incomplete chunked read' error.
+    """
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        response_started = False
+
+        async def send_wrapper(message):
+            nonlocal response_started
+            if message["type"] == "http.response.start":
+                response_started = True
+            await send(message)
+
+        try:
+            await self.app(scope, receive, send_wrapper)
+        except asyncio.CancelledError:
+            # Client disconnected — nothing to send, just let it go silently
+            pass
+        except Exception as exc:
+            logger.exception("Unhandled exception in ASGI app: %s", exc)
+            if not response_started:
+                # Safe to send a fresh 500 response
+                body = b'{"error":"internal server error"}'
+                await send(
+                    {
+                        "type": "http.response.start",
+                        "status": 500,
+                        "headers": [
+                            (b"content-type", b"application/json"),
+                            (b"content-length", str(len(body)).encode()),
+                        ],
+                    }
+                )
+                await send(
+                    {"type": "http.response.body", "body": body, "more_body": False}
+                )
+            # If response already started, we can't fix the stream — log and swallow
+
+
 def _create_http_app(server: FastMCP):
     """Keep stateless HTTP behavior across FastMCP versions."""
     middleware = [create_cors_middleware()]
     try:
-        return server.http_app(middleware=middleware, stateless_http=True)
+        base_app = server.http_app(middleware=middleware, stateless_http=True)
     except TypeError as exc:
         if "stateless_http" not in str(exc):
             raise
-        return server.http_app(middleware=middleware)
+        base_app = server.http_app(middleware=middleware)
+    return _SafeErrorMiddleware(base_app)
 
 
 def _run_http_server(server: FastMCP, host: str, port: int):
