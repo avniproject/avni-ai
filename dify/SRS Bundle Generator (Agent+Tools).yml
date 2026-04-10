@@ -653,23 +653,6 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Execute Python code in a sandboxed environment
-              parameters:
-                code:
-                  auto: 1
-                  value: null
-                context:
-                  auto: 1
-                  value: null
-              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
-              provider_show_name: Avni AI Staging NoAuth openapi
-              settings: {}
-              tool_description: Execute Python code in a sandboxed environment
-              tool_label: execute_python
-              tool_name: execute_python
-              type: api
-            - enabled: true
-              extra:
                 description: List all files in a stored bundle with their sizes. Use
                   bundle_type='generated' (default) for the newly generated bundle
                   or 'existing' for the org's current bundle downloaded from Avni.
@@ -1200,6 +1183,173 @@ workflow:
               tool_label: get_existing_config
               tool_name: get_existing_config
               type: api
+            - enabled: true
+              extra:
+                description: 'Call this after every significant action (tool call,
+                  decision, error) to build
+
+                  a traceable history for the current conversation. Required by the
+                  agent rules.
+
+                  Entries are retained for 24 h and viewable at GET /agent-logs/{conversation_id}.
+
+                  '
+              parameters:
+                action:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                error:
+                  auto: 1
+                  value: null
+                model:
+                  auto: 1
+                  value: null
+                phase:
+                  auto: 1
+                  value: null
+                status:
+                  auto: 1
+                  value: null
+                step:
+                  auto: 1
+                  value: null
+                summary:
+                  auto: 1
+                  value: null
+                tokens_used:
+                  auto: 1
+                  value: null
+                tool:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'Call this after every significant action (tool call,
+                decision, error) to build
+
+                a traceable history for the current conversation. Required by the
+                agent rules.
+
+                Entries are retained for 24 h and viewable at GET /agent-logs/{conversation_id}.
+
+                '
+              tool_label: append_agent_log
+              tool_name: append_agent_log
+              type: api
+            - enabled: true
+              extra:
+                description: 'Runs Python code in a per-conversation silo directory.
+                  Always pass conversation_id (required for auth).
+
+
+                  For large inputs: use input_bundle_files to copy bundle files into
+                  the silo before execution —
+
+                  the script can then open them as local files (e.g. open("concepts.json"))
+                  without any token cost.
+
+
+                  For large outputs: have the script write to files (e.g. open("output.json","w").write(...))
+
+                  and read them back with read_silo_file using offset/limit pagination.
+
+
+                  stdout/stderr are truncated at 2000 chars inline. If truncated,
+                  use read_silo_file to read
+
+                  any output files the script wrote.
+
+                  '
+              parameters:
+                code:
+                  auto: 1
+                  value: null
+                context:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                input_bundle_files:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'Runs Python code in a per-conversation silo directory.
+                Always pass conversation_id (required for auth).
+
+
+                For large inputs: use input_bundle_files to copy bundle files into
+                the silo before execution —
+
+                the script can then open them as local files (e.g. open("concepts.json"))
+                without any token cost.
+
+
+                For large outputs: have the script write to files (e.g. open("output.json","w").write(...))
+
+                and read them back with read_silo_file using offset/limit pagination.
+
+
+                stdout/stderr are truncated at 2000 chars inline. If truncated, use
+                read_silo_file to read
+
+                any output files the script wrote.
+
+                '
+              tool_label: execute_python
+              tool_name: execute_python
+              type: api
+            - enabled: true
+              extra:
+                description: 'Pages through a file in the conversation silo. Use this
+                  to read large outputs written by
+
+                  execute_python scripts without flooding the agent context. Repeat
+                  with increasing offset
+
+                  while has_more=true.
+
+                  '
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                filename:
+                  auto: 1
+                  value: null
+                limit:
+                  auto: 1
+                  value: null
+                offset:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: 'Pages through a file in the conversation silo. Use
+                this to read large outputs written by
+
+                execute_python scripts without flooding the agent context. Repeat
+                with increasing offset
+
+                while has_more=true.
+
+                '
+              tool_label: read_silo_file
+              tool_name: read_silo_file
+              type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
         agent_strategy_provider_name: langgenius/agent/agent
@@ -1436,7 +1586,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -1385.52405463674
-      y: 218.7615391495966
-      zoom: 0.6567548375504701
+      x: -621.6157823558125
+      y: 426.5183917351629
+      zoom: 0.4007884856506001
   rag_pipeline_variables: []
