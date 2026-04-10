@@ -71,14 +71,22 @@ class BundleValidator:
                         f'Inconsistent data type: "{clist[0]["name"]}" has types {types}'
                     )
 
-        # Coded concepts missing answer definitions
+        # Coded concepts missing answer definitions + duplicate answers within same concept
         answer_uuids = {c["uuid"] for c in concepts if c.get("dataType") == "NA"}
         for c in concepts:
             if c.get("dataType") == "Coded":
+                seen_in_concept: set[str] = set()
                 for a in c.get("answers", []):
-                    if a.get("uuid") and a["uuid"] not in answer_uuids:
+                    a_uuid = a.get("uuid", "")
+                    if a_uuid in seen_in_concept:
+                        self.errors.append(
+                            f'Duplicate answer UUID "{a_uuid}" (answer "{a["name"]}") in concept "{c["name"]}" '
+                            f"— causes concept_answer unique constraint violation on server"
+                        )
+                    seen_in_concept.add(a_uuid)
+                    if a_uuid and a_uuid not in answer_uuids:
                         # Check if defined elsewhere in concepts
-                        if a["uuid"] not in concepts_by_uuid:
+                        if a_uuid not in concepts_by_uuid:
                             self.warnings.append(
                                 f'Missing answer definition for "{a["name"]}" in concept "{c["name"]}"'
                             )

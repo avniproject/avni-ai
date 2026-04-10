@@ -128,6 +128,7 @@ Poll `upload_status(task_id=...)` every few seconds until `status` is `completed
   | `null value in column "dashboard_id"` | `groupDashboards.json` — cascades from dashboard failure; fix upstream files first |
   | `Form not found! UUID: <uuid>` | `formMappings.json` — a formUUID references a form not present in the bundle |
   | `X - is not a valid form element type` | `forms/<FormName>.json` — form element `type` field must be `SingleSelect` or `MultiSelect`; change invalid type to `SingleSelect` |
+  | `duplicate key value violates unique constraint "concept_answer_concept_id_answer_concept_id_key"` | `concepts.json` — the `answers` array of a Coded concept contains the same answer UUID twice (case-insensitive duplicate option text); remove the duplicate entry from the `answers` array |
 
   After identifying the files: fix via Bundle Fix Loop → re-run validate_bundle → re-upload.
   Do NOT re-generate the full bundle; use get_bundle_file / put_bundle_file to fix only the affected files.

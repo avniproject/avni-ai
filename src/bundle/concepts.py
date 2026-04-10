@@ -89,16 +89,23 @@ class ConceptGenerator:
             return concept_uuid
         canonical_name = self._canonical_name.get(safe_name.lower(), safe_name)
         answers = []
-        for idx, option in enumerate(field.get("options") or []):
+        seen_answer_uuids: set[str] = set()
+        order = 0
+        for option in field.get("options") or []:
             answer_uuid = self.generate_answer_concept(option)
+            if answer_uuid in seen_answer_uuids:
+                # Case-insensitive duplicate — skip to avoid concept_answer unique constraint
+                continue
+            seen_answer_uuids.add(answer_uuid)
             # Use first-seen capitalisation for answer name in the answers list too
             canonical_option = self._answer_canonical.get(
                 self._safe_name(option.strip().rstrip(",").strip()).lower(),
                 option.strip(),
             )
             answers.append(
-                {"name": canonical_option, "uuid": answer_uuid, "order": idx}
+                {"name": canonical_option, "uuid": answer_uuid, "order": order}
             )
+            order += 1
         self.generated_concepts.append(
             {
                 "name": canonical_name,
