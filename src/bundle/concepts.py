@@ -14,8 +14,10 @@ _MAX_CONCEPT_NAME = 255
 class ConceptGenerator:
     def __init__(self) -> None:
         self.generated_concepts: list[dict] = []
-        self.concept_map: dict[str, str] = {}  # name -> uuid
-        self._answer_cache: dict[str, str] = {}  # answer_name -> uuid
+        self.concept_map: dict[str, str] = {}  # lowercase name -> uuid
+        self._canonical_name: dict[str, str] = {}  # lowercase name -> first-seen name
+        self._answer_cache: dict[str, str] = {}  # lowercase answer_name -> uuid
+        self._answer_canonical: dict[str, str] = {}  # lowercase -> first-seen name
 
     # ── Name safety ─────────────────────────────────────────────────
 
@@ -38,24 +40,30 @@ class ConceptGenerator:
 
     def get_answer_uuid(self, answer_name: str) -> str:
         cleaned = self._safe_name(answer_name.strip().rstrip(",").strip())
-        if cleaned in self._answer_cache:
-            return self._answer_cache[cleaned]
-        # Registry lookup
+        key = cleaned.lower()
+        if key in self._answer_cache:
+            return self._answer_cache[key]
+        # Canonical name = first-seen capitalisation
+        self._answer_canonical[key] = cleaned
+        # Registry lookup (try canonical first-seen name)
         from_registry = lookup_answer_uuid(cleaned)
         if from_registry:
-            self._answer_cache[cleaned] = from_registry
+            self._answer_cache[key] = from_registry
             return from_registry
-        # Deterministic fallback
-        new_uuid = generate_deterministic_uuid(f"answer:{cleaned}")
-        self._answer_cache[cleaned] = new_uuid
+        # Deterministic fallback — UUID derived from lowercase so it's stable regardless of case
+        new_uuid = generate_deterministic_uuid(f"answer:{key}")
+        self._answer_cache[key] = new_uuid
         return new_uuid
 
     def get_concept_uuid(self, concept_name: str) -> str:
         safe = self._safe_name(concept_name)
-        if safe in self.concept_map:
-            return self.concept_map[safe]
-        new_uuid = generate_deterministic_uuid(f"concept:{safe}")
-        self.concept_map[safe] = new_uuid
+        key = safe.lower()
+        if key in self.concept_map:
+            return self.concept_map[key]
+        # Canonical name = first-seen capitalisation
+        self._canonical_name[key] = safe
+        new_uuid = generate_deterministic_uuid(f"concept:{key}")
+        self.concept_map[key] = new_uuid
         return new_uuid
 
     # ── Generators per data type ────────────────────────────────────
@@ -63,27 +71,37 @@ class ConceptGenerator:
     def generate_answer_concept(self, answer_name: str) -> str:
         cleaned = self._safe_name(answer_name.strip().rstrip(",").strip())
         uid = self.get_answer_uuid(cleaned)
-        # Avoid duplicates
+        # Avoid duplicates (case-insensitive — same UUID means already emitted)
         if any(c["uuid"] == uid for c in self.generated_concepts):
             return uid
+        # Use first-seen capitalisation as the canonical name
+        canonical = self._answer_canonical.get(cleaned.lower(), cleaned)
         self.generated_concepts.append(
-            {"name": cleaned, "uuid": uid, "dataType": "NA", "active": True}
+            {"name": canonical, "uuid": uid, "dataType": "NA", "active": True}
         )
         return uid
 
     def generate_coded_concept(self, field: dict) -> str:
-        field = {**field, "name": self._safe_name(field["name"])}
-        concept_uuid = self.get_concept_uuid(field["name"])
-        # Deduplicate — same field name across forms produces same UUID
+        safe_name = self._safe_name(field["name"])
+        concept_uuid = self.get_concept_uuid(safe_name)
+        # Deduplicate — same field name (case-insensitive) across forms produces same UUID
         if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
             return concept_uuid
+        canonical_name = self._canonical_name.get(safe_name.lower(), safe_name)
         answers = []
         for idx, option in enumerate(field.get("options") or []):
             answer_uuid = self.generate_answer_concept(option)
-            answers.append({"name": option.strip(), "uuid": answer_uuid, "order": idx})
+            # Use first-seen capitalisation for answer name in the answers list too
+            canonical_option = self._answer_canonical.get(
+                self._safe_name(option.strip().rstrip(",").strip()).lower(),
+                option.strip(),
+            )
+            answers.append(
+                {"name": canonical_option, "uuid": answer_uuid, "order": idx}
+            )
         self.generated_concepts.append(
             {
-                "name": field["name"],
+                "name": canonical_name,
                 "uuid": concept_uuid,
                 "dataType": "Coded",
                 "answers": answers,
@@ -93,12 +111,13 @@ class ConceptGenerator:
         return concept_uuid
 
     def generate_numeric_concept(self, field: dict) -> str:
-        field = {**field, "name": self._safe_name(field["name"])}
-        concept_uuid = self.get_concept_uuid(field["name"])
+        safe_name = self._safe_name(field["name"])
+        concept_uuid = self.get_concept_uuid(safe_name)
         if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
             return concept_uuid
+        canonical_name = self._canonical_name.get(safe_name.lower(), safe_name)
         concept: dict = {
-            "name": field["name"],
+            "name": canonical_name,
             "uuid": concept_uuid,
             "dataType": "Numeric",
             "active": True,
@@ -112,12 +131,13 @@ class ConceptGenerator:
         return concept_uuid
 
     def _generate_simple_concept(self, field: dict, data_type: str) -> str:
-        field = {**field, "name": self._safe_name(field["name"])}
-        concept_uuid = self.get_concept_uuid(field["name"])
+        safe_name = self._safe_name(field["name"])
+        concept_uuid = self.get_concept_uuid(safe_name)
         if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
             return concept_uuid
+        canonical_name = self._canonical_name.get(safe_name.lower(), safe_name)
         concept: dict = {
-            "name": field["name"],
+            "name": canonical_name,
             "uuid": concept_uuid,
             "dataType": data_type,
             "active": True,
