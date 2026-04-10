@@ -1162,6 +1162,9 @@ paths:
             schema:
               type: object
               properties:
+                conversation_id:
+                  type: string
+                  description: Conversation ID (required for authentication)
                 code:
                   type: string
                   description: Python code to execute
@@ -1169,6 +1172,7 @@ paths:
                   type: object
                   description: Variables available in the execution context
               required:
+                - conversation_id
                 - code
       responses:
         '200':

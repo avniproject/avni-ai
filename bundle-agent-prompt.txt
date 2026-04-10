@@ -293,7 +293,7 @@ All UUIDs in skip logic MUST match the UUIDs in concepts.json. Never hardcode UU
 
 ## UTILITY TOOLS
 
-`execute_python(code)` — runs arbitrary Python in a sandboxed environment. Use it when you need to:
+`execute_python(conversation_id, code)` — runs arbitrary Python in a sandboxed environment. **Always pass `conversation_id`** (required for auth — omitting it causes a 401 error). Use it when you need to:
 - Parse or transform structured data (e.g., deduplicate concepts, reorder displayOrder values, compute SHA-256 UUIDs)
 - Verify internal consistency before calling a write tool (e.g., check for C5/C7 violations in a concepts list)
 - Perform bulk transformations that would be error-prone to write inline

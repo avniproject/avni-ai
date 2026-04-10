@@ -38,7 +38,14 @@ async def handle_execute_python(request: Request) -> JSONResponse:
     if not code:
         return JSONResponse({"error": "'code' is required"}, status_code=400)
 
-    input_files = body.get("input_files")
+    # If caller passed a `context` dict, inject it as a JSON file the script can read
+    context = body.get("context")
+    input_files = body.get("input_files") or {}
+    if context and isinstance(context, dict):
+        import json as _json
+
+        input_files["_context.json"] = _json.dumps(context)
+
     timeout = body.get("timeout")
     avni_base_url = os.getenv("AVNI_BASE_URL")
 
