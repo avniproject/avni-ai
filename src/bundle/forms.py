@@ -22,7 +22,7 @@ _ELEMENT_TYPE_MAP: dict[str, str] = {
     "Video": "SingleSelect",
     "PhoneNumber": "SingleSelect",
     "Location": "SingleSelect",
-    "Duration": "Duration",
+    "Duration": "SingleSelect",
     "QuestionGroup": "SingleSelect",
 }
 

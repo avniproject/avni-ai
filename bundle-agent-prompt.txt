@@ -102,6 +102,7 @@ Poll `upload_status(task_id=...)` every few seconds until `status` is `completed
   | `null value in column "card_id"` | `reportDashboard.json` — cascades from reportCard failure; fix reportCard first |
   | `null value in column "dashboard_id"` | `groupDashboards.json` — cascades from dashboard failure; fix upstream files first |
   | `Form not found! UUID: <uuid>` | `formMappings.json` — a formUUID references a form not present in the bundle |
+  | `X - is not a valid form element type` | `forms/<FormName>.json` — form element `type` field must be `SingleSelect` or `MultiSelect`; change invalid type to `SingleSelect` |
 
   After identifying the files: fix via Bundle Fix Loop → re-run validate_bundle → re-upload.
   Do NOT re-generate the full bundle; use get_bundle_file / put_bundle_file to fix only the affected files.

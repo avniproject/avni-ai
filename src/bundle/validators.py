@@ -98,6 +98,11 @@ class BundleValidator:
 
     # ── Forms ───────────────────────────────────────────────────────
 
+    # FormElementType only has SingleSelect and MultiSelect — anything else is rejected
+    _VALID_FORM_ELEMENT_TYPES: frozenset[str] = frozenset(
+        {"SingleSelect", "MultiSelect"}
+    )
+
     def _validate_forms(self) -> None:
         form_uuids: set[str] = set()
         element_uuids: set[str] = set()
@@ -115,6 +120,13 @@ class BundleValidator:
                             f'Duplicate form element UUID: "{elem["uuid"]}" for "{elem["name"]}"'
                         )
                     element_uuids.add(elem["uuid"])
+
+                    elem_type = elem.get("type", "")
+                    if elem_type and elem_type not in self._VALID_FORM_ELEMENT_TYPES:
+                        self.errors.append(
+                            f'Form "{form["name"]}" element "{elem["name"]}" has invalid type '
+                            f'"{elem_type}" — must be SingleSelect or MultiSelect'
+                        )
 
     def _validate_form_concept_references(self) -> None:
         concepts_by_uuid = {c["uuid"]: c for c in self.bundle.get("concepts", [])}
