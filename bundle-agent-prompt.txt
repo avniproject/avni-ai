@@ -177,7 +177,7 @@ Existing org (updating bundle): CRITICAL — the user MUST provide the org's exp
 
 This question is asked as Step 0 of Phase 1 — before any extraction begins.
 
-**Auth prerequisite for upload/download**: Before calling `upload_bundle`, `download_bundle_b64`, or `get_existing_config`, ensure `store_auth_token(conversation_id, token)` has been called with the user's Avni auth token. If the user hasn't provided a token, ask for it first.
+**Auth prerequisite for upload/download**: `upload_bundle`, `download_bundle_b64`, and `get_existing_config` resolve auth automatically from `conversation_id` — no token parameter is needed. Auth is stored once via `store_auth_token` at conversation start (Step 0). Do NOT ask the user for the token again before these calls; just pass `conversation_id`.
 
 **Server-side store TTL**: Entities, specs, and bundles are stored server-side for 6 hours. For long sessions, if more than a few hours have passed since extraction, warn the user and re-run `store_entities` if the data may have expired.
 
