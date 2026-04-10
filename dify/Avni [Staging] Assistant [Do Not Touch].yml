@@ -108,6 +108,17 @@ workflow:
       allowed_file_upload_methods:
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -606,7 +617,7 @@ workflow:
           required: false
           type: text-input
           variable: user_name
-        - default: https://staging-ai.avniproject.org
+        - default: https://staging-ai.avniproject.org/
           hide: true
           hint: ''
           label: avni_ai_server_url
@@ -624,7 +635,7 @@ workflow:
       positionAbsolute:
         x: 0
         y: 413
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -3150,7 +3161,7 @@ workflow:
         title: Response
         type: answer
         variables: []
-      height: 104
+      height: 103
       id: '17756450495361'
       position:
         x: 3520
@@ -3273,20 +3284,11 @@ workflow:
           - conversation
           - org_name
           write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - conversation
-          - 'True'
-          variable_selector:
-          - conversation
-          - setup_mode_active
-          write_mode: over-write
         selected: false
         title: Conversation Variables Assigner
         type: assigner
         version: '2'
-      height: 162
+      height: 136
       id: '1775657870619'
       position:
         x: 362
@@ -3308,7 +3310,7 @@ workflow:
         title: Agent Error
         type: answer
         variables: []
-      height: 123
+      height: 137
       id: '1775658332808'
       position:
         x: 3540
@@ -3351,7 +3353,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: -354.75
-      y: 260.75
+      x: 351.75
+      y: 255.25
       zoom: 0.25
   rag_pipeline_variables: []
