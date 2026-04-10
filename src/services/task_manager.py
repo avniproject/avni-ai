@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional, Callable, Awaitable
 from dataclasses import dataclass
 from contextvars import ContextVar, copy_context
@@ -77,7 +77,7 @@ class TaskManager:
         self._ensure_cleanup_started()
 
         task_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
         task = ConfigTask(
             task_id=task_id,
@@ -107,7 +107,7 @@ class TaskManager:
         task = self._tasks.get(task_id)
         if task:
             task.status = status
-            task.updated_at = datetime.utcnow()
+            task.updated_at = datetime.now(timezone.utc)
             if result is not None:
                 task.result = result
             if error is not None:
@@ -196,7 +196,7 @@ class TaskManager:
             )
 
     def cleanup_old_tasks(self) -> int:
-        cutoff = datetime.utcnow() - timedelta(hours=self.task_expiry_hours)
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=self.task_expiry_hours)
         to_remove = []
 
         for task_id, task in self._tasks.items():

@@ -110,6 +110,7 @@ When validate_bundle or upload returns errors:
 **PLAN**: Identify which file is wrong (error message usually names the file)
 **EXECUTE**: `get_bundle_file(conversation_id=..., filename=...)` — inspect the problematic file
 **EXECUTE**: `put_bundle_file(conversation_id=..., filename=..., content=...)` — write back only that file
+- If `put_bundle_file` returns status 413 ("Content too large"): call `generate_bundle(conversation_id=...)` to regenerate the full bundle from the corrected entities, then re-validate.
 **EXECUTE**: `validate_bundle(conversation_id=...)` — **VERIFY**: errors resolved
 Repeat until valid=true, then call `upload_bundle`.
 

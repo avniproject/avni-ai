@@ -1083,6 +1083,8 @@ paths:
                     type: integer
         '404':
           description: No stored bundle for conversation_id
+        '413':
+          description: Content too large to patch inline — regenerate the bundle instead
 
   /agent-log:
     post:

@@ -21,6 +21,9 @@ logger = logging.getLogger(__name__)
 
 class BundleGenerator:
     def __init__(self, org_name: str) -> None:
+        # Guard against unresolved Dify template literals (e.g. "{{#n-start.org_name#}}")
+        if not org_name or org_name.startswith("{{#"):
+            org_name = "MyOrg"
         self.org_name = org_name
         self.concept_generator = ConceptGenerator()
         self.form_generator = FormGenerator()

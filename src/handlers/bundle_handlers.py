@@ -787,6 +787,26 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
     if content is None:
         return JSONResponse({"error": "Missing 'content'"}, status_code=400)
 
+    # Reject oversized payloads before attempting to process — nginx may return HTML
+    # for bodies > client_max_body_size (default 1 MB). Concepts.json can be large;
+    # if the content is too big, advise the agent to regenerate_bundle instead.
+    _MAX_PUT_CONTENT_BYTES = 512 * 1024  # 512 KB
+    content_str = (
+        json.dumps(content, ensure_ascii=False)
+        if isinstance(content, (dict, list))
+        else str(content)
+    )
+    if len(content_str.encode("utf-8")) > _MAX_PUT_CONTENT_BYTES:
+        return JSONResponse(
+            {
+                "error": (
+                    f"Content too large to patch inline ({len(content_str)} chars). "
+                    "Call generate_bundle to regenerate the bundle from corrected entities instead."
+                )
+            },
+            status_code=413,
+        )
+
     stored = _bundle_store.get(conversation_id)
     if stored is None:
         return JSONResponse(

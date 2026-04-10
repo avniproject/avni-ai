@@ -35,6 +35,8 @@ from ..schemas.bundle_models import (
     SubjectTypeSpec,
 )
 
+pd.set_option("future.no_silent_downcasting", True)
+
 logger = logging.getLogger(__name__)
 
 _DEFAULT_SCOPING_DOC = (
@@ -593,8 +595,23 @@ def parse_form_df(
         mandatory = _parse_yes_no(row.iloc[mand_idx]) if mand_idx is not None else False
 
         options = None
+        _displaced_type_keyword: str | None = None  # type keyword found in options col
         if options_idx is not None:
-            options = _parse_options(row.iloc[options_idx]) or None
+            raw_options_val = _clean(row.iloc[options_idx]).lower()
+            if raw_options_val in _DATA_TYPE_MAP:
+                # Column displacement detected: the options cell contains a type keyword.
+                # Record it for selection_type inference and scan adjacent columns for
+                # the actual options.
+                _displaced_type_keyword = raw_options_val
+                for scan_idx in range(
+                    options_idx + 1, min(options_idx + 4, row.shape[0])
+                ):
+                    candidate = _parse_options(row.iloc[scan_idx])
+                    if candidate:
+                        options = candidate
+                        break
+            else:
+                options = _parse_options(row.iloc[options_idx]) or None
 
         # If boolean/yes-no type detected, auto-add options
         if (
@@ -610,6 +627,12 @@ def parse_form_df(
             if "multi" in sel_raw:
                 selection_type = "MultiSelect"
             elif "single" in sel_raw:
+                selection_type = "SingleSelect"
+        # Infer selection type from displaced keyword when no explicit selection column
+        if selection_type is None and _displaced_type_keyword:
+            if "multi" in _displaced_type_keyword:
+                selection_type = "MultiSelect"
+            elif "single" in _displaced_type_keyword:
                 selection_type = "SingleSelect"
 
         min_val, max_val = None, None
