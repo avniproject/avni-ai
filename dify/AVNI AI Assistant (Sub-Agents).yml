@@ -1,0 +1,969 @@
+app:
+  description: AVNI AI Assistant with sub-agentic architecture for program specification,
+    form design, rules, reports, inspection, and admin operations
+  icon: "\U0001F916"
+  icon_background: '#E7F3F8'
+  icon_type: emoji
+  mode: advanced-chat
+  name: AVNI AI Assistant (Sub-Agents)
+  use_icon_as_answer_icon: true
+dependencies: []
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables:
+  - description: Detected or user-stated sector (MCH, Livelihoods, Education, etc.)
+    id: a1b2c3d4-0001-4000-8000-000000000001
+    name: sector
+    selector:
+    - conversation
+    - sector
+    value: ''
+    value_type: string
+  - description: Organisation name
+    id: a1b2c3d4-0002-4000-8000-000000000002
+    name: org_name
+    selector:
+    - conversation
+    - org_name
+    value: ''
+    value_type: string
+  - description: Whether this is a new organisation (true) or updating existing (false)
+    id: a1b2c3d4-0003-4000-8000-000000000003
+    name: is_new_org
+    selector:
+    - conversation
+    - is_new_org
+    value: 'true'
+    value_type: string
+  - description: Current workflow phase (spec, forms, rules, reports, inspect, admin)
+    id: a1b2c3d4-0004-4000-8000-000000000004
+    name: current_phase
+    selector:
+    - conversation
+    - current_phase
+    value: ''
+    value_type: string
+  - description: URL of the avni-ai MCP server
+    id: a1b2c3d4-0005-4000-8000-000000000005
+    name: avni_mcp_server_url
+    selector:
+    - conversation
+    - avni_mcp_server_url
+    value: https://staging-ai.avniproject.org/
+    value_type: string
+  - description: Avni auth token for API calls
+    id: a1b2c3d4-0006-4000-8000-000000000006
+    name: auth_token
+    selector:
+    - conversation
+    - auth_token
+    value: ''
+    value_type: string
+  - description: Base URL for the Avni application
+    id: a1b2c3d4-0007-4000-8000-000000000007
+    name: avni_base_url
+    selector:
+    - conversation
+    - avni_base_url
+    value: https://staging.avniproject.org
+    value_type: string
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .xlsx
+      - .csv
+      - .json
+      - .zip
+      - .txt
+      - .js
+      allowed_file_types:
+      - document
+      - custom
+      allowed_file_upload_methods:
+      - local_file
+      enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: 'I''m the AVNI AI Assistant. I can help you with:
+
+
+      1. **Set up a new program** — upload an SRS or describe your program
+
+      2. **Design forms** — add fields, skip logic, and validations
+
+      3. **Create rules** — visit scheduling, auto-calculations, decision support
+
+      4. **Build dashboards** — report cards and monitoring views
+
+      5. **Review configuration** — check completeness and find gaps
+
+      6. **Manage locations & users** — set up hierarchy, catchments, and accounts
+
+
+      What would you like to work on?'
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - Set up a new MCH program
+    - Help me design a registration form
+    - Review my current configuration
+    - Create a dashboard for field workers
+    suggested_questions_after_answer:
+      enabled: true
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: n-start-source-sa-var-assigner-target
+      selected: false
+      source: n-start
+      sourceHandle: source
+      target: sa-var-assigner
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: agent
+      id: sa-var-assigner-source-sa-agent-target
+      selected: false
+      source: sa-var-assigner
+      sourceHandle: source
+      target: sa-agent
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: answer
+      id: sa-agent-source-sa-response-target
+      selected: false
+      source: sa-agent
+      sourceHandle: source
+      target: sa-response
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: answer
+      id: sa-agent-fail-branch-sa-error-target
+      selected: false
+      source: sa-agent
+      sourceHandle: fail-branch
+      target: sa-error
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: Define the initial parameters for launching the workflow
+        selected: false
+        title: Start
+        type: start
+        variables:
+        - hide: true
+          label: auth_token
+          max_length: 2000
+          options: []
+          required: false
+          type: paragraph
+          variable: auth_token
+        - default: ''
+          hide: true
+          label: org_name
+          max_length: 200
+          options: []
+          required: false
+          type: text-input
+          variable: org_name
+        - default: ''
+          hide: true
+          label: sector
+          max_length: 100
+          options: []
+          required: false
+          type: text-input
+          variable: sector
+        - default: https://staging-ai.avniproject.org/
+          hide: true
+          hint: ''
+          label: avni_mcp_server_url
+          max_length: 256
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: avni_mcp_server_url
+      height: 225
+      id: n-start
+      position:
+        x: 0
+        y: 101
+      positionAbsolute:
+        x: 0
+        y: 101
+      selected: false
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - n-start
+          - auth_token
+          variable_selector:
+          - conversation
+          - auth_token
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - n-start
+          - avni_mcp_server_url
+          variable_selector:
+          - conversation
+          - avni_mcp_server_url
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - n-start
+          - org_name
+          variable_selector:
+          - conversation
+          - org_name
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - n-start
+          - sector
+          variable_selector:
+          - conversation
+          - sector
+          write_mode: over-write
+        selected: false
+        title: Variable Assigner
+        type: assigner
+        version: '2'
+      height: 136
+      id: sa-var-assigner
+      position:
+        x: 342
+        y: 140
+      positionAbsolute:
+        x: 342
+        y: 140
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: "You are the AVNI AI Assistant, a sub-agentic system that helps\
+              \ non-technical program managers configure the Avni platform.\n\nConversation\
+              \ ID: {{#sys.conversation_id#}}\nIMPORTANT: Use conversation_id (= {{#sys.conversation_id#}})\
+              \ for ALL tool calls.\n\n--- ORCHESTRATOR ---\n\nClassify every user\
+              \ message into one of 6 intents:\n- SPEC: new program setup, SRS upload,\
+              \ scoping sheet\n- FORMS: form design, fields, skip logic\n- RULES:\
+              \ calculations, visit scheduling, decision support\n- REPORTS: dashboards,\
+              \ report cards, analytics\n- INSPECT: review config, gap analysis, completeness\n\
+              - ADMIN: locations, users, catchments, bulk operations\n\nIf ambiguous,\
+              \ ask ONE clarifying question. Then handle the request using the appropriate\
+              \ sub-agent behaviour below.\n\n--- SPEC AGENT ---\n\nThree entry paths:\n\
+              1. Upload + Ambiguity: parse file, extract entities, resolve ambiguities,\
+              \ generate spec\n2. Chat Questionnaire: detect sector, walk through 10\
+              \ sections (org basics, beneficiaries, programs, visits, registration,\
+              \ enrolment, visit forms, exit, locations, users)\n3. Existing Org: download\
+              \ bundle, convert to spec, show for review, apply changes\n\nSector templates\
+              \ available: MCH, Livelihoods, Education, Nutrition, WASH.\n\nAfter collecting\
+              \ information: store_entities -> validate_entities -> generate_spec ->\
+              \ get_spec -> show to user -> ask for approval.\n\n--- BUNDLE CONFIG\
+              \ AGENT ---\n\nForm design workflow:\n1. Identify form context (subject\
+              \ type, form type, program, encounter)\n2. Design field list with data\
+              \ types, mandatory flags, options\n3. Configure skip logic (4 patterns:\
+              \ coded-show, coded-hide, numeric-threshold, defined)\n4. Review and confirm\n\
+              \nSkip logic operators: containsAnswerConceptName, notContainsAnswerConceptName,\
+              \ equals, notEquals, greaterThan, lessThan, greaterThanOrEqualTo, lessThanOrEqualTo,\
+              \ defined, notDefined\n\nScopes: registration, enrolment, encounter\n\
+              \nDataTypes: Text, Numeric, Coded, Date, DateTime, PhoneNumber, ImageV2,\
+              \ Notes, File, Audio, Video, Duration, Location, QuestionGroup, Subject\n\
+              \n--- RULES AGENT ---\n\n7 rule types:\n1. Visit Schedule Rule: schedule\
+              \ next visits (earliestDate, maxDate)\n2. Decision Rule: clinical/programmatic\
+              \ decisions\n3. Form Element Rule (ViewFilter): visibility, mandatory,\
+              \ validation\n4. Enrolment Summary Rule: derived values on summary page\n\
+              5. Validation Rule: field-level validation with error messages\n6. Checklists\
+              \ Rule: immunisation schedules\n7. Program Eligibility Rule: enrolment\
+              \ eligibility\n\nAPI: getObservationValue, getAgeInYears, getAgeInMonths,\
+              \ FormElementStatusBuilder (.show().when, .skipAnswers, .mandatory()),\
+              \ ScheduleBuilder (.add, .getAll), moment, lodash\n\nCommon patterns:\
+              \ BMI calculation, age from DOB, EDD from LMP, gestational age, z-score\
+              \ classification, conditional visit scheduling\n\n--- REPORTS AGENT ---\n\
+              \n5 report card types:\n1. Standard: count/percentage query\n2. Recent:\
+              \ recently registered/visited\n3. Due/Overdue: scheduled visit tracking\n\
+              4. Enrolment-Based: program enrolment counts\n5. Aggregate/Summary: averages,\
+              \ distributions, trends\n\nSector-specific defaults available for MCH,\
+              \ Livelihoods, Education, Nutrition, WASH.\n\nReport card names must be\
+              \ org-scoped (prefixed with org name).\nDashboard sections: group related\
+              \ cards, most important first, limit 8-12 cards.\nUser group dashboards:\
+              \ field worker, supervisor, manager views.\n\n--- CONFIG INSPECTOR AGENT\
+              \ ---\n\nRequirements compilation:\n- Every subject type has registration\
+              \ form\n- Every program has enrolment and exit forms\n- Every encounter\
+              \ has cancellation form\n- Concepts are unique, no C3/C5/C7 violations\n\
+              - FormMappings match form types\n- DisplayOrder unique within groups\n\
+              - Location hierarchy defined\n- User groups and privileges set\n\nGap\
+              \ analysis: Critical (must fix) vs Warning (should fix) vs Info (suggestions)\n\
+              Completeness checklist with percentage score\n\n--- ADMIN AGENT ---\n\n\
+              Location hierarchy: create types and locations, maintain parent-child relationships\n\
+              User management: find, create, update, disable users\nCatchment assignment:\
+              \ create catchments, assign locations and users\nBulk operations: CSV/Excel\
+              \ upload for locations, users, catchment assignments\nDelete implementation:\
+              \ remove all config (requires double confirmation)\n\n--- USER PERSONA\
+              \ ---\n\nThe user is a NON-TECHNICAL program manager. NEVER use technical\
+              \ terms (UUID, JSON, formMapping, bundle, ZIP, etc.). Ask about their\
+              \ PROGRAM in plain language. Handle all technical implementation silently.\n\
+              \n--- OUTPUT GUIDELINES ---\n\n- Be concise. One-sentence greetings.\n\
+              - Show configuration as readable summaries, not raw data.\n- When corrections\
+              \ needed, show only what changed.\n- Progress messages in plain language\
+              \ only.\n- Never narrate tool calls or show file names.\n- Never expose\
+              \ technical errors to the user."
+          maximum_iterations:
+            type: constant
+            value: 20
+          model:
+            type: constant
+            value:
+              completion_params:
+                context_1m: true
+                max_tokens: 16384
+                prompt_caching_tool_definitions: true
+                prompt_caching_tool_results: true
+                temperature: 0.2
+              mode: chat
+              model: claude-sonnet-4-6
+              model_type: llm
+              provider: langgenius/anthropic/anthropic
+              type: model-selector
+          query:
+            type: constant
+            value: '{{#sys.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: Store extracted entities server-side for subsequent operations
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                entities:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Store extracted entities server-side for subsequent
+                operations
+              tool_label: store_entities
+              tool_name: store_entities
+              type: api
+            - enabled: true
+              extra:
+                description: Validate extracted entities for structural issues
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Validate extracted entities for structural issues
+              tool_label: validate_entities
+              tool_name: validate_entities
+              type: api
+            - enabled: true
+              extra:
+                description: Generate a human-readable YAML spec from entities
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                org_name:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#n-start.org_name#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Generate a human-readable YAML spec from entities
+              tool_label: generate_spec
+              tool_name: generate_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Retrieve the full stored spec YAML for display
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Retrieve the full stored spec YAML for display
+              tool_label: get_spec
+              tool_name: get_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Fetch one section from stored entities for inspection
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                section:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Fetch one section from stored entities for inspection
+              tool_label: get_entities_section
+              tool_name: get_entities_section
+              type: api
+            - enabled: true
+              extra:
+                description: Replace one section in stored entities for surgical edits
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                items:
+                  auto: 1
+                  value: null
+                section:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Replace one section in stored entities for surgical
+                edits
+              tool_label: update_entities_section
+              tool_name: update_entities_section
+              type: api
+            - enabled: true
+              extra:
+                description: Generate the full bundle from stored entities
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                org_name:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#n-start.org_name#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Generate the full bundle from stored entities
+              tool_label: generate_bundle
+              tool_name: generate_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: Validate a stored bundle for errors
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Validate a stored bundle for errors
+              tool_label: validate_bundle
+              tool_name: validate_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: Upload a validated bundle to Avni
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Upload a validated bundle to Avni
+              tool_label: upload_bundle
+              tool_name: upload_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: Check status of a bundle upload task
+              parameters:
+                task_id:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Check status of a bundle upload task
+              tool_label: upload_status
+              tool_name: upload_status
+              type: api
+            - enabled: true
+              extra:
+                description: Fetch SRS text stored server-side
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Fetch SRS text stored server-side
+              tool_label: get_srs_text
+              tool_name: get_srs_text
+              type: api
+            - enabled: true
+              extra:
+                description: Store SRS text server-side
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                srs_text:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Store SRS text server-side
+              tool_label: store_srs_text
+              tool_name: store_srs_text
+              type: api
+            - enabled: true
+              extra:
+                description: Read a specific file from a stored bundle
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                filename:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Read a specific file from a stored bundle
+              tool_label: get_bundle_file
+              tool_name: get_bundle_file
+              type: api
+            - enabled: true
+              extra:
+                description: Replace one file in a stored bundle for surgical fixes
+              parameters:
+                content:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                filename:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Replace one file in a stored bundle for surgical fixes
+              tool_label: put_bundle_file
+              tool_name: put_bundle_file
+              type: api
+            - enabled: true
+              extra:
+                description: Download an existing org bundle and store server-side
+              parameters:
+                baseUrl:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#conversation.avni_base_url#}}'
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Download an existing org bundle and store server-side
+              tool_label: download_bundle_b64
+              tool_name: download_bundle_b64
+              type: api
+            - enabled: true
+              extra:
+                description: Convert an existing bundle to a human-readable YAML spec
+              parameters:
+                bundle:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#n-start.org_name#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Convert an existing bundle to a human-readable YAML
+                spec
+              tool_label: bundle_to_spec
+              tool_name: bundle_to_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Surgical edit of a single spec section
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                section:
+                  auto: 1
+                  value: null
+                value:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Surgical edit of a single spec section
+              tool_label: update_spec_section
+              tool_name: update_spec_section
+              type: api
+            - enabled: true
+              extra:
+                description: Apply corrections to extracted entities
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                corrections:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Apply corrections to extracted entities
+              tool_label: apply_entity_corrections
+              tool_name: apply_entity_corrections
+              type: api
+            - enabled: true
+              extra:
+                description: Fetch Avni resource arrays for an existing org
+              parameters:
+                max_items:
+                  auto: 1
+                  value: null
+                sections:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Fetch Avni resource arrays for an existing org
+              tool_label: get_existing_config
+              tool_name: get_existing_config
+              type: api
+            - enabled: true
+              extra:
+                description: Log agent actions for traceability
+              parameters:
+                action:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                error:
+                  auto: 1
+                  value: null
+                phase:
+                  auto: 1
+                  value: null
+                status:
+                  auto: 1
+                  value: null
+                step:
+                  auto: 1
+                  value: null
+                summary:
+                  auto: 1
+                  value: null
+                tool:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Log agent actions for traceability
+              tool_label: append_agent_log
+              tool_name: append_agent_log
+              type: api
+            - enabled: true
+              extra:
+                description: Run Python code in a sandboxed silo environment
+              parameters:
+                code:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                input_bundle_files:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Run Python code in a sandboxed silo environment
+              tool_label: execute_python
+              tool_name: execute_python
+              type: api
+            - enabled: true
+              extra:
+                description: Read a file from the conversation silo with pagination
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                filename:
+                  auto: 1
+                  value: null
+                limit:
+                  auto: 1
+                  value: null
+                offset:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Read a file from the conversation silo with pagination
+              tool_label: read_silo_file
+              tool_name: read_silo_file
+              type: api
+            - enabled: true
+              extra:
+                description: List all files in a stored bundle
+              parameters:
+                bundle_type:
+                  auto: 1
+                  value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: List all files in a stored bundle
+              tool_label: get_bundle_files
+              tool_name: get_bundle_files
+              type: api
+            - enabled: true
+              extra:
+                description: Fetch one section from the stored spec YAML
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                section:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Fetch one section from the stored spec YAML
+              tool_label: get_spec_section
+              tool_name: get_spec_section
+              type: api
+            - enabled: true
+              extra:
+                description: Patch an existing bundle with spec changes
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                spec_yaml:
+                  auto: 1
+                  value: null
+              provider_name: 7f9b21ca-bafb-43f6-8294-4357a954d50d
+              provider_show_name: Avni AI Staging NoAuth openapi
+              settings: {}
+              tool_description: Patch an existing bundle with spec changes
+              tool_label: patch_bundle
+              tool_name: patch_bundle
+              type: api
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: Orchestrator with sub-agent behaviours for spec, forms, rules, reports,
+          inspection, and admin
+        error_strategy: fail-branch
+        isInIteration: false
+        isInLoop: false
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          window:
+            enabled: true
+            size: 10
+        output_schema: null
+        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: AVNI AI Agent
+        tool_node_version: '2'
+        type: agent
+      height: 312
+      id: sa-agent
+      position:
+        x: 684
+        y: 0
+      positionAbsolute:
+        x: 684
+        y: 0
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        answer: '{{#sa-agent.text#}}'
+        desc: ''
+        isInIteration: false
+        isInLoop: false
+        selected: false
+        title: Response
+        type: answer
+        variables: []
+      height: 103
+      id: sa-response
+      position:
+        x: 1026
+        y: 52
+      positionAbsolute:
+        x: 1026
+        y: 52
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: "Type: {{#sa-agent.error_type#}}\n\nMessage: {{#sa-agent.error_message#}}"
+        selected: false
+        title: Agent Error
+        type: answer
+        variables: []
+      height: 137
+      id: sa-error
+      position:
+        x: 1026
+        y: 250
+      positionAbsolute:
+        x: 1026
+        y: 250
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 0
+      y: 200
+      zoom: 0.5
+  rag_pipeline_variables: []
