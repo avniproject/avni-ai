@@ -1282,3 +1282,1241 @@ paths:
                     type: boolean
         '404':
           description: File not found in silo
+
+  # ─── SPEC AGENT ENDPOINTS ───────────────────────────────────────────
+
+  /resolve-ambiguities:
+    post:
+      operationId: resolve_ambiguities
+      summary: Apply user-provided answers to stored ambiguities
+      description: Resolves ambiguities detected during SRS parsing by applying user answers. Returns updated counts of resolved vs pending ambiguities.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - resolutions
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID
+                resolutions:
+                  type: array
+                  description: List of ambiguity resolutions
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Ambiguity ID
+                      answer:
+                        type: string
+                        description: User's resolution answer
+      responses:
+        '200':
+          description: Resolution result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  resolved_count:
+                    type: integer
+                  pending_count:
+                    type: integer
+                  all_resolved:
+                    type: boolean
+
+  /get-ambiguities:
+    get:
+      operationId: get_ambiguities
+      summary: Retrieve stored ambiguities for this conversation
+      description: Returns the ambiguity list with resolved/pending status. Ambiguities are detected during SRS parsing and stored with 6h TTL.
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID
+      responses:
+        '200':
+          description: Ambiguity list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ambiguities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        resolved:
+                          type: boolean
+                        answer:
+                          type: string
+                  total:
+                    type: integer
+                  pending_count:
+                    type: integer
+                  resolved_count:
+                    type: integer
+                  all_resolved:
+                    type: boolean
+
+  /chat-srs/init-session:
+    post:
+      operationId: chat_srs_init_session
+      summary: Initialize a guided chat SRS session with sector defaults
+      description: Creates a new chat-based SRS session. Pre-loads sector-specific defaults (MCH, Livelihoods, Education, etc.) so the user can refine rather than start from scratch. Returns available sections to fill.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID
+                sector:
+                  type: string
+                  description: Sector name (e.g. MCH, Livelihoods, Education, Nutrition, WASH)
+                org_name:
+                  type: string
+                  description: Organisation name
+                is_new_org:
+                  type: boolean
+                  description: Whether this is a new organisation (default true)
+                description:
+                  type: string
+                  description: Free-text description for auto-detecting sector
+      responses:
+        '200':
+          description: Session initialized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  conversation_id:
+                    type: string
+                  sector:
+                    type: string
+                  available_sectors:
+                    type: array
+                    items:
+                      type: string
+                  has_defaults:
+                    type: boolean
+                  sections:
+                    type: array
+                    items:
+                      type: string
+                  current_section:
+                    type: string
+
+  /chat-srs/update-section:
+    post:
+      operationId: chat_srs_update_section
+      summary: Update a specific section of the chat SRS session
+      description: Updates one section (e.g. subject_types, programs, encounter_types) and runs cross-validation. Advances to next incomplete section automatically.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - section
+                - data
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID
+                section:
+                  type: string
+                  description: Section name (org_info, subject_types, programs, encounter_types, address_levels, groups, forms, rules, reports, users)
+                data:
+                  type: object
+                  description: Section data (structure depends on section type)
+      responses:
+        '200':
+          description: Section updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  section:
+                    type: string
+                  current_section:
+                    type: string
+                  completed_sections:
+                    type: array
+                    items:
+                      type: string
+                  remaining_sections:
+                    type: array
+                    items:
+                      type: string
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+                  progress:
+                    type: string
+
+  /chat-srs/build-entities:
+    post:
+      operationId: chat_srs_build_entities
+      summary: Transform completed chat SRS sections into standard entities
+      description: Converts all completed sections into the standard entities dict format used by generate-spec and generate-bundle. Auto-generates forms from encounter types using sector-specific field templates.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID
+      responses:
+        '200':
+          description: Entities built
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  entities:
+                    type: object
+                    description: Standard entities dict
+                  entity_counts:
+                    type: object
+                    properties:
+                      subject_types:
+                        type: integer
+                      programs:
+                        type: integer
+                      encounter_types:
+                        type: integer
+                      address_levels:
+                        type: integer
+                      groups:
+                        type: integer
+                      forms:
+                        type: integer
+                  completed_sections:
+                    type: array
+                    items:
+                      type: string
+                  sector:
+                    type: string
+
+  # ─── BUNDLE CONFIG AGENT ENDPOINTS ──────────────────────────────────
+
+  /generate-form:
+    post:
+      operationId: generate_form
+      summary: Generate complete AVNI form JSON from field specifications
+      description: Takes a form name, type, and field list and produces a complete AVNI form JSON with concepts, elements, and groups. Used for designing individual forms conversationally.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: Form name
+                formType:
+                  type: string
+                  description: Form type (Encounter, ProgramEncounter, IndividualProfile, ProgramEnrolment, etc.)
+                  default: Encounter
+                fields:
+                  type: array
+                  description: Field specifications
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      dataType:
+                        type: string
+                subjectType:
+                  type: string
+                  description: Subject type name (optional)
+                program:
+                  type: string
+                  description: Program name (optional)
+                encounterType:
+                  type: string
+                  description: Encounter type name (optional)
+      responses:
+        '200':
+          description: Form generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  form:
+                    type: object
+                    description: Complete AVNI form JSON
+                  concepts:
+                    type: array
+                    description: Generated concepts
+                    items:
+                      type: object
+                  field_count:
+                    type: integer
+                  concept_count:
+                    type: integer
+
+  /suggest-form-fields:
+    post:
+      operationId: suggest_form_fields
+      summary: Suggest sector-specific form fields for an encounter type
+      description: Given an encounter name and optional sector, returns recommended field definitions with data types and validation rules based on sector best practices.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - encounter_name
+              properties:
+                encounter_name:
+                  type: string
+                  description: Name of the encounter type
+                sector:
+                  type: string
+                  description: Sector (MCH, Livelihoods, Education, Nutrition, WASH)
+      responses:
+        '200':
+          description: Field suggestions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  encounter_name:
+                    type: string
+                  sector:
+                    type: string
+                  fields:
+                    type: array
+                    items:
+                      type: object
+                  field_count:
+                    type: integer
+                  available_sectors:
+                    type: array
+                    items:
+                      type: string
+
+  /generate-skip-logic:
+    post:
+      operationId: generate_skip_logic
+      summary: Parse natural language skip logic into AVNI declarative rules
+      description: Converts natural language rules like "show when Gender is Female" into AVNI declarative rule JSON format for form element visibility control.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rules
+              properties:
+                rules:
+                  type: array
+                  description: Natural language skip logic expressions
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Parsed skip logic
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        input:
+                          type: string
+                        parsed:
+                          type: object
+                        declarativeRule:
+                          type: array
+                          items:
+                            type: object
+                  parsed_count:
+                    type: integer
+                  error_count:
+                    type: integer
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+  # ─── RULES AGENT ENDPOINTS ─────────────────────────────────────────
+
+  /generate-rule:
+    post:
+      operationId: generate_rule
+      summary: Generate JavaScript rule code for AVNI
+      description: Generates JavaScript rule code for one of 7 supported types (visitSchedule, decision, validation, eligibility, summary, worklist, checklist). Returns the code along with validation results.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rule_type
+              properties:
+                rule_type:
+                  type: string
+                  description: Rule type (visitSchedule, decision, validation, eligibility, summary, worklist, checklist)
+                params:
+                  type: object
+                  description: Rule parameters
+                  properties:
+                    schedule_days:
+                      type: integer
+                      description: Days between scheduled visits (default 30)
+                    max_days:
+                      type: integer
+                      description: Max days for overdue (default 45)
+                    encounter_name:
+                      type: string
+                      description: Encounter type name (default Follow-up)
+                    concept_name:
+                      type: string
+                      description: Concept name for decision/validation rules
+                    min_value:
+                      type: number
+                      description: Min value for validation (default 0)
+                    max_value:
+                      type: number
+                      description: Max value for validation (default 100)
+                    name:
+                      type: string
+                      description: Rule name (default Default)
+      responses:
+        '200':
+          description: Rule generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  rule_type:
+                    type: string
+                  code:
+                    type: string
+                    description: Generated JavaScript rule code
+                  validation:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                      errors:
+                        type: array
+                        items:
+                          type: string
+                      warnings:
+                        type: array
+                        items:
+                          type: string
+
+  /validate-rule:
+    post:
+      operationId: validate_rule
+      summary: Validate JavaScript rule code with static analysis
+      description: Performs static analysis on rule code checking bracket matching, required patterns, and disallowed APIs. Returns errors and warnings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: JavaScript rule code to validate
+                rule_type:
+                  type: string
+                  description: Optional rule type for type-specific validation
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  valid:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+                  error_count:
+                    type: integer
+                  warning_count:
+                    type: integer
+
+  # ─── REPORTS AGENT ENDPOINTS ────────────────────────────────────────
+
+  /generate-report-cards:
+    post:
+      operationId: generate_report_cards
+      summary: Generate reportCard.json entries for AVNI dashboards
+      description: Creates report card configurations for standard types (scheduledVisits, overdueVisits, total, recentRegistrations, recentEnrolments, recentVisits) and custom cards with deterministic UUIDs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_name:
+                  type: string
+                  description: Organisation name (default MyOrg)
+                card_types:
+                  type: array
+                  description: Standard card types to generate
+                  items:
+                    type: string
+                custom_cards:
+                  type: array
+                  description: Custom card definitions
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      color:
+                        type: string
+                      query:
+                        type: string
+      responses:
+        '200':
+          description: Report cards generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  report_cards:
+                    type: array
+                    items:
+                      type: object
+                  card_count:
+                    type: integer
+                  available_card_types:
+                    type: array
+                    items:
+                      type: string
+
+  /suggest-dashboard:
+    post:
+      operationId: suggest_dashboard
+      summary: Suggest sector-specific dashboard cards and layout
+      description: Returns standard cards plus sector-specific suggestions with a recommended layout grouping. Supports MCH, Nutrition, Livelihoods, Education, WASH sectors.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sector:
+                  type: string
+                  description: Sector (MCH, Nutrition, Livelihoods, Education, WASH)
+                org_name:
+                  type: string
+                  description: Organisation name
+      responses:
+        '200':
+          description: Dashboard suggestions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  sector:
+                    type: string
+                  standard_cards:
+                    type: array
+                    items:
+                      type: object
+                  sector_cards:
+                    type: array
+                    items:
+                      type: object
+                  suggested_layout:
+                    type: array
+                    items:
+                      type: object
+                  available_sectors:
+                    type: array
+                    items:
+                      type: string
+
+  # ─── CONFIG INSPECTOR AGENT ENDPOINTS ───────────────────────────────
+
+  /compile-requirements:
+    post:
+      operationId: compile_requirements
+      summary: Check business requirements against entities
+      description: Validates each requirement against the provided entities and returns met/not_met/partial status for each. Used by the Config Inspector agent to verify generated config matches the original SRS requirements.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - requirements
+                - entities
+              properties:
+                requirements:
+                  type: array
+                  description: List of business requirements to check
+                  items:
+                    type: object
+                    required:
+                      - description
+                      - entity_type
+                    properties:
+                      description:
+                        type: string
+                      entity_type:
+                        type: string
+                        description: Entity type (subject_type, program, encounter_type, address_level, form)
+                      name:
+                        type: string
+                        description: Expected entity name (optional)
+                      field:
+                        type: string
+                        description: Expected form field name (optional)
+                entities:
+                  type: object
+                  description: Entities dict to check against
+      responses:
+        '200':
+          description: Requirement check results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        description:
+                          type: string
+                        entity_type:
+                          type: string
+                        status:
+                          type: string
+                          description: met, not_met, or partial
+                        reason:
+                          type: string
+                  total:
+                    type: integer
+                  met_count:
+                    type: integer
+                  not_met_count:
+                    type: integer
+                  partial_count:
+                    type: integer
+                  all_met:
+                    type: boolean
+
+  /inspect-config:
+    post:
+      operationId: inspect_config
+      summary: Perform gap analysis on entity configuration
+      description: Analyzes entities for completeness and structural issues. Returns a 0.0-1.0 completeness score and a list of gaps categorized by severity (error, warning, info).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - entities
+              properties:
+                entities:
+                  type: object
+                  description: Entities dict to inspect
+      responses:
+        '200':
+          description: Inspection results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  completeness_score:
+                    type: number
+                    description: Score from 0.0 to 1.0
+                  checks_passed:
+                    type: integer
+                  checks_total:
+                    type: integer
+                  gaps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        area:
+                          type: string
+                        severity:
+                          type: string
+                          description: error, warning, or info
+                        message:
+                          type: string
+                  gap_count:
+                    type: integer
+                  entity_counts:
+                    type: object
+
+  # ─── ADMIN AGENT ENDPOINTS ─────────────────────────────────────────
+
+  /api/location-types:
+    post:
+      operationId: create_location_type
+      summary: Create a new location type (address level type)
+      description: Creates a location type in the AVNI hierarchy. Requires auth via conversation_id (stored token) or avni-auth-token header.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - level
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID (for auth token lookup)
+                name:
+                  type: string
+                  description: Location type name (e.g. State, District, Village)
+                level:
+                  type: number
+                  description: Hierarchy level (higher = higher in hierarchy)
+                parentId:
+                  type: integer
+                  description: Parent location type ID (optional)
+      responses:
+        '200':
+          description: Location type created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /api/location-types/{id}:
+    put:
+      operationId: update_location_type
+      summary: Update an existing location type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - uuid
+                - name
+                - level
+              properties:
+                conversation_id:
+                  type: string
+                id:
+                  type: integer
+                uuid:
+                  type: string
+                name:
+                  type: string
+                level:
+                  type: number
+                parentId:
+                  type: integer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Location type updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+    delete:
+      operationId: delete_location_type
+      summary: Delete a location type by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversation_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Location type deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /api/locations:
+    get:
+      operationId: get_locations
+      summary: Get all locations for the organisation
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID (for auth token lookup)
+      responses:
+        '200':
+          description: Locations list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+    post:
+      operationId: create_location
+      summary: Create a new location
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - level
+                - type
+              properties:
+                conversation_id:
+                  type: string
+                name:
+                  type: string
+                  description: Location name
+                level:
+                  type: integer
+                  description: Hierarchy level
+                type:
+                  type: string
+                  description: Address level type name
+                parents:
+                  type: array
+                  description: Parent location IDs
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+      responses:
+        '200':
+          description: Location created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /api/locations/{id}:
+    put:
+      operationId: update_location
+      summary: Update a location
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - title
+                - level
+              properties:
+                conversation_id:
+                  type: string
+                id:
+                  type: integer
+                title:
+                  type: string
+                  description: Location name (note — uses 'title' not 'name')
+                level:
+                  type: integer
+                parentId:
+                  type: integer
+      responses:
+        '200':
+          description: Location updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+    delete:
+      operationId: delete_location
+      summary: Delete a location by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversation_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Location deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /api/catchments:
+    get:
+      operationId: get_catchments
+      summary: Get all catchments for the organisation
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID (for auth token lookup)
+      responses:
+        '200':
+          description: Catchments list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+    post:
+      operationId: create_catchment
+      summary: Create a new catchment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - locationIds
+              properties:
+                conversation_id:
+                  type: string
+                name:
+                  type: string
+                  description: Catchment name
+                locationIds:
+                  type: array
+                  description: Location IDs to include
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Catchment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /api/catchments/{id}:
+    put:
+      operationId: update_catchment
+      summary: Update a catchment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - name
+                - locationIds
+              properties:
+                conversation_id:
+                  type: string
+                id:
+                  type: integer
+                name:
+                  type: string
+                locationIds:
+                  type: array
+                  items:
+                    type: integer
+                deleteFastSync:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: Catchment updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+    delete:
+      operationId: delete_catchment
+      summary: Delete a catchment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversation_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Catchment deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /api/users:
+    get:
+      operationId: find_user
+      summary: Find a user by name
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: User name to search for
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID (for auth token lookup)
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /api/users/{id}:
+    put:
+      operationId: update_user
+      summary: Update a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - name
+                - username
+                - phoneNumber
+                - email
+                - organisationId
+                - catchmentId
+              properties:
+                conversation_id:
+                  type: string
+                id:
+                  type: integer
+                name:
+                  type: string
+                username:
+                  type: string
+                phoneNumber:
+                  type: string
+                email:
+                  type: string
+                organisationId:
+                  type: integer
+                catchmentId:
+                  type: integer
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /api/implementation:
+    delete:
+      operationId: delete_implementation
+      summary: Delete organisation implementation (config reset)
+      description: Deletes app designer config and/or admin config for the organisation. Use with extreme caution — this is destructive and irreversible.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deleteMetadata
+                - deleteAdminConfig
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID (for auth token lookup)
+                deleteMetadata:
+                  type: boolean
+                  description: Whether to delete app designer config (subject types, programs, encounters)
+                deleteAdminConfig:
+                  type: boolean
+                  description: Whether to delete admin config (location types, locations, catchments)
+      responses:
+        '200':
+          description: Implementation deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object

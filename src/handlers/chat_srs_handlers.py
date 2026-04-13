@@ -251,10 +251,7 @@ async def handle_update_section(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Missing 'section'"}, status_code=400)
     if section not in VALID_SECTIONS:
         return JSONResponse(
-            {
-                "error": f"Invalid section '{section}'. "
-                f"Valid sections: {VALID_SECTIONS}"
-            },
+            {"error": f"Invalid section '{section}'. Valid sections: {VALID_SECTIONS}"},
             status_code=400,
         )
 
@@ -347,7 +344,13 @@ async def handle_build_entities(request: Request) -> JSONResponse:
 
     # Fall back to sector defaults for any missing sections
     if session.sector_defaults:
-        for key in ("subject_types", "programs", "encounter_types", "address_levels", "groups"):
+        for key in (
+            "subject_types",
+            "programs",
+            "encounter_types",
+            "address_levels",
+            "groups",
+        ):
             if not entities.get(key):
                 entities[key] = session.sector_defaults.get(key, [])
 
@@ -371,8 +374,7 @@ async def handle_build_entities(request: Request) -> JSONResponse:
             "ok": True,
             "entities": entities,
             "entity_counts": {
-                k: len(v) if isinstance(v, list) else 1
-                for k, v in entities.items()
+                k: len(v) if isinstance(v, list) else 1 for k, v in entities.items()
             },
             "completed_sections": session.completed_sections,
             "sector": session.sector,

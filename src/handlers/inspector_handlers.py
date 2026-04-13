@@ -146,11 +146,13 @@ def _inspect_config(entities: dict) -> dict[str, Any]:
     if st_rows:
         checks_passed += 1
     else:
-        gaps.append({
-            "area": "subject_types",
-            "severity": "error",
-            "message": "No subject types defined",
-        })
+        gaps.append(
+            {
+                "area": "subject_types",
+                "severity": "error",
+                "message": "No subject types defined",
+            }
+        )
 
     # Check programs
     checks_total += 1
@@ -164,20 +166,24 @@ def _inspect_config(entities: dict) -> dict[str, Any]:
                 continue
             target = (prog.get("target_subject_type") or "").lower()
             if target and target not in st_names:
-                gaps.append({
-                    "area": "programs",
-                    "severity": "warning",
-                    "message": (
-                        f"Program '{prog.get('name')}' targets "
-                        f"'{prog.get('target_subject_type')}' which is not defined"
-                    ),
-                })
+                gaps.append(
+                    {
+                        "area": "programs",
+                        "severity": "warning",
+                        "message": (
+                            f"Program '{prog.get('name')}' targets "
+                            f"'{prog.get('target_subject_type')}' which is not defined"
+                        ),
+                    }
+                )
     else:
-        gaps.append({
-            "area": "programs",
-            "severity": "warning",
-            "message": "No programs defined (not required for general encounters)",
-        })
+        gaps.append(
+            {
+                "area": "programs",
+                "severity": "warning",
+                "message": "No programs defined (not required for general encounters)",
+            }
+        )
 
     # Check encounter types
     checks_total += 1
@@ -185,11 +191,13 @@ def _inspect_config(entities: dict) -> dict[str, Any]:
     if enc_rows:
         checks_passed += 1
     else:
-        gaps.append({
-            "area": "encounter_types",
-            "severity": "error",
-            "message": "No encounter types defined",
-        })
+        gaps.append(
+            {
+                "area": "encounter_types",
+                "severity": "error",
+                "message": "No encounter types defined",
+            }
+        )
 
     # Check address levels
     checks_total += 1
@@ -203,20 +211,24 @@ def _inspect_config(entities: dict) -> dict[str, Any]:
                 continue
             parent = addr.get("parent", "")
             if parent and parent not in names:
-                gaps.append({
-                    "area": "address_levels",
-                    "severity": "warning",
-                    "message": (
-                        f"Address level '{addr.get('name')}' references parent "
-                        f"'{parent}' which is not defined"
-                    ),
-                })
+                gaps.append(
+                    {
+                        "area": "address_levels",
+                        "severity": "warning",
+                        "message": (
+                            f"Address level '{addr.get('name')}' references parent "
+                            f"'{parent}' which is not defined"
+                        ),
+                    }
+                )
     else:
-        gaps.append({
-            "area": "address_levels",
-            "severity": "warning",
-            "message": "No address levels defined. A default hierarchy will be generated.",
-        })
+        gaps.append(
+            {
+                "area": "address_levels",
+                "severity": "warning",
+                "message": "No address levels defined. A default hierarchy will be generated.",
+            }
+        )
 
     # Check forms
     checks_total += 1
@@ -229,20 +241,24 @@ def _inspect_config(entities: dict) -> dict[str, Any]:
             if isinstance(f, dict) and not f.get("fields")
         ]
         if forms_without_fields:
-            gaps.append({
-                "area": "forms",
-                "severity": "warning",
-                "message": (
-                    f"{len(forms_without_fields)} form(s) have no fields: "
-                    f"{', '.join(forms_without_fields[:5])}"
-                ),
-            })
+            gaps.append(
+                {
+                    "area": "forms",
+                    "severity": "warning",
+                    "message": (
+                        f"{len(forms_without_fields)} form(s) have no fields: "
+                        f"{', '.join(forms_without_fields[:5])}"
+                    ),
+                }
+            )
     else:
-        gaps.append({
-            "area": "forms",
-            "severity": "info",
-            "message": "No explicit forms defined. Forms will be auto-derived from encounter types.",
-        })
+        gaps.append(
+            {
+                "area": "forms",
+                "severity": "info",
+                "message": "No explicit forms defined. Forms will be auto-derived from encounter types.",
+            }
+        )
 
     # Check groups
     checks_total += 1
@@ -250,11 +266,13 @@ def _inspect_config(entities: dict) -> dict[str, Any]:
     if group_rows:
         checks_passed += 1
     else:
-        gaps.append({
-            "area": "groups",
-            "severity": "info",
-            "message": "No groups defined. Default groups will be generated.",
-        })
+        gaps.append(
+            {
+                "area": "groups",
+                "severity": "info",
+                "message": "No groups defined. Default groups will be generated.",
+            }
+        )
 
     # Compute completeness score
     completeness = round(checks_passed / checks_total, 2) if checks_total > 0 else 0.0
@@ -305,9 +323,7 @@ async def handle_compile_requirements(request: Request) -> JSONResponse:
             {"error": "'requirements' must be an array"}, status_code=400
         )
     if not isinstance(entities, dict):
-        return JSONResponse(
-            {"error": "'entities' must be an object"}, status_code=400
-        )
+        return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
 
     results = _check_requirements(requirements, entities)
 
@@ -348,9 +364,7 @@ async def handle_inspect_config(request: Request) -> JSONResponse:
 
     entities = body.get("entities", {})
     if not isinstance(entities, dict):
-        return JSONResponse(
-            {"error": "'entities' must be an object"}, status_code=400
-        )
+        return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
 
     result = _inspect_config(entities)
 

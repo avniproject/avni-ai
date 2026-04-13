@@ -37,47 +37,169 @@ SECTORS = {
             {"name": "Child", "type": "Person", "lowest_address_level": "Village"},
         ],
         "programs": [
-            {"name": "Maternal Health", "target_subject_type": "Woman", "colour": "#FF6F61"},
-            {"name": "Child Health", "target_subject_type": "Child", "colour": "#6FA3EF"},
+            {
+                "name": "Maternal Health",
+                "target_subject_type": "Woman",
+                "colour": "#FF6F61",
+            },
+            {
+                "name": "Child Health",
+                "target_subject_type": "Child",
+                "colour": "#6FA3EF",
+            },
         ],
         "encounter_types": [
-            {"name": "ANC Visit", "program_name": "Maternal Health", "is_scheduled": True},
-            {"name": "Delivery", "program_name": "Maternal Health", "is_scheduled": False},
-            {"name": "PNC Visit", "program_name": "Maternal Health", "is_scheduled": True},
-            {"name": "Growth Monitoring", "program_name": "Child Health", "is_scheduled": True},
-            {"name": "Immunisation", "program_name": "Child Health", "is_scheduled": True},
+            {
+                "name": "ANC Visit",
+                "program_name": "Maternal Health",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Delivery",
+                "program_name": "Maternal Health",
+                "is_scheduled": False,
+            },
+            {
+                "name": "PNC Visit",
+                "program_name": "Maternal Health",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Growth Monitoring",
+                "program_name": "Child Health",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Immunisation",
+                "program_name": "Child Health",
+                "is_scheduled": True,
+            },
         ],
         "form_fields": {
             "ANC Visit": [
-                {"name": "Weight", "dataType": "Numeric", "mandatory": True, "unit": "kg", "min": 30, "max": 200},
-                {"name": "Blood pressure - systolic", "dataType": "Numeric", "mandatory": True, "unit": "mmHg", "min": 60, "max": 260},
-                {"name": "Blood pressure - diastolic", "dataType": "Numeric", "mandatory": True, "unit": "mmHg", "min": 40, "max": 160},
-                {"name": "Haemoglobin", "dataType": "Numeric", "mandatory": True, "unit": "g/dL", "min": 2, "max": 20},
-                {"name": "Fundal height", "dataType": "Numeric", "mandatory": False, "unit": "cm", "min": 5, "max": 50},
-                {"name": "Foetal heart rate", "dataType": "Numeric", "mandatory": False, "unit": "bpm", "min": 60, "max": 220},
+                {
+                    "name": "Weight",
+                    "dataType": "Numeric",
+                    "mandatory": True,
+                    "unit": "kg",
+                    "min": 30,
+                    "max": 200,
+                },
+                {
+                    "name": "Blood pressure - systolic",
+                    "dataType": "Numeric",
+                    "mandatory": True,
+                    "unit": "mmHg",
+                    "min": 60,
+                    "max": 260,
+                },
+                {
+                    "name": "Blood pressure - diastolic",
+                    "dataType": "Numeric",
+                    "mandatory": True,
+                    "unit": "mmHg",
+                    "min": 40,
+                    "max": 160,
+                },
+                {
+                    "name": "Haemoglobin",
+                    "dataType": "Numeric",
+                    "mandatory": True,
+                    "unit": "g/dL",
+                    "min": 2,
+                    "max": 20,
+                },
+                {
+                    "name": "Fundal height",
+                    "dataType": "Numeric",
+                    "mandatory": False,
+                    "unit": "cm",
+                    "min": 5,
+                    "max": 50,
+                },
+                {
+                    "name": "Foetal heart rate",
+                    "dataType": "Numeric",
+                    "mandatory": False,
+                    "unit": "bpm",
+                    "min": 60,
+                    "max": 220,
+                },
             ],
         },
         "vital_ranges": {
-            "Haemoglobin": {"low": 7.0, "normal_low": 11.0, "normal_high": 16.0, "high": 20.0, "unit": "g/dL"},
-            "Blood pressure - systolic": {"low": 60, "normal_low": 90, "normal_high": 140, "high": 200, "unit": "mmHg"},
-            "Blood pressure - diastolic": {"low": 40, "normal_low": 60, "normal_high": 90, "high": 130, "unit": "mmHg"},
-            "Weight": {"low": 30, "normal_low": 40, "normal_high": 100, "high": 200, "unit": "kg"},
+            "Haemoglobin": {
+                "low": 7.0,
+                "normal_low": 11.0,
+                "normal_high": 16.0,
+                "high": 20.0,
+                "unit": "g/dL",
+            },
+            "Blood pressure - systolic": {
+                "low": 60,
+                "normal_low": 90,
+                "normal_high": 140,
+                "high": 200,
+                "unit": "mmHg",
+            },
+            "Blood pressure - diastolic": {
+                "low": 40,
+                "normal_low": 60,
+                "normal_high": 90,
+                "high": 130,
+                "unit": "mmHg",
+            },
+            "Weight": {
+                "low": 30,
+                "normal_low": 40,
+                "normal_high": 100,
+                "high": 200,
+                "unit": "kg",
+            },
         },
     },
     "Livelihoods": {
         "subject_types": [
             {"name": "Individual", "type": "Person", "lowest_address_level": "Village"},
-            {"name": "Household", "type": "Household", "lowest_address_level": "Village"},
-            {"name": "Self-Help Group", "type": "Group", "lowest_address_level": "Block"},
+            {
+                "name": "Household",
+                "type": "Household",
+                "lowest_address_level": "Village",
+            },
+            {
+                "name": "Self-Help Group",
+                "type": "Group",
+                "lowest_address_level": "Block",
+            },
         ],
         "programs": [
-            {"name": "Livelihood Support", "target_subject_type": "Individual", "colour": "#4CAF50"},
-            {"name": "Skill Training", "target_subject_type": "Individual", "colour": "#FFC107"},
+            {
+                "name": "Livelihood Support",
+                "target_subject_type": "Individual",
+                "colour": "#4CAF50",
+            },
+            {
+                "name": "Skill Training",
+                "target_subject_type": "Individual",
+                "colour": "#FFC107",
+            },
         ],
         "encounter_types": [
-            {"name": "Baseline Survey", "program_name": "Livelihood Support", "is_scheduled": False},
-            {"name": "Follow-up Visit", "program_name": "Livelihood Support", "is_scheduled": True},
-            {"name": "Training Session", "program_name": "Skill Training", "is_scheduled": True},
+            {
+                "name": "Baseline Survey",
+                "program_name": "Livelihood Support",
+                "is_scheduled": False,
+            },
+            {
+                "name": "Follow-up Visit",
+                "program_name": "Livelihood Support",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Training Session",
+                "program_name": "Skill Training",
+                "is_scheduled": True,
+            },
         ],
         "form_fields": {},
         "vital_ranges": {},
@@ -88,13 +210,33 @@ SECTORS = {
             {"name": "School", "type": "Group", "lowest_address_level": "Block"},
         ],
         "programs": [
-            {"name": "Student Tracking", "target_subject_type": "Student", "colour": "#2196F3"},
-            {"name": "School Improvement", "target_subject_type": "School", "colour": "#9C27B0"},
+            {
+                "name": "Student Tracking",
+                "target_subject_type": "Student",
+                "colour": "#2196F3",
+            },
+            {
+                "name": "School Improvement",
+                "target_subject_type": "School",
+                "colour": "#9C27B0",
+            },
         ],
         "encounter_types": [
-            {"name": "Attendance Check", "program_name": "Student Tracking", "is_scheduled": True},
-            {"name": "Assessment", "program_name": "Student Tracking", "is_scheduled": True},
-            {"name": "Parent Meeting", "program_name": "Student Tracking", "is_scheduled": False},
+            {
+                "name": "Attendance Check",
+                "program_name": "Student Tracking",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Assessment",
+                "program_name": "Student Tracking",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Parent Meeting",
+                "program_name": "Student Tracking",
+                "is_scheduled": False,
+            },
         ],
         "form_fields": {},
         "vital_ranges": {},
@@ -105,29 +247,73 @@ SECTORS = {
             {"name": "Mother", "type": "Person", "lowest_address_level": "Village"},
         ],
         "programs": [
-            {"name": "Nutrition Monitoring", "target_subject_type": "Child", "colour": "#FF9800"},
-            {"name": "Supplementary Feeding", "target_subject_type": "Child", "colour": "#8BC34A"},
+            {
+                "name": "Nutrition Monitoring",
+                "target_subject_type": "Child",
+                "colour": "#FF9800",
+            },
+            {
+                "name": "Supplementary Feeding",
+                "target_subject_type": "Child",
+                "colour": "#8BC34A",
+            },
         ],
         "encounter_types": [
-            {"name": "Growth Monitoring", "program_name": "Nutrition Monitoring", "is_scheduled": True},
-            {"name": "Feeding Session", "program_name": "Supplementary Feeding", "is_scheduled": True},
-            {"name": "Counselling", "program_name": "Supplementary Feeding", "is_scheduled": False},
+            {
+                "name": "Growth Monitoring",
+                "program_name": "Nutrition Monitoring",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Feeding Session",
+                "program_name": "Supplementary Feeding",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Counselling",
+                "program_name": "Supplementary Feeding",
+                "is_scheduled": False,
+            },
         ],
         "form_fields": {},
         "vital_ranges": {},
     },
     "WASH": {
         "subject_types": [
-            {"name": "Household", "type": "Household", "lowest_address_level": "Village"},
-            {"name": "Water Source", "type": "Person", "lowest_address_level": "Village"},
+            {
+                "name": "Household",
+                "type": "Household",
+                "lowest_address_level": "Village",
+            },
+            {
+                "name": "Water Source",
+                "type": "Person",
+                "lowest_address_level": "Village",
+            },
         ],
         "programs": [
-            {"name": "WASH Monitoring", "target_subject_type": "Household", "colour": "#00BCD4"},
+            {
+                "name": "WASH Monitoring",
+                "target_subject_type": "Household",
+                "colour": "#00BCD4",
+            },
         ],
         "encounter_types": [
-            {"name": "Household Survey", "program_name": "WASH Monitoring", "is_scheduled": False},
-            {"name": "Water Quality Test", "program_name": "WASH Monitoring", "is_scheduled": True},
-            {"name": "Sanitation Inspection", "program_name": "WASH Monitoring", "is_scheduled": True},
+            {
+                "name": "Household Survey",
+                "program_name": "WASH Monitoring",
+                "is_scheduled": False,
+            },
+            {
+                "name": "Water Quality Test",
+                "program_name": "WASH Monitoring",
+                "is_scheduled": True,
+            },
+            {
+                "name": "Sanitation Inspection",
+                "program_name": "WASH Monitoring",
+                "is_scheduled": True,
+            },
         ],
         "form_fields": {},
         "vital_ranges": {},
@@ -138,6 +324,7 @@ SECTORS = {
 # ---------------------------------------------------------------------------
 # Helper functions (mirroring the sector template API)
 # ---------------------------------------------------------------------------
+
 
 def get_available_sectors() -> list[str]:
     """Return sorted list of available sector names."""
@@ -183,11 +370,60 @@ def detect_sector(text: str) -> str | None:
     text_lower = text.lower()
     # Check keywords
     keyword_map = {
-        "MCH": ["pregnant", "anc", "pnc", "maternal", "antenatal", "postnatal", "delivery", "lmp", "edd", "gravida", "parity"],
-        "Livelihoods": ["livelihood", "income", "farming", "agriculture", "shg", "self-help group", "crop", "livestock"],
-        "Education": ["school", "student", "teacher", "attendance", "assessment", "grade", "dropout"],
-        "Nutrition": ["nutrition", "malnutrition", "muac", "stunting", "wasting", "underweight", "z-score", "waz", "haz", "whz"],
-        "WASH": ["wash", "sanitation", "hygiene", "water source", "open defecation", "toilet", "handwashing", "odf"],
+        "MCH": [
+            "pregnant",
+            "anc",
+            "pnc",
+            "maternal",
+            "antenatal",
+            "postnatal",
+            "delivery",
+            "lmp",
+            "edd",
+            "gravida",
+            "parity",
+        ],
+        "Livelihoods": [
+            "livelihood",
+            "income",
+            "farming",
+            "agriculture",
+            "shg",
+            "self-help group",
+            "crop",
+            "livestock",
+        ],
+        "Education": [
+            "school",
+            "student",
+            "teacher",
+            "attendance",
+            "assessment",
+            "grade",
+            "dropout",
+        ],
+        "Nutrition": [
+            "nutrition",
+            "malnutrition",
+            "muac",
+            "stunting",
+            "wasting",
+            "underweight",
+            "z-score",
+            "waz",
+            "haz",
+            "whz",
+        ],
+        "WASH": [
+            "wash",
+            "sanitation",
+            "hygiene",
+            "water source",
+            "open defecation",
+            "toilet",
+            "handwashing",
+            "odf",
+        ],
     }
     scores: dict[str, int] = {}
     for sector, keywords in keyword_map.items():
@@ -202,6 +438,7 @@ def detect_sector(text: str) -> str | None:
 # ===========================================================================
 # TESTS
 # ===========================================================================
+
 
 class TestGetAvailableSectors:
     """Tests for get_available_sectors."""
@@ -240,7 +477,9 @@ class TestGetSectorDefaults:
             assert defaults is not None, f"Sector {sector} returned None"
             for key in ["subject_types", "programs", "encounter_types"]:
                 assert key in defaults, f"Sector {sector} missing key {key}"
-                assert isinstance(defaults[key], list), f"Sector {sector}[{key}] not a list"
+                assert isinstance(defaults[key], list), (
+                    f"Sector {sector}[{key}] not a list"
+                )
                 assert len(defaults[key]) > 0, f"Sector {sector}[{key}] is empty"
 
     def test_unknown_sector_returns_none(self):
@@ -322,16 +561,30 @@ class TestDetectSector:
         assert detect_sector("We run an ANC program for pregnant women") == "MCH"
 
     def test_detect_livelihoods(self):
-        assert detect_sector("Our program supports farming and livelihood activities") == "Livelihoods"
+        assert (
+            detect_sector("Our program supports farming and livelihood activities")
+            == "Livelihoods"
+        )
 
     def test_detect_education(self):
-        assert detect_sector("We track student attendance and school assessments") == "Education"
+        assert (
+            detect_sector("We track student attendance and school assessments")
+            == "Education"
+        )
 
     def test_detect_nutrition(self):
-        assert detect_sector("We monitor malnutrition and MUAC measurements") == "Nutrition"
+        assert (
+            detect_sector("We monitor malnutrition and MUAC measurements")
+            == "Nutrition"
+        )
 
     def test_detect_wash(self):
-        assert detect_sector("We do sanitation and hygiene surveys, checking toilet and handwashing") == "WASH"
+        assert (
+            detect_sector(
+                "We do sanitation and hygiene surveys, checking toilet and handwashing"
+            )
+            == "WASH"
+        )
 
     def test_unknown_text(self):
         assert detect_sector("Hello, how are you today?") is None

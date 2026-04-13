@@ -107,13 +107,9 @@ async def handle_bulk_locations(request: Request) -> JSONResponse:
     locations = body.get("locations", [])
 
     if not isinstance(locations, list):
-        return JSONResponse(
-            {"error": "'locations' must be an array"}, status_code=400
-        )
+        return JSONResponse({"error": "'locations' must be an array"}, status_code=400)
     if not locations:
-        return JSONResponse(
-            {"error": "No locations provided"}, status_code=400
-        )
+        return JSONResponse({"error": "No locations provided"}, status_code=400)
 
     # Validate hierarchy
     validation_errors = _validate_location_hierarchy(locations)
@@ -230,9 +226,7 @@ async def handle_bulk_users(request: Request) -> JSONResponse:
             "email": user.get("email", ""),
             "phoneNumber": user.get("phone", ""),
             "language": user.get("language", "en"),
-            "operatingIndividualScope": user.get(
-                "operating_scope", "ByDistrict"
-            ),
+            "operatingIndividualScope": user.get("operating_scope", "ByDistrict"),
         }
 
         # Catchment assignment

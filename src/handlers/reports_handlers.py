@@ -204,9 +204,7 @@ async def handle_generate_report_cards(request: Request) -> JSONResponse:
     custom_cards = body.get("custom_cards", [])
 
     if not isinstance(card_types, list):
-        return JSONResponse(
-            {"error": "'card_types' must be an array"}, status_code=400
-        )
+        return JSONResponse({"error": "'card_types' must be an array"}, status_code=400)
     if not isinstance(custom_cards, list):
         return JSONResponse(
             {"error": "'custom_cards' must be an array"}, status_code=400
@@ -220,9 +218,7 @@ async def handle_generate_report_cards(request: Request) -> JSONResponse:
         if not card_meta:
             continue
 
-        card_uuid = generate_deterministic_uuid(
-            f"reportCard:{org_name}:{card_type}"
-        )
+        card_uuid = generate_deterministic_uuid(f"reportCard:{org_name}:{card_type}")
         card: dict[str, Any] = {
             "uuid": card_uuid,
             "name": f"{org_name}: {card_meta['label']}",
@@ -285,11 +281,23 @@ async def handle_suggest_dashboard(request: Request) -> JSONResponse:
 
     # Always include standard cards
     standard_suggestions = [
-        {"name": "Scheduled Visits", "type": "standard", "card_type": "scheduledVisits"},
+        {
+            "name": "Scheduled Visits",
+            "type": "standard",
+            "card_type": "scheduledVisits",
+        },
         {"name": "Overdue Visits", "type": "standard", "card_type": "overdueVisits"},
         {"name": "Total Registrations", "type": "standard", "card_type": "total"},
-        {"name": "Recent Registrations", "type": "standard", "card_type": "recentRegistrations"},
-        {"name": "Recent Enrolments", "type": "standard", "card_type": "recentEnrolments"},
+        {
+            "name": "Recent Registrations",
+            "type": "standard",
+            "card_type": "recentRegistrations",
+        },
+        {
+            "name": "Recent Enrolments",
+            "type": "standard",
+            "card_type": "recentEnrolments",
+        },
         {"name": "Recent Visits", "type": "standard", "card_type": "recentVisits"},
     ]
 

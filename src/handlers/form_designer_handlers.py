@@ -127,9 +127,7 @@ def _build_declarative_rule(parsed: dict, concept_uuid: str = "") -> list[dict]:
     """
     Convert a parsed skip logic dict into an AVNI declarative rule structure.
     """
-    action_type = (
-        "showFormElement" if parsed["action"] == "show" else "hideFormElement"
-    )
+    action_type = "showFormElement" if parsed["action"] == "show" else "hideFormElement"
 
     rhs: dict[str, Any] = {}
     operator = "containsAnswerConceptName"
