@@ -82,3 +82,16 @@ fix_missing_edges.py
 # Generated/exported DSL artifacts in root
 AppConfigV3_*.yml
 App\ Configurator*.yml
+
+# Copied knowledge bases (from avni-skills repo)
+avni-skills/
+
+# Planning/notes docs
+AI Cohort 2 - Notes-full.md
+
+# Agent debugger deps
+tools/agent-debugger/node_modules/
+tools/agent-debugger/package-lock.json
+
+# Misc
+extract.txt

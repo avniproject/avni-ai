@@ -56,6 +56,36 @@ from .handlers.spec_handlers import (
 )
 from .handlers.sandbox_handlers import handle_execute_python, handle_read_silo_file
 from .handlers.log_handlers import handle_append_agent_log, handle_get_agent_logs
+from .handlers.ambiguity_handlers import (
+    handle_resolve_ambiguities,
+    handle_get_ambiguities,
+)
+from .handlers.chat_srs_handlers import (
+    handle_init_session,
+    handle_update_section,
+    handle_build_entities,
+)
+from .handlers.form_designer_handlers import (
+    handle_generate_form,
+    handle_suggest_form_fields,
+    handle_generate_skip_logic,
+)
+from .handlers.rules_handlers import (
+    handle_generate_rule,
+    handle_validate_rule,
+)
+from .handlers.reports_handlers import (
+    handle_generate_report_cards,
+    handle_suggest_dashboard,
+)
+from .handlers.inspector_handlers import (
+    handle_compile_requirements,
+    handle_inspect_config,
+)
+from .handlers.bulk_admin_handlers import (
+    handle_bulk_locations,
+    handle_bulk_users,
+)
 from .handlers.debug_handlers import (
     handle_debug_conversation,
     handle_debug_list_conversations,
@@ -401,6 +431,77 @@ async def create_server():
     @server.custom_route("/agent-logs/{conversation_id}", methods=["GET"])
     async def get_agent_logs_endpoint(request: Request):
         return await handle_get_agent_logs(request)
+
+    # --- Ambiguity Resolution ---
+    @server.custom_route("/resolve-ambiguities", methods=["POST"])
+    async def resolve_ambiguities_endpoint(request: Request):
+        return await handle_resolve_ambiguities(request)
+
+    @server.custom_route("/get-ambiguities", methods=["GET"])
+    async def get_ambiguities_endpoint(request: Request):
+        return await handle_get_ambiguities(request)
+
+    # --- Chat SRS Creation ---
+    @server.custom_route("/chat-srs/init-session", methods=["POST"])
+    async def chat_srs_init_session(request: Request):
+        return await handle_init_session(request)
+
+    @server.custom_route("/chat-srs/update-section", methods=["POST"])
+    async def chat_srs_update_section(request: Request):
+        return await handle_update_section(request)
+
+    @server.custom_route("/chat-srs/build-entities", methods=["POST"])
+    async def chat_srs_build_entities(request: Request):
+        return await handle_build_entities(request)
+
+    # --- Form Designer ---
+    @server.custom_route("/generate-form", methods=["POST"])
+    async def generate_form_endpoint(request: Request):
+        return await handle_generate_form(request)
+
+    @server.custom_route("/suggest-form-fields", methods=["POST"])
+    async def suggest_form_fields_endpoint(request: Request):
+        return await handle_suggest_form_fields(request)
+
+    @server.custom_route("/generate-skip-logic", methods=["POST"])
+    async def generate_skip_logic_endpoint(request: Request):
+        return await handle_generate_skip_logic(request)
+
+    # --- Rules Generation ---
+    @server.custom_route("/generate-rule", methods=["POST"])
+    async def generate_rule_endpoint(request: Request):
+        return await handle_generate_rule(request)
+
+    @server.custom_route("/validate-rule", methods=["POST"])
+    async def validate_rule_endpoint(request: Request):
+        return await handle_validate_rule(request)
+
+    # --- Reports & Dashboards ---
+    @server.custom_route("/generate-report-cards", methods=["POST"])
+    async def generate_report_cards_endpoint(request: Request):
+        return await handle_generate_report_cards(request)
+
+    @server.custom_route("/suggest-dashboard", methods=["POST"])
+    async def suggest_dashboard_endpoint(request: Request):
+        return await handle_suggest_dashboard(request)
+
+    # --- Config Inspector ---
+    @server.custom_route("/compile-requirements", methods=["POST"])
+    async def compile_requirements_endpoint(request: Request):
+        return await handle_compile_requirements(request)
+
+    @server.custom_route("/inspect-config", methods=["POST"])
+    async def inspect_config_endpoint(request: Request):
+        return await handle_inspect_config(request)
+
+    # --- Bulk Admin ---
+    @server.custom_route("/api/bulk-locations", methods=["POST"])
+    async def bulk_locations_endpoint(request: Request):
+        return await handle_bulk_locations(request)
+
+    @server.custom_route("/api/bulk-users", methods=["POST"])
+    async def bulk_users_endpoint(request: Request):
+        return await handle_bulk_users(request)
 
     # --- Debug Endpoints ---
     @server.custom_route("/debug/conversation/{conversation_id}", methods=["GET"])
