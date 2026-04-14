@@ -1130,8 +1130,8 @@ def consolidate_and_audit(
     # Generate the YAML spec — this is the source of truth
     spec_yaml = entities_to_spec(entities, org_name=org_name)
 
-    # Build audit report
-    warnings: list[str] = []
+    # Build audit report — include cross-ref warnings from EntitySpec validation
+    warnings: list[str] = list(entity_spec.validation_warnings)
     errors: list[str] = []
 
     # Check completeness

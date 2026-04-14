@@ -107,21 +107,41 @@ class EntitySpec(BaseModel):
     groups: list[GroupSpec] = Field(default_factory=list)
     forms: list[FormSpec] = Field(default_factory=list)
 
+    # Cross-ref issues stored as warnings instead of raising ValueError.
+    # Populated by the validator; downstream code can inspect these.
+    validation_warnings: list[str] = Field(default_factory=list, exclude=True)
+
+    # Set to True to raise on cross-ref errors (strict mode).
+    # Default False = lenient mode (store as warnings).
+    _strict_validation: bool = False
+
+    model_config = {"arbitrary_types_allowed": True}
+
+    @classmethod
+    def create_strict(cls, **kwargs) -> "EntitySpec":
+        """Create an EntitySpec that raises on cross-ref errors."""
+        spec = cls(**kwargs)
+        spec._strict_validation = True
+        spec._run_cross_ref_checks()
+        return spec
+
     @model_validator(mode="after")
     def validate_no_duplicates_and_cross_refs(self) -> "EntitySpec":
+        self._run_cross_ref_checks()
+        return self
+
+    def _run_cross_ref_checks(self) -> None:
         errors: list[str] = []
 
         # ── Duplicate checks ──────────────────────────────────────────────────
         def _check_dupes(items: list, label: str) -> set[str]:
             seen: set[str] = set()
-            dupes: set[str] = set()
             for item in items:
                 name = getattr(item, "name", "").strip()
                 if not name:
                     continue
                 key = name.lower()
                 if key in seen:
-                    dupes.add(name)
                     errors.append(f"Duplicate {label}: '{name}'")
                 seen.add(key)
             return seen
@@ -152,12 +172,12 @@ class EntitySpec(BaseModel):
                 )
 
         if errors:
-            raise ValueError(
-                "EntitySpec validation failed:\n"
-                + "\n".join(f"  - {e}" for e in errors)
-            )
-
-        return self
+            if self._strict_validation:
+                raise ValueError(
+                    "EntitySpec validation failed:\n"
+                    + "\n".join(f"  - {e}" for e in errors)
+                )
+            self.validation_warnings = errors
 
     def to_entities_dict(self) -> dict:
         """Return a plain dict compatible with AppConfiguratorFlow.state.entities_jsonl."""

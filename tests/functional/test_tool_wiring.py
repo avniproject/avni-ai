@@ -27,7 +27,7 @@ _OPENAPI_PATH = _PROJECT_ROOT / "dify" / "avni-ai-tools-openapi.yaml"
 _WORKFLOW_PATH = _PROJECT_ROOT / "dify" / "Avni [Staging] Sub-Agentic Assistant.yml"
 _MAIN_PY_PATH = _PROJECT_ROOT / "src" / "main.py"
 
-EXPECTED_PROVIDER_ID = "7f9b21ca-bafb-43f6-8294-4357a954d50d"
+EXPECTED_PROVIDER_ID = "fa71db84-aa31-44cc-95a2-6b5b7961a51e"
 
 # Tools that are legitimately not assigned to any agent (infrastructure tools)
 ALLOWED_ORPHAN_TOOLS = {
@@ -265,10 +265,11 @@ class TestNoOrphanTools:
 
 
 class TestConversationIdHardwiring:
-    """Tools that take a conversation_id parameter should have auto:0 with
-    sys.conversation_id value, ensuring the agent does not hallucinate IDs."""
+    """Tools that take a conversation_id parameter should have auto:1
+    (framework-injected) with the SubAgents provider. The framework
+    automatically resolves conversation_id from context."""
 
-    def test_tools_with_cid_have_auto_0(self, workflow: dict):
+    def test_tools_with_cid_have_auto_1(self, workflow: dict):
         cid_tools = _extract_tools_with_cid_wiring(workflow)
 
         # There should be at least some tools with conversation_id
@@ -276,36 +277,31 @@ class TestConversationIdHardwiring:
 
         bad_tools: list[str] = []
         for entry in cid_tools:
-            if entry["auto"] != 0:
+            if entry["auto"] != 1:
                 bad_tools.append(
                     f"{entry['tool_name']} in agent {entry['agent']} "
-                    f"has auto={entry['auto']} (expected 0)"
+                    f"has auto={entry['auto']} (expected 1)"
                 )
 
         assert not bad_tools, (
-            "Tools with conversation_id not set to auto:0:\n" + "\n".join(bad_tools)
+            "Tools with conversation_id not set to auto:1:\n" + "\n".join(bad_tools)
         )
 
-    def test_cid_value_references_sys_conversation_id(self, workflow: dict):
+    def test_cid_value_is_null_for_auto_inject(self, workflow: dict):
+        """With auto:1, value should be null (framework handles injection)."""
         cid_tools = _extract_tools_with_cid_wiring(workflow)
 
         bad_tools: list[str] = []
         for entry in cid_tools:
-            value = entry.get("value", {})
-            # value can be a dict with type/value or a plain string
-            if isinstance(value, dict):
-                val_str = str(value.get("value", ""))
-            else:
-                val_str = str(value)
-
-            if "sys.conversation_id" not in val_str:
+            value = entry.get("value")
+            if value is not None:
                 bad_tools.append(
-                    f"{entry['tool_name']}: value={val_str} "
-                    f"(expected reference to sys.conversation_id)"
+                    f"{entry['tool_name']}: value={value} "
+                    f"(expected null for auto:1 injection)"
                 )
 
         assert not bad_tools, (
-            "Tools with conversation_id not referencing sys.conversation_id:\n"
+            "Tools with conversation_id should have value=null for auto:1:\n"
             + "\n".join(bad_tools)
         )
 
