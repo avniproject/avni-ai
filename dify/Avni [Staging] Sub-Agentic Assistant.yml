@@ -694,7 +694,7 @@ workflow:
       selected: false
       source: '1800000000110'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -707,7 +707,7 @@ workflow:
       selected: false
       source: '1800000000210'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -720,7 +720,7 @@ workflow:
       selected: false
       source: '1800000000310'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -733,7 +733,7 @@ workflow:
       selected: false
       source: '1800000000410'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -746,7 +746,7 @@ workflow:
       selected: false
       source: '1800000000510'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -759,7 +759,7 @@ workflow:
       selected: false
       source: '1800000000610'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -772,7 +772,7 @@ workflow:
       selected: false
       source: '1800000000101'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -785,7 +785,7 @@ workflow:
       selected: false
       source: '1800000000201'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -798,7 +798,7 @@ workflow:
       selected: false
       source: '1800000000301'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -811,7 +811,7 @@ workflow:
       selected: false
       source: '1800000000401'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -824,7 +824,7 @@ workflow:
       selected: false
       source: '1800000000501'
       sourceHandle: fail-branch
-      target: '1800000000760'
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -837,6 +837,19 @@ workflow:
       selected: false
       source: '1800000000601'
       sourceHandle: fail-branch
+      target: '1800000000761'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: code
+        targetType: assigner
+      id: 1800000000761-source-1800000000760-target
+      selected: false
+      source: '1800000000761'
+      sourceHandle: source
       target: '1800000000760'
       targetHandle: target
       type: custom
@@ -4490,6 +4503,47 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
+        code: "def main(active_agent: str, existing_memory: str) -> dict:\n    error_msg\
+          \ = f\"[ERROR] The {active_agent} agent encountered an error and could not\
+          \ complete its task. The workflow has been stopped.\"\n    sep = \"\\n---\\\
+          n\"\n    updated_memory = (existing_memory + sep + error_msg) if existing_memory\
+          \ else error_msg\n    return {\"updated_memory\": updated_memory}\n"
+        code_language: python3
+        isInLoop: true
+        loop_id: '1800000000700'
+        outputs:
+          updated_memory:
+            type: string
+        selected: false
+        title: Error Collector
+        type: code
+        variables:
+        - value_selector:
+          - conversation
+          - active_agent
+          value_type: string
+          variable: active_agent
+        - value_selector:
+          - conversation
+          - agent_memory
+          value_type: string
+          variable: existing_memory
+      height: 52
+      id: '1800000000761'
+      parentId: '1800000000700'
+      position:
+        x: 1250
+        y: 750
+      positionAbsolute:
+        x: 4770
+        y: 750
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
         isInLoop: true
         items:
         - input_type: variable
@@ -4500,6 +4554,15 @@ workflow:
           variable_selector:
           - conversation
           - agent_loop_active
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000761'
+          - updated_memory
+          variable_selector:
+          - conversation
+          - agent_memory
           write_mode: over-write
         loop_id: '1800000000700'
         selected: false
@@ -4558,21 +4621,17 @@ workflow:
             ## Instructions
 
 
-            1. Summarize what was accomplished in 3-5 bullet points (what was created,
-            configured, uploaded)
-
-            2. Highlight any issues found and how they were handled
-
-            3. If the bundle was uploaded, confirm it with the upload status
-
-            4. End with clear next steps — what the user should do now (e.g. "Check
-            your Avni app", "Review the forms", "Upload locations and users")
-
-            5. Keep it under 200 words
-
-            6. Use markdown formatting
-
-            7. Do NOT dump raw data or technical details — keep it user-friendly'
+            1. Check if the log contains [ERROR] entries. If yes, this is an error report:\n\
+            \   - Explain what went wrong in simple terms\n\
+            \   - Suggest what the user can try (e.g. \"Please try again\" or \"Check your uploaded files\")\n\
+            \   - Do NOT show technical error details\n\
+            \n2. If no errors, summarize what was accomplished in 3-5 bullet points\
+            \ (what was created, configured, uploaded)\n\
+            \n3. Highlight any issues found and how they were handled\n\
+            \n4. If the bundle was uploaded, confirm it with the upload status\n\
+            \n5. End with clear next steps — what the user should do now\n\
+            \n6. Keep it under 200 words, use markdown formatting\n\
+            \n7. Do NOT dump raw data or technical details'
         - id: a1b2c3d4-summary-prompt-02
           role: user
           text: Summarize what was done and what the user should do next.
