@@ -246,9 +246,9 @@ class TestFormDesign:
         )
         assert resp.status_code in (200, 201)
 
-        r2 = await client.post(
-            "/get-entities-section",
-            json={"conversation_id": conversation_id, "section": "forms"},
+        r2 = await client.get(
+            "/entities-section",
+            params={"conversation_id": conversation_id, "section": "forms"},
         )
         assert r2.status_code in (200, 201)
         forms = r2.json()
@@ -906,8 +906,8 @@ class TestAmbiguityResolution:
         assert resp.status_code in (200, 201)
 
         # Fetch it back
-        r2 = await client.post(
-            "/get-srs-text", json={"conversation_id": conversation_id}
+        r2 = await client.get(
+            "/get-srs-text", params={"conversation_id": conversation_id}
         )
         assert r2.status_code in (200, 201)
         body = r2.json()
@@ -978,8 +978,8 @@ class TestAmbiguityResolution:
         assert resp.status_code in (200, 201)
 
         # Verify the update took effect
-        r3 = await client.post(
-            "/get-entities-section",
-            json={"conversation_id": conversation_id, "section": "forms"},
+        r3 = await client.get(
+            "/entities-section",
+            params={"conversation_id": conversation_id, "section": "forms"},
         )
         assert r3.status_code in (200, 201)

@@ -494,7 +494,7 @@ class TestDurgaEntities:
             "groups": [],
         }
         with pytest.raises(ValueError, match="references unknown program"):
-            EntitySpec.model_validate(entities)
+            EntitySpec.create_strict(**entities)
 
     def test_entity_spec_rejects_duplicates(self):
         """EntitySpec raises ValueError on duplicate encounter type names."""
@@ -517,7 +517,7 @@ class TestDurgaEntities:
             "groups": [],
         }
         with pytest.raises(ValueError, match="Duplicate encounter_type"):
-            EntitySpec.model_validate(entities)
+            EntitySpec.create_strict(**entities)
 
     def test_pev_retry_triggered_on_spec_error(self):
         """

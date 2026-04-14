@@ -265,11 +265,11 @@ class TestNoOrphanTools:
 
 
 class TestConversationIdHardwiring:
-    """Tools that take a conversation_id parameter should have auto:1
-    (framework-injected) with the SubAgents provider. The framework
-    automatically resolves conversation_id from context."""
+    """Tools that take a conversation_id parameter should have auto:0
+    with a hardwired value of {{#sys.conversation_id#}} so Dify injects
+    the conversation ID automatically via template variable."""
 
-    def test_tools_with_cid_have_auto_1(self, workflow: dict):
+    def test_tools_with_cid_have_auto_0(self, workflow: dict):
         cid_tools = _extract_tools_with_cid_wiring(workflow)
 
         # There should be at least some tools with conversation_id
@@ -277,31 +277,31 @@ class TestConversationIdHardwiring:
 
         bad_tools: list[str] = []
         for entry in cid_tools:
-            if entry["auto"] != 1:
+            if entry["auto"] != 0:
                 bad_tools.append(
                     f"{entry['tool_name']} in agent {entry['agent']} "
-                    f"has auto={entry['auto']} (expected 1)"
+                    f"has auto={entry['auto']} (expected 0)"
                 )
 
         assert not bad_tools, (
-            "Tools with conversation_id not set to auto:1:\n" + "\n".join(bad_tools)
+            "Tools with conversation_id not set to auto:0:\n" + "\n".join(bad_tools)
         )
 
-    def test_cid_value_is_null_for_auto_inject(self, workflow: dict):
-        """With auto:1, value should be null (framework handles injection)."""
+    def test_cid_value_is_sys_conversation_id(self, workflow: dict):
+        """With auto:0, value should be the sys.conversation_id template variable."""
         cid_tools = _extract_tools_with_cid_wiring(workflow)
 
         bad_tools: list[str] = []
         for entry in cid_tools:
             value = entry.get("value")
-            if value is not None:
+            expected = {"type": "mixed", "value": "{{#sys.conversation_id#}}"}
+            if value != expected:
                 bad_tools.append(
-                    f"{entry['tool_name']}: value={value} "
-                    f"(expected null for auto:1 injection)"
+                    f"{entry['tool_name']}: value={value} (expected {expected})"
                 )
 
         assert not bad_tools, (
-            "Tools with conversation_id should have value=null for auto:1:\n"
+            "Tools with conversation_id should have sys.conversation_id value:\n"
             + "\n".join(bad_tools)
         )
 
