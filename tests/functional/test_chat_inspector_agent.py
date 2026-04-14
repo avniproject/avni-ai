@@ -343,16 +343,20 @@ class TestChatSrsSession:
 
 @pytest.mark.asyncio(loop_scope="function")
 class TestAmbiguityResolution:
-    """GET /get-ambiguities: returns 404 when no ambiguities stored."""
+    """GET /get-ambiguities: returns empty list when no ambiguities stored."""
 
-    async def test_get_without_store_returns_404(
+    async def test_get_without_store_returns_empty(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
         resp = await client.get(
             "/get-ambiguities",
             params={"conversation_id": conversation_id},
         )
-        assert resp.status_code == 404
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["ambiguities"] == []
+        assert body["total"] == 0
+        assert body["all_resolved"] is True
 
 
 # ===========================================================================
