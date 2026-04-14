@@ -138,6 +138,7 @@ async def handle_get_ambiguities(request: Request) -> JSONResponse:
     """
     GET /get-ambiguities?conversation_id=...
     Returns the stored ambiguity list for the given conversation.
+    Returns empty list (200) if no ambiguities were ever stored.
     """
     conversation_id = request.query_params.get("conversation_id")
     if not conversation_id:
@@ -147,12 +148,16 @@ async def handle_get_ambiguities(request: Request) -> JSONResponse:
 
     ambiguities = _ambiguity_store.get(conversation_id)
     if ambiguities is None:
+        # No ambiguities stored — return empty list (not 404).
+        # This is normal when SRS was parsed without detecting ambiguities.
         return JSONResponse(
             {
-                "error": f"No ambiguities found for conversation_id={conversation_id}. "
-                "They may have expired (TTL 6h) or were never stored."
-            },
-            status_code=404,
+                "ambiguities": [],
+                "total": 0,
+                "pending_count": 0,
+                "resolved_count": 0,
+                "all_resolved": True,
+            }
         )
 
     pending = [a for a in ambiguities if not a.get("resolved")]

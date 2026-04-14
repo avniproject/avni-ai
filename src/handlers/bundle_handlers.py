@@ -667,7 +667,7 @@ async def handle_get_bundle_files(request: Request) -> JSONResponse:
     """
     GET /bundle-files?conversation_id=<id>&bundle_type=generated|existing
     Lists all files in a stored bundle with their sizes.
-    Returns: { "files": [{"name": "...", "size_bytes": N}, ...], "total_files": N, "bundle_type": "..." }
+    Returns empty list if no bundle exists yet (not 404).
     """
     conversation_id = request.query_params.get("conversation_id")
     bundle_type = request.query_params.get("bundle_type", "generated")
@@ -683,7 +683,16 @@ async def handle_get_bundle_files(request: Request) -> JSONResponse:
 
     zip_bytes, err = _resolve_bundle_zip(conversation_id, bundle_type)
     if err:
-        return JSONResponse({"error": err}, status_code=404)
+        # Return empty list instead of 404 — bundle hasn't been generated yet.
+        return JSONResponse(
+            {
+                "files": [],
+                "total_files": 0,
+                "bundle_type": bundle_type,
+                "conversation_id": conversation_id,
+                "note": "No bundle found. Call generate_bundle first.",
+            }
+        )
 
     try:
         file_map = unzip_to_map(zip_bytes)

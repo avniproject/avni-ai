@@ -4414,15 +4414,23 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        answer: Error in {{#conversation.active_agent#}} agent. Please try again or
-          contact support.
         isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'False'
+          variable_selector:
+          - conversation
+          - agent_loop_active
+          write_mode: over-write
         loop_id: '1800000000700'
         selected: false
         title: Error Handler
-        type: answer
-        variables: []
-      height: 120
+        type: assigner
+        version: '2'
+      height: 84
       id: '1800000000760'
       parentId: '1800000000700'
       position:
