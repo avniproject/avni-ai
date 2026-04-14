@@ -3503,13 +3503,68 @@ workflow:
               type: api
             - enabled: true
               extra:
+                description: Upload a bundle ZIP to Avni server for import
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                bundle_zip_b64:
+                  auto: 1
+                  value: null
+              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
+              provider_show_name: Avni AI Staging SubAgents Openapi
+              settings: {}
+              tool_description: Upload a bundle ZIP to Avni server for import
+              tool_label: upload_bundle
+              tool_name: upload_bundle
+              type: api
+            - enabled: true
+              extra:
+                description: Check the status of a bundle upload task
+              parameters:
+                task_id:
+                  auto: 1
+                  value: null
+              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
+              provider_show_name: Avni AI Staging SubAgents Openapi
+              settings: {}
+              tool_description: Check the status of a bundle upload task
+              tool_label: upload_status
+              tool_name: upload_status
+              type: api
+            - enabled: true
+              extra:
+                description: Replace one file in the stored generated bundle ZIP
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                filename:
+                  auto: 1
+                  value: null
+                content:
+                  auto: 1
+                  value: null
+              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
+              provider_show_name: Avni AI Staging SubAgents Openapi
+              settings: {}
+              tool_description: Replace one file in the stored generated bundle ZIP
+              tool_label: put_bundle_file
+              tool_name: put_bundle_file
+              type: api
+            - enabled: true
+              extra:
                 description: Append a step trace entry to the agent activity log
               parameters:
                 conversation_id:
                   auto: 0
                   value:
                     type: mixed
-                    value: '{{#sys.conversation_id#}}' 
+                    value: '{{#sys.conversation_id#}}'
                 step:
                   auto: 1
                   value: null
