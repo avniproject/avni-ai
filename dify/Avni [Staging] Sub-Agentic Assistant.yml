@@ -73,14 +73,6 @@ workflow:
     value: ''
     value_type: string
   - description: ''
-    id: b024871d-efdb-4367-98e2-fc111ec12c4a
-    name: current_phase
-    selector:
-    - conversation
-    - current_phase
-    value: ''
-    value_type: string
-  - description: ''
     id: e70690cc-336c-46f4-b20b-576153bbb9b7
     name: agent_memory
     selector:
@@ -88,22 +80,6 @@ workflow:
     - agent_memory
     value: ''
     value_type: string
-  - description: ''
-    id: e56b6ac8-fa4e-4aa0-80d0-3f7eda4b9928
-    name: spec_complete
-    selector:
-    - conversation
-    - spec_complete
-    value: false
-    value_type: boolean
-  - description: ''
-    id: af8eaabc-d169-44ae-9bd6-612b82f1e896
-    name: bundle_complete
-    selector:
-    - conversation
-    - bundle_complete
-    value: false
-    value_type: boolean
   - description: ''
     id: 4b1f4a64-c732-4f11-acb3-a6ecd9214738
     name: agent_loop_active
@@ -1687,7 +1663,7 @@ workflow:
         error_handle_mode: terminated
         height: 2452
         logical_operator: and
-        loop_count: 3
+        loop_count: 10
         loop_variables:
         - id: a416f73e-492a-44c9-9b05-4e9576a5b7ef
           label: agent_loop_active
@@ -2504,7 +2480,7 @@ workflow:
               IMPORTANT: Use conversation_id for ALL tool calls.'
           maximum_iterations:
             type: constant
-            value: 10
+            value: 15
           model:
             type: constant
             value:
@@ -3336,7 +3312,7 @@ workflow:
               IMPORTANT: Use conversation_id for ALL tool calls.'
           maximum_iterations:
             type: constant
-            value: 3
+            value: 10
           model:
             type: constant
             value:
@@ -4025,31 +4001,18 @@ workflow:
           \        \"bundle_config\": bundle_text,\n        \"rules\": rules_text,\n\
           \        \"reports\": reports_text,\n        \"inspect\": inspect_text,\n\
           \        \"admin\": admin_text,\n    }\n    agent_text = texts.get(active_agent,\
-          \ \"\") or \"\"\n    t = agent_text.lower()\n    entry = f\"[{active_agent}] {agent_text[:500]}\"\
-          \n    sep = \"\\n---\\n\"\n    memory_entry = (existing_memory + sep + entry)\
-          \ if existing_memory else entry\n    spec_keywords = [\"spec generated\"\
-          , \"spec is ready\", \"specification complete\", \"stored=true\", \"generate_spec\"\
-          , \"approved\"]\n    spec_just_completed = (\n        active_agent == \"spec\"\
-          \n        and any(kw in t for kw in spec_keywords)\n    )\n    bundle_keywords\
-          \ = [\"bundle generated\", \"bundle is ready\", \"bundle complete\", \"generate_bundle\"\
-          , \"upload_bundle\", \"validate_bundle\"]\n    bundle_just_completed = (\n\
-          \        active_agent == \"bundle_config\"\n        and any(kw in t for kw\
-          \ in bundle_keywords)\n    )\n    return {\n        \"memory_entry\": memory_entry,\n\
-          \        \"agent_output\": agent_text,\n        \"spec_just_completed\":\
-          \ spec_just_completed,\n        \"bundle_just_completed\": bundle_just_completed,\n\
-          \    }\n"
+          \ \"\") or \"\"\n    entry = f\"[{active_agent}] {agent_text[:1000]}\"\n \
+          \   sep = \"\\n---\\n\"\n    memory_entry = (existing_memory + sep + entry)\
+          \ if existing_memory else entry\n    return {\n        \"memory_entry\":\
+          \ memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
         outputs:
           agent_output:
             type: string
-          bundle_just_completed:
-            type: boolean
           memory_entry:
             type: string
-          spec_just_completed:
-            type: boolean
         selected: false
         title: Output Collector
         type: code
@@ -4121,24 +4084,6 @@ workflow:
           - conversation
           - agent_memory
           write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000720'
-          - spec_just_completed
-          variable_selector:
-          - conversation
-          - spec_complete
-          write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000720'
-          - bundle_just_completed
-          variable_selector:
-          - conversation
-          - bundle_complete
-          write_mode: over-write
         loop_id: '1800000000700'
         selected: false
         title: State Update
@@ -4160,21 +4105,56 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        code: "def main(active_agent: str, workflow_mode: str,\n         spec_complete:\
-          \ bool, bundle_complete: bool) -> dict:\n    if workflow_mode == \"targeted\"\
-          :\n        return {\"next_agent\": \"done\", \"loop_done\": True}\n\n  \
-          \  chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"inspect\"\
-          , \"admin\"]\n    try:\n        idx = chain.index(active_agent)\n      \
-          \  if idx < len(chain) - 1:\n            next_a = chain[idx + 1]\n     \
-          \       if next_a == \"bundle_config\" and not spec_complete:\n        \
-          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n      \
-          \                  \"reason\": \"Spec incomplete\"}\n            if next_a\
-          \ in (\"rules\", \"reports\", \"inspect\") and not bundle_complete:\n  \
-          \              return {\"next_agent\": \"done\", \"loop_done\": True,\n\
-          \                        \"reason\": \"Bundle incomplete\"}\n          \
-          \  return {\"next_agent\": next_a, \"loop_done\": False}\n        return\
-          \ {\"next_agent\": \"done\", \"loop_done\": True}\n    except ValueError:\n\
-          \        return {\"next_agent\": \"done\", \"loop_done\": True}\n"
+        code: "import re\n\ndef main(active_agent: str, workflow_mode: str,\n     \
+          \    agent_output: str) -> dict:\n    if workflow_mode == \"targeted\":\n \
+          \       return {\"next_agent\": \"done\", \"loop_done\": True,\n         \
+          \       \"reason\": \"Targeted mode — single agent only\"}\n\n    t = (agent_output\
+          \ or \"\").lower()\n    has_output = len(t.strip()) > 50\n\n    # Detect\
+          \ if agent is asking user a question (should exit loop)\n    question_signals\
+          \ = [\"could you\", \"can you please\", \"would you like\",\n            \
+          \         \"please provide\", \"please confirm\", \"please share\",\n   \
+          \                  \"let me know\", \"what would you\", \"which option\",\
+          \n                     \"do you want\", \"shall i\", \"?\\'s next?\"]\n \
+          \   asking_user = any(q in t for q in question_signals) and t.rstrip().endswith(\"\
+          ?\")\n\n    # Completion signals per agent\n    completion = {\n        \"\
+          spec\": [\"generate_spec\", \"spec generated\", \"stored=true\",\n      \
+          \           \"approved\", \"encounter types\", \"subject types\",\n      \
+          \           \"spec summary\", \"configuration summary\",\n              \
+          \   \"forms |\", \"programs |\", \"address hierarchy\"],\n        \"bundle_config\"\
+          : [\"generate_bundle\", \"bundle generated\",\n                    \"validate_bundle\"\
+          , \"put_bundle_file\", \"upload_bundle\",\n                    \"generate_form\"\
+          , \"concepts.json\", \"formmappings\",\n                    \"bundle complete\"\
+          , \"bundle is ready\"],\n        \"rules\": [\"generate_rule\", \"validate_rule\"\
+          , \"rule code\",\n                 \"visitschedule\", \"decision rule\",\
+          \ \"formElementRule\"],\n        \"reports\": [\"generate_report_cards\"\
+          , \"suggest_dashboard\",\n                   \"reportcard\", \"dashboard\"\
+          , \"report cards\"],\n        \"inspect\": [\"compile_requirements\", \"\
+          inspect_config\",\n                   \"completeness\", \"gap analysis\"\
+          , \"score\", \"upload_bundle\", \"upload_status\",\n                   \"\
+          uploaded successfully\"],\n    }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\"\
+          , \"reports\", \"inspect\"]\n    try:\n        idx = chain.index(active_agent)\n\
+          \    except ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": f\"Unknown agent: {active_agent}\"}\n\
+          \n    # Check if current agent completed\n    signals = completion.get(active_agent,\
+          \ [])\n    completed = has_output and any(s in t for s in signals)\n\n  \
+          \  # If asking user a question, always exit\n    if asking_user and not completed:\n\
+          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n        \
+          \        \"reason\": f\"{active_agent} is asking the user a question\"}\n\
+          \n    # If not completed and no output, exit\n    if not has_output:\n  \
+          \      return {\"next_agent\": \"done\", \"loop_done\": True,\n          \
+          \      \"reason\": f\"{active_agent} produced no output\"}\n\n    # If completed,\
+          \ advance\n    if completed and idx < len(chain) - 1:\n        next_a =\
+          \ chain[idx + 1]\n        return {\"next_agent\": next_a, \"loop_done\"\
+          : False,\n                \"reason\": f\"{active_agent} done, advancing\
+          \ to {next_a}\"}\n\n    # If completed but last in chain, done\n    if completed\
+          \ and idx >= len(chain) - 1:\n        return {\"next_agent\": \"done\",\
+          \ \"loop_done\": True,\n                \"reason\": \"End of chain\"}\n\n\
+          \    # Not clearly completed but has output — assume done, try to advance\n\
+          \    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n        return\
+          \ {\"next_agent\": next_a, \"loop_done\": False,\n                \"reason\"\
+          : f\"{active_agent} output unclear but advancing to {next_a}\"}\n\n    return\
+          \ {\"next_agent\": \"done\", \"loop_done\": True,\n            \"reason\"\
+          : \"End of chain\"}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4200,15 +4180,10 @@ workflow:
           value_type: string
           variable: workflow_mode
         - value_selector:
-          - conversation
-          - spec_complete
-          value_type: boolean
-          variable: spec_complete
-        - value_selector:
-          - conversation
-          - bundle_complete
-          value_type: boolean
-          variable: bundle_complete
+          - '1800000000720'
+          - agent_output
+          value_type: string
+          variable: agent_output
       height: 52
       id: '1800000000740'
       parentId: '1800000000700'

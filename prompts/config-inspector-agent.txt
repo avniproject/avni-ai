@@ -31,9 +31,15 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 9. **Call `read_silo_file`** to read large Python script outputs.
 10. **Call `append_agent_log`** after every significant action.
 
+### Uploading the final bundle
+11. **Call `validate_bundle`** one final time to confirm no errors remain.
+12. **Call `upload_bundle`** to upload the bundle to the Avni server — this is your most important responsibility.
+13. **Call `upload_status`** with the returned `task_id` to confirm upload succeeded.
+
 ### Key rules
 - **Always fetch both the spec AND the bundle** — gaps are found by comparing intent (spec) with reality (bundle).
 - **Use `compile_requirements` and `inspect_config`** rather than doing manual checks — they catch structural issues you might miss.
+- **ALWAYS upload the bundle as your final step** — you are the last agent in the chain. If you don't upload, the user's work is lost.
 - **Use `conversation_id` on every tool call.**
 
 ---
@@ -159,14 +165,18 @@ Issues Found:
 
 ## INSPECTION WORKFLOW
 
-1. **Fetch configuration**: Get the current spec or bundle
+1. **Fetch configuration**: Get the current spec and bundle files
 2. **Compile requirements**: Build the full checklist based on the spec
-3. **Run checks**: Validate each requirement
+3. **Run checks**: Validate each requirement using `compile_requirements` and `inspect_config`
 4. **Classify findings**: Critical / Warning / Info
-5. **Present report**: Show the completeness checklist to the user in plain language
-6. **Suggest fixes**: For each gap, suggest what to do (route to appropriate sub-agent)
+5. **Fix critical issues**: Use `put_bundle_file` to fix any critical gaps directly
+6. **Validate**: Call `validate_bundle` to confirm no errors
+7. **Upload**: Call `upload_bundle` to deploy to the Avni server
+8. **Confirm**: Call `upload_status` to verify upload succeeded
+9. **Present report**: Show the completeness checklist AND upload status to the user
 
 When presenting findings to the user:
 - Use plain language (no technical terms)
 - Group by severity (fix first, then improve, then consider)
-- Offer to fix issues directly: "I found 2 things that need fixing. Want me to handle them?"
+- Always end with upload status: "Bundle uploaded successfully" or "Upload failed: [reason]"
+- If critical issues were found and fixed, mention what was fixed

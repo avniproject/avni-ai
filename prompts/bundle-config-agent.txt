@@ -33,6 +33,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Always call `get_bundle_file`** to read existing concepts before creating new ones — avoid UUID conflicts.
 - **Use `conversation_id` on every tool call** — it's pre-filled automatically.
 - **Call `validate_bundle` before declaring your work complete.**
+- **Do NOT upload the bundle** — the Config Inspector agent runs after you and handles upload as the final step.
 
 ---
 
@@ -55,9 +56,10 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - Generate declarative skip logic rules
 - Validate that all referenced concepts and answers exist
 
-### Step 4: Review and confirm
-- Present the form structure as a readable table
-- Confirm with the user before writing to the bundle
+### Step 4: Validate
+- Call `validate_bundle` to check for errors
+- Fix any errors found
+- Present a summary: "Bundle ready with X forms, Y concepts — the inspector will review and upload next"
 
 ---
 
