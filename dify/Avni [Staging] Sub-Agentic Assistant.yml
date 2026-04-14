@@ -361,6 +361,18 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: false
+        sourceType: if-else
+        targetType: assigner
+      id: 1757493270484-case-bundle-setup-1800000000040-target
+      selected: false
+      source: '1757493270484'
+      sourceHandle: case-bundle-setup
+      target: '1800000000040'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
         sourceType: assigner
         targetType: if-else
       id: 1800000000040-source-1775719228711-target
@@ -1008,7 +1020,10 @@ workflow:
             \ an active bundle setup workflow (follow-up turn: \"what\\'s next?\"\
             , \"proceed\", \"approve\", etc.)\n3. User explicitly says \"upload SRS\"\
             , \"upload spec\", \"upload field workflow\", \"generate bundle from file\"\
-            \n\n**Do NOT route here for:**\n- Verbal SRS description without a file\
+            \n\n**When routing BUNDLE_SETUP, ALWAYS set initial_agent = \\\"spec\\\"\
+            \ and workflow_mode = \\\"generic\\\"**. The spec agent must run first\
+            \ to parse the SRS and extract entities before bundle generation.\n\n\
+            **Do NOT route here for:**\n- Verbal SRS description without a file\
             \ → ASSISTANT\n- General Avni platform questions → RAG\n\n\n### RAG -\
             \ Platform Knowledge & Capabilities\n\n\n**Primary Intent**: Learning\
             \ what Avni can/cannot do\n\n\n**Definitive Indicators** (Route to RAG\
@@ -1232,6 +1247,18 @@ workflow:
             - structured_output
             - service
           id: case-agent-work
+          logical_operator: and
+        - case_id: case-bundle-setup
+          conditions:
+          - comparison_operator: is
+            id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+            value: BUNDLE_SETUP
+            varType: string
+            variable_selector:
+            - '1757492907627'
+            - structured_output
+            - service
+          id: case-bundle-setup
           logical_operator: and
         desc: ''
         selected: false
