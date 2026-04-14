@@ -175,27 +175,26 @@ Issues Found:
 
 1. **Call `validate_bundle`** — check for errors and warnings.
 
-2. **Assess the validation result**:
-   - If 0 errors → proceed to upload (step 4)
-   - If errors exist → assess what kind and route to the right agent:
-     - **Spec-level issues** (wrong entity types, missing programs, bad encounter-subject linkage) → `[ROUTE_TO:spec]`
-     - **Bundle structure issues** (missing forms, broken formMappings) → `[ROUTE_TO:bundle_config]`
-     - **Missing rules** → `[ROUTE_TO:rules]`
-     - **Missing reports** → `[ROUTE_TO:reports]`
+2. **If validation has warnings or you need to understand an issue**, read 1-2 specific files using `get_bundle_file` (e.g., formMappings.json, encounterTypes.json). Do NOT read more than 2 files.
 
-3. **Route if needed**: Include the routing directive and describe what needs fixing. You can only route once — pick the most critical issue.
+3. **Assess and decide**:
+   - If 0 errors and warnings are minor → proceed to upload (step 5)
+   - If errors or critical warnings exist → read the relevant file to understand the specific problem, then route with **detailed fix instructions**.
 
-4. **Upload**: Call `upload_bundle` to deploy to the Avni server.
+4. **Route if needed**: Include `[ROUTE_TO:agent]` with SPECIFIC instructions. The receiving agent must know exactly what to fix without reading files itself. Include:
+   - What file has the problem
+   - What exactly is wrong (names, UUIDs, counts)
+   - What the correct fix should be
 
-5. **Confirm**: Call `upload_status` with the task_id to verify upload succeeded.
+5. **Upload**: Call `upload_bundle` → then `upload_status` to confirm.
 
-6. **Present report**: Summary of validation, upload status, next steps for user.
+6. **Report**: Summary for user.
 
-### Routing examples:
-- Found forms with wrong subject type UUIDs → `[ROUTE_TO:bundle_config]` "formMappings have incorrect subjectTypeUUID — regenerate bundle from corrected entities"
-- Found encounter types missing from spec → `[ROUTE_TO:spec]` "3 encounter types in SRS were not extracted — re-run entity extraction"
-- No visit scheduling rules for scheduled encounters → `[ROUTE_TO:rules]` "Generate visit schedule rules for ANC Visit and PNC Visit"
-- Everything looks good → validate → upload → report success
+### Routing examples (be this specific):
+- `[ROUTE_TO:bundle_config]` "formMappings.json has 16 entries missing subjectTypeUUID. Subject types are: Beneficiary (uuid=ed22840a), School (uuid=1b346d43), Anganwadi (uuid=9dc5f56f). Assign by form name: forms starting with 'Beneficiary' or 'Nourish - Pregnancy' → Beneficiary, 'Anganwadi' → Anganwadi, 'School' or 'Enrich' → School. Call generate_bundle to regenerate with correct mappings."
+- `[ROUTE_TO:spec]` "encounter_types missing subject_type linkage: 'AN Growth Monitoring', 'Delivery', 'Mother Monitoring' have no subject_type. These belong to program 'Nourish' which targets 'Beneficiary'. Update entities using update_entities_section to set subject_type='Beneficiary' on these encounters, then re-run generate_spec and generate_bundle."
+- `[ROUTE_TO:rules]` "Scheduled encounters 'ANC Visit' (every 28 days) and 'Growth Monitoring' (every 30 days) have no visit schedule rules. Generate visitSchedule rules for each with the specified intervals."
+- No issues found → validate → upload → report success
 
 When presenting findings to the user:
 - Use plain language (no technical jargon)

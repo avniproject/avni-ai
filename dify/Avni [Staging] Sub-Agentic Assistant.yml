@@ -3451,12 +3451,12 @@ workflow:
 
               IMPORTANT RULES:
               1. Use conversation_id for ALL tool calls.
-              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
-              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
-              4. Always state your plan before acting: "I will call X to do Y".'
+              2. Call append_agent_log at the START and END of your work.
+              3. Do NOT fix bundle files yourself — if you find issues, use [ROUTE_TO:agent] to send fixes back to the right agent.
+              4. Your workflow: validate_bundle → assess errors → either upload_bundle or [ROUTE_TO:agent]. Keep it to 3-4 tool calls.'
           maximum_iterations:
             type: constant
-            value: 10
+            value: 5
           model:
             type: constant
             value:
@@ -3474,37 +3474,6 @@ workflow:
           tools:
             type: constant
             value:
-            - enabled: true
-              extra:
-                description: Check business requirements against entities
-              parameters:
-                entities:
-                  auto: 1
-                  value: null
-                requirements:
-                  auto: 1
-                  value: null
-              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
-              provider_show_name: Avni AI Staging SubAgents Openapi
-              settings: {}
-              tool_description: Check business requirements against entities
-              tool_label: compile_requirements
-              tool_name: compile_requirements
-              type: api
-            - enabled: true
-              extra:
-                description: Perform gap analysis on entity configuration
-              parameters:
-                entities:
-                  auto: 1
-                  value: null
-              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
-              provider_show_name: Avni AI Staging SubAgents Openapi
-              settings: {}
-              tool_description: Perform gap analysis on entity configuration
-              tool_label: inspect_config
-              tool_name: inspect_config
-              type: api
             - enabled: true
               extra:
                 description: Validate a generated bundle for structural correctness
@@ -3619,28 +3588,6 @@ workflow:
               tool_description: Check the status of a bundle upload task
               tool_label: upload_status
               tool_name: upload_status
-              type: api
-            - enabled: true
-              extra:
-                description: Replace one file in the stored generated bundle ZIP
-              parameters:
-                content:
-                  auto: 1
-                  value: null
-                conversation_id:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#sys.conversation_id#}}'
-                filename:
-                  auto: 1
-                  value: null
-              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
-              provider_show_name: Avni AI Staging SubAgents Openapi
-              settings: {}
-              tool_description: Replace one file in the stored generated bundle ZIP
-              tool_label: put_bundle_file
-              tool_name: put_bundle_file
               type: api
             - enabled: true
               extra:
