@@ -86,8 +86,8 @@ workflow:
     selector:
     - conversation
     - agent_memory
-    value: []
-    value_type: array[object]
+    value: ''
+    value_type: string
   - description: ''
     id: e56b6ac8-fa4e-4aa0-80d0-3f7eda4b9928
     name: spec_complete
@@ -102,7 +102,7 @@ workflow:
     selector:
     - conversation
     - bundle_complete
-    value: true
+    value: false
     value_type: boolean
   - description: ''
     id: 4b1f4a64-c732-4f11-acb3-a6ecd9214738
@@ -110,7 +110,7 @@ workflow:
     selector:
     - conversation
     - agent_loop_active
-    value: true
+    value: false
     value_type: boolean
   - description: ''
     id: 467f932c-99b5-443b-902f-55c458b858b2
@@ -981,7 +981,7 @@ workflow:
           - result
         desc: ''
         memory:
-          query_prompt_template: '{{#sys.files#}} {{#sys.query#}}'
+          query_prompt_template: '{{#sys.query#}}'
           role_prefix:
             assistant: ''
             user: ''
@@ -990,26 +990,6 @@ workflow:
             size: 100
         model:
           completion_params:
-            enable_stream: true
-            json_schema: "{\n  \"type\": \"object\",\n  \"additionalProperties\":\
-              \ false,\n  \"required\": [\n    \"service\",\n    \"initial_agent\"\
-              ,\n    \"workflow_mode\",\n    \"confidence\",\n\
-              \    \"question_type\",\n    \"routing_reason\",\n    \"clarification_needed\"\
-              ,\n    \"clarifying_questions\"\n  ],\n  \"properties\": {\n    \"service\"\
-              : {\n      \"type\": \"string\",\n      \"enum\": [\"RAG\", \"ASSISTANT\"\
-              , \"BUNDLE_SETUP\", \"OUT_OF_SCOPE\"]\n    },\n    \"initial_agent\"\
-              : {\n      \"type\": \"string\",\n      \"enum\": [\"spec\", \"bundle_config\"\
-              , \"rules\", \"reports\", \"inspect\", \"admin\"]\n    },\n    \"workflow_mode\"\
-              : {\n      \"type\": \"string\",\n      \"enum\": [\"targeted\", \"generic\"\
-              ]\n    },\n    \"confidence\": {\n\
-              \      \"type\": \"number\",\n      \"minimum\": 0,\n      \"maximum\"\
-              : 1\n    },\n    \"question_type\": {\n      \"type\": \"string\",\n\
-              \      \"enum\": [\n        \"capability_inquiry\",\n        \"implementation_request\"\
-              ,\n        \"novel_requirement\",\n        \"not_avni_related\"\n  \
-              \    ]\n    },\n    \"routing_reason\": {\n      \"type\": \"string\"\
-              \n    },\n    \"clarification_needed\": {\n      \"type\": \"boolean\"\
-              \n    },\n    \"clarifying_questions\": {\n      \"type\": \"array\"\
-              ,\n      \"items\": { \"type\": \"string\" }\n    }\n  }\n}"
             temperature: 0
           mode: chat
           name: claude-haiku-4-5-20251001
@@ -1020,18 +1000,21 @@ workflow:
           text: "You are the Avni Platform Orchestrator of the Avni AI Assistant.\
             \ Route user messages based on their PRIMARY INTENT, not the complexity\
             \ or specificity of their\nquestion.\n\n<context>\n{{#context#}}\n</context>\n\
-            \n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
+            \n<uploaded_files_metadata>\n{{#sys.files#}}\n</uploaded_files_metadata>\n\
+            \nIf the uploaded_files_metadata section above is non-empty, files have\
+            \ been uploaded this turn.\n\n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
             \ NOT about Avni or data collection platforms → OUT_OF_SCOPE\n2. If a\
             \ message starts with capability questions (\"Is it possible\", \"Can\
             \ Avni\", \"Does Avni support\", \"Is there a way\", \"How can I\"), it\
             \ is ALWAYS RAG regardless of complexity.\n\n\n### BUNDLE_SETUP — Program\
             \ Setup from Uploaded SRS/Specification Files\n\n**Priority: HIGHEST —\
             \ evaluate before RAG and ASSISTANT**\n\n**Route BUNDLE_SETUP when ANY\
-            \ of the following:**\n1. `sys.files` is not empty — user uploaded file(s)\
-            \ this turn\n2. `conversation.setup_mode_active == true` — already in\
-            \ an active bundle setup workflow (follow-up turn: \"what\\'s next?\"\
-            , \"proceed\", \"approve\", etc.)\n3. User explicitly says \"upload SRS\"\
-            , \"upload spec\", \"upload field workflow\", \"generate bundle from file\"\
+            \ of the following:**\n1. The <uploaded_files_metadata> section above is\
+            \ non-empty — user uploaded file(s) this turn\n2. `conversation.setup_mode_active\
+            \ == true` — already in an active bundle setup workflow (follow-up turn:\
+            \ \"what\\'s next?\", \"proceed\", \"approve\", etc.)\n3. User explicitly\
+            \ says \"upload SRS\", \"upload spec\", \"upload field workflow\",\
+            \ \"generate bundle from file\"\
             \n\n**When routing BUNDLE_SETUP, ALWAYS set initial_agent = \\\"spec\\\"\
             \ and workflow_mode = \\\"generic\\\"**. The spec agent must run first\
             \ to parse the SRS and extract entities before bundle generation.\n\n\
@@ -1715,10 +1698,8 @@ workflow:
           var_type: boolean
         - id: cd56c7bd-76ad-4c96-a8af-31e0ee630096
           label: output
-          value:
-          - '1800000000720'
-          - agent_output
-          value_type: variable
+          value: ''
+          value_type: constant
           var_type: string
         selected: false
         start_node_id: 1800000000700start
@@ -4038,24 +4019,25 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        code: "import json\n\ndef main(active_agent: str,\n         spec_text:\
+        code: "def main(active_agent: str, existing_memory: str,\n         spec_text:\
           \ str, bundle_text: str, rules_text: str,\n         reports_text: str, inspect_text:\
           \ str, admin_text: str) -> dict:\n    texts = {\n        \"spec\": spec_text,\n\
           \        \"bundle_config\": bundle_text,\n        \"rules\": rules_text,\n\
           \        \"reports\": reports_text,\n        \"inspect\": inspect_text,\n\
           \        \"admin\": admin_text,\n    }\n    agent_text = texts.get(active_agent,\
-          \ \"\") or \"\"\n    t = agent_text.lower()\n    memory_entry = json.dumps({\n\
-          \        \"agent\": active_agent,\n        \"summary\": agent_text[:500],\n\
-          \    })\n    spec_keywords = [\"spec generated\", \"spec is ready\", \"specification\
-          \ complete\", \"stored=true\", \"generate_spec\", \"approved\"]\n    spec_just_completed\
-          \ = (\n        active_agent == \"spec\"\n        and any(kw in t for kw\
-          \ in spec_keywords)\n    )\n    bundle_keywords = [\"bundle generated\"\
-          , \"bundle is ready\", \"bundle complete\", \"generate_bundle\", \"upload_bundle\"\
-          , \"validate_bundle\"]\n    bundle_just_completed = (\n        active_agent\
-          \ == \"bundle_config\"\n        and any(kw in t for kw in bundle_keywords)\n\
-          \    )\n    return {\n        \"memory_entry\": memory_entry,\n        \"\
-          agent_output\": agent_text,\n        \"spec_just_completed\": spec_just_completed,\n\
-          \        \"bundle_just_completed\": bundle_just_completed,\n    }\n"
+          \ \"\") or \"\"\n    t = agent_text.lower()\n    entry = f\"[{active_agent}] {agent_text[:500]}\"\
+          \n    sep = \"\\n---\\n\"\n    memory_entry = (existing_memory + sep + entry)\
+          \ if existing_memory else entry\n    spec_keywords = [\"spec generated\"\
+          , \"spec is ready\", \"specification complete\", \"stored=true\", \"generate_spec\"\
+          , \"approved\"]\n    spec_just_completed = (\n        active_agent == \"spec\"\
+          \n        and any(kw in t for kw in spec_keywords)\n    )\n    bundle_keywords\
+          \ = [\"bundle generated\", \"bundle is ready\", \"bundle complete\", \"generate_bundle\"\
+          , \"upload_bundle\", \"validate_bundle\"]\n    bundle_just_completed = (\n\
+          \        active_agent == \"bundle_config\"\n        and any(kw in t for kw\
+          \ in bundle_keywords)\n    )\n    return {\n        \"memory_entry\": memory_entry,\n\
+          \        \"agent_output\": agent_text,\n        \"spec_just_completed\":\
+          \ spec_just_completed,\n        \"bundle_just_completed\": bundle_just_completed,\n\
+          \    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4077,6 +4059,11 @@ workflow:
           - active_agent
           value_type: string
           variable: active_agent
+        - value_selector:
+          - conversation
+          - agent_memory
+          value_type: string
+          variable: existing_memory
         - value_selector:
           - '1800000000110'
           - text
@@ -4126,14 +4113,14 @@ workflow:
         isInLoop: true
         items:
         - input_type: variable
-          operation: append
+          operation: over-write
           value:
           - '1800000000720'
           - memory_entry
           variable_selector:
           - conversation
           - agent_memory
-          write_mode: append
+          write_mode: over-write
         - input_type: variable
           operation: over-write
           value:
@@ -4274,12 +4261,23 @@ workflow:
     - data:
         isInLoop: true
         items:
-        - input_type: constant
+        - input_type: variable
           operation: over-write
-          value: 'false'
+          value:
+          - conversation
+          - 'False'
           variable_selector:
           - conversation
           - agent_loop_active
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000720'
+          - agent_output
+          variable_selector:
+          - '1800000000700'
+          - output
           write_mode: over-write
         loop_id: '1800000000700'
         selected: false
@@ -4312,6 +4310,15 @@ workflow:
           variable_selector:
           - conversation
           - active_agent
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000720'
+          - agent_output
+          variable_selector:
+          - '1800000000700'
+          - output
           write_mode: over-write
         loop_id: '1800000000700'
         selected: false
