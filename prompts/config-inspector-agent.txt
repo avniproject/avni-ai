@@ -171,29 +171,25 @@ Issues Found:
 
 ## INSPECTION WORKFLOW
 
-1. **Fetch configuration**: Call `get_bundle_files` to see what's in the bundle
-2. **Validate bundle**: Call `validate_bundle` for structural checks
-3. **Assess issues**: Categorise what you find:
-   - **Spec-level issues** (wrong entity types, missing programs, bad encounter mappings) → route to spec agent
-   - **Bundle-level issues** (missing forms, broken formMappings, concept conflicts) → route to bundle_config agent
-   - **Rule issues** (missing visit schedules, no skip logic) → route to rules agent
-   - **Minor issues** (naming cleanup, missing descriptions) → fix yourself with `put_bundle_file`
+**Be efficient — aim for 3-5 tool calls total.**
 
-4. **Route to other agents if needed**: If you find issues that another agent should fix:
-   - Include `[ROUTE_TO:spec]` in your response to send the workflow back to the spec agent
-   - Include `[ROUTE_TO:bundle_config]` for bundle structure issues
-   - Include `[ROUTE_TO:rules]` for missing rules
-   - Include `[ROUTE_TO:reports]` for missing dashboards/report cards
-   - Describe what needs fixing so the routed agent knows what to do
-   - You can only route once per inspection — pick the most critical agent
+1. **Call `validate_bundle`** — check for errors and warnings.
 
-5. **If no routing needed** (issues are minor or none found):
-   - Fix minor naming issues yourself using `put_bundle_file`
-   - Call `validate_bundle` to confirm
-   - Call `upload_bundle` to deploy to the Avni server
-   - Call `upload_status` to verify upload succeeded
+2. **Assess the validation result**:
+   - If 0 errors → proceed to upload (step 4)
+   - If errors exist → assess what kind and route to the right agent:
+     - **Spec-level issues** (wrong entity types, missing programs, bad encounter-subject linkage) → `[ROUTE_TO:spec]`
+     - **Bundle structure issues** (missing forms, broken formMappings) → `[ROUTE_TO:bundle_config]`
+     - **Missing rules** → `[ROUTE_TO:rules]`
+     - **Missing reports** → `[ROUTE_TO:reports]`
 
-6. **Present report**: Show what was found, what was fixed/routed, and upload status
+3. **Route if needed**: Include the routing directive and describe what needs fixing. You can only route once — pick the most critical issue.
+
+4. **Upload**: Call `upload_bundle` to deploy to the Avni server.
+
+5. **Confirm**: Call `upload_status` with the task_id to verify upload succeeded.
+
+6. **Present report**: Summary of validation, upload status, next steps for user.
 
 ### Routing examples:
 - Found forms with wrong subject type UUIDs → `[ROUTE_TO:bundle_config]` "formMappings have incorrect subjectTypeUUID — regenerate bundle from corrected entities"

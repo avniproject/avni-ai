@@ -179,15 +179,24 @@ def _resolve_subject_type(raw: str, known: set[str]) -> str:
     if not raw:
         return ""
     raw_lower = raw.strip().lower()
+    # Also try cleaned version (strip "Registration" etc.)
+    cleaned_lower = _clean_subject_name(raw).lower()
     # Exact match first
     for name in known:
-        if name.lower() == raw_lower:
+        nl = name.lower()
+        if nl == raw_lower or nl == cleaned_lower:
             return name
     # Substring match
     for name in known:
-        if name.lower() in raw_lower or raw_lower in name.lower():
+        nl = name.lower()
+        if (
+            nl in raw_lower
+            or raw_lower in nl
+            or nl in cleaned_lower
+            or cleaned_lower in nl
+        ):
             return name
-    return raw
+    return _clean_subject_name(raw)
 
 
 def _map_data_type(raw: str) -> str:
@@ -314,6 +323,52 @@ def parse_location_hierarchy(df: pd.DataFrame) -> list[AddressLevelSpec]:
     return levels
 
 
+_SUBJECT_NAME_STRIP_SUFFIXES = [
+    " registration",
+    " enrolment",
+    " enrollment",
+    " form",
+    " profile",
+    " details",
+    " entry",
+]
+
+# Header row values that should be filtered out
+_HEADER_ROW_VALUES = {
+    "subject type",
+    "subject type name",
+    "name",
+    "entity name",
+    "encounter name",
+    "encounter",
+    "program name",
+    "program",
+    "type",
+    "entity type",
+    "scheduled",
+    "unscheduled",
+}
+
+
+def _clean_subject_name(raw: str) -> str:
+    """Clean a subject type name: strip form-like suffixes.
+    'Beneficiary Registration' → 'Beneficiary'
+    'School Registration' → 'School'
+    """
+    name = raw.strip()
+    lower = name.lower()
+    for suffix in _SUBJECT_NAME_STRIP_SUFFIXES:
+        if lower.endswith(suffix):
+            name = name[: len(name) - len(suffix)].strip()
+            break
+    return name
+
+
+def _is_header_row(name: str) -> bool:
+    """Check if a parsed name is actually a header row value."""
+    return name.strip().lower() in _HEADER_ROW_VALUES
+
+
 def parse_subject_types(df: pd.DataFrame) -> list[SubjectTypeSpec]:
     subject_types: list[SubjectTypeSpec] = []
     seen: set[str] = set()
@@ -325,7 +380,11 @@ def parse_subject_types(df: pd.DataFrame) -> list[SubjectTypeSpec]:
         return []
 
     for _, row in df.iterrows():
-        name = _clean(row.get(name_col, ""))
+        raw_name = _clean(row.get(name_col, ""))
+        if not raw_name or _is_header_row(raw_name):
+            continue
+
+        name = _clean_subject_name(raw_name)
         if not name or name.lower() in seen:
             continue
         seen.add(name.lower())
@@ -403,16 +462,22 @@ def parse_encounters(
         name = _clean(row.get(name_col, ""))
         if not name or name.lower() in seen:
             continue
+        # Skip header rows that got parsed as data
+        if _is_header_row(name):
+            continue
         seen.add(name.lower())
 
         program_name = ""
         subject_type = ""
 
         if is_program_encounter and prog_col:
-            program_name = _clean(row.get(prog_col, ""))
+            raw_prog = _clean(row.get(prog_col, ""))
+            if not _is_header_row(raw_prog):
+                program_name = raw_prog
         elif st_col:
             raw_subject = _clean(row.get(st_col, ""))
-            subject_type = _resolve_subject_type(raw_subject, subject_type_names)
+            if not _is_header_row(raw_subject):
+                subject_type = _resolve_subject_type(raw_subject, subject_type_names)
 
         enc_type_raw = ""
         if sched_col:
@@ -1094,7 +1159,21 @@ def parse_scoping_docs(
             all_forms.append(form)
             seen["form"].add(sheet_name.lower())
 
-    # Phase 5: Resolve missing subjectType on forms
+    # Phase 5a: Resolve missing subject_type on encounters via programs
+    prog_to_subject: dict[str, str] = {}
+    for prog in all_programs:
+        if prog.target_subject_type:
+            prog_to_subject[prog.name.lower()] = prog.target_subject_type
+    for et in all_encounters:
+        if not et.subject_type and et.program_name:
+            resolved = prog_to_subject.get(et.program_name.lower())
+            if resolved:
+                et.subject_type = resolved
+        # If still no subject_type and only one subject type exists, use it
+        if not et.subject_type and len(all_subjects) == 1:
+            et.subject_type = all_subjects[0].name
+
+    # Phase 5b: Resolve missing subjectType on forms
     _resolve_form_subject_types(all_forms, all_encounters, all_subjects)
 
     # Phase 6: Always include default group
@@ -1180,10 +1259,12 @@ def consolidate_and_audit(
         if et["name"] not in form_encounter_links:
             warnings.append(f"Encounter type '{et['name']}' has no form linked to it")
 
-    # Forms with no subjectType
+    # Forms with no subjectType — this is a critical issue
     for f in entities["forms"]:
         if not f.get("subjectType"):
-            warnings.append(f"Form '{f['name']}' has no subjectType — bundle may fail")
+            errors.append(
+                f"Form '{f['name']}' has no subjectType — bundle generation will produce broken formMappings"
+            )
 
     # Forms with 0 or very few fields
     for f in entities["forms"]:

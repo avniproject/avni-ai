@@ -111,6 +111,62 @@ def _create_fastmcp_server() -> FastMCP:
         return FastMCP(name="Avni AI Server")
 
 
+class _RequestLoggingMiddleware:
+    """Logs every non-health API request with conversation_id, method, path, and status."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        path = scope.get("path", "")
+        method = scope.get("method", "?")
+
+        # Skip health checks and static files
+        if path in ("/health", "/favicon.ico") or path.startswith("/sse"):
+            await self.app(scope, receive, send)
+            return
+
+        # Extract conversation_id from query string
+        qs = scope.get("query_string", b"").decode()
+        cid = ""
+        for part in qs.split("&"):
+            if part.startswith("conversation_id="):
+                cid = part.split("=", 1)[1][:12]
+                break
+
+        status_code = 0
+
+        async def send_wrapper(message):
+            nonlocal status_code
+            if message["type"] == "http.response.start":
+                status_code = message.get("status", 0)
+            await send(message)
+
+        try:
+            await self.app(scope, receive, send_wrapper)
+        finally:
+            if status_code >= 400:
+                logger.warning(
+                    "API %s %s [cid=%s] → %d",
+                    method,
+                    path,
+                    cid or "?",
+                    status_code,
+                )
+            else:
+                logger.info(
+                    "API %s %s [cid=%s] → %d",
+                    method,
+                    path,
+                    cid or "body",
+                    status_code,
+                )
+
+
 class _SafeErrorMiddleware:
     """Catch-all ASGI middleware that ensures every request gets a complete HTTP response.
 
@@ -168,7 +224,7 @@ def _create_http_app(server: FastMCP):
         if "stateless_http" not in str(exc):
             raise
         base_app = server.http_app(middleware=middleware)
-    return _SafeErrorMiddleware(base_app)
+    return _RequestLoggingMiddleware(_SafeErrorMiddleware(base_app))
 
 
 def _run_http_server(server: FastMCP, host: str, port: int):

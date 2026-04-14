@@ -2140,7 +2140,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT: Use conversation_id for ALL tool calls.'
+              IMPORTANT RULES:
+              1. Use conversation_id for ALL tool calls.
+              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
+              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
+              4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 8
@@ -2550,10 +2554,14 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT: Use conversation_id for ALL tool calls.'
+              IMPORTANT RULES:
+              1. Use conversation_id for ALL tool calls.
+              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
+              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
+              4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 10
+            value: 5
           model:
             type: constant
             value:
@@ -2948,7 +2956,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT: Use conversation_id for ALL tool calls.'
+              IMPORTANT RULES:
+              1. Use conversation_id for ALL tool calls.
+              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
+              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
+              4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 5
@@ -3191,7 +3203,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT: Use conversation_id for ALL tool calls.'
+              IMPORTANT RULES:
+              1. Use conversation_id for ALL tool calls.
+              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
+              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
+              4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 5
@@ -3433,7 +3449,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT: Use conversation_id for ALL tool calls.'
+              IMPORTANT RULES:
+              1. Use conversation_id for ALL tool calls.
+              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
+              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
+              4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 10
@@ -3736,7 +3756,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT: Use conversation_id for ALL tool calls.'
+              IMPORTANT RULES:
+              1. Use conversation_id for ALL tool calls.
+              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
+              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
+              4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 10
