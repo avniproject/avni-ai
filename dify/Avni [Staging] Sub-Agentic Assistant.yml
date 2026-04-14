@@ -161,18 +161,21 @@ workflow:
         - local_file
         - remote_url
       number_limits: 3
-    opening_statement: Hey {{user_name}} ! I’m your AI assistant . I can help you with any questions about Avni — from creating new forms automatically to guiding you through the platform. How can I help
-      you today?
+    opening_statement: Hey {{user_name}} ! I’m your AI assistant . I can help you
+      with any questions about Avni — from creating new forms automatically to guiding
+      you through the platform. How can I help you today?
     retriever_resource:
       enabled: false
     sensitive_word_avoidance:
       config:
         inputs_config:
           enabled: true
-          preset_response: In-appropriate input, only designed to help with Avni implementation tasks.
+          preset_response: In-appropriate input, only designed to help with Avni implementation
+            tasks.
         outputs_config:
           enabled: true
-          preset_response: I apologize, but I can only provide assistance with Avni implementation topics.
+          preset_response: I apologize, but I can only provide assistance with Avni
+            implementation topics.
       enabled: true
       type: openai_moderation
     speech_to_text:
@@ -418,9 +421,9 @@ workflow:
       zIndex: 0
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: loop-start
         targetType: if-else
-        loop_id: '1800000000700'
       id: 1800000000700start-source-1800000000710-target
       selected: false
       source: 1800000000700start
@@ -431,9 +434,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: if-else
         targetType: http-request
-        loop_id: '1800000000700'
       id: 1800000000710-dispatch-spec-1800000000101-target
       selected: false
       source: '1800000000710'
@@ -444,9 +447,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: if-else
         targetType: http-request
-        loop_id: '1800000000700'
       id: 1800000000710-dispatch-bundle-config-1800000000201-target
       selected: false
       source: '1800000000710'
@@ -457,9 +460,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: if-else
         targetType: http-request
-        loop_id: '1800000000700'
       id: 1800000000710-dispatch-rules-1800000000301-target
       selected: false
       source: '1800000000710'
@@ -470,9 +473,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: if-else
         targetType: http-request
-        loop_id: '1800000000700'
       id: 1800000000710-dispatch-reports-1800000000401-target
       selected: false
       source: '1800000000710'
@@ -483,9 +486,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: if-else
         targetType: http-request
-        loop_id: '1800000000700'
       id: 1800000000710-dispatch-inspect-1800000000501-target
       selected: false
       source: '1800000000710'
@@ -496,9 +499,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: if-else
         targetType: http-request
-        loop_id: '1800000000700'
       id: 1800000000710-dispatch-admin-1800000000601-target
       selected: false
       source: '1800000000710'
@@ -509,9 +512,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: agent
-        loop_id: '1800000000700'
       id: 1800000000101-source-1800000000110-target
       selected: false
       source: '1800000000101'
@@ -522,9 +525,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: agent
-        loop_id: '1800000000700'
       id: 1800000000201-source-1800000000210-target
       selected: false
       source: '1800000000201'
@@ -535,9 +538,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: agent
-        loop_id: '1800000000700'
       id: 1800000000301-source-1800000000310-target
       selected: false
       source: '1800000000301'
@@ -548,9 +551,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: agent
-        loop_id: '1800000000700'
       id: 1800000000401-source-1800000000410-target
       selected: false
       source: '1800000000401'
@@ -561,9 +564,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: agent
-        loop_id: '1800000000700'
       id: 1800000000501-source-1800000000510-target
       selected: false
       source: '1800000000501'
@@ -574,9 +577,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: agent
-        loop_id: '1800000000700'
       id: 1800000000601-source-1800000000610-target
       selected: false
       source: '1800000000601'
@@ -587,9 +590,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: code
-        loop_id: '1800000000700'
       id: 1800000000110-source-1800000000720-target
       selected: false
       source: '1800000000110'
@@ -600,9 +603,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: code
-        loop_id: '1800000000700'
       id: 1800000000210-source-1800000000720-target
       selected: false
       source: '1800000000210'
@@ -613,9 +616,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: code
-        loop_id: '1800000000700'
       id: 1800000000310-source-1800000000720-target
       selected: false
       source: '1800000000310'
@@ -626,9 +629,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: code
-        loop_id: '1800000000700'
       id: 1800000000410-source-1800000000720-target
       selected: false
       source: '1800000000410'
@@ -639,9 +642,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: code
-        loop_id: '1800000000700'
       id: 1800000000510-source-1800000000720-target
       selected: false
       source: '1800000000510'
@@ -652,9 +655,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: code
-        loop_id: '1800000000700'
       id: 1800000000610-source-1800000000720-target
       selected: false
       source: '1800000000610'
@@ -665,9 +668,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000110-fail-branch-1800000000760-target
       selected: false
       source: '1800000000110'
@@ -678,9 +681,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000210-fail-branch-1800000000760-target
       selected: false
       source: '1800000000210'
@@ -691,9 +694,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000310-fail-branch-1800000000760-target
       selected: false
       source: '1800000000310'
@@ -704,9 +707,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000410-fail-branch-1800000000760-target
       selected: false
       source: '1800000000410'
@@ -717,9 +720,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000510-fail-branch-1800000000760-target
       selected: false
       source: '1800000000510'
@@ -730,9 +733,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: agent
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000610-fail-branch-1800000000760-target
       selected: false
       source: '1800000000610'
@@ -743,9 +746,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000101-fail-branch-1800000000760-target
       selected: false
       source: '1800000000101'
@@ -756,9 +759,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000201-fail-branch-1800000000760-target
       selected: false
       source: '1800000000201'
@@ -769,9 +772,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000301-fail-branch-1800000000760-target
       selected: false
       source: '1800000000301'
@@ -782,9 +785,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000401-fail-branch-1800000000760-target
       selected: false
       source: '1800000000401'
@@ -795,9 +798,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000501-fail-branch-1800000000760-target
       selected: false
       source: '1800000000501'
@@ -808,9 +811,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: answer
-        loop_id: '1800000000700'
       id: 1800000000601-fail-branch-1800000000760-target
       selected: false
       source: '1800000000601'
@@ -821,9 +824,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: code
         targetType: assigner
-        loop_id: '1800000000700'
       id: 1800000000720-source-1800000000730-target
       selected: false
       source: '1800000000720'
@@ -834,9 +837,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: assigner
         targetType: code
-        loop_id: '1800000000700'
       id: 1800000000730-source-1800000000740-target
       selected: false
       source: '1800000000730'
@@ -847,9 +850,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: code
         targetType: if-else
-        loop_id: '1800000000700'
       id: 1800000000740-source-1800000000745-target
       selected: false
       source: '1800000000740'
@@ -860,9 +863,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: if-else
         targetType: assigner
-        loop_id: '1800000000700'
       id: 1800000000745-loop-done-1800000000751-target
       selected: false
       source: '1800000000745'
@@ -873,9 +876,9 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
+        loop_id: '1800000000700'
         sourceType: if-else
         targetType: assigner
-        loop_id: '1800000000700'
       id: 1800000000745-false-1800000000752-target
       selected: false
       source: '1800000000745'
@@ -936,11 +939,11 @@ workflow:
       id: '1711528708197'
       position:
         x: 0
-        y: 413
+        y: 2032
       positionAbsolute:
         x: 0
-        y: 413
-      selected: true
+        y: 2032
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -963,12 +966,25 @@ workflow:
         model:
           completion_params:
             enable_stream: true
-            json_schema: "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\n    \"service\",\n    \"confidence\",\n    \"question_type\",\n    \"routing_reason\",\n    \"\
-              clarification_needed\",\n    \"clarifying_questions\"\n  ],\n  \"properties\": {\n    \"service\": {\n      \"type\": \"string\",\n      \"enum\": [\"RAG\", \"ASSISTANT\", \"BUNDLE_SETUP\"\
-              , \"OUT_OF_SCOPE\"]\n    },\n    \"confidence\": {\n      \"type\": \"number\",\n      \"minimum\": 0,\n      \"maximum\": 1\n    },\n    \"question_type\": {\n      \"type\": \"string\",\n\
-              \      \"enum\": [\n        \"capability_inquiry\",\n        \"implementation_request\",\n        \"novel_requirement\",\n        \"not_avni_related\"\n      ]\n    },\n    \"routing_reason\"\
-              : {\n      \"type\": \"string\"\n    },\n    \"clarification_needed\": {\n      \"type\": \"boolean\"\n    },\n    \"clarifying_questions\": {\n      \"type\": \"array\",\n      \"items\"\
-              : { \"type\": \"string\" }\n    }\n  }\n}"
+            json_schema: "{\n  \"type\": \"object\",\n  \"additionalProperties\":\
+              \ false,\n  \"required\": [\n    \"service\",\n    \"initial_agent\"\
+              ,\n    \"workflow_mode\",\n    \"confidence\",\n\
+              \    \"question_type\",\n    \"routing_reason\",\n    \"clarification_needed\"\
+              ,\n    \"clarifying_questions\"\n  ],\n  \"properties\": {\n    \"service\"\
+              : {\n      \"type\": \"string\",\n      \"enum\": [\"RAG\", \"ASSISTANT\"\
+              , \"BUNDLE_SETUP\", \"OUT_OF_SCOPE\"]\n    },\n    \"initial_agent\"\
+              : {\n      \"type\": \"string\",\n      \"enum\": [\"spec\", \"bundle_config\"\
+              , \"rules\", \"reports\", \"inspect\", \"admin\"]\n    },\n    \"workflow_mode\"\
+              : {\n      \"type\": \"string\",\n      \"enum\": [\"targeted\", \"generic\"\
+              ]\n    },\n    \"confidence\": {\n\
+              \      \"type\": \"number\",\n      \"minimum\": 0,\n      \"maximum\"\
+              : 1\n    },\n    \"question_type\": {\n      \"type\": \"string\",\n\
+              \      \"enum\": [\n        \"capability_inquiry\",\n        \"implementation_request\"\
+              ,\n        \"novel_requirement\",\n        \"not_avni_related\"\n  \
+              \    ]\n    },\n    \"routing_reason\": {\n      \"type\": \"string\"\
+              \n    },\n    \"clarification_needed\": {\n      \"type\": \"boolean\"\
+              \n    },\n    \"clarifying_questions\": {\n      \"type\": \"array\"\
+              ,\n      \"items\": { \"type\": \"string\" }\n    }\n  }\n}"
             reasoning_effort: minimal
             verbosity: low
           mode: chat
@@ -977,53 +993,133 @@ workflow:
         prompt_template:
         - id: b14eb575-d615-41dd-aac1-00663db3a6eb
           role: system
-          text: "You are the Avni Platform Orchestrator of the Avni AI Assistant. Route user messages based on their PRIMARY INTENT, not the complexity or specificity of their\nquestion.\n\n<context>\n\
-            {{#context#}}\n</context>\n\n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly NOT about Avni or data collection platforms → OUT_OF_SCOPE\n2. If a message starts with\
-            \ capability questions (\"Is it possible\", \"Can Avni\", \"Does Avni support\", \"Is there a way\", \"How can I\"), it is ALWAYS RAG regardless of complexity.\n\n\n### BUNDLE_SETUP — Program\
-            \ Setup from Uploaded SRS/Specification Files\n\n**Priority: HIGHEST — evaluate before RAG and ASSISTANT**\n\n**Route BUNDLE_SETUP when ANY of the following:**\n1. `sys.files` is not empty —\
-            \ user uploaded file(s) this turn\n2. `conversation.setup_mode_active == true` — already in an active bundle setup workflow (follow-up turn: \"what\\'s next?\", \"proceed\", \"approve\", etc.)\n\
-            3. User explicitly says \"upload SRS\", \"upload spec\", \"upload field workflow\", \"generate bundle from file\"\n\n**Do NOT route here for:**\n- Verbal SRS description without a file → ASSISTANT\n\
-            - General Avni platform questions → RAG\n\n\n### RAG - Platform Knowledge & Capabilities\n\n\n**Primary Intent**: Learning what Avni can/cannot do\n\n\n**Definitive Indicators** (Route to RAG\
-            \ even if complex):\n- \"What is Avni?\" → RAG (basic platform knowledge)\n- \"Tell me about Avni\" → RAG (platform overview)\n- \"Is it possible to...\" → RAG (capability inquiry)\n- \"Can\
-            \ Avni...\" → RAG (platform capability)\n- \"Does Avni support...\" → RAG (feature question)\n- \"Is there a way to...\" → RAG (method inquiry)\n- \"How can I...\" → RAG (step-by-step guidance\
-            \ inquiry)\n- \"What are the limitations of...\" → RAG (constraint question)\n- \"How does Avni handle...\" → RAG (mechanism inquiry)\n\n\n**Key Principle**: Complexity of the scenario does\
-            \ NOT change the\nintent. A detailed capability question is still a capability question.\n\n\n\n### ASSISTANT - Custom/Novel Requirements\n\n\n**Primary Intent**: Building something new or unique\n\
-            \n\n**Indicators**: - \"We need something that doesn't exist...\" - \"Can you\nbuild/create/develop...\" - \"We have unique requirements...\" -\n\"Integration with external system X...\" - \"\
-            Delete everything and start fresh...\" - \"Clean slate configuration...\" - \"Remove all my current setup...\"\n\n\n### OUT_OF_SCOPE - Not Avni Related\n\n\n**Primary Intent**: Questions completely\
-            \ unrelated to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n- Questions for which no relevant context available in this prompt\n- General programming/coding questions not\
-            \ specific to Avni\n- Questions about other software platforms (Salesforce, Excel, etc.)\n- Personal questions, weather, news, entertainment\n- Academic questions unrelated to health/social\
-            \ programs\n- Technical questions about non-Avni systems\n- \"What is the capital of...\" / \"How do I cook...\" / \"What's the weather...\"\n- Questions about competitors without Avni context\n\
-            \n\n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\") should NOT be marked as OUT_OF_SCOPE. These require clarification to understand the user's actual intent.\n\n\n##\
-            \ Decision Framework\n\n\n**Step 1**: Check relevance - If clearly NOT about Avni/data collection → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**: If greeting message → Set clarification_needed =\
-            \ true\n\n\n**Step 2**: Identify the question type - If starts with capability\nquestions → RAG (STOP HERE) - If describes implementation needs →\nASSISTANT - If requests deletion/configuration\
-            \ changes → ASSISTANT\n\n\n## Critical Examples\n\n✅ User uploads Excel/CSV/ZIP file → **BUNDLE_SETUP** (highest priority)\n✅ \"Proceed with the spec\" when setup_mode_active=true → **BUNDLE_SETUP**\
-            \ (follow-up)\n✅ \"Here is my SRS\" (with file attached) → **BUNDLE_SETUP**\n\n✅ \"What is Avni?\" → **RAG** (basic platform knowledge)\n\n✅ \"Tell me about Avni platform\" → **RAG** (platform\
-            \ overview)\n\n✅ \"What does Avni do?\" → **RAG** (platform purpose/functionality)\n\n✅ \"Is it possible to automatically show selected answers from Clinical\nAssessment in Follow-up Visit forms?\"\
-            \ → **RAG** (capability question,\nregardless of technical complexity)\n\n✅ \"Can Avni restrict encounter forms to single entry per individual?\" →\n**RAG** (capability question)\n\n✅ \"Is there\
-            \ a way to integrate complex multi-step approval workflows?\"\n→ **RAG** (capability question, even if the workflow is complex)\n\n✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"\
-            What are identifiers\"\n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\n✅ \"What is a program\"\n✅ \"What is a subject type\"\n✅ \"How can I setup the assignment feature\
-            \ in Avni?\" → **RAG** (step-by-step guidance question)\n\n✅ \"I want to delete my entire configuration and start fresh\" → **ASSISTANT** (implementation request for complete deletion)\n\n✅\
-            \ \"Can you help me clean slate my Avni setup?\" → **ASSISTANT** (configuration deletion and rebuild request)\n\n✅ \"Remove everything and build a new configuration\" → **ASSISTANT** (delete\
-            \ and create request)\n\n\n\n✅ \"What is the capital of France?\" → **OUT_OF_SCOPE** (not related to Avni)\n\n\n✅ \"How do I write Python code for web scraping?\" → **OUT_OF_SCOPE** (general\
-            \ programming, not Avni-specific)\n\n\n✅ \"Can you help me with my Excel formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅ \"Hello\" → **RAG** with clarification_needed = true (greeting\
-            \ requires clarification)\n\n\n✅ \"Hi there\" → **RAG** with clarification_needed = true (greeting requires clarification)\n\n\n❌ **WRONG**: \"Sounds complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\
-            \"Starts with capability question → RAG\"\n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap 1**: Complexity Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\" - ✅ \"Capability question\
-            \ = platform inquiry = RAG\"\n\n\n**Trap 2**: Implementation Details Bias - ❌ \"Mentions specific\ntechnical details = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**: Domain\
-            \ Specificity Bias - ❌ \"Very specific use case =\nASSISTANT\" - ✅ \"Question format determines intent\"\n\n\n**Trap 4**: Relevance Assumption - ❌ \"Any question = must be Avni-related\" - ✅\
-            \ \"Check if actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification to understand intent\"\n\n\n\
-            ## Response Format\n\n\n``` json\n{\n  \"service\": \"RAG|ASSISTANT|OUT_OF_SCOPE\",\n  \"confidence\": 0.0-1.0,\n  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
-            ,\n  \"routing_reason\": \"Brief explanation focusing on question structure, not content complexity\",\n  \"clarification_needed\": true|false,\n  \"clarifying_questions\": [\"question1\", \"\
-            question2\"]\n}\n```\n\n\n## Clarifying Questions Strategy\n\n\nAsk maximum 2 clarifying questions when:\n- Intent is ambiguous between RAG and Assistant\n- User provides insufficient context\
-            \ about their needs\n- Requirements could match multiple services\n- User sends only greeting messages without specific questions\n\n\n**Example clarifying questions:**\n- \"Could you describe\
-            \ what type of programs your organization runs?\"\n- \"Are you looking to learn about Avni's capabilities or need help setting something up?\"\n- \"Is this similar to typical community health/education\
-            \ programs?\"\n- \"How can I help you with Avni today?\" (for greetings)\n\n\n**General Prompt for Clarification:** When unsure, ask concise,\nopen-ended clarifying questions that help determine\
-            \ whether the user is\nasking about platform capabilities (RAG) or needs implementation help\n(ASSISTANT). Never ask more than two questions at once.\n\n\n## Mental Model Validation\n\n\nBefore\
-            \ routing, ask:\n1. **\"Is this just a greeting message?\"** - YES → RAG with clarification_needed = true\n2. **\"Is this question actually about Avni or data collection platforms?\"** - NO\
-            \ → OUT_OF_SCOPE\n3. **\"Is the user asking IF something is possible, or telling me they WANT something implemented?\"** - IF possible → RAG - WANT implemented → ASSISTANT\n\n\n## Decision Tree\
-            \ for Edge Cases\n\n\n    User Message\n        │\n        ├── NOT about Avni/data collection (general questions, other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n        │\n        ├──\
-            \ Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does Avni...\" / \"How can I...\" ?\n        │   └── YES → RAG (regardless of complexity)\n        │\n        ├── Describes implementation\
-            \ needs (\"We need...\", \"Help us set up...\", \"Our org wants...\") or deletion       requests (\"Delete everything...\", \"Clean slate...\", \"Remove all...\")?\n        │   └── YES → ASSISTANT\n\
-            \        │\n        └── UNCLEAR → Default to RAG (safer for capability questions)"
+          text: "You are the Avni Platform Orchestrator of the Avni AI Assistant.\
+            \ Route user messages based on their PRIMARY INTENT, not the complexity\
+            \ or specificity of their\nquestion.\n\n<context>\n{{#context#}}\n</context>\n\
+            \n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly\
+            \ NOT about Avni or data collection platforms → OUT_OF_SCOPE\n2. If a\
+            \ message starts with capability questions (\"Is it possible\", \"Can\
+            \ Avni\", \"Does Avni support\", \"Is there a way\", \"How can I\"), it\
+            \ is ALWAYS RAG regardless of complexity.\n\n\n### BUNDLE_SETUP — Program\
+            \ Setup from Uploaded SRS/Specification Files\n\n**Priority: HIGHEST —\
+            \ evaluate before RAG and ASSISTANT**\n\n**Route BUNDLE_SETUP when ANY\
+            \ of the following:**\n1. `sys.files` is not empty — user uploaded file(s)\
+            \ this turn\n2. `conversation.setup_mode_active == true` — already in\
+            \ an active bundle setup workflow (follow-up turn: \"what\\'s next?\"\
+            , \"proceed\", \"approve\", etc.)\n3. User explicitly says \"upload SRS\"\
+            , \"upload spec\", \"upload field workflow\", \"generate bundle from file\"\
+            \n\n**Do NOT route here for:**\n- Verbal SRS description without a file\
+            \ → ASSISTANT\n- General Avni platform questions → RAG\n\n\n### RAG -\
+            \ Platform Knowledge & Capabilities\n\n\n**Primary Intent**: Learning\
+            \ what Avni can/cannot do\n\n\n**Definitive Indicators** (Route to RAG\
+            \ even if complex):\n- \"What is Avni?\" → RAG (basic platform knowledge)\n\
+            - \"Tell me about Avni\" → RAG (platform overview)\n- \"Is it possible\
+            \ to...\" → RAG (capability inquiry)\n- \"Can Avni...\" → RAG (platform\
+            \ capability)\n- \"Does Avni support...\" → RAG (feature question)\n-\
+            \ \"Is there a way to...\" → RAG (method inquiry)\n- \"How can I...\"\
+            \ → RAG (step-by-step guidance inquiry)\n- \"What are the limitations\
+            \ of...\" → RAG (constraint question)\n- \"How does Avni handle...\" →\
+            \ RAG (mechanism inquiry)\n\n\n**Key Principle**: Complexity of the scenario\
+            \ does NOT change the\nintent. A detailed capability question is still\
+            \ a capability question.\n\n\n\n### ASSISTANT - Custom/Novel Requirements\n\
+            \n\n**Primary Intent**: Building something new or unique\n\n\n**Indicators**:\
+            \ - \"We need something that doesn't exist...\" - \"Can you\nbuild/create/develop...\"\
+            \ - \"We have unique requirements...\" -\n\"Integration with external\
+            \ system X...\" - \"Delete everything and start fresh...\" - \"Clean slate\
+            \ configuration...\" - \"Remove all my current setup...\"\n\n\n### OUT_OF_SCOPE\
+            \ - Not Avni Related\n\n\n**Primary Intent**: Questions completely unrelated\
+            \ to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n\
+            - Questions for which no relevant context available in this prompt\n-\
+            \ General programming/coding questions not specific to Avni\n- Questions\
+            \ about other software platforms (Salesforce, Excel, etc.)\n- Personal\
+            \ questions, weather, news, entertainment\n- Academic questions unrelated\
+            \ to health/social programs\n- Technical questions about non-Avni systems\n\
+            - \"What is the capital of...\" / \"How do I cook...\" / \"What's the\
+            \ weather...\"\n- Questions about competitors without Avni context\n\n\
+            \n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\"\
+            ) should NOT be marked as OUT_OF_SCOPE. These require clarification to\
+            \ understand the user's actual intent.\n\n\n## Decision Framework\n\n\n\
+            **Step 1**: Check relevance - If clearly NOT about Avni/data collection\
+            \ → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**: If greeting message → Set\
+            \ clarification_needed = true\n\n\n**Step 2**: Identify the question type\
+            \ - If starts with capability\nquestions → RAG (STOP HERE) - If describes\
+            \ implementation needs →\nASSISTANT - If requests deletion/configuration\
+            \ changes → ASSISTANT\n\n\n## Critical Examples\n\n✅ User uploads Excel/CSV/ZIP\
+            \ file → **BUNDLE_SETUP** (highest priority)\n✅ \"Proceed with the spec\"\
+            \ when setup_mode_active=true → **BUNDLE_SETUP** (follow-up)\n✅ \"Here\
+            \ is my SRS\" (with file attached) → **BUNDLE_SETUP**\n\n✅ \"What is Avni?\"\
+            \ → **RAG** (basic platform knowledge)\n\n✅ \"Tell me about Avni platform\"\
+            \ → **RAG** (platform overview)\n\n✅ \"What does Avni do?\" → **RAG**\
+            \ (platform purpose/functionality)\n\n✅ \"Is it possible to automatically\
+            \ show selected answers from Clinical\nAssessment in Follow-up Visit forms?\"\
+            \ → **RAG** (capability question,\nregardless of technical complexity)\n\
+            \n✅ \"Can Avni restrict encounter forms to single entry per individual?\"\
+            \ →\n**RAG** (capability question)\n\n✅ \"Is there a way to integrate\
+            \ complex multi-step approval workflows?\"\n→ **RAG** (capability question,\
+            \ even if the workflow is complex)\n\n✅ \"What are catchments\"\n✅ \"\
+            What are user groups\"\n✅ \"What are identifiers\"\n✅ \"What is an identifier\
+            \ source\"\n✅ \"How do I create a new catchment\"\n✅ \"What is a program\"\
+            \n✅ \"What is a subject type\"\n✅ \"How can I setup the assignment feature\
+            \ in Avni?\" → **RAG** (step-by-step guidance question)\n\n✅ \"I want\
+            \ to delete my entire configuration and start fresh\" → **ASSISTANT**\
+            \ (implementation request for complete deletion)\n\n✅ \"Can you help me\
+            \ clean slate my Avni setup?\" → **ASSISTANT** (configuration deletion\
+            \ and rebuild request)\n\n✅ \"Remove everything and build a new configuration\"\
+            \ → **ASSISTANT** (delete and create request)\n\n\n\n✅ \"What is the capital\
+            \ of France?\" → **OUT_OF_SCOPE** (not related to Avni)\n\n\n✅ \"How do\
+            \ I write Python code for web scraping?\" → **OUT_OF_SCOPE** (general\
+            \ programming, not Avni-specific)\n\n\n✅ \"Can you help me with my Excel\
+            \ formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅ \"Hello\"\
+            \ → **RAG** with clarification_needed = true (greeting requires clarification)\n\
+            \n\n✅ \"Hi there\" → **RAG** with clarification_needed = true (greeting\
+            \ requires clarification)\n\n\n❌ **WRONG**: \"Sounds complex/custom →\
+            \ ASSISTANT\" ✅ **CORRECT**:\n\"Starts with capability question → RAG\"\
+            \n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap 1**: Complexity\
+            \ Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\" - ✅ \"Capability\
+            \ question = platform inquiry = RAG\"\n\n\n**Trap 2**: Implementation\
+            \ Details Bias - ❌ \"Mentions specific\ntechnical details = ASSISTANT\"\
+            \ - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**: Domain Specificity\
+            \ Bias - ❌ \"Very specific use case =\nASSISTANT\" - ✅ \"Question format\
+            \ determines intent\"\n\n\n**Trap 4**: Relevance Assumption - ❌ \"Any\
+            \ question = must be Avni-related\" - ✅ \"Check if actually about Avni/data\
+            \ collection first\"\n\n\n**Trap 5**: Greeting Misrouting - ❌ \"Greeting\
+            \ = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification to understand\
+            \ intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"service\": \"\
+            RAG|ASSISTANT|BUNDLE_SETUP|OUT_OF_SCOPE\",\n  \"initial_agent\"\
+            : \"spec|bundle_config|rules|reports|inspect|admin\",\n  \"workflow_mode\"\
+            : \"targeted|generic\",\n  \"confidence\": 0.0-1.0,\n  \"question_type\"\
+            : \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
+            ,\n  \"routing_reason\": \"Brief explanation focusing on question structure,\
+            \ not content complexity\",\n  \"clarification_needed\": true|false,\n\
+            \  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\
+            \n## Clarifying Questions Strategy\n\n\nAsk maximum 2 clarifying questions\
+            \ when:\n- Intent is ambiguous between RAG and Assistant\n- User provides\
+            \ insufficient context about their needs\n- Requirements could match multiple\
+            \ services\n- User sends only greeting messages without specific questions\n\
+            \n\n**Example clarifying questions:**\n- \"Could you describe what type\
+            \ of programs your organization runs?\"\n- \"Are you looking to learn\
+            \ about Avni's capabilities or need help setting something up?\"\n- \"\
+            Is this similar to typical community health/education programs?\"\n- \"\
+            How can I help you with Avni today?\" (for greetings)\n\n\n**General Prompt\
+            \ for Clarification:** When unsure, ask concise,\nopen-ended clarifying\
+            \ questions that help determine whether the user is\nasking about platform\
+            \ capabilities (RAG) or needs implementation help\n(ASSISTANT). Never\
+            \ ask more than two questions at once.\n\n\n## Mental Model Validation\n\
+            \n\nBefore routing, ask:\n1. **\"Is this just a greeting message?\"**\
+            \ - YES → RAG with clarification_needed = true\n2. **\"Is this question\
+            \ actually about Avni or data collection platforms?\"** - NO → OUT_OF_SCOPE\n\
+            3. **\"Is the user asking IF something is possible, or telling me they\
+            \ WANT something implemented?\"** - IF possible → RAG - WANT implemented\
+            \ → ASSISTANT\n\n\n## Decision Tree for Edge Cases\n\n\n    User Message\n\
+            \        │\n        ├── NOT about Avni/data collection (general questions,\
+            \ other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n        │\n \
+            \       ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does\
+            \ Avni...\" / \"How can I...\" ?\n        │   └── YES → RAG (regardless\
+            \ of complexity)\n        │\n        ├── Describes implementation needs\
+            \ (\"We need...\", \"Help us set up...\", \"Our org wants...\") or deletion\
+            \       requests (\"Delete everything...\", \"Clean slate...\", \"Remove\
+            \ all...\")?\n        │   └── YES → ASSISTANT\n        │\n        └──\
+            \ UNCLEAR → Default to RAG (safer for capability questions)"
         - id: 36b2faa1-0e45-4962-8107-74a07045af09
           role: user
           text: ''
@@ -1040,14 +1136,20 @@ workflow:
                 type: array
               confidence:
                 type: number
+              initial_agent:
+                type: string
               question_type:
                 type: string
               routing_reason:
                 type: string
               service:
                 type: string
+              workflow_mode:
+                type: string
             required:
             - service
+            - initial_agent
+            - workflow_mode
             - confidence
             - question_type
             - routing_reason
@@ -1064,10 +1166,10 @@ workflow:
       id: '1757492907627'
       position:
         x: 684
-        y: 455
+        y: 2074
       positionAbsolute:
         x: 684
-        y: 455
+        y: 2074
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1123,7 +1225,7 @@ workflow:
           conditions:
           - comparison_operator: is
             id: c3b0ee63-3c37-45ad-a05e-0f7b28599a90
-            value: AGENT_WORK
+            value: ASSISTANT
             varType: string
             variable_selector:
             - '1757492907627'
@@ -1135,14 +1237,14 @@ workflow:
         selected: false
         title: IF/ELSE
         type: if-else
-      height: 486
+      height: 414
       id: '1757493270484'
       position:
         x: 1026
-        y: 256
+        y: 1911
       positionAbsolute:
         x: 1026
-        y: 256
+        y: 1911
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1176,13 +1278,23 @@ workflow:
         prompt_template:
         - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
           role: system
-          text: "Use the following context as your learned knowledge, inside <context></context> XML tags.\n<context>\n{{#context#}}\n</context>\nYou are talking to {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\n\
-            You are part of the Avni AI Assistant. The Avni AI Assistant is currently capable of the following\n1. Answering questions about the Avni system\n2. Assistance with designing workflows, forms\
-            \ etc on Avni\n   The Avni AI Assistant is currently not capable of\n1. Helping with rules\n2. You must not guess or invent Avni features, workflows, or UI options that are not explicitly known.\n\
-            \nWhen answer to user:\n- If you don't know, just say that you don't know.\n- If you don't know when you are not sure, ask for clarification.\n- If greeting, greet professionaly by their name\
-            \ :  {{#1711528708197.user_name#}}\n- Do not greet repeatedly in every response.\n- Never infer or assume features (e.g., don't claim a program can be assigned to a catchment unless explicitly\
-            \ supported).\n- If there is any ambiguity, ask a clarifying question instead of guessing.\n  Avoid mentioning that you obtained the information from the context.\n  And answer according to\
-            \ the language of the user's question."
+          text: "Use the following context as your learned knowledge, inside <context></context>\
+            \ XML tags.\n<context>\n{{#context#}}\n</context>\nYou are talking to\
+            \ {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\nYou\
+            \ are part of the Avni AI Assistant. The Avni AI Assistant is currently\
+            \ capable of the following\n1. Answering questions about the Avni system\n\
+            2. Assistance with designing workflows, forms etc on Avni\n   The Avni\
+            \ AI Assistant is currently not capable of\n1. Helping with rules\n2.\
+            \ You must not guess or invent Avni features, workflows, or UI options\
+            \ that are not explicitly known.\n\nWhen answer to user:\n- If you don't\
+            \ know, just say that you don't know.\n- If you don't know when you are\
+            \ not sure, ask for clarification.\n- If greeting, greet professionaly\
+            \ by their name :  {{#1711528708197.user_name#}}\n- Do not greet repeatedly\
+            \ in every response.\n- Never infer or assume features (e.g., don't claim\
+            \ a program can be assigned to a catchment unless explicitly supported).\n\
+            - If there is any ambiguity, ask a clarifying question instead of guessing.\n\
+            \  Avoid mentioning that you obtained the information from the context.\n\
+            \  And answer according to the language of the user's question."
         selected: false
         title: RAG LLM
         type: llm
@@ -1193,10 +1305,10 @@ workflow:
       id: '1757495664531'
       position:
         x: 1388
-        y: 738
+        y: 2191
       positionAbsolute:
         x: 1388
-        y: 738
+        y: 2191
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1213,10 +1325,10 @@ workflow:
       id: '1757495688732'
       position:
         x: 1730
-        y: 730
+        y: 2183
       positionAbsolute:
         x: 1730
-        y: 730
+        y: 2183
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1232,17 +1344,18 @@ workflow:
       id: '1758608702077'
       position:
         x: 1388
-        y: 309
+        y: 1762
       positionAbsolute:
         x: 1388
-        y: 309
+        y: 1762
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     - data:
-        answer: This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.
+        answer: This assistant can help you with any questions related to Avni. This
+          does not seem relevant to Avni.
         selected: false
         title: Unrelated Question
         type: answer
@@ -1251,10 +1364,10 @@ workflow:
       id: '1758699378772'
       position:
         x: 1388
-        y: 526
+        y: 1979
       positionAbsolute:
         x: 1388
-        y: 526
+        y: 1979
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1287,19 +1400,24 @@ workflow:
       id: '1758713692744'
       position:
         x: 342
-        y: 454
+        y: 2073
       positionAbsolute:
         x: 342
-        y: 454
+        y: 2073
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     - data:
-        code: "import json\n\ndef main(files: list) -> dict:\n    if not files:\n        return {\"file_infos_json\": \"[]\"}\n    infos = [                                                             \
-          \              \n        {\"url\": f.get(\"url\", \"\"), \"filename\": f.get(\"filename\", \"document.xlsx\")}\n        for f in files                                                         \
-          \         \n        if f.get(\"url\")                                   \n    ]                                                                                   \n    return {\"file_infos_json\"\
+        code: "import json\n\ndef main(files: list) -> dict:\n    if not files:\n\
+          \        return {\"file_infos_json\": \"[]\"}\n    infos = [           \
+          \                                                                \n    \
+          \    {\"url\": f.get(\"url\", \"\"), \"filename\": f.get(\"filename\", \"\
+          document.xlsx\")}\n        for f in files                              \
+          \                                    \n        if f.get(\"url\")       \
+          \                            \n    ]                                   \
+          \                                                \n    return {\"file_infos_json\"\
           : json.dumps(infos)}"
         code_language: python3
         desc: Extract pre-signed URLs and filenames — backend downloads the files
@@ -1317,11 +1435,11 @@ workflow:
       height: 112
       id: '1775800000001'
       position:
-        x: 1750
-        y: 1064
+        x: 2092
+        y: 2524
       positionAbsolute:
-        x: 1750
-        y: 1064
+        x: 2092
+        y: 2524
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1336,7 +1454,8 @@ workflow:
           - id: parse-srs-file-body
             key: ''
             type: text
-            value: '{"conversation_id": "{{#sys.conversation_id#}}", "file_infos": {{#1775800000001.file_infos_json#}}}'
+            value: '{"conversation_id": "{{#sys.conversation_id#}}", "file_infos":
+              {{#1775800000001.file_infos_json#}}}'
           type: json
         error_strategy: fail-branch
         headers: ''
@@ -1359,11 +1478,11 @@ workflow:
       height: 177
       id: '1775800000002'
       position:
-        x: 2092
-        y: 1031
+        x: 2434
+        y: 2491
       positionAbsolute:
-        x: 2092
-        y: 1031
+        x: 2434
+        y: 2491
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1378,7 +1497,8 @@ workflow:
           - id: key-value-73
             key: ''
             type: text
-            value: '{"conversation_id": "{{#sys.conversation_id#}}", "auth_token": "{{#conversation.auth_token#}}"}'
+            value: '{"conversation_id": "{{#sys.conversation_id#}}", "auth_token":
+              "{{#conversation.auth_token#}}"}'
           type: json
         error_strategy: fail-branch
         headers: ''
@@ -1401,11 +1521,11 @@ workflow:
       height: 177
       id: '1775648480416'
       position:
-        x: 2454
-        y: 922
+        x: 2796
+        y: 2381
       positionAbsolute:
-        x: 2454
-        y: 922
+        x: 2796
+        y: 2381
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1448,10 +1568,10 @@ workflow:
       id: '1775657870619'
       position:
         x: 362
-        y: 624
+        y: 2243
       positionAbsolute:
         x: 362
-        y: 624
+        y: 2243
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1476,20 +1596,17 @@ workflow:
       height: 124
       id: '1775719228711'
       position:
-        x: 1388
-        y: 906
+        x: 1730
+        y: 2366
       positionAbsolute:
-        x: 1388
-        y: 906
+        x: 1730
+        y: 2366
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     - data:
-        selected: false
-        title: Set Initial Agent
-        type: assigner
         items:
         - input_type: variable
           operation: over-write
@@ -1520,15 +1637,18 @@ workflow:
           - conversation
           - agent_loop_active
           write_mode: over-write
+        selected: false
+        title: Set Initial Agent
+        type: assigner
         version: '2'
       height: 136
       id: '1800000000040'
       position:
-        x: 1600
-        y: 600
+        x: 1388
+        y: 2360
       positionAbsolute:
-        x: 1600
-        y: 600
+        x: 1388
+        y: 2360
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1544,9 +1664,9 @@ workflow:
           - conversation
           - agent_loop_active
         error_handle_mode: terminated
-        height: 900
+        height: 2452
         logical_operator: and
-        loop_count: 6
+        loop_count: 3
         loop_variables:
         - id: a416f73e-492a-44c9-9b05-4e9576a5b7ef
           label: agent_loop_active
@@ -1555,19 +1675,24 @@ workflow:
           - agent_loop_active
           value_type: variable
           var_type: boolean
+        - id: cd56c7bd-76ad-4c96-a8af-31e0ee630096
+          label: output
+          value: ''
+          value_type: constant
+          var_type: string
         selected: false
         start_node_id: 1800000000700start
         title: Agent Loop
         type: loop
         width: 4000
-      height: 900
+      height: 2452
       id: '1800000000700'
       position:
-        x: 2200
-        y: 400
+        x: 3158
+        y: 0
       positionAbsolute:
-        x: 2200
-        y: 400
+        x: 3158
+        y: 0
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1586,10 +1711,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 60
-        y: 113
+        y: 703
       positionAbsolute:
-        x: 2260
-        y: 513
+        x: 3218
+        y: 703
       selectable: false
       selected: false
       sourcePosition: right
@@ -1598,11 +1723,6 @@ workflow:
       width: 44
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Agent Dispatcher
-        type: if-else
         cases:
         - case_id: dispatch-spec
           conditions:
@@ -1671,15 +1791,20 @@ workflow:
           id: dispatch-admin
           logical_operator: and
         desc: ''
-      height: 400
+        isInLoop: true
+        loop_id: '1800000000700'
+        selected: false
+        title: Agent Dispatcher
+        type: if-else
+      height: 364
       id: '1800000000710'
       parentId: '1800000000700'
       position:
-        x: 180
-        y: 50
+        x: 184
+        y: 545
       positionAbsolute:
-        x: 2380
-        y: 450
+        x: 3342
+        y: 545
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1687,11 +1812,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: SPEC_PROMPT_FETCH
-        type: http-request
         authorization:
           config: null
           type: no-auth
@@ -1700,28 +1820,33 @@ workflow:
           type: none
         error_strategy: fail-branch
         headers: ''
+        isInLoop: true
+        loop_id: '1800000000700'
         method: get
         params: ''
         retry_config:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
+        selected: false
         ssl_verify: true
         timeout:
           max_connect_timeout: 0
           max_read_timeout: 0
           max_write_timeout: 0
+        title: SPEC_PROMPT_FETCH
+        type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/spec-agent.txt
         variables: []
       height: 205
       id: '1800000000101'
       parentId: '1800000000700'
       position:
-        x: 550
-        y: 50
+        x: 526
+        y: 60
       positionAbsolute:
-        x: 2750
-        y: 450
+        x: 3684
+        y: 60
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1729,11 +1854,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: BUNDLE_CONFIG_PROMPT_FETCH
-        type: http-request
         authorization:
           config: null
           type: no-auth
@@ -1742,28 +1862,33 @@ workflow:
           type: none
         error_strategy: fail-branch
         headers: ''
+        isInLoop: true
+        loop_id: '1800000000700'
         method: get
         params: ''
         retry_config:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
+        selected: false
         ssl_verify: true
         timeout:
           max_connect_timeout: 0
           max_read_timeout: 0
           max_write_timeout: 0
+        title: BUNDLE_CONFIG_PROMPT_FETCH
+        type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/bundle-config-agent.txt
         variables: []
-      height: 205
+      height: 221
       id: '1800000000201'
       parentId: '1800000000700'
       position:
-        x: 550
-        y: 180
+        x: 526
+        y: 590
       positionAbsolute:
-        x: 2750
-        y: 580
+        x: 3684
+        y: 590
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1771,11 +1896,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: RULES_PROMPT_FETCH
-        type: http-request
         authorization:
           config: null
           type: no-auth
@@ -1784,28 +1904,33 @@ workflow:
           type: none
         error_strategy: fail-branch
         headers: ''
+        isInLoop: true
+        loop_id: '1800000000700'
         method: get
         params: ''
         retry_config:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
+        selected: false
         ssl_verify: true
         timeout:
           max_connect_timeout: 0
           max_read_timeout: 0
           max_write_timeout: 0
+        title: RULES_PROMPT_FETCH
+        type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/rules-agent.txt
         variables: []
       height: 205
       id: '1800000000301'
       parentId: '1800000000700'
       position:
-        x: 550
-        y: 310
+        x: 526
+        y: 871
       positionAbsolute:
-        x: 2750
-        y: 710
+        x: 3684
+        y: 871
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1813,11 +1938,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: REPORTS_PROMPT_FETCH
-        type: http-request
         authorization:
           config: null
           type: no-auth
@@ -1826,28 +1946,33 @@ workflow:
           type: none
         error_strategy: fail-branch
         headers: ''
+        isInLoop: true
+        loop_id: '1800000000700'
         method: get
         params: ''
         retry_config:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
+        selected: false
         ssl_verify: true
         timeout:
           max_connect_timeout: 0
           max_read_timeout: 0
           max_write_timeout: 0
+        title: REPORTS_PROMPT_FETCH
+        type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/reports-agent.txt
         variables: []
       height: 205
       id: '1800000000401'
       parentId: '1800000000700'
       position:
-        x: 550
-        y: 440
+        x: 526
+        y: 1136
       positionAbsolute:
-        x: 2750
-        y: 840
+        x: 3684
+        y: 1136
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1855,11 +1980,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: INSPECTOR_PROMPT_FETCH
-        type: http-request
         authorization:
           config: null
           type: no-auth
@@ -1868,28 +1988,33 @@ workflow:
           type: none
         error_strategy: fail-branch
         headers: ''
+        isInLoop: true
+        loop_id: '1800000000700'
         method: get
         params: ''
         retry_config:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
+        selected: false
         ssl_verify: true
         timeout:
           max_connect_timeout: 0
           max_read_timeout: 0
           max_write_timeout: 0
+        title: INSPECTOR_PROMPT_FETCH
+        type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/config-inspector-agent.txt
         variables: []
-      height: 205
+      height: 221
       id: '1800000000501'
       parentId: '1800000000700'
       position:
-        x: 550
-        y: 570
+        x: 526
+        y: 1401
       positionAbsolute:
-        x: 2750
-        y: 970
+        x: 3684
+        y: 1401
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1897,11 +2022,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: ADMIN_PROMPT_FETCH
-        type: http-request
         authorization:
           config: null
           type: no-auth
@@ -1910,28 +2030,33 @@ workflow:
           type: none
         error_strategy: fail-branch
         headers: ''
+        isInLoop: true
+        loop_id: '1800000000700'
         method: get
         params: ''
         retry_config:
           max_retries: 3
           retry_enabled: true
           retry_interval: 100
+        selected: false
         ssl_verify: true
         timeout:
           max_connect_timeout: 0
           max_read_timeout: 0
           max_write_timeout: 0
+        title: ADMIN_PROMPT_FETCH
+        type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/admin-agent.txt
         variables: []
       height: 205
       id: '1800000000601'
       parentId: '1800000000700'
       position:
-        x: 550
-        y: 700
+        x: 526
+        y: 325
       positionAbsolute:
-        x: 2750
-        y: 1100
+        x: 3684
+        y: 325
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1939,11 +2064,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Spec Agent
-        type: agent
         agent_parameters:
           instruction:
             type: constant
@@ -1978,178 +2098,336 @@ workflow:
             type: constant
             value:
             - enabled: true
+              extra:
+                description: Retrieve the stored SRS document text for this conversation
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Retrieve the stored SRS document text for this conversation
               tool_label: get_srs_text
               tool_name: get_srs_text
               type: api
             - enabled: true
+              extra:
+                description: Cache entities server-side by conversation_id (TTL 6h)
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                entities:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Cache entities server-side by conversation_id (TTL 6h)
               tool_label: store_entities
               tool_name: store_entities
               type: api
             - enabled: true
+              extra:
+                description: Validate extracted entities for structural issues
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Validate extracted entities for structural issues
               tool_label: validate_entities
               tool_name: validate_entities
               type: api
             - enabled: true
+              extra:
+                description: Apply corrections to extracted entities
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                corrections:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Apply corrections to extracted entities
               tool_label: apply_entity_corrections
               tool_name: apply_entity_corrections
               type: api
             - enabled: true
+              extra:
+                description: Generate a YAML spec from stored entities and store it server-side
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                org_name:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Generate a YAML spec from stored entities and store it server-side
               tool_label: generate_spec
               tool_name: generate_spec
               type: api
             - enabled: true
+              extra:
+                description: Retrieve the full stored spec YAML for display to the user
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Retrieve the full stored spec YAML for display to the user
               tool_label: get_spec
               tool_name: get_spec
               type: api
             - enabled: true
+              extra:
+                description: Fetch one top-level section from the stored spec
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                section:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Fetch one top-level section from the stored spec
               tool_label: get_spec_section
               tool_name: get_spec_section
               type: api
             - enabled: true
+              extra:
+                description: Replace one top-level section in the stored spec
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                section:
+                  auto: 1
+                  value: null
+                value:
+                  auto: 1
+                  value: null
+                yaml_fragment:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Replace one top-level section in the stored spec
               tool_label: update_spec_section
               tool_name: update_spec_section
               type: api
             - enabled: true
+              extra:
+                description: Fetch one section from the stored entities dict
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                section:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Fetch one section from the stored entities dict
               tool_label: get_entities_section
               tool_name: get_entities_section
               type: api
             - enabled: true
+              extra:
+                description: Replace one section in the stored entities dict
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                section:
+                  auto: 1
+                  value: null
+                items:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Replace one section in the stored entities dict
               tool_label: update_entities_section
               tool_name: update_entities_section
               type: api
             - enabled: true
+              extra:
+                description: Apply user-provided answers to stored ambiguities
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                resolutions:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Apply user-provided answers to stored ambiguities
               tool_label: resolve_ambiguities
               tool_name: resolve_ambiguities
               type: api
             - enabled: true
+              extra:
+                description: Retrieve stored ambiguities for this conversation
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Retrieve stored ambiguities for this conversation
               tool_label: get_ambiguities
               tool_name: get_ambiguities
               type: api
             - enabled: true
+              extra:
+                description: Initialize a guided chat SRS session with sector defaults
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                sector:
+                  auto: 1
+                  value: null
+                org_name:
+                  auto: 1
+                  value: null
+                is_new_org:
+                  auto: 1
+                  value: null
+                description:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Initialize a guided chat SRS session with sector defaults
               tool_label: chat_srs_init_session
               tool_name: chat_srs_init_session
               type: api
             - enabled: true
+              extra:
+                description: Update a specific section of the chat SRS session
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                section:
+                  auto: 1
+                  value: null
+                data:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Update a specific section of the chat SRS session
               tool_label: chat_srs_update_section
               tool_name: chat_srs_update_section
               type: api
             - enabled: true
+              extra:
+                description: Transform completed chat SRS sections into standard entities
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Transform completed chat SRS sections into standard entities
               tool_label: chat_srs_build_entities
               tool_name: chat_srs_build_entities
               type: api
             - enabled: true
+              extra:
+                description: Append a step trace entry to the agent activity log
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                step:
+                  auto: 1
+                  value: null
+                phase:
+                  auto: 1
+                  value: null
+                action:
+                  auto: 1
+                  value: null
+                tool:
+                  auto: 1
+                  value: null
+                status:
+                  auto: 1
+                  value: null
+                summary:
+                  auto: 1
+                  value: null
+                error:
+                  auto: 1
+                  value: null
+                tokens_used:
+                  auto: 1
+                  value: null
+                model:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Append a step trace entry to the agent activity log
               tool_label: append_agent_log
               tool_name: append_agent_log
               type: api
@@ -2158,6 +2436,8 @@ workflow:
         agent_strategy_provider_name: langgenius/agent/agent
         desc: Spec Agent - specialized agent
         error_strategy: fail-branch
+        isInLoop: true
+        loop_id: '1800000000700'
         memory:
           query_prompt_template: '{{#sys.query#}}
 
@@ -2168,16 +2448,19 @@ workflow:
             size: 5
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Spec Agent
         tool_node_version: '2'
-      height: 312
+        type: agent
+      height: 274
       id: '1800000000110'
       parentId: '1800000000700'
       position:
-        x: 950
-        y: 50
+        x: 868
+        y: 456
       positionAbsolute:
-        x: 3150
-        y: 450
+        x: 4026
+        y: 456
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2185,11 +2468,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Bundle Config Agent
-        type: agent
         agent_parameters:
           instruction:
             type: constant
@@ -2224,156 +2502,325 @@ workflow:
             type: constant
             value:
             - enabled: true
+              extra:
+                description: Generate a complete Avni bundle ZIP from entities
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                org_name:
+                  auto: 1
+                  value: null
+                entities:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Generate a complete Avni bundle ZIP from entities
               tool_label: generate_bundle
               tool_name: generate_bundle
               type: api
             - enabled: true
+              extra:
+                description: Validate a generated bundle for structural correctness
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                bundle:
+                  auto: 1
+                  value: null
+                bundle_zip_b64:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Validate a generated bundle for structural correctness
               tool_label: validate_bundle
               tool_name: validate_bundle
               type: api
             - enabled: true
+              extra:
+                description: Patch an existing bundle ZIP with a new spec
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                spec_yaml:
+                  auto: 1
+                  value: null
+                existing_bundle_b64:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Patch an existing bundle ZIP with a new spec
               tool_label: patch_bundle
               tool_name: patch_bundle
               type: api
             - enabled: true
+              extra:
+                description: List all files in a stored bundle with their sizes
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                bundle_type:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: List all files in a stored bundle with their sizes
               tool_label: get_bundle_files
               tool_name: get_bundle_files
               type: api
             - enabled: true
+              extra:
+                description: Read the content of a specific file from a stored bundle
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                filename:
+                  auto: 1
+                  value: null
+                bundle_type:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Read the content of a specific file from a stored bundle
               tool_label: get_bundle_file
               tool_name: get_bundle_file
               type: api
             - enabled: true
+              extra:
+                description: Replace one file in the stored generated bundle ZIP
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                filename:
+                  auto: 1
+                  value: null
+                content:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Replace one file in the stored generated bundle ZIP
               tool_label: put_bundle_file
               tool_name: put_bundle_file
               type: api
             - enabled: true
+              extra:
+                description: Download existing org bundle from Avni and store server-side
               parameters:
+                includeLocations:
+                  auto: 1
+                  value: null
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                baseUrl:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Download existing org bundle from Avni and store server-side
               tool_label: download_bundle_b64
               tool_name: download_bundle_b64
               type: api
             - enabled: true
+              extra:
+                description: Generate complete AVNI form JSON from field specifications
               parameters:
-                conversation_id:
+                name:
+                  auto: 1
+                  value: null
+                formType:
+                  auto: 1
+                  value: null
+                fields:
+                  auto: 1
+                  value: null
+                subjectType:
+                  auto: 1
+                  value: null
+                program:
+                  auto: 1
+                  value: null
+                encounterType:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Generate complete AVNI form JSON from field specifications
               tool_label: generate_form
               tool_name: generate_form
               type: api
             - enabled: true
+              extra:
+                description: Suggest sector-specific form fields for an encounter type
               parameters:
-                conversation_id:
+                encounter_name:
+                  auto: 1
+                  value: null
+                sector:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Suggest sector-specific form fields for an encounter type
               tool_label: suggest_form_fields
               tool_name: suggest_form_fields
               type: api
             - enabled: true
+              extra:
+                description: Parse natural language skip logic into AVNI declarative rules
               parameters:
-                conversation_id:
+                rules:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Parse natural language skip logic into AVNI declarative rules
               tool_label: generate_skip_logic
               tool_name: generate_skip_logic
               type: api
             - enabled: true
+              extra:
+                description: Execute Python code in a sandboxed environment
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                code:
+                  auto: 1
+                  value: null
+                input_bundle_files:
+                  auto: 1
+                  value: null
+                context:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Execute Python code in a sandboxed environment
               tool_label: execute_python
               tool_name: execute_python
               type: api
             - enabled: true
+              extra:
+                description: Read a file written by execute_python in chunks
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                filename:
+                  auto: 1
+                  value: null
+                offset:
+                  auto: 1
+                  value: null
+                limit:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Read a file written by execute_python in chunks
               tool_label: read_silo_file
               tool_name: read_silo_file
               type: api
             - enabled: true
+              extra:
+                description: Upload a bundle ZIP to Avni server for import
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                bundle_zip_b64:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Upload a bundle ZIP to Avni server for import
               tool_label: upload_bundle
               tool_name: upload_bundle
               type: api
             - enabled: true
+              extra:
+                description: Append a step trace entry to the agent activity log
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                step:
+                  auto: 1
+                  value: null
+                phase:
+                  auto: 1
+                  value: null
+                action:
+                  auto: 1
+                  value: null
+                tool:
+                  auto: 1
+                  value: null
+                status:
+                  auto: 1
+                  value: null
+                summary:
+                  auto: 1
+                  value: null
+                error:
+                  auto: 1
+                  value: null
+                tokens_used:
+                  auto: 1
+                  value: null
+                model:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Append a step trace entry to the agent activity log
               tool_label: append_agent_log
               tool_name: append_agent_log
               type: api
@@ -2382,6 +2829,8 @@ workflow:
         agent_strategy_provider_name: langgenius/agent/agent
         desc: Bundle Config Agent - specialized agent
         error_strategy: fail-branch
+        isInLoop: true
+        loop_id: '1800000000700'
         memory:
           query_prompt_template: '{{#sys.query#}}
 
@@ -2392,16 +2841,19 @@ workflow:
             size: 5
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Bundle Config Agent
         tool_node_version: '2'
-      height: 312
+        type: agent
+      height: 290
       id: '1800000000210'
       parentId: '1800000000700'
       position:
-        x: 950
-        y: 180
+        x: 868
+        y: 1145
       positionAbsolute:
-        x: 3150
-        y: 580
+        x: 4026
+        y: 1145
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2409,11 +2861,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Rules Agent
-        type: agent
         agent_parameters:
           instruction:
             type: constant
@@ -2448,76 +2895,162 @@ workflow:
             type: constant
             value:
             - enabled: true
+              extra:
+                description: Validate JavaScript rule code with static analysis
               parameters:
-                conversation_id:
+                code:
+                  auto: 1
+                  value: null
+                rule_type:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_label: generate_rule
-              tool_name: generate_rule
-              type: api
-            - enabled: true
-              parameters:
-                conversation_id:
-                  auto: 1
-                  value: null
-              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
-              provider_show_name: Avni AI Staging SubAgents Openapi
-              settings: {}
+              tool_description: Validate JavaScript rule code with static analysis
               tool_label: validate_rule
               tool_name: validate_rule
               type: api
             - enabled: true
+              extra:
+                description: Read the content of a specific file from a stored bundle
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                filename:
+                  auto: 1
+                  value: null
+                bundle_type:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Read the content of a specific file from a stored bundle
               tool_label: get_bundle_file
               tool_name: get_bundle_file
               type: api
             - enabled: true
+              extra:
+                description: Replace one file in the stored generated bundle ZIP
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                filename:
+                  auto: 1
+                  value: null
+                content:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Replace one file in the stored generated bundle ZIP
               tool_label: put_bundle_file
               tool_name: put_bundle_file
               type: api
             - enabled: true
+              extra:
+                description: Execute Python code in a sandboxed environment
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                code:
+                  auto: 1
+                  value: null
+                input_bundle_files:
+                  auto: 1
+                  value: null
+                context:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Execute Python code in a sandboxed environment
               tool_label: execute_python
               tool_name: execute_python
               type: api
             - enabled: true
+              extra:
+                description: Append a step trace entry to the agent activity log
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                step:
+                  auto: 1
+                  value: null
+                phase:
+                  auto: 1
+                  value: null
+                action:
+                  auto: 1
+                  value: null
+                tool:
+                  auto: 1
+                  value: null
+                status:
+                  auto: 1
+                  value: null
+                summary:
+                  auto: 1
+                  value: null
+                error:
+                  auto: 1
+                  value: null
+                tokens_used:
+                  auto: 1
+                  value: null
+                model:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Append a step trace entry to the agent activity log
               tool_label: append_agent_log
               tool_name: append_agent_log
+              type: api
+            - enabled: true
+              extra:
+                description: Generates JavaScript rule code for one of 7 supported
+                  types (visitSchedule, decision, validation, eligibility, summary,
+                  worklist, checklist). Returns the code along with validation results.
+              parameters:
+                params:
+                  auto: 1
+                  value: null
+                rule_type:
+                  auto: 1
+                  value: null
+              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
+              provider_show_name: Avni AI Staging SubAgents Openapi
+              settings: {}
+              tool_description: Generates JavaScript rule code for one of 7 supported
+                types (visitSchedule, decision, validation, eligibility, summary,
+                worklist, checklist). Returns the code along with validation results.
+              tool_label: generate_rule
+              tool_name: generate_rule
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
         agent_strategy_provider_name: langgenius/agent/agent
         desc: Rules Agent - specialized agent
         error_strategy: fail-branch
+        isInLoop: true
+        loop_id: '1800000000700'
         memory:
           query_prompt_template: '{{#sys.query#}}
 
@@ -2528,28 +3061,26 @@ workflow:
             size: 5
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Rules Agent
         tool_node_version: '2'
-      height: 312
+        type: agent
+      height: 252
       id: '1800000000310'
       parentId: '1800000000700'
       position:
-        x: 950
-        y: 310
+        x: 868
+        y: 1516
       positionAbsolute:
-        x: 3150
-        y: 710
-      selected: false
+        x: 4026
+        y: 1516
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Reports Agent
-        type: agent
         agent_parameters:
           instruction:
             type: constant
@@ -2584,68 +3115,151 @@ workflow:
             type: constant
             value:
             - enabled: true
+              extra:
+                description: Generate reportCard.json entries for AVNI dashboards
               parameters:
-                conversation_id:
+                org_name:
+                  auto: 1
+                  value: null
+                card_types:
+                  auto: 1
+                  value: null
+                custom_cards:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Generate reportCard.json entries for AVNI dashboards
               tool_label: generate_report_cards
               tool_name: generate_report_cards
               type: api
             - enabled: true
+              extra:
+                description: Suggest sector-specific dashboard cards and layout
               parameters:
-                conversation_id:
+                sector:
+                  auto: 1
+                  value: null
+                org_name:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Suggest sector-specific dashboard cards and layout
               tool_label: suggest_dashboard
               tool_name: suggest_dashboard
               type: api
             - enabled: true
+              extra:
+                description: Read the content of a specific file from a stored bundle
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                filename:
+                  auto: 1
+                  value: null
+                bundle_type:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Read the content of a specific file from a stored bundle
               tool_label: get_bundle_file
               tool_name: get_bundle_file
               type: api
             - enabled: true
+              extra:
+                description: Replace one file in the stored generated bundle ZIP
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                filename:
+                  auto: 1
+                  value: null
+                content:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Replace one file in the stored generated bundle ZIP
               tool_label: put_bundle_file
               tool_name: put_bundle_file
               type: api
             - enabled: true
+              extra:
+                description: Execute Python code in a sandboxed environment
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                code:
+                  auto: 1
+                  value: null
+                input_bundle_files:
+                  auto: 1
+                  value: null
+                context:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Execute Python code in a sandboxed environment
               tool_label: execute_python
               tool_name: execute_python
               type: api
             - enabled: true
+              extra:
+                description: Append a step trace entry to the agent activity log
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                step:
+                  auto: 1
+                  value: null
+                phase:
+                  auto: 1
+                  value: null
+                action:
+                  auto: 1
+                  value: null
+                tool:
+                  auto: 1
+                  value: null
+                status:
+                  auto: 1
+                  value: null
+                summary:
+                  auto: 1
+                  value: null
+                error:
+                  auto: 1
+                  value: null
+                tokens_used:
+                  auto: 1
+                  value: null
+                model:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Append a step trace entry to the agent activity log
               tool_label: append_agent_log
               tool_name: append_agent_log
               type: api
@@ -2654,6 +3268,8 @@ workflow:
         agent_strategy_provider_name: langgenius/agent/agent
         desc: Reports Agent - specialized agent
         error_strategy: fail-branch
+        isInLoop: true
+        loop_id: '1800000000700'
         memory:
           query_prompt_template: '{{#sys.query#}}
 
@@ -2664,16 +3280,19 @@ workflow:
             size: 5
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Reports Agent
         tool_node_version: '2'
-      height: 312
+        type: agent
+      height: 252
       id: '1800000000410'
       parentId: '1800000000700'
       position:
-        x: 950
-        y: 440
+        x: 868
+        y: 1828
       positionAbsolute:
-        x: 3150
-        y: 840
+        x: 4026
+        y: 1828
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2681,11 +3300,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Config Inspector
-        type: agent
         agent_parameters:
           instruction:
             type: constant
@@ -2720,79 +3334,155 @@ workflow:
             type: constant
             value:
             - enabled: true
+              extra:
+                description: Check business requirements against entities
               parameters:
-                conversation_id:
+                requirements:
+                  auto: 1
+                  value: null
+                entities:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Check business requirements against entities
               tool_label: compile_requirements
               tool_name: compile_requirements
               type: api
             - enabled: true
+              extra:
+                description: Perform gap analysis on entity configuration
               parameters:
-                conversation_id:
+                entities:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Perform gap analysis on entity configuration
               tool_label: inspect_config
               tool_name: inspect_config
               type: api
             - enabled: true
+              extra:
+                description: Validate a generated bundle for structural correctness
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                bundle:
+                  auto: 1
+                  value: null
+                bundle_zip_b64:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Validate a generated bundle for structural correctness
               tool_label: validate_bundle
               tool_name: validate_bundle
               type: api
             - enabled: true
+              extra:
+                description: Retrieve the full stored spec YAML for display to the user
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Retrieve the full stored spec YAML for display to the user
               tool_label: get_spec
               tool_name: get_spec
               type: api
             - enabled: true
+              extra:
+                description: List all files in a stored bundle with their sizes
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                bundle_type:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: List all files in a stored bundle with their sizes
               tool_label: get_bundle_files
               tool_name: get_bundle_files
               type: api
             - enabled: true
+              extra:
+                description: Read the content of a specific file from a stored bundle
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                filename:
+                  auto: 1
+                  value: null
+                bundle_type:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Read the content of a specific file from a stored bundle
               tool_label: get_bundle_file
               tool_name: get_bundle_file
               type: api
             - enabled: true
+              extra:
+                description: Append a step trace entry to the agent activity log
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                step:
+                  auto: 1
+                  value: null
+                phase:
+                  auto: 1
+                  value: null
+                action:
+                  auto: 1
+                  value: null
+                tool:
+                  auto: 1
+                  value: null
+                status:
+                  auto: 1
+                  value: null
+                summary:
+                  auto: 1
+                  value: null
+                error:
+                  auto: 1
+                  value: null
+                tokens_used:
+                  auto: 1
+                  value: null
+                model:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Append a step trace entry to the agent activity log
               tool_label: append_agent_log
               tool_name: append_agent_log
               type: api
@@ -2801,6 +3491,8 @@ workflow:
         agent_strategy_provider_name: langgenius/agent/agent
         desc: Config Inspector - specialized agent
         error_strategy: fail-branch
+        isInLoop: true
+        loop_id: '1800000000700'
         memory:
           query_prompt_template: '{{#sys.query#}}
 
@@ -2811,16 +3503,19 @@ workflow:
             size: 5
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Config Inspector
         tool_node_version: '2'
-      height: 312
+        type: agent
+      height: 252
       id: '1800000000510'
       parentId: '1800000000700'
       position:
-        x: 950
-        y: 570
+        x: 868
+        y: 2140
       positionAbsolute:
-        x: 3150
-        y: 970
+        x: 4026
+        y: 2140
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2828,11 +3523,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Admin Agent
-        type: agent
         agent_parameters:
           instruction:
             type: constant
@@ -2867,189 +3557,407 @@ workflow:
             type: constant
             value:
             - enabled: true
+              extra:
+                description: Create a new location type (address level type)
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                name:
+                  auto: 1
+                  value: null
+                level:
+                  auto: 1
+                  value: null
+                parentId:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Create a new location type (address level type)
               tool_label: create_location_type
               tool_name: create_location_type
               type: api
             - enabled: true
+              extra:
+                description: Update an existing location type
               parameters:
+                id:
+                  auto: 1
+                  value: null
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                uuid:
+                  auto: 1
+                  value: null
+                name:
+                  auto: 1
+                  value: null
+                level:
+                  auto: 1
+                  value: null
+                parentId:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Update an existing location type
               tool_label: update_location_type
               tool_name: update_location_type
               type: api
             - enabled: true
+              extra:
+                description: Delete a location type by ID
               parameters:
-                conversation_id:
+                id:
                   auto: 1
                   value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Delete a location type by ID
               tool_label: delete_location_type
               tool_name: delete_location_type
               type: api
             - enabled: true
+              extra:
+                description: Get all locations for the organisation
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Get all locations for the organisation
               tool_label: get_locations
               tool_name: get_locations
               type: api
             - enabled: true
+              extra:
+                description: Create a new location
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                name:
+                  auto: 1
+                  value: null
+                level:
+                  auto: 1
+                  value: null
+                type:
+                  auto: 1
+                  value: null
+                parents:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Create a new location
               tool_label: create_location
               tool_name: create_location
               type: api
             - enabled: true
+              extra:
+                description: Update a location
               parameters:
+                id:
+                  auto: 1
+                  value: null
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                title:
+                  auto: 1
+                  value: null
+                level:
+                  auto: 1
+                  value: null
+                parentId:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Update a location
               tool_label: update_location
               tool_name: update_location
               type: api
             - enabled: true
+              extra:
+                description: Delete a location by ID
               parameters:
-                conversation_id:
+                id:
                   auto: 1
                   value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Delete a location by ID
               tool_label: delete_location
               tool_name: delete_location
               type: api
             - enabled: true
+              extra:
+                description: Get all catchments for the organisation
               parameters:
                 conversation_id:
-                  auto: 1
-                  value: null
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Get all catchments for the organisation
               tool_label: get_catchments
               tool_name: get_catchments
               type: api
             - enabled: true
+              extra:
+                description: Create a new catchment
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                name:
+                  auto: 1
+                  value: null
+                locationIds:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Create a new catchment
               tool_label: create_catchment
               tool_name: create_catchment
               type: api
             - enabled: true
+              extra:
+                description: Update a catchment
               parameters:
+                id:
+                  auto: 1
+                  value: null
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                name:
+                  auto: 1
+                  value: null
+                locationIds:
+                  auto: 1
+                  value: null
+                deleteFastSync:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Update a catchment
               tool_label: update_catchment
               tool_name: update_catchment
               type: api
             - enabled: true
+              extra:
+                description: Delete a catchment by ID
               parameters:
-                conversation_id:
+                id:
                   auto: 1
                   value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Delete a catchment by ID
               tool_label: delete_catchment
               tool_name: delete_catchment
               type: api
             - enabled: true
+              extra:
+                description: Find a user by name
               parameters:
-                conversation_id:
+                name:
                   auto: 1
                   value: null
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Find a user by name
               tool_label: find_user
               tool_name: find_user
               type: api
             - enabled: true
+              extra:
+                description: Update a user
               parameters:
+                id:
+                  auto: 1
+                  value: null
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                name:
+                  auto: 1
+                  value: null
+                username:
+                  auto: 1
+                  value: null
+                phoneNumber:
+                  auto: 1
+                  value: null
+                email:
+                  auto: 1
+                  value: null
+                organisationId:
+                  auto: 1
+                  value: null
+                catchmentId:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Update a user
               tool_label: update_user
               tool_name: update_user
               type: api
             - enabled: true
+              extra:
+                description: Delete organisation implementation (config reset)
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                deleteMetadata:
+                  auto: 1
+                  value: null
+                deleteAdminConfig:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Delete organisation implementation (config reset)
               tool_label: delete_implementation
               tool_name: delete_implementation
               type: api
             - enabled: true
+              extra:
+                description: Upload a bundle ZIP to Avni server for import
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                bundle_zip_b64:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Upload a bundle ZIP to Avni server for import
               tool_label: upload_bundle
               tool_name: upload_bundle
               type: api
             - enabled: true
+              extra:
+                description: Check the status of a bundle upload task
               parameters:
-                conversation_id:
+                task_id:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Check the status of a bundle upload task
               tool_label: upload_status
               tool_name: upload_status
               type: api
             - enabled: true
+              extra:
+                description: Append a step trace entry to the agent activity log
               parameters:
                 conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}' 
+                step:
+                  auto: 1
+                  value: null
+                phase:
+                  auto: 1
+                  value: null
+                action:
+                  auto: 1
+                  value: null
+                tool:
+                  auto: 1
+                  value: null
+                status:
+                  auto: 1
+                  value: null
+                summary:
+                  auto: 1
+                  value: null
+                error:
+                  auto: 1
+                  value: null
+                tokens_used:
+                  auto: 1
+                  value: null
+                model:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
+              tool_description: Append a step trace entry to the agent activity log
               tool_label: append_agent_log
               tool_name: append_agent_log
               type: api
@@ -3058,6 +3966,8 @@ workflow:
         agent_strategy_provider_name: langgenius/agent/agent
         desc: Admin Agent - specialized agent
         error_strategy: fail-branch
+        isInLoop: true
+        loop_id: '1800000000700'
         memory:
           query_prompt_template: '{{#sys.query#}}
 
@@ -3068,16 +3978,19 @@ workflow:
             size: 5
         output_schema: null
         plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        selected: false
+        title: Admin Agent
         tool_node_version: '2'
-      height: 312
+        type: agent
+      height: 274
       id: '1800000000610'
       parentId: '1800000000700'
       position:
-        x: 950
-        y: 700
+        x: 868
+        y: 811
       positionAbsolute:
-        x: 3150
-        y: 1100
+        x: 4026
+        y: 811
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3085,28 +3998,37 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
+        code: "import json\n\ndef main(active_agent: str,\n         spec_text: str,\
+          \ bundle_text: str, rules_text: str,\n         reports_text: str, inspect_text:\
+          \ str, admin_text: str) -> dict:\n    texts = {\n        \"spec\": spec_text,\n\
+          \        \"bundle_config\": bundle_text,\n        \"rules\": rules_text,\n\
+          \        \"reports\": reports_text,\n        \"inspect\": inspect_text,\n\
+          \        \"admin\": admin_text,\n    }\n    agent_text = texts.get(active_agent,\
+          \ \"\") or \"\"\n    memory_entry = json.dumps({\n        \"agent\": active_agent,\n\
+          \        \"summary\": agent_text[:500],\n    })\n    spec_just_completed\
+          \ = (\n        active_agent == \"spec\"\n        and \"spec\" in agent_text.lower()\n\
+          \        and (\"generated\" in agent_text.lower() or \"complete\" in agent_text.lower())\n\
+          \    )\n    bundle_just_completed = (\n        active_agent == \"bundle_config\"\
+          \n        and \"bundle\" in agent_text.lower()\n        and (\"generated\"\
+          \ in agent_text.lower() or \"complete\" in agent_text.lower())\n    )\n\
+          \    return {\n        \"memory_entry\": memory_entry,\n        \"agent_output\"\
+          : agent_text,\n        \"spec_just_completed\": spec_just_completed,\n \
+          \       \"bundle_just_completed\": bundle_just_completed,\n    }\n"
+        code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
-        selected: false
-        title: Output Collector
-        type: code
-        code: "import json\n\ndef main(active_agent: str,\n         spec_text: str, bundle_text: str, rules_text: str,\n         reports_text: str, inspect_text: str, admin_text: str) -> dict:\n    texts\
-          \ = {\n        \"spec\": spec_text,\n        \"bundle_config\": bundle_text,\n        \"rules\": rules_text,\n        \"reports\": reports_text,\n        \"inspect\": inspect_text,\n        \"\
-          admin\": admin_text,\n    }\n    agent_text = texts.get(active_agent, \"\") or \"\"\n    memory_entry = json.dumps({\n        \"agent\": active_agent,\n        \"summary\": agent_text[:500],\n\
-          \    })\n    spec_just_completed = (\n        active_agent == \"spec\"\n        and \"spec\" in agent_text.lower()\n        and (\"generated\" in agent_text.lower() or \"complete\" in agent_text.lower())\n\
-          \    )\n    bundle_just_completed = (\n        active_agent == \"bundle_config\"\n        and \"bundle\" in agent_text.lower()\n        and (\"generated\" in agent_text.lower() or \"complete\"\
-          \ in agent_text.lower())\n    )\n    return {\n        \"memory_entry\": memory_entry,\n        \"agent_output\": agent_text,\n        \"spec_just_completed\": spec_just_completed,\n        \"\
-          bundle_just_completed\": bundle_just_completed,\n    }\n"
-        code_language: python3
         outputs:
-          memory_entry:
-            type: string
           agent_output:
+            type: string
+          bundle_just_completed:
+            type: boolean
+          memory_entry:
             type: string
           spec_just_completed:
             type: boolean
-          bundle_just_completed:
-            type: boolean
+        selected: false
+        title: Output Collector
+        type: code
         variables:
         - value_selector:
           - conversation
@@ -3143,15 +4065,15 @@ workflow:
           - text
           value_type: string
           variable: admin_text
-      height: 112
+      height: 52
       id: '1800000000720'
       parentId: '1800000000700'
       position:
-        x: 1400
-        y: 200
+        x: 1240
+        y: 1316
       positionAbsolute:
-        x: 3600
-        y: 600
+        x: 4398
+        y: 1316
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3160,10 +4082,6 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: State Update
-        type: assigner
         items:
         - input_type: variable
           operation: append
@@ -3192,16 +4110,20 @@ workflow:
           - conversation
           - bundle_complete
           write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: State Update
+        type: assigner
         version: '2'
       height: 136
       id: '1800000000730'
       parentId: '1800000000700'
       position:
-        x: 1700
-        y: 200
+        x: 1562
+        y: 1274
       positionAbsolute:
-        x: 3900
-        y: 600
+        x: 4720
+        y: 1274
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3209,25 +4131,34 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
+        code: "def main(active_agent: str, workflow_mode: str,\n         spec_complete:\
+          \ bool, bundle_complete: bool) -> dict:\n    if workflow_mode == \"targeted\"\
+          :\n        return {\"next_agent\": \"done\", \"loop_done\": True}\n\n  \
+          \  chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"inspect\"\
+          , \"admin\"]\n    try:\n        idx = chain.index(active_agent)\n      \
+          \  if idx < len(chain) - 1:\n            next_a = chain[idx + 1]\n     \
+          \       if next_a == \"bundle_config\" and not spec_complete:\n        \
+          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n      \
+          \                  \"reason\": \"Spec incomplete\"}\n            if next_a\
+          \ in (\"rules\", \"reports\", \"inspect\") and not bundle_complete:\n  \
+          \              return {\"next_agent\": \"done\", \"loop_done\": True,\n\
+          \                        \"reason\": \"Bundle incomplete\"}\n          \
+          \  return {\"next_agent\": next_a, \"loop_done\": False}\n        return\
+          \ {\"next_agent\": \"done\", \"loop_done\": True}\n    except ValueError:\n\
+          \        return {\"next_agent\": \"done\", \"loop_done\": True}\n"
+        code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
+        outputs:
+          loop_done:
+            type: boolean
+          next_agent:
+            type: string
+          reason:
+            type: string
         selected: false
         title: Next Agent Decider
         type: code
-        code: "def main(active_agent: str, workflow_mode: str,\n         spec_complete: bool, bundle_complete: bool) -> dict:\n    if workflow_mode == \"targeted\":\n        return {\"next_agent\": \"done\"\
-          , \"loop_done\": True}\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"inspect\", \"admin\"]\n    try:\n        idx = chain.index(active_agent)\n        if idx < len(chain)\
-          \ - 1:\n            next_a = chain[idx + 1]\n            if next_a == \"bundle_config\" and not spec_complete:\n                return {\"next_agent\": \"done\", \"loop_done\": True,\n       \
-          \                 \"reason\": \"Spec incomplete\"}\n            if next_a in (\"rules\", \"reports\", \"inspect\") and not bundle_complete:\n                return {\"next_agent\": \"done\", \"\
-          loop_done\": True,\n                        \"reason\": \"Bundle incomplete\"}\n            return {\"next_agent\": next_a, \"loop_done\": False}\n        return {\"next_agent\": \"done\", \"\
-          loop_done\": True}\n    except ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\": True}\n"
-        code_language: python3
-        outputs:
-          next_agent:
-            type: string
-          loop_done:
-            type: boolean
-          reason:
-            type: string
         variables:
         - value_selector:
           - conversation
@@ -3249,15 +4180,15 @@ workflow:
           - bundle_complete
           value_type: boolean
           variable: bundle_complete
-      height: 112
+      height: 52
       id: '1800000000740'
       parentId: '1800000000700'
       position:
-        x: 2000
-        y: 200
+        x: 1884
+        y: 1316
       positionAbsolute:
-        x: 4200
-        y: 600
+        x: 5042
+        y: 1316
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3265,11 +4196,6 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Loop Done Check
-        type: if-else
         cases:
         - case_id: loop-done
           conditions:
@@ -3283,15 +4209,20 @@ workflow:
           id: loop-done
           logical_operator: and
         desc: ''
+        isInLoop: true
+        loop_id: '1800000000700'
+        selected: false
+        title: Loop Done Check
+        type: if-else
       height: 148
       id: '1800000000745'
       parentId: '1800000000700'
       position:
-        x: 2300
-        y: 150
+        x: 2206
+        y: 1268
       positionAbsolute:
-        x: 4500
-        y: 550
+        x: 5364
+        y: 1268
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3300,10 +4231,6 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Break Loop
-        type: assigner
         items:
         - input_type: variable
           operation: over-write
@@ -3314,16 +4241,20 @@ workflow:
           - conversation
           - agent_loop_active
           write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Break Loop
+        type: assigner
         version: '2'
       height: 84
       id: '1800000000751'
       parentId: '1800000000700'
       position:
-        x: 2600
-        y: 100
+        x: 2548
+        y: 1275
       positionAbsolute:
-        x: 4800
-        y: 500
+        x: 5706
+        y: 1275
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3332,10 +4263,6 @@ workflow:
       zIndex: 1002
     - data:
         isInLoop: true
-        loop_id: '1800000000700'
-        selected: false
-        title: Continue Loop
-        type: assigner
         items:
         - input_type: variable
           operation: over-write
@@ -3346,16 +4273,20 @@ workflow:
           - conversation
           - active_agent
           write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Continue Loop
+        type: assigner
         version: '2'
       height: 84
       id: '1800000000752'
       parentId: '1800000000700'
       position:
-        x: 2600
-        y: 300
+        x: 2548
+        y: 1419
       positionAbsolute:
-        x: 4800
-        y: 700
+        x: 5706
+        y: 1419
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3363,22 +4294,23 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
+        answer: Error in {{#conversation.active_agent#}} agent. Please try again or
+          contact support.
         isInLoop: true
         loop_id: '1800000000700'
         selected: false
         title: Error Handler
         type: answer
-        answer: Error in {{#conversation.active_agent#}} agent. Please try again or contact support.
         variables: []
-      height: 137
+      height: 120
       id: '1800000000760'
       parentId: '1800000000700'
       position:
-        x: 2600
-        y: 500
+        x: 1240
+        y: 715
       positionAbsolute:
-        x: 4800
-        y: 900
+        x: 4398
+        y: 715
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3386,45 +4318,45 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
+        answer: '{{#1800000000700.output#}}'
         selected: false
         title: Post-Loop Answer
         type: answer
-        answer: '{{#1800000000700.output#}}'
         variables: []
       height: 103
       id: '1800000000800'
       position:
-        x: 6400
-        y: 600
+        x: 7258
+        y: 1174
       positionAbsolute:
-        x: 6400
-        y: 600
+        x: 7258
+        y: 1174
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     - data:
+        answer: An error occurred while setting up. Please try again or contact support.
         selected: false
         title: Pre-Loop Error
         type: answer
-        answer: An error occurred while setting up. Please try again or contact support.
         variables: []
-      height: 137
+      height: 116
       id: '1800000000112'
       position:
-        x: 2200
-        y: 1300
+        x: 3158
+        y: 2532
       positionAbsolute:
-        x: 2200
-        y: 1300
+        x: 3158
+        y: 2532
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: 351.75
-      y: 255.25
+      x: -508.74218809490003
+      y: 90.85731538414711
       zoom: 0.25
   rag_pipeline_variables: []
