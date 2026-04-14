@@ -2143,7 +2143,7 @@ workflow:
               IMPORTANT: Use conversation_id for ALL tool calls.'
           maximum_iterations:
             type: constant
-            value: 5
+            value: 8
           model:
             type: constant
             value:
@@ -4310,56 +4310,59 @@ workflow:
       zIndex: 1002
     - data:
         code: "import re\n\ndef main(active_agent: str, workflow_mode: str,\n    \
-          \     agent_output: str) -> dict:\n    if workflow_mode == \"targeted\"\
-          :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n    \
-          \            \"reason\": \"Targeted mode — single agent only\"}\n\n    t\
-          \ = (agent_output or \"\").lower()\n    has_output = len(t.strip()) > 50\n\
-          \n    # Detect if agent is asking user a question (should exit loop)\n \
-          \   question_signals = [\"could you\", \"can you please\", \"would you like\"\
-          ,\n                     \"please provide\", \"please confirm\", \"please\
-          \ share\",\n                     \"let me know\", \"what would you\", \"\
-          which option\",\n                     \"do you want\", \"shall i\", \"?\\\
-          's next?\"]\n    asking_user = any(q in t for q in question_signals) and\
-          \ t.rstrip().endswith(\"?\")\n\n    # Completion signals per agent\n   \
-          \ completion = {\n        \"spec\": [\"generate_spec\", \"spec generated\"\
-          , \"stored=true\",\n                 \"approved\", \"encounter types\",\
-          \ \"subject types\",\n                 \"spec summary\", \"configuration\
-          \ summary\",\n                 \"forms |\", \"programs |\", \"address hierarchy\"\
-          ],\n        \"bundle_config\": [\"generate_bundle\", \"bundle generated\"\
-          ,\n                    \"validate_bundle\", \"put_bundle_file\", \"upload_bundle\"\
+          \     agent_output: str, agent_memory: str) -> dict:\n    if workflow_mode\
+          \ == \"targeted\":\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": \"Targeted mode — single agent only\"\
+          }\n\n    t = (agent_output or \"\").lower()\n    has_output = len(t.strip())\
+          \ > 50\n\n    # Inspector backward routing: [ROUTE_TO:agent_name]\n    route_match\
+          \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
+          \ == \"inspect\":\n        target = route_match.group(1)\n        valid_targets\
+          \ = [\"spec\", \"bundle_config\", \"rules\", \"reports\"]\n        # Prevent\
+          \ infinite loops: only reroute if we haven't already rerouted\n        already_rerouted\
+          \ = \"[rerouted from inspect]\" in (agent_memory or \"\").lower()\n      \
+          \  if target in valid_targets and not already_rerouted:\n            return\
+          \ {\"next_agent\": target, \"loop_done\": False,\n                    \"\
+          reason\": f\"Inspector found issues, routing to {target} for fixes\"}\n\n\
+          \    # Detect if agent is asking user a question\n    question_signals =\
+          \ [\"could you\", \"can you please\", \"would you like\",\n             \
+          \        \"please provide\", \"please confirm\", \"please share\",\n    \
+          \                 \"let me know\", \"what would you\", \"which option\",\n\
+          \                     \"do you want\", \"shall i\"]\n    asking_user = any(q\
+          \ in t for q in question_signals) and t.rstrip().endswith(\"?\")\n\n    #\
+          \ Completion signals per agent\n    completion = {\n        \"spec\": [\"\
+          generate_spec\", \"spec generated\", \"stored=true\",\n                 \"\
+          approved\", \"encounter types\", \"subject types\",\n                 \"\
+          spec summary\", \"configuration summary\",\n                 \"generate_bundle\"\
+          , \"bundle stored\"],\n        \"bundle_config\": [\"generate_bundle\", \"\
+          bundle generated\",\n                    \"validate_bundle\", \"put_bundle_file\"\
           ,\n                    \"generate_form\", \"concepts.json\", \"formmappings\"\
-          ,\n                    \"bundle complete\", \"bundle is ready\"],\n    \
-          \    \"rules\": [\"generate_rule\", \"validate_rule\", \"rule code\",\n\
-          \                 \"visitschedule\", \"decision rule\", \"formElementRule\"\
+          ,\n                    \"bundle complete\", \"bundle is ready\", \"validation\
+          \ passed\"],\n        \"rules\": [\"generate_rule\", \"validate_rule\", \"\
+          rule code\",\n                 \"visitschedule\", \"decision rule\", \"formElementRule\"\
           ],\n        \"reports\": [\"generate_report_cards\", \"suggest_dashboard\"\
           ,\n                   \"reportcard\", \"dashboard\", \"report cards\"],\n\
-          \        \"inspect\": [\"compile_requirements\", \"inspect_config\",\n \
-          \                  \"completeness\", \"gap analysis\", \"score\", \"upload_bundle\"\
-          , \"upload_status\",\n                   \"uploaded successfully\"],\n \
-          \   }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\"\
-          , \"inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
-          \ ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\":\
-          \ True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
-          }\n\n    # Check if current agent completed\n    signals = completion.get(active_agent,\
-          \ [])\n    completed = has_output and any(s in t for s in signals)\n\n \
-          \   # If asking user a question, always exit\n    if asking_user and not\
-          \ completed:\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n\
-          \                \"reason\": f\"{active_agent} is asking the user a question\"\
-          }\n\n    # If not completed and no output, exit\n    if not has_output:\n\
-          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n      \
-          \          \"reason\": f\"{active_agent} produced no output\"}\n\n    #\
-          \ If completed, advance\n    if completed and idx < len(chain) - 1:\n  \
-          \      next_a = chain[idx + 1]\n        return {\"next_agent\": next_a,\
-          \ \"loop_done\": False,\n                \"reason\": f\"{active_agent} done,\
-          \ advancing to {next_a}\"}\n\n    # If completed but last in chain, done\n\
-          \    if completed and idx >= len(chain) - 1:\n        return {\"next_agent\"\
+          \        \"inspect\": [\"upload_bundle\", \"upload_status\",\n          \
+          \         \"uploaded successfully\", \"upload complete\",\n              \
+          \     \"bundle uploaded\"],\n    }\n\n    chain = [\"spec\", \"bundle_config\"\
+          , \"rules\", \"reports\", \"inspect\"]\n    try:\n        idx = chain.index(active_agent)\n\
+          \    except ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": f\"Unknown agent: {active_agent}\"}\n\
+          \n    signals = completion.get(active_agent, [])\n    completed = has_output\
+          \ and any(s in t for s in signals)\n\n    if asking_user and not completed:\n\
+          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n       \
+          \         \"reason\": f\"{active_agent} is asking the user a question\"}\n\
+          \n    if not has_output:\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": f\"{active_agent} produced no output\"\
+          }\n\n    if completed and idx < len(chain) - 1:\n        next_a = chain[idx\
+          \ + 1]\n        return {\"next_agent\": next_a, \"loop_done\": False,\n \
+          \               \"reason\": f\"{active_agent} done, advancing to {next_a}\"\
+          }\n\n    if completed and idx >= len(chain) - 1:\n        return {\"next_agent\"\
           : \"done\", \"loop_done\": True,\n                \"reason\": \"End of chain\"\
-          }\n\n    # Not clearly completed but has output — assume done, try to advance\n\
-          \    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n       \
-          \ return {\"next_agent\": next_a, \"loop_done\": False,\n              \
-          \  \"reason\": f\"{active_agent} output unclear but advancing to {next_a}\"\
-          }\n\n    return {\"next_agent\": \"done\", \"loop_done\": True,\n      \
-          \      \"reason\": \"End of chain\"}\n"
+          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n    \
+          \    return {\"next_agent\": next_a, \"loop_done\": False,\n             \
+          \   \"reason\": f\"{active_agent} output unclear but advancing to {next_a}\"\
+          }\n\n    return {\"next_agent\": \"done\", \"loop_done\": True,\n       \
+          \     \"reason\": \"End of chain\"}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4389,6 +4392,11 @@ workflow:
           - agent_output
           value_type: string
           variable: agent_output
+        - value_selector:
+          - conversation
+          - agent_memory
+          value_type: string
+          variable: agent_memory
       height: 52
       id: '1800000000740'
       parentId: '1800000000700'

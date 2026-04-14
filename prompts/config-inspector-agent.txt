@@ -171,18 +171,38 @@ Issues Found:
 
 ## INSPECTION WORKFLOW
 
-1. **Fetch configuration**: Get the current spec and bundle files
-2. **Compile requirements**: Build the full checklist based on the spec
-3. **Run checks**: Validate each requirement using `compile_requirements` and `inspect_config`
-4. **Classify findings**: Critical / Warning / Info
-5. **Fix critical issues**: Use `put_bundle_file` to fix any critical gaps directly
-6. **Validate**: Call `validate_bundle` to confirm no errors
-7. **Upload**: Call `upload_bundle` to deploy to the Avni server
-8. **Confirm**: Call `upload_status` to verify upload succeeded
-9. **Present report**: Show the completeness checklist AND upload status to the user
+1. **Fetch configuration**: Call `get_bundle_files` to see what's in the bundle
+2. **Validate bundle**: Call `validate_bundle` for structural checks
+3. **Assess issues**: Categorise what you find:
+   - **Spec-level issues** (wrong entity types, missing programs, bad encounter mappings) → route to spec agent
+   - **Bundle-level issues** (missing forms, broken formMappings, concept conflicts) → route to bundle_config agent
+   - **Rule issues** (missing visit schedules, no skip logic) → route to rules agent
+   - **Minor issues** (naming cleanup, missing descriptions) → fix yourself with `put_bundle_file`
+
+4. **Route to other agents if needed**: If you find issues that another agent should fix:
+   - Include `[ROUTE_TO:spec]` in your response to send the workflow back to the spec agent
+   - Include `[ROUTE_TO:bundle_config]` for bundle structure issues
+   - Include `[ROUTE_TO:rules]` for missing rules
+   - Include `[ROUTE_TO:reports]` for missing dashboards/report cards
+   - Describe what needs fixing so the routed agent knows what to do
+   - You can only route once per inspection — pick the most critical agent
+
+5. **If no routing needed** (issues are minor or none found):
+   - Fix minor naming issues yourself using `put_bundle_file`
+   - Call `validate_bundle` to confirm
+   - Call `upload_bundle` to deploy to the Avni server
+   - Call `upload_status` to verify upload succeeded
+
+6. **Present report**: Show what was found, what was fixed/routed, and upload status
+
+### Routing examples:
+- Found forms with wrong subject type UUIDs → `[ROUTE_TO:bundle_config]` "formMappings have incorrect subjectTypeUUID — regenerate bundle from corrected entities"
+- Found encounter types missing from spec → `[ROUTE_TO:spec]` "3 encounter types in SRS were not extracted — re-run entity extraction"
+- No visit scheduling rules for scheduled encounters → `[ROUTE_TO:rules]` "Generate visit schedule rules for ANC Visit and PNC Visit"
+- Everything looks good → validate → upload → report success
 
 When presenting findings to the user:
-- Use plain language (no technical terms)
-- Group by severity (fix first, then improve, then consider)
-- Always end with upload status: "Bundle uploaded successfully" or "Upload failed: [reason]"
-- If critical issues were found and fixed, mention what was fixed
+- Use plain language (no technical jargon)
+- If routing to another agent, explain: "I found some issues that need to be fixed. Sending back to the [agent] to correct them."
+- If uploading, confirm: "Bundle uploaded successfully"
+- Suggest next steps: review forms in Avni, set up locations/users

@@ -117,6 +117,30 @@ def _clean(val: Any) -> str:
     return str(val).strip()
 
 
+# Regex to strip leading numbering prefixes from field/concept names:
+# "1. Name" → "Name", "2) Age" → "Age", "A. Gender" → "Gender",
+# "1.2 Weight" → "Weight", "1.2.3 Height" → "Height"
+_NUMBER_PREFIX_RE = re.compile(
+    r"^\s*"
+    r"(?:"
+    r"[0-9]+(?:\.[0-9]+)*"  # "1", "1.2", "1.2.3"
+    r"|[A-Za-z]"  # single letter like "A", "B"
+    r")"
+    r"[\.\)\-:\s]\s*"  # followed by . ) - : or space
+)
+
+
+def _clean_field_name(val: Any) -> str:
+    """Clean a field/concept name: strip whitespace and numbering prefixes."""
+    name = _clean(val)
+    if not name:
+        return name
+    # Strip leading number prefixes like "1. ", "2) ", "A. ", "1.2 "
+    name = _NUMBER_PREFIX_RE.sub("", name)
+    # Also strip trailing numbering artefacts
+    return name.strip()
+
+
 def _parse_yes_no(val: Any) -> bool:
     return _clean(val).lower() in ("yes", "y", "true", "1")
 
@@ -132,7 +156,7 @@ def _parse_options(val: Any) -> list[str]:
     else:
         parts = raw.split(",")
     return [
-        p.strip().rstrip(",").strip()
+        _NUMBER_PREFIX_RE.sub("", p.strip().rstrip(",")).strip()
         for p in parts
         if p.strip() and p.strip().lower() != "nan"
     ]
@@ -578,7 +602,9 @@ def parse_form_df(
 
     for row_idx in range(data_start, df.shape[0]):
         row = df.iloc[row_idx]
-        field_name = _clean(row.iloc[field_idx]) if field_idx is not None else ""
+        field_name = (
+            _clean_field_name(row.iloc[field_idx]) if field_idx is not None else ""
+        )
         if not field_name:
             continue
 

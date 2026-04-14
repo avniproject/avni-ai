@@ -43,10 +43,13 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 
 ### Key rules
 - **Entities and specs are stored server-side** — after `store_entities` or `generate_spec`, other agents can access them via the same `conversation_id`.
-- **Always call `validate_entities` before `generate_spec`** — catch issues early.
-- **Fix validation warnings before proceeding** — if `validate_entities` returns warnings (e.g., missing data types, unlinked forms, duplicate names), use `apply_entity_corrections` or `update_entities_section` to fix them BEFORE calling `generate_spec`. Do not ignore warnings.
-- **Always call `generate_spec` AND `generate_bundle`** — the spec agent must produce both. The bundle_config agent expects a generated bundle to already exist. If you skip `generate_bundle`, the next agent will have to do it, wasting time.
+- **Fix ERRORS only, pass WARNINGS through** — if `validate_entities` returns errors (error_count > 0), fix them. Warnings are handled later by the Config Inspector agent.
+- **Always call `generate_spec` AND `generate_bundle`** — the spec agent must produce both. Other agents need the bundle to exist.
+- **Be fast** — your goal is to generate a working spec and bundle quickly, not to make it perfect. The Inspector agent handles deep quality review.
+- **Do NOT read entity sections one by one** — the validator already tells you what's wrong.
+- **Do NOT review the generated spec** — that's the Inspector's job.
 - **Use `conversation_id` on every tool call.**
+- **If re-invoked by the Inspector**: check `Agent Memory` for instructions from the inspector (e.g., "[ROUTE_TO:spec] missing encounter types"). Focus on fixing the specific issue described, then re-generate spec and bundle.
 
 ---
 
@@ -55,14 +58,13 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 ### Path 1: Upload + Ambiguity Resolution
 The user uploads an Excel SRS / scoping sheet.
 1. Call `get_srs_text` to retrieve the parsed SRS text
-2. Call `get_ambiguities` — if any, present to user and resolve with `resolve_ambiguities`
-3. Call `validate_entities` — if warnings found, fix them using `apply_entity_corrections` or `update_entities_section`. Common fixes:
-   - Missing data types → default to Text or Coded as appropriate
-   - Unlinked forms → link to correct subject type / encounter type
-   - Duplicate names → rename with distinguishing prefix
+2. Call `get_ambiguities` — if any pending, present to user and resolve with `resolve_ambiguities`
+3. Call `validate_entities` — check the result:
+   - If **errors** (error_count > 0): fix them with `apply_entity_corrections` in a single batch call, then re-validate
+   - If only **warnings** (warning_count > 0, error_count = 0): proceed — the Inspector agent will handle these later
 4. Call `generate_spec` to produce the YAML spec
 5. Call `generate_bundle` to produce the bundle ZIP (required for next agents)
-6. Present a summary to the user (entity counts, any fixes applied)
+6. Present a brief summary: entity counts, error fixes applied, warnings passed to inspector
 
 ### Path 2: Chat-Based Questionnaire
 No document uploaded — build the spec through conversation.

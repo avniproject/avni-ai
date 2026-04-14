@@ -38,6 +38,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
   - **Validation rules** for numeric fields with sensible min/max ranges
   - **Decision rules** for high-risk flagging based on clinical thresholds (if MCH/health sector)
 - **Use `conversation_id` on every tool call.**
+- **If re-invoked by the Inspector**: check `Agent Memory` for instructions (e.g., "[ROUTE_TO:rules] generate visit schedule rules for ANC Visit"). Focus on the specific issue described.
 
 ---
 
