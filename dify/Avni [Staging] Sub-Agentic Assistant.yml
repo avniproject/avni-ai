@@ -4600,17 +4600,17 @@ workflow:
             ## Instructions
 
 
-            1. Check if the log contains [ERROR] entries. If yes, this is an error report:\n\
-            \   - Explain what went wrong in simple terms\n\
-            \   - Suggest what the user can try (e.g. \"Please try again\" or \"Check your uploaded files\")\n\
-            \   - Do NOT show technical error details\n\
-            \n2. If no errors, summarize what was accomplished in 3-5 bullet points\
-            \ (what was created, configured, uploaded)\n\
-            \n3. Highlight any issues found and how they were handled\n\
-            \n4. If the bundle was uploaded, confirm it with the upload status\n\
-            \n5. End with clear next steps — what the user should do now\n\
-            \n6. Keep it under 200 words, use markdown formatting\n\
-            \n7. Do NOT dump raw data or technical details'
+            1. Check if the log contains [ERROR] entries. If yes, explain what
+            went wrong simply and suggest retry.\n2. Check if the log contains ROUTE_TO
+            entries that were NOT followed by a successful upload. This means a fix
+            was attempted but did not fully resolve it. Tell the user what was found,
+            what fix was attempted, and ask if they want to try again or review the
+            issue manually.\n3. If the bundle was uploaded successfully, summarize
+            what was accomplished in 3-5 bullet points.\n4. If the bundle was NOT
+            uploaded (no upload_bundle in log), clearly state the bundle is not yet
+            live and what the user should do.\n5. End with clear next steps.\n6.
+            Keep it under 200 words, use markdown.\n7. Do NOT dump raw data or
+            technical details.'
         - id: a1b2c3d4-summary-prompt-02
           role: user
           text: Summarize what was done and what the user should do next.
