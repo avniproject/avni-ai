@@ -525,6 +525,19 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
+        sourceType: if-else
+        targetType: code
+      id: 1800000000710-false-1800000000720-target
+      selected: false
+      source: '1800000000710'
+      sourceHandle: 'false'
+      target: '1800000000720'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
         sourceType: http-request
         targetType: agent
       id: 1800000000101-source-1800000000110-target
@@ -997,11 +1010,10 @@ workflow:
               \n    },\n    \"clarification_needed\": {\n      \"type\": \"boolean\"\
               \n    },\n    \"clarifying_questions\": {\n      \"type\": \"array\"\
               ,\n      \"items\": { \"type\": \"string\" }\n    }\n  }\n}"
-            reasoning_effort: minimal
-            verbosity: low
+            temperature: 0
           mode: chat
-          name: gpt-5-mini
-          provider: langgenius/openai/openai
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: b14eb575-d615-41dd-aac1-00663db3a6eb
           role: system
@@ -1297,22 +1309,21 @@ workflow:
             size: 50
         model:
           completion_params:
-            reasoning_effort: minimal
-            verbosity: low
+            max_tokens: 4096
+            temperature: 0.3
           mode: chat
-          name: gpt-5-mini
-          provider: langgenius/openai/openai
+          name: claude-sonnet-4-6
+          provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
           role: system
           text: "Use the following context as your learned knowledge, inside <context></context>\
             \ XML tags.\n<context>\n{{#context#}}\n</context>\nYou are talking to\
             \ {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\nYou\
-            \ are part of the Avni AI Assistant. The Avni AI Assistant is currently\
-            \ capable of the following\n1. Answering questions about the Avni system\n\
-            2. Assistance with designing workflows, forms etc on Avni\n   The Avni\
-            \ AI Assistant is currently not capable of\n1. Helping with rules\n2.\
-            \ You must not guess or invent Avni features, workflows, or UI options\
+            \ are part of the Avni AI Assistant. The Avni AI Assistant is capable\
+            \ of the following\n1. Answering questions about the Avni system\n\
+            2. Assistance with designing workflows, forms, rules, reports, and full\
+            \ program setup on Avni\n\nYou must not guess or invent Avni features, workflows, or UI options\
             \ that are not explicitly known.\n\nWhen answer to user:\n- If you don't\
             \ know, just say that you don't know.\n- If you don't know when you are\
             \ not sure, ask for clarification.\n- If greeting, greet professionaly\
@@ -1704,8 +1715,10 @@ workflow:
           var_type: boolean
         - id: cd56c7bd-76ad-4c96-a8af-31e0ee630096
           label: output
-          value: ''
-          value_type: constant
+          value:
+          - '1800000000720'
+          - agent_output
+          value_type: variable
           var_type: string
         selected: false
         start_node_id: 1800000000700start
@@ -4025,22 +4038,24 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        code: "import json\n\ndef main(active_agent: str,\n         spec_text: str,\
-          \ bundle_text: str, rules_text: str,\n         reports_text: str, inspect_text:\
+        code: "import json\n\ndef main(active_agent: str,\n         spec_text:\
+          \ str, bundle_text: str, rules_text: str,\n         reports_text: str, inspect_text:\
           \ str, admin_text: str) -> dict:\n    texts = {\n        \"spec\": spec_text,\n\
           \        \"bundle_config\": bundle_text,\n        \"rules\": rules_text,\n\
           \        \"reports\": reports_text,\n        \"inspect\": inspect_text,\n\
           \        \"admin\": admin_text,\n    }\n    agent_text = texts.get(active_agent,\
-          \ \"\") or \"\"\n    memory_entry = json.dumps({\n        \"agent\": active_agent,\n\
-          \        \"summary\": agent_text[:500],\n    })\n    spec_just_completed\
-          \ = (\n        active_agent == \"spec\"\n        and \"spec\" in agent_text.lower()\n\
-          \        and (\"generated\" in agent_text.lower() or \"complete\" in agent_text.lower())\n\
-          \    )\n    bundle_just_completed = (\n        active_agent == \"bundle_config\"\
-          \n        and \"bundle\" in agent_text.lower()\n        and (\"generated\"\
-          \ in agent_text.lower() or \"complete\" in agent_text.lower())\n    )\n\
-          \    return {\n        \"memory_entry\": memory_entry,\n        \"agent_output\"\
-          : agent_text,\n        \"spec_just_completed\": spec_just_completed,\n \
-          \       \"bundle_just_completed\": bundle_just_completed,\n    }\n"
+          \ \"\") or \"\"\n    t = agent_text.lower()\n    memory_entry = json.dumps({\n\
+          \        \"agent\": active_agent,\n        \"summary\": agent_text[:500],\n\
+          \    })\n    spec_keywords = [\"spec generated\", \"spec is ready\", \"specification\
+          \ complete\", \"stored=true\", \"generate_spec\", \"approved\"]\n    spec_just_completed\
+          \ = (\n        active_agent == \"spec\"\n        and any(kw in t for kw\
+          \ in spec_keywords)\n    )\n    bundle_keywords = [\"bundle generated\"\
+          , \"bundle is ready\", \"bundle complete\", \"generate_bundle\", \"upload_bundle\"\
+          , \"validate_bundle\"]\n    bundle_just_completed = (\n        active_agent\
+          \ == \"bundle_config\"\n        and any(kw in t for kw in bundle_keywords)\n\
+          \    )\n    return {\n        \"memory_entry\": memory_entry,\n        \"\
+          agent_output\": agent_text,\n        \"spec_just_completed\": spec_just_completed,\n\
+          \        \"bundle_just_completed\": bundle_just_completed,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4259,11 +4274,9 @@ workflow:
     - data:
         isInLoop: true
         items:
-        - input_type: variable
+        - input_type: constant
           operation: over-write
-          value:
-          - conversation
-          - 'False'
+          value: 'false'
           variable_selector:
           - conversation
           - agent_loop_active
