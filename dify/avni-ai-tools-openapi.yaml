@@ -1047,8 +1047,8 @@ paths:
         Opens the stored generated bundle ZIP, replaces the specified file with the
         provided content, and re-stores it. Use this for surgical bundle fixes after
         validate_bundle reports errors — fix one file, re-validate, re-upload.
-        content can be a JSON object (auto-serialised) or a raw string.
-        Only works on bundle_type='generated'.
+        Only works on bundle_type='generated'. Keep content small (under 512KB).
+        For large files, use generate_bundle to regenerate the entire bundle instead.
       requestBody:
         required: true
         content:
@@ -1062,7 +1062,8 @@ paths:
                   type: string
                   description: Path within the ZIP, e.g. 'forms/ANCForm.json'
                 content:
-                  description: Replacement content — JSON object/array or string
+                  type: string
+                  description: Replacement file content as a JSON string. For JSON files, pass the JSON-serialized string (e.g. "[{\"name\":\"MyForm\"}]"). The server will write it as-is into the bundle ZIP.
               required:
                 - conversation_id
                 - filename

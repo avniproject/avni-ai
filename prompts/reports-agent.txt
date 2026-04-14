@@ -20,6 +20,8 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 
 ### Writing into the bundle
 7. **Call `put_bundle_file`** to write `reportCard.json`, `reportDashboard.json`, and `groupDashboards.json` into the bundle.
+   - `content` must be a **JSON string** (serialize before passing).
+   - Keep content small — for large files, use `generate_bundle` instead.
 8. **Call `get_bundle_file`** with `filename=reportCard.json` to read existing report cards before adding new ones (avoid duplicates).
 9. **Call `validate_bundle`** after making changes.
 

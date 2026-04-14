@@ -774,6 +774,7 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
     try:
         body = await request.json()
     except Exception:
+        logger.warning("put-bundle-file: invalid JSON body")
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
     conversation_id = body.get("conversation_id")
@@ -781,10 +782,24 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
     content = body.get("content")
 
     if not conversation_id:
+        logger.warning(
+            "put-bundle-file: missing conversation_id, keys=%s", list(body.keys())
+        )
         return JSONResponse({"error": "Missing 'conversation_id'"}, status_code=400)
     if not filename:
+        logger.warning(
+            "put-bundle-file: missing filename for conversation_id=%s, keys=%s",
+            conversation_id,
+            list(body.keys()),
+        )
         return JSONResponse({"error": "Missing 'filename'"}, status_code=400)
     if content is None:
+        logger.warning(
+            "put-bundle-file: missing content for conversation_id=%s filename=%s, keys=%s",
+            conversation_id,
+            filename,
+            list(body.keys()),
+        )
         return JSONResponse({"error": "Missing 'content'"}, status_code=400)
 
     # Reject oversized payloads before attempting to process — nginx may return HTML
@@ -820,11 +835,26 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
         zip_bytes = base64.b64decode(stored["zip_b64"])
         file_map = unzip_to_map(zip_bytes)
 
-        # Serialise content to bytes
+        # Normalise content: accept dict/list (direct JSON), or string
+        # (which may itself be a JSON-serialised string from the LLM).
         if isinstance(content, (dict, list)):
             file_bytes = json.dumps(content, indent=2, ensure_ascii=False).encode(
                 "utf-8"
             )
+        elif isinstance(content, str):
+            # If the string looks like JSON, try to parse and re-serialise
+            # for consistent formatting. If not, use as-is.
+            stripped = content.strip()
+            if stripped and stripped[0] in ("{", "["):
+                try:
+                    parsed = json.loads(stripped)
+                    file_bytes = json.dumps(
+                        parsed, indent=2, ensure_ascii=False
+                    ).encode("utf-8")
+                except (json.JSONDecodeError, ValueError):
+                    file_bytes = content.encode("utf-8")
+            else:
+                file_bytes = content.encode("utf-8")
         else:
             file_bytes = str(content).encode("utf-8")
 

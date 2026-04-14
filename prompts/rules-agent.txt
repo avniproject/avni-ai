@@ -19,6 +19,8 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 
 ### Writing rules into the bundle
 6. **Call `put_bundle_file`** to write rule files into the generated bundle.
+   - `content` must be a **JSON string** (serialize before passing).
+   - Keep content small — for large files, use `generate_bundle` instead.
 7. **Call `validate_bundle`** after making changes to verify structural correctness.
 
 ### Utility tools
