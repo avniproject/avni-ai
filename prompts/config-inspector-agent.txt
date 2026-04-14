@@ -36,9 +36,15 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 12. **Call `upload_bundle`** to upload the bundle to the Avni server — this is your most important responsibility.
 13. **Call `upload_status`** with the returned `task_id` to confirm upload succeeded.
 
+### Looking up best practices
+11. **Call `knowledge_search`** with relevant queries to look up Avni best practices when reviewing configuration. Examples:
+    - `knowledge_search(query="form validation best practices", category="forms")`
+    - `knowledge_search(query="rules debugging", category="troubleshooting")`
+
 ### Key rules
 - **Always fetch both the spec AND the bundle** — gaps are found by comparing intent (spec) with reality (bundle).
 - **Use `compile_requirements` and `inspect_config`** rather than doing manual checks — they catch structural issues you might miss.
+- **Use `knowledge_search`** to look up best practices and verify your recommendations against official Avni documentation.
 - **ALWAYS upload the bundle as your final step** — you are the last agent in the chain. If you don't upload, the user's work is lost.
 - **Use `conversation_id` on every tool call.**
 

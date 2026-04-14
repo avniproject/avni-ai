@@ -44,6 +44,8 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 ### Key rules
 - **Entities and specs are stored server-side** — after `store_entities` or `generate_spec`, other agents can access them via the same `conversation_id`.
 - **Always call `validate_entities` before `generate_spec`** — catch issues early.
+- **Fix validation warnings before proceeding** — if `validate_entities` returns warnings (e.g., missing data types, unlinked forms, duplicate names), use `apply_entity_corrections` or `update_entities_section` to fix them BEFORE calling `generate_spec`. Do not ignore warnings.
+- **Always call `generate_spec` AND `generate_bundle`** — the spec agent must produce both. The bundle_config agent expects a generated bundle to already exist. If you skip `generate_bundle`, the next agent will have to do it, wasting time.
 - **Use `conversation_id` on every tool call.**
 
 ---
@@ -52,12 +54,15 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 
 ### Path 1: Upload + Ambiguity Resolution
 The user uploads an Excel SRS / scoping sheet.
-1. Parse the uploaded file server-side (call parse_srs_file or get_srs_text)
-2. Extract entities automatically
-3. Identify ambiguities (missing data types, unclear visit schedules, duplicate field names, etc.)
-4. Present ambiguities to the user as plain-language questions
-5. Resolve each ambiguity, update entities
-6. Generate spec, show for review
+1. Call `get_srs_text` to retrieve the parsed SRS text
+2. Call `get_ambiguities` — if any, present to user and resolve with `resolve_ambiguities`
+3. Call `validate_entities` — if warnings found, fix them using `apply_entity_corrections` or `update_entities_section`. Common fixes:
+   - Missing data types → default to Text or Coded as appropriate
+   - Unlinked forms → link to correct subject type / encounter type
+   - Duplicate names → rename with distinguishing prefix
+4. Call `generate_spec` to produce the YAML spec
+5. Call `generate_bundle` to produce the bundle ZIP (required for next agents)
+6. Present a summary to the user (entity counts, any fixes applied)
 
 ### Path 2: Chat-Based Questionnaire
 No document uploaded — build the spec through conversation.

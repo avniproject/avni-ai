@@ -1087,6 +1087,62 @@ paths:
         '413':
           description: Content too large to patch inline — regenerate the bundle instead
 
+  /knowledge-search:
+    post:
+      operationId: knowledge_search
+      summary: Search Avni documentation and guides
+      description: |
+        Searches the knowledge base for relevant documentation about Avni features,
+        rules, forms, reports, dashboards, etc. Use this to look up examples, best
+        practices, and reference material before generating rules or reports.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: Search query (e.g. "visit schedule rule example", "dashboard report cards", "skip logic")
+                category:
+                  type: string
+                  description: Optional category filter — rules, forms, reports, troubleshooting, concepts, programs, setup, mobile, implementation, reference
+                top_k:
+                  type: integer
+                  description: Number of results to return (default 3, max 5)
+              required:
+                - query
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        source:
+                          type: string
+                          description: File path within the knowledge base
+                        title:
+                          type: string
+                        category:
+                          type: string
+                        content:
+                          type: string
+                          description: Document content (truncated to ~2000 chars)
+                        score:
+                          type: number
+                  total_results:
+                    type: integer
+
   /agent-log:
     post:
       operationId: append_agent_log

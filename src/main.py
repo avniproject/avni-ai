@@ -65,6 +65,7 @@ from .handlers.chat_srs_handlers import (
     handle_update_section,
     handle_build_entities,
 )
+from .handlers.knowledge_handlers import handle_knowledge_search
 from .handlers.form_designer_handlers import (
     handle_generate_form,
     handle_suggest_form_fields,
@@ -431,6 +432,11 @@ async def create_server():
     @server.custom_route("/agent-logs/{conversation_id}", methods=["GET"])
     async def get_agent_logs_endpoint(request: Request):
         return await handle_get_agent_logs(request)
+
+    # --- Knowledge Search ---
+    @server.custom_route("/knowledge-search", methods=["POST"])
+    async def knowledge_search_endpoint(request: Request):
+        return await handle_knowledge_search(request)
 
     # --- Ambiguity Resolution ---
     @server.custom_route("/resolve-ambiguities", methods=["POST"])
