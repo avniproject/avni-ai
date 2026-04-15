@@ -706,7 +706,12 @@ def _match_sheet_to_w3h(
 
 def parse_unified_modelling(
     df: pd.DataFrame,
-) -> tuple[list[SubjectTypeSpec], list[ProgramSpec], list[EncounterTypeSpec], list[AddressLevelSpec]]:
+) -> tuple[
+    list[SubjectTypeSpec],
+    list[ProgramSpec],
+    list[EncounterTypeSpec],
+    list[AddressLevelSpec],
+]:
     """Parse a unified modelling sheet where Type column identifies entity kind.
 
     Format:
@@ -729,7 +734,6 @@ def parse_unified_modelling(
 
     st_col = _find_col(df, "Subject Type", "Entity Type")
     color_col = _find_col(df, "Color", "Colour")
-    level_col = _find_col(df, "Level")
 
     seen_st: set[str] = set()
     seen_prog: set[str] = set()
@@ -748,10 +752,15 @@ def parse_unified_modelling(
             seen_st.add(name.lower())
             raw_type = _clean(row.get(st_col, "Person")).lower() if st_col else "person"
             avni_type = _SUBJECT_TYPE_MAP.get(raw_type, "Person")
-            subject_types.append(SubjectTypeSpec(
-                name=name, type=avni_type,
-                allowProfilePicture=False, uniqueName=False, lastNameOptional=True,
-            ))
+            subject_types.append(
+                SubjectTypeSpec(
+                    name=name,
+                    type=avni_type,
+                    allowProfilePicture=False,
+                    uniqueName=False,
+                    lastNameOptional=True,
+                )
+            )
 
         elif row_type == "program":
             if name.lower() in seen_prog:
@@ -763,18 +772,27 @@ def parse_unified_modelling(
                 target = _clean(row.get(st_col, ""))
             if not target and subject_types:
                 target = subject_types[0].name
-            programs.append(ProgramSpec(
-                name=name, target_subject_type=target, colour=colour or "#4A148C",
-            ))
+            programs.append(
+                ProgramSpec(
+                    name=name,
+                    target_subject_type=target,
+                    colour=colour or "#4A148C",
+                )
+            )
 
         elif row_type == "encounter type":
             if name.lower() in seen_enc:
                 continue
             seen_enc.add(name.lower())
-            encounters.append(EncounterTypeSpec(
-                name=name, program_name="", subject_type="",
-                is_program_encounter=False, is_scheduled=True,
-            ))
+            encounters.append(
+                EncounterTypeSpec(
+                    name=name,
+                    program_name="",
+                    subject_type="",
+                    is_program_encounter=False,
+                    is_scheduled=True,
+                )
+            )
 
         elif row_type == "address level":
             if name.lower() in seen_addr:
@@ -786,9 +804,13 @@ def parse_unified_modelling(
             level_match = re.search(r"(\d+)", level_str)
             if level_match:
                 level = int(level_match.group(1))
-            address_levels.append(AddressLevelSpec(
-                name=name, level=level, parent=None,
-            ))
+            address_levels.append(
+                AddressLevelSpec(
+                    name=name,
+                    level=level,
+                    parent=None,
+                )
+            )
 
     # Fix address level parent chain (highest level = no parent, each lower level → parent is one above)
     if address_levels:
@@ -932,7 +954,9 @@ def parse_form_df(
 
     # Find columns by fuzzy matching on the header row
     header_row_idx = header_offset  # 0 or 1
-    header_row = {str(df.iloc[header_row_idx, c]).strip().lower(): c for c in range(df.shape[1])}
+    header_row = {
+        str(df.iloc[header_row_idx, c]).strip().lower(): c for c in range(df.shape[1])
+    }
 
     def _col_idx(*names: str) -> int | None:
         for n in names:
@@ -1450,7 +1474,9 @@ def parse_scoping_docs(
             program_names = {p.name for p in all_programs}
 
             if classification == "unified_modelling":
-                u_sts, u_progs, u_encs, u_addrs = parse_unified_modelling(df_with_header)
+                u_sts, u_progs, u_encs, u_addrs = parse_unified_modelling(
+                    df_with_header
+                )
                 for st in u_sts:
                     if st.name.lower() not in seen["subject"]:
                         all_subjects.append(st)
@@ -1503,9 +1529,19 @@ def parse_scoping_docs(
                 # Otherwise (scoping format with title in row 0) → offset=1
                 offset = 0
                 if df.shape[0] > 0:
-                    row0_vals = [str(df.iloc[0, c]).strip().lower() for c in range(min(df.shape[1], 6))]
+                    row0_vals = [
+                        str(df.iloc[0, c]).strip().lower()
+                        for c in range(min(df.shape[1], 6))
+                    ]
                     has_form_headers = any(
-                        h in row0_vals for h in ("field name", "data type", "page name", "field", "mandatory")
+                        h in row0_vals
+                        for h in (
+                            "field name",
+                            "data type",
+                            "page name",
+                            "field",
+                            "mandatory",
+                        )
                     )
                     offset = 0 if has_form_headers else 1
                 form_sheets.append((sheet_name, df, offset))
