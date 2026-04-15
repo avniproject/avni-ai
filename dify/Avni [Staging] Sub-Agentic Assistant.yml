@@ -3453,10 +3453,11 @@ workflow:
               1. Use conversation_id for ALL tool calls.
               2. Call append_agent_log at the START and END of your work.
               3. Do NOT fix bundle files yourself — if you find issues, use [ROUTE_TO:agent] to send fixes back to the right agent.
-              4. Your workflow: validate_bundle → assess errors → either upload_bundle or [ROUTE_TO:agent]. Keep it to 3-4 tool calls.'
+              4. Your workflow: log_start → validate_bundle → upload_bundle → upload_status → log_end. If errors, read 1 file then [ROUTE_TO:agent].
+              5. Your final response MUST include "Bundle uploaded successfully" or describe the error. This text is shown to the user.'
           maximum_iterations:
             type: constant
-            value: 5
+            value: 8
           model:
             type: constant
             value:

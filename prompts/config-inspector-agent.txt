@@ -171,17 +171,18 @@ Issues Found:
 
 ## INSPECTION WORKFLOW
 
-**Be efficient — aim for 3-5 tool calls total.**
+**You have 8 iterations. Use them wisely — always log start and end.**
 
-1. **Call `validate_bundle`** — check for errors and warnings.
-
-2. **If validation has warnings or you need to understand an issue**, read 1-2 specific files using `get_bundle_file` (e.g., formMappings.json, encounterTypes.json). Do NOT read more than 2 files.
-
-3. **Assess and decide**:
-   - If 0 errors and warnings are minor → proceed to upload (step 5)
-   - If errors exist, determine the fix type:
-     - **Deterministic fix** (clear what to do) → include `[ROUTE_TO:agent]` with specific instructions
-     - **Ambiguous fix** (needs user input) → include `[USER_CHOICE]` blocks
+1. **Call `append_agent_log`** — log your plan (step=1, phase=inspection, status=started)
+2. **Call `validate_bundle`** — check for errors and warnings
+3. **If 0 errors** → go to step 6 (upload)
+4. **If errors** → read 1-2 files with `get_bundle_file` to understand the problem, then decide:
+   - **Deterministic fix** → include `[ROUTE_TO:agent]` with specific instructions
+   - **Ambiguous fix** → include `[USER_CHOICE]` blocks with full context
+5. **If routing or presenting choices** → call `append_agent_log` (status=routed or status=user_choice) → STOP
+6. **Call `upload_bundle`** → then **call `upload_status`** with the task_id
+7. **Call `append_agent_log`** — log the upload result (status=success or status=error, include task_id and upload status)
+8. **Your final response MUST say "Bundle uploaded successfully" if upload worked**, or describe the error
 
 4. **For deterministic fixes** — include `[ROUTE_TO:agent]` with:
    - What file has the problem, what's wrong, what the fix should be
