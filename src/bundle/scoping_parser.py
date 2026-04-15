@@ -970,8 +970,10 @@ def _resolve_form_subject_types(
     for form in forms:
         # Step 1: Match form to encounter type by name if not set
         if not form.encounterType and form.formType in (
-            "Encounter", "ProgramEncounter",
-            "IndividualEncounterCancellation", "ProgramEncounterCancellation",
+            "Encounter",
+            "ProgramEncounter",
+            "IndividualEncounterCancellation",
+            "ProgramEncounterCancellation",
         ):
             form_lower = form.name.lower()
             # Strip " Cancellation" suffix for matching

@@ -96,7 +96,8 @@ class ConceptGenerator:
             existing_uuid = self._answer_cache[key]
             # Remove the NA entry from generated_concepts
             self.generated_concepts = [
-                c for c in self.generated_concepts
+                c
+                for c in self.generated_concepts
                 if not (c.get("name", "").lower() == key and c.get("dataType") == "NA")
             ]
             # Store in concept_map so future answer lookups find it

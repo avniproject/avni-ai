@@ -7,7 +7,6 @@ exactly one concept entry with a consistent UUID — not two entries with
 different UUIDs and data types.
 """
 
-import pytest
 
 from src.bundle.concepts import ConceptGenerator
 
@@ -69,20 +68,14 @@ class TestDualRoleConceptResolution:
 
         # UUIDs must match
         for name in dual_names:
-            assert answer_uids[name] == coded_uids[name], (
-                f"UUID mismatch for {name}"
-            )
+            assert answer_uids[name] == coded_uids[name], f"UUID mismatch for {name}"
 
         # Each should appear exactly once
         for name in dual_names:
             entries = [
-                c
-                for c in cg.generated_concepts
-                if c["name"].lower() == name.lower()
+                c for c in cg.generated_concepts if c["name"].lower() == name.lower()
             ]
-            assert len(entries) == 1, (
-                f"{name}: expected 1 entry, got {len(entries)}"
-            )
+            assert len(entries) == 1, f"{name}: expected 1 entry, got {len(entries)}"
             assert entries[0]["dataType"] == "Coded"
 
     def test_case_insensitive_dual_role(self):
@@ -90,14 +83,10 @@ class TestDualRoleConceptResolution:
         cg = ConceptGenerator()
 
         uid1 = cg.generate_answer_concept("eye drop")
-        uid2 = cg.generate_coded_concept(
-            {"name": "Eye Drop", "options": ["Yes", "No"]}
-        )
+        uid2 = cg.generate_coded_concept({"name": "Eye Drop", "options": ["Yes", "No"]})
 
         assert uid1 == uid2
-        entries = [
-            c for c in cg.generated_concepts if c["name"].lower() == "eye drop"
-        ]
+        entries = [c for c in cg.generated_concepts if c["name"].lower() == "eye drop"]
         assert len(entries) == 1
 
     def test_pure_answer_not_affected(self):
@@ -107,9 +96,7 @@ class TestDualRoleConceptResolution:
         cg.generate_answer_concept("Yes")
         cg.generate_answer_concept("No")
 
-        yes_entries = [
-            c for c in cg.generated_concepts if c["name"] == "Yes"
-        ]
+        yes_entries = [c for c in cg.generated_concepts if c["name"] == "Yes"]
         assert len(yes_entries) == 1
         assert yes_entries[0]["dataType"] == "NA"
 
@@ -121,9 +108,7 @@ class TestDualRoleConceptResolution:
             {"name": "Blood Group", "options": ["A+", "B+", "O+"]}
         )
 
-        bg_entries = [
-            c for c in cg.generated_concepts if c["name"] == "Blood Group"
-        ]
+        bg_entries = [c for c in cg.generated_concepts if c["name"] == "Blood Group"]
         assert len(bg_entries) == 1
         assert bg_entries[0]["dataType"] == "Coded"
         assert len(bg_entries[0]["answers"]) == 3
@@ -149,13 +134,9 @@ class TestDualRoleConceptResolution:
 
         # The UUID used in Material Distributed's answers should match
         mat = next(
-            c
-            for c in cg.generated_concepts
-            if c["name"] == "Material Distributed"
+            c for c in cg.generated_concepts if c["name"] == "Material Distributed"
         )
-        eye_drop_answer = next(
-            a for a in mat["answers"] if a["name"] == "Eye Drop"
-        )
+        eye_drop_answer = next(a for a in mat["answers"] if a["name"] == "Eye Drop")
 
         # The answer UUID in Material Distributed should equal the
         # standalone Eye Drop concept UUID
