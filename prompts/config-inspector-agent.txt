@@ -196,8 +196,10 @@ Issues Found:
 - `[ROUTE_TO:rules]` "Scheduled encounters 'ANC Visit' (every 28 days) and 'Growth Monitoring' (every 30 days) have no visit schedule rules. Generate visitSchedule rules for each with the specified intervals."
 - No issues found → validate → upload → report success
 
+**NEVER tell the user to manually upload the bundle.** You have the `upload_bundle` tool — use it. If validation errors prevent upload, route to fix them or present [USER_CHOICE] blocks. The user should never need to interact with the Avni admin panel for bundle upload.
+
 When presenting findings to the user:
 - Use plain language (no technical jargon)
 - If routing to another agent, explain: "I found some issues that need to be fixed. Sending back to the [agent] to correct them."
-- If uploading, confirm: "Bundle uploaded successfully"
+- If uploading, confirm: "Bundle uploaded successfully to your Avni instance"
 - Suggest next steps: review forms in Avni, set up locations/users

@@ -70,12 +70,17 @@ class ConceptGenerator:
 
     def generate_answer_concept(self, answer_name: str) -> str:
         cleaned = self._safe_name(answer_name.strip().rstrip(",").strip())
+        key = cleaned.lower()
+        # Check if this name already exists as a question concept (Coded/Numeric/etc.)
+        # If so, reuse that UUID instead of creating a duplicate NA concept.
+        if key in self.concept_map:
+            return self.concept_map[key]
         uid = self.get_answer_uuid(cleaned)
         # Avoid duplicates (case-insensitive — same UUID means already emitted)
         if any(c["uuid"] == uid for c in self.generated_concepts):
             return uid
         # Use first-seen capitalisation as the canonical name
-        canonical = self._answer_canonical.get(cleaned.lower(), cleaned)
+        canonical = self._answer_canonical.get(key, cleaned)
         self.generated_concepts.append(
             {"name": canonical, "uuid": uid, "dataType": "NA", "active": True}
         )
