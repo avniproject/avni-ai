@@ -179,27 +179,51 @@ Issues Found:
 
 3. **Assess and decide**:
    - If 0 errors and warnings are minor → proceed to upload (step 5)
-   - If errors or critical warnings exist → read the relevant file to understand the specific problem, then route with **detailed fix instructions**.
+   - If errors exist, determine the fix type:
+     - **Deterministic fix** (clear what to do) → include `[ROUTE_TO:agent]` with specific instructions
+     - **Ambiguous fix** (needs user input) → include `[USER_CHOICE]` blocks
 
-4. **Route if needed**: Include `[ROUTE_TO:agent]` with SPECIFIC instructions. The receiving agent must know exactly what to fix without reading files itself. Include:
-   - What file has the problem
-   - What exactly is wrong (names, UUIDs, counts)
-   - What the correct fix should be
+4. **For deterministic fixes** — include `[ROUTE_TO:agent]` with:
+   - What file has the problem, what's wrong, what the fix should be
 
-5. **Upload**: Call `upload_bundle` → then `upload_status` to confirm.
+5. **For ambiguous fixes** — include `[USER_CHOICE]` blocks with FULL CONTEXT.
+   Always start with a summary of available entities so the user can make informed decisions:
 
-6. **Report**: Summary for user.
+```
+[CONTEXT]
+Your configuration has:
+- Subject Types: Beneficiary (Person), School (Group), Anganwadi (Person)
+- Programs: Nourish-Pregnancy (targets Beneficiary), Nourish-Child (targets Beneficiary), Enrich (targets School)
+- Encounter Types: 19 total (AN Growth Monitoring, Delivery, Growth Monitoring, ...)
+[/CONTEXT]
 
-### Routing examples (be this specific):
-- `[ROUTE_TO:bundle_config]` "formMappings.json has 16 entries missing subjectTypeUUID. Subject types are: Beneficiary (uuid=ed22840a), School (uuid=1b346d43), Anganwadi (uuid=9dc5f56f). Assign by form name: forms starting with 'Beneficiary' or 'Nourish - Pregnancy' → Beneficiary, 'Anganwadi' → Anganwadi, 'School' or 'Enrich' → School. Call generate_bundle to regenerate with correct mappings."
-- `[ROUTE_TO:spec]` "encounter_types missing subject_type linkage: 'AN Growth Monitoring', 'Delivery', 'Mother Monitoring' have no subject_type. These belong to program 'Nourish' which targets 'Beneficiary'. Update entities using update_entities_section to set subject_type='Beneficiary' on these encounters, then re-run generate_spec and generate_bundle."
-- `[ROUTE_TO:rules]` "Scheduled encounters 'ANC Visit' (every 28 days) and 'Growth Monitoring' (every 30 days) have no visit schedule rules. Generate visitSchedule rules for each with the specified intervals."
-- No issues found → validate → upload → report success
+[USER_CHOICE]
+Issue: Encounter "Leave form" has subject type "User" which doesn't exist in your configuration
+Options:
+A) Assign to "Beneficiary" — if this leave form tracks beneficiary leave/absence
+B) Assign to "Anganwadi" — if this tracks Anganwadi worker leave
+C) Remove this encounter — if it's an administrative form not needed in Avni
+[/USER_CHOICE]
 
-**NEVER tell the user to manually upload the bundle.** You have the `upload_bundle` tool — use it. If validation errors prevent upload, route to fix them or present [USER_CHOICE] blocks. The user should never need to interact with the Avni admin panel for bundle upload.
+[USER_CHOICE]
+Issue: Form "Awareness Register" has no encounter type or subject type linked
+Options:
+A) Create as general encounter for "Beneficiary"
+B) Create as general encounter for "Anganwadi"
+C) Link to program "Enrich" as a program encounter for "School"
+D) Remove this form
+[/USER_CHOICE]
+```
+
+6. **Upload** (if no errors): Call `upload_bundle` → `upload_status` → confirm.
+
+7. **Report**: Summary for user.
+
+**NEVER tell the user to manually upload the bundle.** You have the `upload_bundle` tool — use it. If validation errors prevent upload, route to fix them or present [USER_CHOICE] blocks.
 
 When presenting findings to the user:
 - Use plain language (no technical jargon)
-- If routing to another agent, explain: "I found some issues that need to be fixed. Sending back to the [agent] to correct them."
+- Always show the [CONTEXT] block so users understand their configuration
+- For [USER_CHOICE], include a recommendation with reasoning (e.g., "recommended — matches Nourish program")
 - If uploading, confirm: "Bundle uploaded successfully to your Avni instance"
 - Suggest next steps: review forms in Avni, set up locations/users
