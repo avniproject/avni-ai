@@ -4325,19 +4325,16 @@ workflow:
           \         \"reason\": f\"{active_agent} is asking the user a question\"}\n\
           \n    if not has_output:\n        return {\"next_agent\": \"done\", \"loop_done\"\
           : True,\n                \"reason\": f\"{active_agent} produced no output\"\
-          }\n\n    # Find next agent, skipping those that already ran successfully\n\
-          \    mem_lower = (agent_memory or \"\").lower()\n    def _already_ran(agent_name):\n\
-          \        return f\"[{agent_name}]\" in mem_lower and any(\n            kw\
-          \ in mem_lower for kw in completion.get(agent_name, [])\n        )\n\n  \
-          \  if completed or idx < len(chain) - 1:\n        # Find the next agent\
-          \ that hasn't already completed\n        for next_idx in range(idx + 1, len(chain)):\n\
-          \            next_a = chain[next_idx]\n            if _already_ran(next_a)\
-          \ and next_a != \"inspect\":\n                continue  # Skip — already ran\n\
-          \            return {\"next_agent\": next_a, \"loop_done\": False,\n    \
-          \                \"reason\": f\"{active_agent} done, advancing to {next_a}\"\
-          }\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n      \
-          \          \"reason\": \"End of chain\"}\n\n    return {\"next_agent\": \"\
-          done\", \"loop_done\": True,\n            \"reason\": \"End of chain\"}\n"
+          }\n\n    if completed and idx < len(chain) - 1:\n        next_a = chain[idx\
+          \ + 1]\n        return {\"next_agent\": next_a, \"loop_done\": False,\n \
+          \               \"reason\": f\"{active_agent} done, advancing to {next_a}\"\
+          }\n\n    if completed and idx >= len(chain) - 1:\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": \"End of chain\"\
+          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n    \
+          \    return {\"next_agent\": next_a, \"loop_done\": False,\n             \
+          \   \"reason\": f\"{active_agent} output unclear but advancing to {next_a}\"\
+          }\n\n    return {\"next_agent\": \"done\", \"loop_done\": True,\n       \
+          \     \"reason\": \"End of chain\"}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
