@@ -1,30 +1,12 @@
 """
 Form generator — produces AVNI form JSON from fields + concepts.
-Ported from srs-bundle-generator/generators/forms.js.
+Supports: MultiSelect, QuestionGroup, Repeatable QG, skip logic (declarativeRule),
+readOnly (keyValues.editable=false), mandatory, lowAbsolute/highAbsolute.
 """
 
 from __future__ import annotations
 
 from .uuid_utils import generate_deterministic_uuid
-
-# All AVNI data types map to SingleSelect in the form element
-_ELEMENT_TYPE_MAP: dict[str, str] = {
-    "Coded": "SingleSelect",
-    "Numeric": "SingleSelect",
-    "Text": "SingleSelect",
-    "Date": "SingleSelect",
-    "DateTime": "SingleSelect",
-    "Notes": "SingleSelect",
-    "ImageV2": "SingleSelect",
-    "Image": "SingleSelect",
-    "File": "SingleSelect",
-    "Audio": "SingleSelect",
-    "Video": "SingleSelect",
-    "PhoneNumber": "SingleSelect",
-    "Location": "SingleSelect",
-    "Duration": "SingleSelect",
-    "QuestionGroup": "SingleSelect",
-}
 
 
 class FormGenerator:
@@ -33,21 +15,44 @@ class FormGenerator:
         self.form_uuid: str | None = None
         self.form_type: str | None = None
 
+    # ── Element type resolution ────────────────────────────────────
+
+    @staticmethod
+    def _get_element_type(data_type: str, field: dict) -> str:
+        """Determine SingleSelect vs MultiSelect for form elements."""
+        if data_type == "Coded":
+            sel = (field.get("selectionType") or "").lower()
+            if sel in ("multiselect", "multi-select", "multi select", "checkbox"):
+                return "MultiSelect"
+        return "SingleSelect"
+
     # ── Skip logic → declarative rule ───────────────────────────────
 
     def _build_declarative_rule(
         self, skip_logic: dict, scope: str = "encounter"
     ) -> list[dict] | None:
-        if not skip_logic or skip_logic.get("raw"):
+        if not skip_logic:
             return None
+
         depends_on = skip_logic.get("dependsOn")
+        condition = skip_logic.get("condition", "")
+        value = skip_logic.get("value", "")
+
         depends_concept = self.concept_map.get(depends_on)
         if not depends_concept:
             return None
 
-        rhs: dict = {}
-        if skip_logic.get("condition") in ("equals", "contains"):
-            value = skip_logic.get("value", "")
+        # Build LHS
+        lhs = {
+            "type": "concept",
+            "scope": scope,
+            "conceptName": depends_on,
+            "conceptUuid": depends_concept["uuid"],
+            "conceptDataType": depends_concept.get("dataType", "Coded"),
+        }
+
+        # Build RHS based on condition type
+        if condition in ("containsAnswerConceptName", "equals", "contains", "="):
             answers = depends_concept.get("answers") or []
             answer_match = next(
                 (a for a in answers if a["name"].lower() == value.lower()), None
@@ -57,6 +62,25 @@ class FormGenerator:
                 "answerConceptNames": [value],
                 "answerConceptUuids": [answer_match["uuid"]] if answer_match else [],
             }
+            operator = "containsAnswerConceptName"
+        elif condition in ("defined", "notDefined"):
+            rhs = {"type": "value", "value": None}
+            operator = condition
+        elif condition in (
+            "greaterThan",
+            "lessThan",
+            "greaterThanOrEqualTo",
+            "lessThanOrEqualTo",
+        ):
+            rhs = {"type": "value", "value": value}
+            operator = condition
+        else:
+            # Fallback: treat as containsAnswerConceptName
+            rhs = {
+                "type": "answerConcept",
+                "answerConceptNames": [value],
+            }
+            operator = "containsAnswerConceptName"
 
         return [
             {
@@ -64,18 +88,7 @@ class FormGenerator:
                 "conditions": [
                     {
                         "compoundRule": {
-                            "rules": [
-                                {
-                                    "lhs": {
-                                        "type": "concept",
-                                        "scope": scope,
-                                        "conceptName": depends_on,
-                                        "conceptUuid": depends_concept["uuid"],
-                                    },
-                                    "rhs": rhs,
-                                    "operator": "containsAnswerConceptName",
-                                }
-                            ]
+                            "rules": [{"lhs": lhs, "rhs": rhs, "operator": operator}]
                         }
                     }
                 ],
@@ -84,19 +97,34 @@ class FormGenerator:
 
     # ── Form element ────────────────────────────────────────────────
 
-    def _generate_form_element(self, field: dict, display_order: int) -> dict | None:
+    def _generate_form_element(
+        self,
+        field: dict,
+        display_order: float,
+        parent_element_uuid: str | None = None,
+    ) -> list[dict]:
+        """Generate one or more form elements for a field.
+        Returns a list because QG fields produce parent + children."""
         concept = self.concept_map.get(field["name"])
         if not concept:
-            return None
+            return []
 
+        data_type = concept.get("dataType", "Text")
         element_uuid = generate_deterministic_uuid(
             f"element:{self.form_uuid}:{field['name']}"
         )
-        data_type = concept.get("dataType", "Text")
+
+        # Build keyValues
+        key_values = []
+        if field.get("readOnly"):
+            key_values.append({"key": "editable", "value": False})
+        if field.get("isQuestionGroup") and field.get("isRepeatable"):
+            key_values.append({"key": "repeatable", "value": True})
+
         element: dict = {
             "name": field["name"],
             "uuid": element_uuid,
-            "keyValues": [],
+            "keyValues": key_values,
             "concept": {
                 "name": field["name"],
                 "uuid": concept["uuid"],
@@ -104,18 +132,49 @@ class FormGenerator:
                 "active": True,
             },
             "displayOrder": display_order,
-            "type": _ELEMENT_TYPE_MAP.get(data_type, "SingleSelect"),
+            "type": self._get_element_type(data_type, field),
             "mandatory": field.get("mandatory", False),
+            "voided": False,
         }
 
+        # Add parent link for RQG children
+        if parent_element_uuid:
+            element["parentFormElementUuid"] = parent_element_uuid
+
+        # Add answers for Coded concepts
+        if data_type == "Coded" and concept.get("answers"):
+            element["concept"]["answers"] = concept["answers"]
+
+        # Add numeric bounds
+        if data_type == "Numeric":
+            if field.get("min") is not None:
+                element["lowAbsolute"] = field["min"]
+            if field.get("max") is not None:
+                element["highAbsolute"] = field["max"]
+
+        # Add declarative rule (skip logic)
         skip_logic = field.get("skipLogic")
-        if skip_logic and not skip_logic.get("raw"):
+        if skip_logic:
             scope = "enrolment" if self.form_type == "ProgramEnrolment" else "encounter"
             decl = self._build_declarative_rule(skip_logic, scope)
             if decl:
                 element["declarativeRule"] = decl
 
-        return element
+        elements = [element]
+
+        # Handle QuestionGroup children
+        if field.get("isQuestionGroup") and field.get("children"):
+            children = field["children"]
+            for child_idx, child_field in enumerate(children):
+                child_order = display_order + (child_idx + 1) * 0.1
+                # RQG children need parentFormElementUuid
+                parent_uuid = element_uuid if field.get("isRepeatable") else None
+                child_elements = self._generate_form_element(
+                    child_field, child_order, parent_element_uuid=parent_uuid
+                )
+                elements.extend(child_elements)
+
+        return elements
 
     # ── Grouping ────────────────────────────────────────────────────
 
@@ -139,9 +198,8 @@ class FormGenerator:
         group_uuid = generate_deterministic_uuid(f"group:{self.form_uuid}:{group_name}")
         elements = []
         for idx, field in enumerate(fields):
-            elem = self._generate_form_element(field, idx + 1)
-            if elem:
-                elements.append(elem)
+            field_elements = self._generate_form_element(field, idx + 1)
+            elements.extend(field_elements)
         return {
             "uuid": group_uuid,
             "name": group_name,
@@ -219,6 +277,7 @@ class FormGenerator:
                             "displayOrder": 1,
                             "type": "SingleSelect",
                             "mandatory": True,
+                            "voided": False,
                         }
                     ],
                     "timed": False,

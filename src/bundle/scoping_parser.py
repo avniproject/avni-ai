@@ -685,6 +685,117 @@ def _match_sheet_to_w3h(
     return None
 
 
+def _detect_skip_logic_patterns(fields: list[FieldSpec]) -> None:
+    """Auto-detect skip logic from field relationships. Mutates fields in place.
+
+    Patterns detected:
+    1. "Others" pattern: Coded field with "Others" option + next field "Specify"/"Other" → show when Others
+    2. Sub-type pattern: "X Type" (Coded) + "X Sub-Type" (Coded) → show when parent answer matches
+    3. Yes/No detail: Coded Yes/No + "X Details"/"X Reason" → show when Yes
+    """
+    for i, field in enumerate(fields):
+        if field.skipLogic:
+            continue  # Already has explicit skip logic from SRS
+
+        name_lower = field.name.lower()
+
+        # Pattern 1: "Specify" / "Other details" after a Coded field with "Others" option
+        if any(
+            kw in name_lower
+            for kw in ("specify", "other detail", "if other", "details - ")
+        ):
+            # Look backwards for the nearest Coded field with "Others" option
+            for j in range(i - 1, max(i - 5, -1), -1):
+                prev = fields[j]
+                if prev.dataType == "Coded" and prev.options:
+                    has_others = any(
+                        o.lower() in ("others", "other", "na", "not applicable")
+                        for o in prev.options
+                    )
+                    if has_others:
+                        other_val = next(
+                            o for o in prev.options if o.lower() in ("others", "other")
+                        )
+                        field.skipLogic = SkipLogicSpec(
+                            dependsOn=prev.name,
+                            condition="containsAnswerConceptName",
+                            value=other_val,
+                        )
+                        break
+
+        # Pattern 2: Sub-type field following a "Type" field
+        # "Health Activity Sub-Type" → parent "Activity Type", qualifier "Health"
+        if (
+            "sub-type" in name_lower
+            or "sub type" in name_lower
+            or "subtype" in name_lower
+        ):
+            # Strip "sub-type" to get the rest, then find the parent by word overlap
+            stripped = (
+                name_lower.replace("sub-type", "")
+                .replace("sub type", "")
+                .replace("subtype", "")
+                .strip()
+            )
+            stripped_words = set(re.findall(r"[a-z]+", stripped))
+            for j in range(i - 1, max(i - 10, -1), -1):
+                prev = fields[j]
+                if prev.dataType != "Coded" or not prev.options:
+                    continue
+                prev_lower = prev.name.lower()
+                prev_words = set(re.findall(r"[a-z]+", prev_lower))
+                # Parent must share at least one content word (not "type")
+                common = (stripped_words & prev_words) - {"type"}
+                if common:
+                    # Qualifier = words in sub-type name NOT in parent
+                    qualifier_words = stripped_words - prev_words - {"type"}
+                    qualifier = " ".join(qualifier_words)
+                    if qualifier:
+                        match_opt = next(
+                            (o for o in prev.options if qualifier in o.lower()),
+                            None,
+                        )
+                        if match_opt:
+                            field.skipLogic = SkipLogicSpec(
+                                dependsOn=prev.name,
+                                condition="containsAnswerConceptName",
+                                value=match_opt,
+                            )
+                            break
+
+        # Pattern 3: Yes/No detail — "X Details" / "X Reason" after "X" (Yes/No)
+        if field.skipLogic:
+            continue
+        for suffix in ("details", "reason", "description", "explanation"):
+            if suffix in name_lower:
+                base = (
+                    name_lower.replace(suffix, "")
+                    .strip()
+                    .rstrip("-")
+                    .rstrip("–")
+                    .strip()
+                )
+                if not base:
+                    continue
+                for j in range(i - 1, max(i - 5, -1), -1):
+                    prev = fields[j]
+                    if prev.dataType == "Coded" and prev.options:
+                        prev_lower = prev.name.lower()
+                        if base in prev_lower or prev_lower in base:
+                            yes_opts = [
+                                o for o in prev.options if o.lower() in ("yes", "true")
+                            ]
+                            if yes_opts:
+                                field.skipLogic = SkipLogicSpec(
+                                    dependsOn=prev.name,
+                                    condition="containsAnswerConceptName",
+                                    value=yes_opts[0],
+                                )
+                                break
+                if field.skipLogic:
+                    break
+
+
 def parse_form_df(
     df: pd.DataFrame,
     sheet_name: str,
@@ -868,6 +979,9 @@ def parse_form_df(
 
     if not fields:
         return None
+
+    # Auto-detect skip logic patterns from field relationships
+    _detect_skip_logic_patterns(fields)
 
     form_type = "Encounter"
     subject_type = None

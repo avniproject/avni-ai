@@ -26,14 +26,18 @@ class FieldSpec(BaseModel):
     name: str
     dataType: str = "Text"
     mandatory: bool = False
+    readOnly: bool = False
     group: str | None = None
     unit: str | None = None
     min: float | None = None
     max: float | None = None
     options: list[str] | None = None
-    selectionType: str | None = None
+    selectionType: str | None = None  # "SingleSelect" or "MultiSelect"
     skipLogic: SkipLogicSpec | None = None
     keyValues: dict[str, Any] | None = None
+    isQuestionGroup: bool = False
+    isRepeatable: bool = False  # Only meaningful when isQuestionGroup=True
+    children: list["FieldSpec"] | None = None  # Child fields for QG/RQG
 
 
 # ── Form-level ─────────────────────────────────────────────────────────────────
