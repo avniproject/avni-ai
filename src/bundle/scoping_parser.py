@@ -957,8 +957,9 @@ def _resolve_form_subject_types(
     forms: list[FormSpec],
     encounter_types: list[EncounterTypeSpec],
     subject_types: list[SubjectTypeSpec],
+    programs: list[ProgramSpec],
 ) -> None:
-    """Fill missing encounterType and subjectType on forms. Mutates in place."""
+    """Fix formType, encounterType, subjectType, and program on forms. Mutates in place."""
     enc_to_subject: dict[str, str] = {}
     enc_to_program: dict[str, str] = {}
     for et in encounter_types:
@@ -967,21 +968,66 @@ def _resolve_form_subject_types(
         if et.program_name:
             enc_to_program[et.name.lower()] = et.program_name
 
+    prog_names_lower = {p.name.lower() for p in programs}
+    prog_to_subject = {p.name.lower(): p.target_subject_type for p in programs if p.target_subject_type}
+    st_names_lower = {st.name.lower() for st in subject_types}
+
     for form in forms:
-        # Step 1: Match form to encounter type by name if not set
+        name_lower = form.name.lower()
+
+        # Step 0: Fix formType based on form name patterns
+        if form.formType == "Encounter":
+            if any(kw in name_lower for kw in ("registration", "profile", "details")):
+                # Check if it's a subject type registration
+                for st in subject_types:
+                    if st.name.lower() in name_lower:
+                        form.formType = "IndividualProfile"
+                        form.subjectType = st.name
+                        break
+            elif any(kw in name_lower for kw in ("enrolment", "enrollment")):
+                # Check if it matches a program name
+                for p in programs:
+                    if p.name.lower() in name_lower or name_lower in p.name.lower():
+                        form.formType = "ProgramEnrolment"
+                        form.program = p.name
+                        form.subjectType = p.target_subject_type
+                        break
+            elif "exit" in name_lower:
+                for p in programs:
+                    # "Nourish - Pregnancy Exit" → matches "Nourish - Pregnancy Enrollment"
+                    prog_base = p.name.lower().replace("enrollment", "").replace("enrolment", "").strip()
+                    form_base = name_lower.replace("exit", "").strip().rstrip("-").strip()
+                    if prog_base == form_base or prog_base in form_base or form_base in prog_base:
+                        form.formType = "ProgramExit"
+                        form.program = p.name
+                        form.subjectType = p.target_subject_type
+                        break
+
+        # Step 1: Match form to encounter type by name (fuzzy) if not set
         if not form.encounterType and form.formType in (
-            "Encounter",
-            "ProgramEncounter",
-            "IndividualEncounterCancellation",
-            "ProgramEncounterCancellation",
+            "Encounter", "ProgramEncounter",
+            "IndividualEncounterCancellation", "ProgramEncounterCancellation",
         ):
-            form_lower = form.name.lower()
-            # Strip " Cancellation" suffix for matching
-            match_name = form_lower.replace(" cancellation", "").strip()
+            match_name = name_lower.replace(" cancellation", "").strip()
+            best_match = None
+            best_score = 0
             for et in encounter_types:
-                if et.name.lower() == match_name:
-                    form.encounterType = et.name
+                et_lower = et.name.lower()
+                # Exact match
+                if et_lower == match_name:
+                    best_match = et
                     break
+                # Substring containment (longer match = better)
+                if et_lower in match_name or match_name in et_lower:
+                    score = min(len(et_lower), len(match_name))
+                    if score > best_score:
+                        best_match = et
+                        best_score = score
+            if best_match:
+                form.encounterType = best_match.name
+                if best_match.is_program_encounter and best_match.program_name:
+                    form.formType = "ProgramEncounter" if "cancellation" not in name_lower else "ProgramEncounterCancellation"
+                    form.program = best_match.program_name
 
         # Step 2: Resolve subjectType from encounterType
         if not form.subjectType and form.encounterType:
@@ -989,23 +1035,26 @@ def _resolve_form_subject_types(
             if subject:
                 form.subjectType = subject
 
-        # Step 3: Resolve subjectType for registration forms by name match
+        # Step 3: Resolve subjectType from program
+        if not form.subjectType and form.program:
+            subject = prog_to_subject.get(form.program.lower())
+            if subject:
+                form.subjectType = subject
+
+        # Step 4: Resolve subjectType for registration forms by name match
         if not form.subjectType and form.formType == "IndividualProfile":
             for st in subject_types:
-                if (
-                    st.name.lower() in form.name.lower()
-                    or form.name.lower() in st.name.lower()
-                ):
+                if st.name.lower() in name_lower or name_lower in st.name.lower():
                     form.subjectType = st.name
                     break
 
-        # Step 4: Resolve program from encounterType
+        # Step 5: Resolve program from encounterType
         if not form.program and form.encounterType:
             prog = enc_to_program.get(form.encounterType.lower())
             if prog:
                 form.program = prog
 
-        # Step 5: Fallback — single subject type
+        # Step 6: Fallback — single subject type
         if not form.subjectType and len(subject_types) == 1:
             form.subjectType = subject_types[0].name
 
@@ -1192,7 +1241,15 @@ def parse_scoping_docs(
             prog_to_subject[prog.name.lower()] = prog.target_subject_type
     for et in all_encounters:
         if not et.subject_type and et.program_name:
-            resolved = prog_to_subject.get(et.program_name.lower())
+            prog_lower = et.program_name.lower()
+            # Exact match first
+            resolved = prog_to_subject.get(prog_lower)
+            if not resolved:
+                # Substring match: "Nourish" matches "Nourish - Pregnancy Enrollment"
+                for pname, psubj in prog_to_subject.items():
+                    if prog_lower in pname or pname in prog_lower:
+                        resolved = psubj
+                        break
             if resolved:
                 et.subject_type = resolved
         # If still no subject_type and only one subject type exists, use it
@@ -1200,7 +1257,7 @@ def parse_scoping_docs(
             et.subject_type = all_subjects[0].name
 
     # Phase 5b: Resolve missing subjectType on forms
-    _resolve_form_subject_types(all_forms, all_encounters, all_subjects)
+    _resolve_form_subject_types(all_forms, all_encounters, all_subjects, all_programs)
 
     # Phase 6: Always include default group
     groups = [GroupSpec(name="Everyone", has_all_privileges=True)]
