@@ -1610,12 +1610,21 @@ def parse_scoping_docs(
         if prog.target_subject_type:
             prog_to_subject[prog.name.lower()] = prog.target_subject_type
     prog_names_for_match = set(prog_to_subject.keys())
+    st_names_set = {st.name for st in all_subjects}
     for et in all_encounters:
         if not et.subject_type and et.program_name:
+            # Try matching program_name to actual programs
             matched = _fuzzy_match(et.program_name, prog_names_for_match)
             resolved = prog_to_subject.get(matched) if matched else None
             if resolved:
                 et.subject_type = resolved
+            else:
+                # program_name might actually be a subject type name
+                # (some SRS docs put subject type in the program column)
+                matched_st = _fuzzy_match(et.program_name, st_names_set)
+                if matched_st:
+                    et.subject_type = matched_st
+                    et.program_name = ""  # Clear — it's a subject type, not a program
         # If still no subject_type and only one subject type exists, use it
         if not et.subject_type and len(all_subjects) == 1:
             et.subject_type = all_subjects[0].name

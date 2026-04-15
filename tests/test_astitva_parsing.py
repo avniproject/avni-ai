@@ -200,6 +200,21 @@ class TestAstitvaProgramSubjectResolution:
                 f"Beneficiary, got '{et.subject_type}'"
             )
 
+    def test_subject_type_in_program_column_resolves(self, parsed_spec):
+        """Encounters with subject type name in program column should resolve.
+        E.g., 'Indent Register' has prog='Anganwadi' which is a subject type, not a program."""
+        spec, _ = parsed_spec
+        for et_name, expected_subj in [
+            ("Indent Register (Stock Requirement)", "Anganwadi"),
+            ("Field Visit", "Anganwadi"),
+            ("Awareness Register", "Beneficiary"),
+        ]:
+            et = next((e for e in spec.encounter_types if e.name == et_name), None)
+            if et:
+                assert et.subject_type == expected_subj, (
+                    f"'{et.name}' should resolve subj={expected_subj}, got '{et.subject_type}'"
+                )
+
 
 class TestAstitvaBundleGeneration:
     """End-to-end bundle generation from Astitva SRS."""
