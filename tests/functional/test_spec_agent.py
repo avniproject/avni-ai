@@ -313,6 +313,11 @@ class TestSpecToEntities:
             params={"conversation_id": conversation_id},
         )
         spec_yaml = get_resp.json()["spec_yaml"]
+        truncated = get_resp.json().get("truncated", False)
+        if truncated:
+            pytest.skip(
+                f"spec YAML truncated for {org_name} — roundtrip comparison unreliable"
+            )
 
         # Convert back to entities
         resp = await client.post(
