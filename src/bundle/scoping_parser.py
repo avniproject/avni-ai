@@ -309,6 +309,17 @@ def _classify_sheet(df: pd.DataFrame, sheet_name: str = "") -> str:
     cols_set = set(cols_lower)
     first_col = cols_lower[0] if cols_lower else ""
 
+    # Unified modelling sheet — "Type" as first column with entity type values
+    if first_col == "type" and "name" in cols_set:
+        # Check if data rows contain entity type values
+        type_vals = set()
+        for _, row in df.head(10).iterrows():
+            v = str(row.iloc[0]).strip().lower()
+            if v in ("subject type", "program", "encounter type", "address level"):
+                type_vals.add(v)
+        if len(type_vals) >= 2:
+            return "unified_modelling"
+
     # W3H — "what" as first column + "when"/"who"/"how"
     if first_col in ("what", "activity") and any(
         c in cols_set for c in ("when", "who", "how")
@@ -491,7 +502,15 @@ def parse_programs(df: pd.DataFrame, subject_type_names: set[str]) -> list[Progr
         seen.add(name.lower())
 
         target = _clean(row.get(target_col, "")) if target_col else ""
-        if not target and subject_type_names:
+        if target and subject_type_names:
+            # Try fuzzy match against known subject types
+            matched = _fuzzy_match(target, subject_type_names)
+            if matched:
+                target = matched
+            elif len(subject_type_names) == 1:
+                # Single subject type — assume it's the target
+                target = next(iter(subject_type_names))
+        elif not target and subject_type_names:
             target = next(iter(subject_type_names))
 
         programs.append(
@@ -685,6 +704,101 @@ def _match_sheet_to_w3h(
     return None
 
 
+def parse_unified_modelling(
+    df: pd.DataFrame,
+) -> tuple[list[SubjectTypeSpec], list[ProgramSpec], list[EncounterTypeSpec], list[AddressLevelSpec]]:
+    """Parse a unified modelling sheet where Type column identifies entity kind.
+
+    Format:
+      Type           | Name         | Subject Type | Color | ...
+      Subject Type   | Individual   | Person       |       |
+      Subject Type   | Household    | Household    |       |
+      Program        | Hypertension |              | #368  |
+      Encounter Type | ANC Followup |              |       |
+      Address Level  | Village      | Level 1      |       |
+    """
+    type_col = _find_col(df, "Type")
+    name_col = _find_col(df, "Name")
+    if not type_col or not name_col:
+        return [], [], [], []
+
+    subject_types: list[SubjectTypeSpec] = []
+    programs: list[ProgramSpec] = []
+    encounters: list[EncounterTypeSpec] = []
+    address_levels: list[AddressLevelSpec] = []
+
+    st_col = _find_col(df, "Subject Type", "Entity Type")
+    color_col = _find_col(df, "Color", "Colour")
+    level_col = _find_col(df, "Level")
+
+    seen_st: set[str] = set()
+    seen_prog: set[str] = set()
+    seen_enc: set[str] = set()
+    seen_addr: set[str] = set()
+
+    for _, row in df.iterrows():
+        row_type = _clean(row.get(type_col, "")).lower()
+        name = _clean(row.get(name_col, ""))
+        if not name or name.startswith("---"):
+            continue
+
+        if row_type == "subject type":
+            if name.lower() in seen_st:
+                continue
+            seen_st.add(name.lower())
+            raw_type = _clean(row.get(st_col, "Person")).lower() if st_col else "person"
+            avni_type = _SUBJECT_TYPE_MAP.get(raw_type, "Person")
+            subject_types.append(SubjectTypeSpec(
+                name=name, type=avni_type,
+                allowProfilePicture=False, uniqueName=False, lastNameOptional=True,
+            ))
+
+        elif row_type == "program":
+            if name.lower() in seen_prog:
+                continue
+            seen_prog.add(name.lower())
+            colour = _clean(row.get(color_col, "#4A148C")) if color_col else "#4A148C"
+            target = ""
+            if st_col:
+                target = _clean(row.get(st_col, ""))
+            if not target and subject_types:
+                target = subject_types[0].name
+            programs.append(ProgramSpec(
+                name=name, target_subject_type=target, colour=colour or "#4A148C",
+            ))
+
+        elif row_type == "encounter type":
+            if name.lower() in seen_enc:
+                continue
+            seen_enc.add(name.lower())
+            encounters.append(EncounterTypeSpec(
+                name=name, program_name="", subject_type="",
+                is_program_encounter=False, is_scheduled=True,
+            ))
+
+        elif row_type == "address level":
+            if name.lower() in seen_addr:
+                continue
+            seen_addr.add(name.lower())
+            # Try to extract level number
+            level_str = _clean(row.get(st_col, "")) if st_col else ""
+            level = 1
+            level_match = re.search(r"(\d+)", level_str)
+            if level_match:
+                level = int(level_match.group(1))
+            address_levels.append(AddressLevelSpec(
+                name=name, level=level, parent=None,
+            ))
+
+    # Fix address level parent chain (highest level = no parent, each lower level → parent is one above)
+    if address_levels:
+        sorted_levels = sorted(address_levels, key=lambda a: a.level, reverse=True)
+        for i in range(1, len(sorted_levels)):
+            sorted_levels[i].parent = sorted_levels[i - 1].name
+
+    return subject_types, programs, encounters, address_levels
+
+
 def _detect_skip_logic_patterns(fields: list[FieldSpec]) -> None:
     """Auto-detect skip logic from field relationships. Mutates fields in place.
 
@@ -814,13 +928,11 @@ def parse_form_df(
         # Use raw positional access — row 0 = categories, row 1 = headers, row 2+ = data
         data_start = 2
     else:
-        data_start = 0
+        data_start = 1  # row 0 = headers, row 1+ = data
 
     # Find columns by fuzzy matching on the header row
-    if header_offset == 1:
-        header_row = {str(df.iloc[1, c]).strip().lower(): c for c in range(df.shape[1])}
-    else:
-        header_row = {str(c).strip().lower(): i for i, c in enumerate(df.columns)}
+    header_row_idx = header_offset  # 0 or 1
+    header_row = {str(df.iloc[header_row_idx, c]).strip().lower(): c for c in range(df.shape[1])}
 
     def _col_idx(*names: str) -> int | None:
         for n in names:
@@ -1337,7 +1449,26 @@ def parse_scoping_docs(
             subject_type_names = {st.name for st in all_subjects}
             program_names = {p.name for p in all_programs}
 
-            if classification == "location":
+            if classification == "unified_modelling":
+                u_sts, u_progs, u_encs, u_addrs = parse_unified_modelling(df_with_header)
+                for st in u_sts:
+                    if st.name.lower() not in seen["subject"]:
+                        all_subjects.append(st)
+                        seen["subject"].add(st.name.lower())
+                for p in u_progs:
+                    if p.name.lower() not in seen["program"]:
+                        all_programs.append(p)
+                        seen["program"].add(p.name.lower())
+                for et in u_encs:
+                    if et.name.lower() not in seen["encounter"]:
+                        all_encounters.append(et)
+                        seen["encounter"].add(et.name.lower())
+                for al in u_addrs:
+                    if al.name.lower() not in seen["address"]:
+                        all_address.append(al)
+                        seen["address"].add(al.name.lower())
+
+            elif classification == "location":
                 for al in parse_location_hierarchy(df_with_header):
                     if al.name.lower() not in seen["address"]:
                         all_address.append(al)
@@ -1368,7 +1499,16 @@ def parse_scoping_docs(
                 w3h_dfs.append(df_with_header)
 
             elif classification == "form":
-                form_sheets.append((sheet_name, df, 1))  # offset=1 for scoping format
+                # Auto-detect header row: if row 0 has form headers → offset=0
+                # Otherwise (scoping format with title in row 0) → offset=1
+                offset = 0
+                if df.shape[0] > 0:
+                    row0_vals = [str(df.iloc[0, c]).strip().lower() for c in range(min(df.shape[1], 6))]
+                    has_form_headers = any(
+                        h in row0_vals for h in ("field name", "data type", "page name", "field", "mandatory")
+                    )
+                    offset = 0 if has_form_headers else 1
+                form_sheets.append((sheet_name, df, offset))
 
             else:
                 # Unknown — capture for agent inspection
