@@ -157,7 +157,13 @@ class BundleValidator:
         et_uuids = {e["uuid"] for e in self.bundle.get("encounterTypes", [])}
 
         for m in self.bundle.get("formMappings", []):
-            if m.get("subjectTypeUUID") and m["subjectTypeUUID"] not in st_uuids:
+            # subjectTypeUUID is REQUIRED by Avni server (subject_type_check constraint)
+            if not m.get("subjectTypeUUID"):
+                self.errors.append(
+                    f'Form mapping "{m.get("formName", "?")}" is missing subjectTypeUUID '
+                    f"(required by Avni — will fail on import)"
+                )
+            elif m["subjectTypeUUID"] not in st_uuids:
                 self.errors.append(
                     f'Form mapping "{m["formName"]}" references unknown subjectTypeUUID'
                 )
