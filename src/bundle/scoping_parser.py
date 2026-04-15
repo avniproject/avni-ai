@@ -979,11 +979,32 @@ def _resolve_form_subject_types(
         if form.formType == "Encounter":
             if any(kw in name_lower for kw in ("registration", "profile", "details")):
                 # Check if it's a subject type registration
+                # Strip the keyword suffix to get the base name for matching
+                base = name_lower
+                for kw in ("registration", "profile", "details"):
+                    base = base.replace(kw, "").strip()
+                best_st = None
+                best_score = 0
                 for st in subject_types:
-                    if st.name.lower() in name_lower:
-                        form.formType = "IndividualProfile"
-                        form.subjectType = st.name
+                    st_lower = st.name.lower()
+                    # Exact substring
+                    if st_lower in name_lower or base in st_lower or st_lower in base:
+                        best_st = st
                         break
+                    # Fuzzy: check if base and st_lower share >60% of characters
+                    if base and st_lower:
+                        common = sum(1 for c in base if c in st_lower)
+                        score = common / max(len(base), len(st_lower))
+                        if score > 0.6 and score > best_score:
+                            best_st = st
+                            best_score = score
+                if best_st:
+                    form.formType = "IndividualProfile"
+                    form.subjectType = best_st.name
+                elif len(subject_types) == 1:
+                    # Only one subject type — assign it
+                    form.formType = "IndividualProfile"
+                    form.subjectType = subject_types[0].name
             elif any(kw in name_lower for kw in ("enrolment", "enrollment")):
                 # Check if it matches a program name
                 for p in programs:
