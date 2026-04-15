@@ -176,12 +176,14 @@ def _parse_min_max(val: Any) -> tuple[float | None, float | None]:
 
 
 def _fuzzy_match(
-    query: str, candidates: set[str] | list[str], threshold: float = 0.6
+    query: str, candidates: set[str] | list[str], threshold: float = 0.5
 ) -> str | None:
-    """Match a query string against candidates using exact, substring, then fuzzy character overlap.
+    """Match a query string against candidates using exact, substring, then word overlap.
 
     Returns the best matching candidate name, or None if no match above threshold.
-    Handles typos like 'Paritcipant' matching 'Participant'.
+    Uses word-level overlap (not character-level) to avoid false matches
+    between strings that share common letters but different meanings.
+    Handles typos via character scoring only for short single-word names.
     """
     if not query:
         return None
@@ -207,19 +209,49 @@ def _fuzzy_match(
     if best_sub:
         return best_sub
 
-    # 3. Fuzzy character overlap (handles typos)
-    best_fuzzy = None
-    best_score = 0.0
+    q_words = set(re.findall(r"[a-z0-9]+", q))
+    if not q_words:
+        return None
+
+    # 3. Word overlap scoring (semantic matching)
+    best_word_match = None
+    best_word_score = 0.0
     for c in candidates:
         cl = c.lower()
-        if not cl:
+        c_words = set(re.findall(r"[a-z0-9]+", cl))
+        if not c_words:
             continue
-        common = sum(1 for ch in q if ch in cl)
-        score = common / max(len(q), len(cl))
-        if score > threshold and score > best_score:
-            best_fuzzy = c
-            best_score = score
-    return best_fuzzy
+        common_words = q_words & c_words
+        # Jaccard similarity on words
+        score = len(common_words) / len(q_words | c_words)
+        if score > threshold and score > best_word_score:
+            best_word_match = c
+            best_word_score = score
+
+    if best_word_match:
+        return best_word_match
+
+    # 4. Character overlap (only for short names — handles typos like Paritcipant)
+    # Skip for multi-word names to avoid false matches
+    if len(q_words) <= 2:
+        best_fuzzy = None
+        best_char_score = 0.0
+        for c in candidates:
+            cl = c.lower()
+            c_words_count = len(re.findall(r"[a-z0-9]+", cl))
+            if c_words_count > 2:
+                continue  # Don't char-match multi-word candidates
+            if not cl:
+                continue
+            common = sum(1 for ch in q if ch in cl)
+            score = common / max(len(q), len(cl))
+            if score > 0.7 and score > best_char_score:
+                best_fuzzy = c
+                best_char_score = score
+        if best_fuzzy:
+            return best_fuzzy
+
+    return None
 
 
 def _resolve_subject_type(raw: str, known: set[str]) -> str:
