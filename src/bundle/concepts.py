@@ -88,6 +88,21 @@ class ConceptGenerator:
 
     def generate_coded_concept(self, field: dict) -> str:
         safe_name = self._safe_name(field["name"])
+        key = safe_name.lower()
+
+        # Check if this name already exists as an NA answer concept.
+        # If so, upgrade it to Coded (remove the NA entry, reuse or create UUID).
+        if key in self._answer_cache and key not in self.concept_map:
+            existing_uuid = self._answer_cache[key]
+            # Remove the NA entry from generated_concepts
+            self.generated_concepts = [
+                c for c in self.generated_concepts
+                if not (c.get("name", "").lower() == key and c.get("dataType") == "NA")
+            ]
+            # Store in concept_map so future answer lookups find it
+            self.concept_map[key] = existing_uuid
+            self._canonical_name[key] = safe_name
+
         concept_uuid = self.get_concept_uuid(safe_name)
         # Deduplicate — same field name (case-insensitive) across forms produces same UUID
         if any(c["uuid"] == concept_uuid for c in self.generated_concepts):
