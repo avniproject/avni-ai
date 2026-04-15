@@ -175,27 +175,65 @@ def _parse_min_max(val: Any) -> tuple[float | None, float | None]:
     return None, None
 
 
+def _fuzzy_match(
+    query: str, candidates: set[str] | list[str], threshold: float = 0.6
+) -> str | None:
+    """Match a query string against candidates using exact, substring, then fuzzy character overlap.
+
+    Returns the best matching candidate name, or None if no match above threshold.
+    Handles typos like 'Paritcipant' matching 'Participant'.
+    """
+    if not query:
+        return None
+    q = query.strip().lower()
+    if not q:
+        return None
+
+    # 1. Exact match
+    for c in candidates:
+        if c.lower() == q:
+            return c
+
+    # 2. Substring containment (longer overlap = better)
+    best_sub = None
+    best_sub_len = 0
+    for c in candidates:
+        cl = c.lower()
+        if cl in q or q in cl:
+            overlap = min(len(cl), len(q))
+            if overlap > best_sub_len:
+                best_sub = c
+                best_sub_len = overlap
+    if best_sub:
+        return best_sub
+
+    # 3. Fuzzy character overlap (handles typos)
+    best_fuzzy = None
+    best_score = 0.0
+    for c in candidates:
+        cl = c.lower()
+        if not cl:
+            continue
+        common = sum(1 for ch in q if ch in cl)
+        score = common / max(len(q), len(cl))
+        if score > threshold and score > best_score:
+            best_fuzzy = c
+            best_score = score
+    return best_fuzzy
+
+
 def _resolve_subject_type(raw: str, known: set[str]) -> str:
     if not raw:
         return ""
-    raw_lower = raw.strip().lower()
-    # Also try cleaned version (strip "Registration" etc.)
-    cleaned_lower = _clean_subject_name(raw).lower()
-    # Exact match first
-    for name in known:
-        nl = name.lower()
-        if nl == raw_lower or nl == cleaned_lower:
-            return name
-    # Substring match
-    for name in known:
-        nl = name.lower()
-        if (
-            nl in raw_lower
-            or raw_lower in nl
-            or nl in cleaned_lower
-            or cleaned_lower in nl
-        ):
-            return name
+    # Try raw name first, then cleaned version
+    match = _fuzzy_match(raw, known)
+    if match:
+        return match
+    cleaned = _clean_subject_name(raw)
+    if cleaned.lower() != raw.strip().lower():
+        match = _fuzzy_match(cleaned, known)
+        if match:
+            return match
     return _clean_subject_name(raw)
 
 
@@ -972,100 +1010,73 @@ def _resolve_form_subject_types(
         p.name.lower(): p.target_subject_type for p in programs if p.target_subject_type
     }
 
+    st_names = {st.name for st in subject_types}
+    prog_names = {p.name for p in programs}
+    enc_names = {et.name for et in encounter_types}
+
     for form in forms:
         name_lower = form.name.lower()
 
         # Step 0: Fix formType based on form name patterns
         if form.formType == "Encounter":
             if any(kw in name_lower for kw in ("registration", "profile", "details")):
-                # Check if it's a subject type registration
-                # Strip the keyword suffix to get the base name for matching
                 base = name_lower
                 for kw in ("registration", "profile", "details"):
                     base = base.replace(kw, "").strip()
-                best_st = None
-                best_score = 0
-                for st in subject_types:
-                    st_lower = st.name.lower()
-                    # Exact substring
-                    if st_lower in name_lower or base in st_lower or st_lower in base:
-                        best_st = st
-                        break
-                    # Fuzzy: check if base and st_lower share >60% of characters
-                    if base and st_lower:
-                        common = sum(1 for c in base if c in st_lower)
-                        score = common / max(len(base), len(st_lower))
-                        if score > 0.6 and score > best_score:
-                            best_st = st
-                            best_score = score
-                if best_st:
+                matched_st = _fuzzy_match(base, st_names)
+                if matched_st:
                     form.formType = "IndividualProfile"
-                    form.subjectType = best_st.name
+                    form.subjectType = matched_st
                 elif len(subject_types) == 1:
-                    # Only one subject type — assign it
                     form.formType = "IndividualProfile"
                     form.subjectType = subject_types[0].name
             elif any(kw in name_lower for kw in ("enrolment", "enrollment")):
-                # Check if it matches a program name
-                for p in programs:
-                    if p.name.lower() in name_lower or name_lower in p.name.lower():
-                        form.formType = "ProgramEnrolment"
-                        form.program = p.name
-                        form.subjectType = p.target_subject_type
-                        break
+                matched_prog = _fuzzy_match(form.name, prog_names)
+                if matched_prog:
+                    prog = next(p for p in programs if p.name == matched_prog)
+                    form.formType = "ProgramEnrolment"
+                    form.program = prog.name
+                    form.subjectType = prog.target_subject_type
             elif "exit" in name_lower:
-                for p in programs:
-                    # "Nourish - Pregnancy Exit" → matches "Nourish - Pregnancy Enrollment"
-                    prog_base = (
-                        p.name.lower()
-                        .replace("enrollment", "")
-                        .replace("enrolment", "")
-                        .strip()
-                    )
-                    form_base = (
-                        name_lower.replace("exit", "").strip().rstrip("-").strip()
-                    )
-                    if (
-                        prog_base == form_base
-                        or prog_base in form_base
-                        or form_base in prog_base
-                    ):
-                        form.formType = "ProgramExit"
-                        form.program = p.name
-                        form.subjectType = p.target_subject_type
-                        break
+                form_base = name_lower.replace("exit", "").strip().rstrip("-").strip()
+                prog_bases = {
+                    p.name: p.name.lower()
+                    .replace("enrollment", "")
+                    .replace("enrolment", "")
+                    .strip()
+                    for p in programs
+                }
+                matched_prog = _fuzzy_match(form_base, set(prog_bases.values()))
+                if matched_prog:
+                    prog = next(p for p, b in prog_bases.items() if b == matched_prog)
+                    real_prog = next(p for p in programs if p.name == prog)
+                    form.formType = "ProgramExit"
+                    form.program = real_prog.name
+                    form.subjectType = real_prog.target_subject_type
 
-        # Step 1: Match form to encounter type by name (fuzzy) if not set
+        # Step 1: Match form to encounter type by name (fuzzy)
         if not form.encounterType and form.formType in (
             "Encounter",
             "ProgramEncounter",
             "IndividualEncounterCancellation",
             "ProgramEncounterCancellation",
         ):
-            match_name = name_lower.replace(" cancellation", "").strip()
-            best_match = None
-            best_score = 0
-            for et in encounter_types:
-                et_lower = et.name.lower()
-                # Exact match
-                if et_lower == match_name:
-                    best_match = et
-                    break
-                # Substring containment (longer match = better)
-                if et_lower in match_name or match_name in et_lower:
-                    score = min(len(et_lower), len(match_name))
-                    if score > best_score:
-                        best_match = et
-                        best_score = score
-            if best_match:
-                form.encounterType = best_match.name
-                if best_match.is_program_encounter and best_match.program_name:
+            match_name = (
+                form.name.replace(" Cancellation", "")
+                .replace(" cancellation", "")
+                .strip()
+            )
+            matched_enc = _fuzzy_match(match_name, enc_names)
+            if matched_enc:
+                et = next(e for e in encounter_types if e.name == matched_enc)
+                form.encounterType = et.name
+                if et.is_program_encounter and et.program_name:
                     form.formType = (
                         "ProgramEncounter"
                         if "cancellation" not in name_lower
                         else "ProgramEncounterCancellation"
                     )
-                    form.program = best_match.program_name
+                    form.program = et.program_name
 
         # Step 2: Resolve subjectType from encounterType
         if not form.subjectType and form.encounterType:
@@ -1073,18 +1084,17 @@ def _resolve_form_subject_types(
             if subject:
                 form.subjectType = subject
 
-        # Step 3: Resolve subjectType from program
+        # Step 3: Resolve subjectType from program (fuzzy)
         if not form.subjectType and form.program:
-            subject = prog_to_subject.get(form.program.lower())
-            if subject:
-                form.subjectType = subject
+            matched_prog = _fuzzy_match(form.program, set(prog_to_subject.keys()))
+            if matched_prog:
+                form.subjectType = prog_to_subject[matched_prog]
 
-        # Step 4: Resolve subjectType for registration forms by name match
+        # Step 4: Resolve subjectType for registration forms (fuzzy)
         if not form.subjectType and form.formType == "IndividualProfile":
-            for st in subject_types:
-                if st.name.lower() in name_lower or name_lower in st.name.lower():
-                    form.subjectType = st.name
-                    break
+            matched_st = _fuzzy_match(form.name, st_names)
+            if matched_st:
+                form.subjectType = matched_st
 
         # Step 5: Resolve program from encounterType
         if not form.program and form.encounterType:
@@ -1277,17 +1287,11 @@ def parse_scoping_docs(
     for prog in all_programs:
         if prog.target_subject_type:
             prog_to_subject[prog.name.lower()] = prog.target_subject_type
+    prog_names_for_match = set(prog_to_subject.keys())
     for et in all_encounters:
         if not et.subject_type and et.program_name:
-            prog_lower = et.program_name.lower()
-            # Exact match first
-            resolved = prog_to_subject.get(prog_lower)
-            if not resolved:
-                # Substring match: "Nourish" matches "Nourish - Pregnancy Enrollment"
-                for pname, psubj in prog_to_subject.items():
-                    if prog_lower in pname or pname in prog_lower:
-                        resolved = psubj
-                        break
+            matched = _fuzzy_match(et.program_name, prog_names_for_match)
+            resolved = prog_to_subject.get(matched) if matched else None
             if resolved:
                 et.subject_type = resolved
         # If still no subject_type and only one subject type exists, use it
