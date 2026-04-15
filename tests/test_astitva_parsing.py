@@ -113,9 +113,7 @@ class TestAstitvaEncounterTypes:
 
     def test_program_encounters_have_subject_type(self, parsed_spec):
         spec, _ = parsed_spec
-        nourish_encounters = [
-            et for et in spec.encounter_types if et.program_name
-        ]
+        nourish_encounters = [et for et in spec.encounter_types if et.program_name]
         for et in nourish_encounters:
             assert et.subject_type, (
                 f"Encounter '{et.name}' has program '{et.program_name}' "
@@ -137,8 +135,7 @@ class TestAstitvaFormTypeClassification:
     def test_enrolment_forms_are_program_enrolment(self, parsed_spec):
         spec, _ = parsed_spec
         enrol_forms = [
-            f for f in spec.forms
-            if "Enrolment" in f.name or "Enrollment" in f.name
+            f for f in spec.forms if "Enrolment" in f.name or "Enrollment" in f.name
         ]
         for f in enrol_forms:
             assert f.formType == "ProgramEnrolment", (
@@ -167,27 +164,21 @@ class TestAstitvaFuzzyEncounterMatching:
         """'Mother Monitoring - HCCM Daily' should match encounter
         'Mother Monitoring - HCCM Daily Consumption'."""
         spec, _ = parsed_spec
-        form = next(
-            (f for f in spec.forms if "Mother Monitoring" in f.name), None
-        )
+        form = next((f for f in spec.forms if "Mother Monitoring" in f.name), None)
         assert form is not None
         assert form.encounterType == "Mother Monitoring - HCCM Daily Consumption"
 
     def test_partial_name_matches(self, parsed_spec):
         """'Indent Register' should match 'Indent Register (Stock Requirement)'."""
         spec, _ = parsed_spec
-        form = next(
-            (f for f in spec.forms if f.name == "Indent Register"), None
-        )
+        form = next((f for f in spec.forms if f.name == "Indent Register"), None)
         assert form is not None
         assert form.encounterType == "Indent Register (Stock Requirement)"
 
     def test_substring_match_field_visit(self, parsed_spec):
         """'Field Visit Page (Nourish – Sup' should match 'Field Visit'."""
         spec, _ = parsed_spec
-        form = next(
-            (f for f in spec.forms if "Field Visit" in f.name), None
-        )
+        form = next((f for f in spec.forms if "Field Visit" in f.name), None)
         assert form is not None
         assert form.encounterType == "Field Visit"
 
@@ -198,7 +189,8 @@ class TestAstitvaProgramSubjectResolution:
     def test_nourish_encounters_resolve_to_beneficiary(self, parsed_spec):
         spec, _ = parsed_spec
         nourish_enc = [
-            et for et in spec.encounter_types
+            et
+            for et in spec.encounter_types
             if et.program_name and "nourish" in et.program_name.lower()
         ]
         assert len(nourish_enc) > 0
@@ -223,6 +215,7 @@ class TestAstitvaBundleGeneration:
     def test_no_duplicate_concepts(self, bundle_validation):
         bundle, _ = bundle_validation
         from collections import Counter
+
         names = Counter(c["name"].lower() for c in bundle.get("concepts", []))
         dupes = {n: c for n, c in names.items() if c > 1}
         assert len(dupes) == 0, f"Duplicate concepts: {dupes}"
@@ -240,8 +233,12 @@ class TestAstitvaBundleGeneration:
     def test_most_encounter_mappings_have_encounter_type(self, bundle_validation):
         bundle, _ = bundle_validation
         fm = bundle.get("formMappings", [])
-        enc_types = ("Encounter", "ProgramEncounter",
-                     "IndividualEncounterCancellation", "ProgramEncounterCancellation")
+        enc_types = (
+            "Encounter",
+            "ProgramEncounter",
+            "IndividualEncounterCancellation",
+            "ProgramEncounterCancellation",
+        )
         enc_fm = [m for m in fm if m.get("formType") in enc_types]
         missing = [m for m in enc_fm if not m.get("encounterTypeUUID")]
         assert len(missing) <= 2, (

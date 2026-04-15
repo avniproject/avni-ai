@@ -968,9 +968,9 @@ def _resolve_form_subject_types(
         if et.program_name:
             enc_to_program[et.name.lower()] = et.program_name
 
-    prog_names_lower = {p.name.lower() for p in programs}
-    prog_to_subject = {p.name.lower(): p.target_subject_type for p in programs if p.target_subject_type}
-    st_names_lower = {st.name.lower() for st in subject_types}
+    prog_to_subject = {
+        p.name.lower(): p.target_subject_type for p in programs if p.target_subject_type
+    }
 
     for form in forms:
         name_lower = form.name.lower()
@@ -995,9 +995,20 @@ def _resolve_form_subject_types(
             elif "exit" in name_lower:
                 for p in programs:
                     # "Nourish - Pregnancy Exit" → matches "Nourish - Pregnancy Enrollment"
-                    prog_base = p.name.lower().replace("enrollment", "").replace("enrolment", "").strip()
-                    form_base = name_lower.replace("exit", "").strip().rstrip("-").strip()
-                    if prog_base == form_base or prog_base in form_base or form_base in prog_base:
+                    prog_base = (
+                        p.name.lower()
+                        .replace("enrollment", "")
+                        .replace("enrolment", "")
+                        .strip()
+                    )
+                    form_base = (
+                        name_lower.replace("exit", "").strip().rstrip("-").strip()
+                    )
+                    if (
+                        prog_base == form_base
+                        or prog_base in form_base
+                        or form_base in prog_base
+                    ):
                         form.formType = "ProgramExit"
                         form.program = p.name
                         form.subjectType = p.target_subject_type
@@ -1005,8 +1016,10 @@ def _resolve_form_subject_types(
 
         # Step 1: Match form to encounter type by name (fuzzy) if not set
         if not form.encounterType and form.formType in (
-            "Encounter", "ProgramEncounter",
-            "IndividualEncounterCancellation", "ProgramEncounterCancellation",
+            "Encounter",
+            "ProgramEncounter",
+            "IndividualEncounterCancellation",
+            "ProgramEncounterCancellation",
         ):
             match_name = name_lower.replace(" cancellation", "").strip()
             best_match = None
@@ -1026,7 +1039,11 @@ def _resolve_form_subject_types(
             if best_match:
                 form.encounterType = best_match.name
                 if best_match.is_program_encounter and best_match.program_name:
-                    form.formType = "ProgramEncounter" if "cancellation" not in name_lower else "ProgramEncounterCancellation"
+                    form.formType = (
+                        "ProgramEncounter"
+                        if "cancellation" not in name_lower
+                        else "ProgramEncounterCancellation"
+                    )
                     form.program = best_match.program_name
 
         # Step 2: Resolve subjectType from encounterType

@@ -7,7 +7,6 @@ exactly one concept entry with a consistent UUID — not two entries with
 different UUIDs and data types.
 """
 
-
 from src.bundle.concepts import ConceptGenerator
 
 
