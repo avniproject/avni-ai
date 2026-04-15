@@ -958,21 +958,37 @@ def _resolve_form_subject_types(
     encounter_types: list[EncounterTypeSpec],
     subject_types: list[SubjectTypeSpec],
 ) -> None:
-    """Fill missing subjectType on forms using encounter/subject context. Mutates in place."""
+    """Fill missing encounterType and subjectType on forms. Mutates in place."""
     enc_to_subject: dict[str, str] = {}
+    enc_to_program: dict[str, str] = {}
     for et in encounter_types:
         if et.subject_type:
             enc_to_subject[et.name.lower()] = et.subject_type
+        if et.program_name:
+            enc_to_program[et.name.lower()] = et.program_name
 
     for form in forms:
-        if form.subjectType:
-            continue
-        if form.encounterType:
+        # Step 1: Match form to encounter type by name if not set
+        if not form.encounterType and form.formType in (
+            "Encounter", "ProgramEncounter",
+            "IndividualEncounterCancellation", "ProgramEncounterCancellation",
+        ):
+            form_lower = form.name.lower()
+            # Strip " Cancellation" suffix for matching
+            match_name = form_lower.replace(" cancellation", "").strip()
+            for et in encounter_types:
+                if et.name.lower() == match_name:
+                    form.encounterType = et.name
+                    break
+
+        # Step 2: Resolve subjectType from encounterType
+        if not form.subjectType and form.encounterType:
             subject = enc_to_subject.get(form.encounterType.lower())
             if subject:
                 form.subjectType = subject
-                continue
-        if form.formType == "IndividualProfile":
+
+        # Step 3: Resolve subjectType for registration forms by name match
+        if not form.subjectType and form.formType == "IndividualProfile":
             for st in subject_types:
                 if (
                     st.name.lower() in form.name.lower()
@@ -980,6 +996,14 @@ def _resolve_form_subject_types(
                 ):
                     form.subjectType = st.name
                     break
+
+        # Step 4: Resolve program from encounterType
+        if not form.program and form.encounterType:
+            prog = enc_to_program.get(form.encounterType.lower())
+            if prog:
+                form.program = prog
+
+        # Step 5: Fallback — single subject type
         if not form.subjectType and len(subject_types) == 1:
             form.subjectType = subject_types[0].name
 
