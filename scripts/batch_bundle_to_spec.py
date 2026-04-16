@@ -620,7 +620,11 @@ def bundle_to_comprehensive_spec(
     # ── Message rules ──────────────────────────────────────────────────────
     message_rules = bundle.get("messageRule", [])
     if message_rules:
-        active_mr = [m for m in message_rules if not m.get("voided", False) and not m.get("isVoided", False)]
+        active_mr = [
+            m
+            for m in message_rules
+            if not m.get("voided", False) and not m.get("isVoided", False)
+        ]
         if active_mr:
             spec["messageRules"] = []
             for mr in active_mr:
@@ -698,12 +702,18 @@ def bundle_to_comprehensive_spec(
             if grp.get("uuid"):
                 grp_uuid_to_name[grp["uuid"]] = grp.get("name", "")
 
-        active_gp = [g for g in group_privs if not g.get("voided", False) and g.get("allow", True)]
+        active_gp = [
+            g
+            for g in group_privs
+            if not g.get("voided", False) and g.get("allow", True)
+        ]
         if active_gp:
             # Group by group name for readability
             priv_by_group: dict[str, list] = {}
             for gp in active_gp:
-                group_name = gp.get("groupName", "") or grp_uuid_to_name.get(gp.get("groupUUID", ""), "")
+                group_name = gp.get("groupName", "") or grp_uuid_to_name.get(
+                    gp.get("groupUUID", ""), ""
+                )
                 if not group_name:
                     group_name = "Unknown"
                 priv_by_group.setdefault(group_name, []).append(gp)
@@ -759,7 +769,8 @@ def bundle_to_comprehensive_spec(
                 genders = ir.get("genders", [])
                 if genders:
                     ir_spec["genders"] = [
-                        g.get("name", "") for g in genders
+                        g.get("name", "")
+                        for g in genders
                         if isinstance(g, dict) and not g.get("voided", False)
                     ]
                 spec["individualRelations"].append(ir_spec)
@@ -771,7 +782,11 @@ def bundle_to_comprehensive_spec(
     if not isinstance(catchments_raw, list):
         catchments_raw = []
     if catchments_raw:
-        active_catch = [c for c in catchments_raw if isinstance(c, dict) and not c.get("voided", False)]
+        active_catch = [
+            c
+            for c in catchments_raw
+            if isinstance(c, dict) and not c.get("voided", False)
+        ]
         if active_catch:
             spec["catchments"] = []
             for cat in active_catch:
@@ -797,7 +812,11 @@ def bundle_to_comprehensive_spec(
     # ── Concepts (full detail) ────────────────────────────────────────────
     concepts_raw = bundle.get("concepts", [])
     if concepts_raw:
-        active_concepts = [c for c in concepts_raw if c.get("active", True) and not c.get("voided", False)]
+        active_concepts = [
+            c
+            for c in concepts_raw
+            if c.get("active", True) and not c.get("voided", False)
+        ]
         spec["concepts"] = []
         for c in active_concepts:
             dt = c.get("dataType", "NA")
@@ -857,7 +876,10 @@ def bundle_to_comprehensive_spec(
     rule_dep = bundle.get("ruleDependency", {})
     if rule_dep:
         if isinstance(rule_dep, dict) and rule_dep.get("code"):
-            spec["ruleDependency"] = {"hasCode": True, "codeLength": len(rule_dep["code"])}
+            spec["ruleDependency"] = {
+                "hasCode": True,
+                "codeLength": len(rule_dep["code"]),
+            }
 
     return spec
 
@@ -1048,12 +1070,36 @@ def analyze_coverage(bundle: dict, spec: dict, org_name: str) -> dict[str, Any]:
         "groups": len(
             [g for g in bundle.get("groups", []) if not g.get("voided", False)]
         ),
-        "menuItems": len([m for m in bundle.get("menuItem", []) if not m.get("voided", False)]),
-        "messageRules": len([m for m in bundle.get("messageRule", []) if not m.get("voided", False) and not m.get("isVoided", False)]),
-        "groupPrivileges": len([g for g in bundle.get("groupPrivilege", []) if not g.get("voided", False)]),
-        "groupDashboards": len([g for g in bundle.get("groupDashboards", []) if not g.get("voided", False)]),
-        "individualRelations": len([r for r in bundle.get("individualRelation", []) if not r.get("voided", False)]),
-        "catchments": len([c for c in (_unwrap_list(bundle, "catchments")) if isinstance(c, dict) and not c.get("voided", False)]),
+        "menuItems": len(
+            [m for m in bundle.get("menuItem", []) if not m.get("voided", False)]
+        ),
+        "messageRules": len(
+            [
+                m
+                for m in bundle.get("messageRule", [])
+                if not m.get("voided", False) and not m.get("isVoided", False)
+            ]
+        ),
+        "groupPrivileges": len(
+            [g for g in bundle.get("groupPrivilege", []) if not g.get("voided", False)]
+        ),
+        "groupDashboards": len(
+            [g for g in bundle.get("groupDashboards", []) if not g.get("voided", False)]
+        ),
+        "individualRelations": len(
+            [
+                r
+                for r in bundle.get("individualRelation", [])
+                if not r.get("voided", False)
+            ]
+        ),
+        "catchments": len(
+            [
+                c
+                for c in (_unwrap_list(bundle, "catchments"))
+                if isinstance(c, dict) and not c.get("voided", False)
+            ]
+        ),
         "locations": len(_unwrap_list(bundle, "locations")),
     }
 

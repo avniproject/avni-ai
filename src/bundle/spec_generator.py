@@ -282,6 +282,22 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
     if report_dashboards:
         spec["reportDashboards"] = report_dashboards
 
+    # Passthrough sections from bundle → spec (captured by _bundle_to_entities)
+    for entities_key, spec_key in [
+        ("menu_items", "menuItems"),
+        ("message_rules", "messageRules"),
+        ("group_privileges", "groupPrivileges"),
+        ("group_dashboards", "groupDashboards"),
+        ("individual_relations", "individualRelations"),
+        ("catchments", "catchments"),
+        ("locations", "locations"),
+        ("concepts_detail", "concepts"),
+        ("rule_dependency", "ruleDependency"),
+    ]:
+        val = entities.get(entities_key)
+        if val:
+            spec[spec_key] = val
+
     return yaml.dump(
         spec, allow_unicode=True, default_flow_style=False, sort_keys=False
     )

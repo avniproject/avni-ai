@@ -239,3 +239,80 @@ reportCards:
 reportDashboards:
   - name: "Overview Dashboard"
     description: ""
+
+menuItems:
+  - displayKey: "Menu Label"
+    type: "Link"
+    icon: "icon-name"
+    group: "Group Name"
+    linkFunction: "function() { ... }"
+
+messageRules:
+  - name: "Reminder Rule"
+    entityType: "ProgramEncounter"
+    entityTypeName: "ANC Visit"       # Resolved from UUID
+    messageRule: "'use strict'; ..."
+    scheduleRule: "'use strict'; ..."
+    messageTemplateId: "template-uuid"
+    receiverType: "Subject"
+
+operationalEncounterTypes:
+  - name: "ANC Visit"
+    encounterType: "ANC Visit"        # Resolved from UUID
+
+operationalSubjectTypes:
+  - name: "Individual"
+    subjectType: "Individual"         # Resolved from UUID
+
+groupPrivileges:
+  - group: "Everyone"
+    privileges:
+      - type: ViewSubject
+        subjectType: "Individual"
+      - type: PerformVisit
+        subjectType: "Individual"
+        encounterType: "ANC Visit"
+        program: "Pregnancy"
+
+groupDashboards:
+  - groupName: "Everyone"
+    dashboardName: "Default Dashboard"
+    primaryDashboard: true
+    secondaryDashboard: false
+
+individualRelations:
+  - name: "mother"
+    genders: ["Female"]
+
+catchments:
+  - name: "Block Sanganer"
+    locationCount: 15
+
+locations:
+  totalCount: 150
+  byType:
+    State: 1
+    District: 5
+    Block: 20
+    Village: 124
+
+concepts:
+  - name: "Weight"
+    dataType: Numeric
+    lowAbsolute: 0
+    highAbsolute: 300
+    lowNormal: 2
+    highNormal: 200
+    unit: "kg"
+  - name: "Gender"
+    dataType: Coded
+    answers: ["Male", "Female", "Other"]
+  - name: "Risk Level"
+    dataType: Coded
+    answers: ["Low", "Medium", "High"]
+    keyValues:
+      subjectType: "Individual"
+
+ruleDependency:
+  hasCode: true
+  codeLength: 15000

@@ -21,7 +21,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 ### Spec generation & editing
 7. **Call `generate_spec`** to produce a YAML spec from stored entities (stored server-side, returns summary only).
 8. **Call `get_spec`** to retrieve the full spec YAML for display to the user.
-9. **Call `get_spec_section`** to fetch one section for focused review. Valid sections: `subjectTypes`, `programs`, `encounterTypes`, `addressLevels`, `groups`, `settings`, `groupRoles`, `identifierSources`, `relationshipTypes`, `checklists`, `videos`, `documentations`, `customQueries`, `reportCards`, `reportDashboards`.
+9. **Call `get_spec_section`** to fetch one section for focused review. Valid sections: `subjectTypes`, `programs`, `encounterTypes`, `addressLevels`, `groups`, `settings`, `groupRoles`, `identifierSources`, `relationshipTypes`, `checklists`, `videos`, `documentations`, `customQueries`, `reportCards`, `reportDashboards`, `menuItems`, `messageRules`, `groupPrivileges`, `groupDashboards`, `individualRelations`, `catchments`, `locations`, `concepts`, `ruleDependency`.
 10. **Call `update_spec_section`** to surgically replace one section without rewriting the whole spec.
 
 ### Entity section editing

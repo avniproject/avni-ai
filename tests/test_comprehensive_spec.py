@@ -433,7 +433,9 @@ class TestComprehensiveSpec:
         """Concepts should be captured as full list with details, not just summary."""
         bundle, spec = _load_org("JNPCT")
         concepts = spec.get("concepts", [])
-        assert isinstance(concepts, list), "concepts should be a list, not a summary dict"
+        assert isinstance(concepts, list), (
+            "concepts should be a list, not a summary dict"
+        )
         assert len(concepts) >= 100
 
     def test_concepts_coded_have_answers(self):
@@ -444,7 +446,9 @@ class TestComprehensiveSpec:
         assert len(coded) > 0
         coded_with_answers = [c for c in coded if c.get("answers")]
         assert len(coded_with_answers) > 0, "No coded concepts have answers"
-        assert len(coded_with_answers) >= len(coded) * 0.5, "Less than half of coded concepts have answers"
+        assert len(coded_with_answers) >= len(coded) * 0.5, (
+            "Less than half of coded concepts have answers"
+        )
 
     def test_concepts_numeric_have_bounds(self):
         """Numeric concepts with bounds should have them captured."""
@@ -478,8 +482,14 @@ class TestComprehensiveSpec:
         """Bare NA concepts (answer options) without keyValues should be skipped."""
         bundle, spec = _load_org("JNPCT")
         concepts = spec.get("concepts", [])
-        bare_na = [c for c in concepts if c["dataType"] == "NA" and not c.get("keyValues") and not c.get("answers")]
-        assert len(bare_na) == 0, f"Found {len(bare_na)} bare NA concepts that should be skipped"
+        bare_na = [
+            c
+            for c in concepts
+            if c["dataType"] == "NA" and not c.get("keyValues") and not c.get("answers")
+        ]
+        assert len(bare_na) == 0, (
+            f"Found {len(bare_na)} bare NA concepts that should be skipped"
+        )
 
     def test_rule_dependency_captured(self):
         """Rule dependency should be captured when present."""
@@ -538,11 +548,14 @@ class TestComprehensiveSpec:
     def test_all_orgs_have_concepts(self):
         """Every org should have concepts captured in spec."""
         org_dirs = [
-            d for d in sorted(BUNDLE_DIR.iterdir())
+            d
+            for d in sorted(BUNDLE_DIR.iterdir())
             if d.is_dir() and not d.name.startswith(".") and d.name != "specs"
         ]
         for org_dir in org_dirs:
             bundle = read_bundle_dir(org_dir)
             spec = bundle_to_comprehensive_spec(bundle, org_name=org_dir.name)
             if bundle.get("concepts"):
-                assert spec.get("concepts"), f"{org_dir.name} has concepts in bundle but not in spec"
+                assert spec.get("concepts"), (
+                    f"{org_dir.name} has concepts in bundle but not in spec"
+                )

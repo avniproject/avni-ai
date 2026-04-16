@@ -189,6 +189,22 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
         entities["groups"] = [{"name": "Everyone", "has_all_privileges": False}]
 
     # Validate through EntitySpec — catches duplicates and cross-ref errors early
+    # Passthrough sections (round-trip from bundle → spec → entities)
+    for spec_key, entities_key in [
+        ("menuItems", "menu_items"),
+        ("messageRules", "message_rules"),
+        ("groupPrivileges", "group_privileges"),
+        ("groupDashboards", "group_dashboards"),
+        ("individualRelations", "individual_relations"),
+        ("catchments", "catchments"),
+        ("locations", "locations"),
+        ("concepts", "concepts_detail"),
+        ("ruleDependency", "rule_dependency"),
+    ]:
+        val = spec.get(spec_key)
+        if val:
+            entities[entities_key] = val
+
     try:
         EntitySpec(
             subject_types=entities["subject_types"],

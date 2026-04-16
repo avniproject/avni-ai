@@ -805,6 +805,205 @@ def _bundle_to_entities(bundle: dict) -> dict:
                 for d in active_dashes
             ]
 
+    # ── Menu items ─────────────────────────────────────────────────────────
+    menu_items = bundle.get("menuItem", [])
+    if menu_items:
+        active_mi = [m for m in menu_items if not m.get("voided", False)]
+        if active_mi:
+            entities["menu_items"] = [
+                {
+                    "displayKey": m.get("displayKey", ""),
+                    "type": m.get("type", ""),
+                    **({"icon": m["icon"]} if m.get("icon") else {}),
+                    **({"group": m["group"]} if m.get("group") else {}),
+                    **(
+                        {"linkFunction": m["linkFunction"]}
+                        if m.get("linkFunction")
+                        else {}
+                    ),
+                }
+                for m in active_mi
+            ]
+
+    # ── Message rules ──────────────────────────────────────────────────────
+    message_rules = bundle.get("messageRule", [])
+    if message_rules:
+        active_mr = [m for m in message_rules if not m.get("voided", False)]
+        if active_mr:
+            entities["message_rules"] = []
+            for mr in active_mr:
+                mr_entry: dict = {"name": mr.get("name", "")}
+                for key in (
+                    "entityType",
+                    "messageRule",
+                    "scheduleRule",
+                    "messageTemplateId",
+                    "receiverType",
+                ):
+                    if mr.get(key):
+                        mr_entry[key] = mr[key]
+                entity_uuid = mr.get("entityTypeUuid")
+                if entity_uuid:
+                    resolved = (
+                        st_uuid_to_name.get(entity_uuid)
+                        or prog_uuid_to_name.get(entity_uuid)
+                        or enc_uuid_to_name.get(entity_uuid)
+                    )
+                    if resolved:
+                        mr_entry["entityTypeName"] = resolved
+                entities["message_rules"].append(mr_entry)
+
+    # ── Group privileges ───────────────────────────────────────────────────
+    group_privs = bundle.get("groupPrivilege", [])
+    if group_privs:
+        grp_uuid_to_name: dict[str, str] = {
+            g["uuid"]: g.get("name", "")
+            for g in bundle.get("groups", [])
+            if g.get("uuid")
+        }
+        active_gp = [
+            g
+            for g in group_privs
+            if not g.get("voided", False) and g.get("allow", True)
+        ]
+        if active_gp:
+            priv_by_group: dict[str, list] = {}
+            for gp in active_gp:
+                group_name = gp.get("groupName", "") or grp_uuid_to_name.get(
+                    gp.get("groupUUID", ""), "Unknown"
+                )
+                priv_by_group.setdefault(group_name, []).append(gp)
+            entities["group_privileges"] = []
+            for group_name, privs in sorted(priv_by_group.items()):
+                gp_entry: dict = {"group": group_name, "privileges": []}
+                for gp in privs:
+                    p: dict = {"type": gp.get("privilegeType", "")}
+                    st_name = st_uuid_to_name.get(gp.get("subjectTypeUUID", ""), "")
+                    if st_name:
+                        p["subjectType"] = st_name
+                    prog_name = prog_uuid_to_name.get(gp.get("programUUID", ""), "")
+                    if prog_name:
+                        p["program"] = prog_name
+                    enc_name = enc_uuid_to_name.get(gp.get("encounterTypeUUID", ""), "")
+                    if enc_name:
+                        p["encounterType"] = enc_name
+                    gp_entry["privileges"].append(p)
+                entities["group_privileges"].append(gp_entry)
+
+    # ── Group dashboards ───────────────────────────────────────────────────
+    group_dashes = bundle.get("groupDashboards", [])
+    if group_dashes:
+        active_gd = [g for g in group_dashes if not g.get("voided", False)]
+        if active_gd:
+            entities["group_dashboards"] = [
+                {
+                    "groupName": gd.get("groupName", ""),
+                    "dashboardName": gd.get("dashboardName", ""),
+                    **(
+                        {"primaryDashboard": True} if gd.get("primaryDashboard") else {}
+                    ),
+                    **(
+                        {"secondaryDashboard": True}
+                        if gd.get("secondaryDashboard")
+                        else {}
+                    ),
+                }
+                for gd in active_gd
+            ]
+
+    # ── Individual relations ───────────────────────────────────────────────
+    ind_relations = bundle.get("individualRelation", [])
+    if ind_relations:
+        active_ir = [r for r in ind_relations if not r.get("voided", False)]
+        if active_ir:
+            entities["individual_relations"] = []
+            for ir in active_ir:
+                ir_entry: dict = {"name": ir.get("name", "")}
+                genders = ir.get("genders", [])
+                if genders:
+                    ir_entry["genders"] = [
+                        g.get("name", "")
+                        for g in genders
+                        if isinstance(g, dict) and not g.get("voided", False)
+                    ]
+                entities["individual_relations"].append(ir_entry)
+
+    # ── Catchments ─────────────────────────────────────────────────────────
+    catchments_raw = bundle.get("catchments", [])
+    if isinstance(catchments_raw, dict):
+        catchments_raw = catchments_raw.get("catchments", [])
+    if isinstance(catchments_raw, list) and catchments_raw:
+        active_catch = [
+            c
+            for c in catchments_raw
+            if isinstance(c, dict) and not c.get("voided", False)
+        ]
+        if active_catch:
+            entities["catchments"] = [
+                {
+                    "name": c.get("name", ""),
+                    **(
+                        {"locationCount": len(c["locations"])}
+                        if c.get("locations")
+                        else {}
+                    ),
+                }
+                for c in active_catch
+            ]
+
+    # ── Locations (summary) ────────────────────────────────────────────────
+    locations_raw = bundle.get("locations", [])
+    if locations_raw:
+        type_counts: dict[str, int] = {}
+        for loc in locations_raw:
+            loc_type = loc.get("type", "Unknown")
+            type_counts[loc_type] = type_counts.get(loc_type, 0) + 1
+        entities["locations"] = {
+            "totalCount": len(locations_raw),
+            "byType": type_counts,
+        }
+
+    # ── Concepts (full detail) ─────────────────────────────────────────────
+    concepts_raw = bundle.get("concepts", [])
+    if concepts_raw:
+        active_concepts = [
+            c
+            for c in concepts_raw
+            if c.get("active", True) and not c.get("voided", False)
+        ]
+        concepts_list = []
+        for c in active_concepts:
+            dt = c.get("dataType", "NA")
+            if dt == "NA" and not c.get("keyValues") and not c.get("answers"):
+                continue
+            c_entry: dict = {"name": c.get("name", ""), "dataType": dt}
+            if c.get("answers"):
+                c_entry["answers"] = [
+                    a["name"] if isinstance(a, dict) else str(a)
+                    for a in c["answers"]
+                    if not (isinstance(a, dict) and a.get("voided"))
+                ]
+            for key in (
+                "lowAbsolute",
+                "highAbsolute",
+                "lowNormal",
+                "highNormal",
+                "unit",
+            ):
+                if c.get(key) is not None:
+                    c_entry[key] = c[key]
+            concepts_list.append(c_entry)
+        if concepts_list:
+            entities["concepts_detail"] = concepts_list
+
+    # ── Rule dependency ────────────────────────────────────────────────────
+    rule_dep = bundle.get("ruleDependency", {})
+    if isinstance(rule_dep, dict) and rule_dep.get("code"):
+        entities["rule_dependency"] = {
+            "hasCode": True,
+            "codeLength": len(rule_dep["code"]),
+        }
+
     return entities
 
 

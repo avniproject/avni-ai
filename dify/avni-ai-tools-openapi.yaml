@@ -856,7 +856,9 @@ paths:
         agent can review or edit one section at a time without loading the full spec.
         Valid sections: subjectTypes, programs, encounterTypes, addressLevels, groups,
         settings, groupRoles, identifierSources, relationshipTypes, checklists,
-        videos, documentations, customQueries, reportCards, reportDashboards
+        videos, documentations, customQueries, reportCards, reportDashboards,
+        menuItems, messageRules, groupPrivileges, groupDashboards, individualRelations,
+        catchments, locations, concepts, ruleDependency
       parameters:
         - name: conversation_id
           in: query
@@ -895,7 +897,9 @@ paths:
         Provide either 'value' (parsed object) or 'yaml_fragment' (YAML string).
         Valid sections: subjectTypes, programs, encounterTypes, addressLevels, groups,
         settings, groupRoles, identifierSources, relationshipTypes, checklists,
-        videos, documentations, customQueries, reportCards, reportDashboards
+        videos, documentations, customQueries, reportCards, reportDashboards,
+        menuItems, messageRules, groupPrivileges, groupDashboards, individualRelations,
+        catchments, locations, concepts, ruleDependency
       requestBody:
         required: true
         content:
