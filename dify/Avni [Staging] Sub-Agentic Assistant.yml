@@ -857,19 +857,6 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: assigner
-        targetType: code
-      id: 1800000000730-source-1800000000740-target
-      selected: false
-      source: '1800000000730'
-      sourceHandle: source
-      target: '1800000000740'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
         sourceType: code
         targetType: if-else
       id: 1800000000740-source-1800000000745-target
@@ -932,6 +919,71 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: http-request
+      id: 1800000000730-source-1800000000770-target
+      selected: false
+      source: '1800000000730'
+      sourceHandle: source
+      target: '1800000000770'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: http-request
+        targetType: if-else
+      id: 1800000000770-source-1800000000775-target
+      selected: false
+      source: '1800000000770'
+      sourceHandle: source
+      target: '1800000000775'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: if-else
+        targetType: assigner
+      id: 1800000000775-gate-has-questions-1800000000751-target
+      selected: false
+      source: '1800000000775'
+      sourceHandle: gate-has-questions
+      target: '1800000000751'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: if-else
+        targetType: code
+      id: 1800000000775-false-1800000000740-target
+      selected: false
+      source: '1800000000775'
+      sourceHandle: 'false'
+      target: '1800000000740'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: http-request
+        targetType: code
+      id: 1800000000770-fail-branch-1800000000761-target
+      selected: false
+      source: '1800000000770'
+      sourceHandle: fail-branch
+      target: '1800000000761'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
     nodes:
     - data:
         desc: Define the initial parameters for launching a workflow
@@ -4894,6 +4946,87 @@ workflow:
       targetPosition: left
       type: custom
       width: 241
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: gate-body
+            key: ''
+            type: text
+            value: '{"conversation_id": "{{#sys.conversation_id#}}", "phase": "{{#conversation.active_agent#}}"}'
+          type: json
+        error_strategy: fail-branch
+        headers: ''
+        isInLoop: true
+        loop_id: '1800000000700'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 2
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: Pipeline Gate
+        type: http-request
+        url: '{{#conversation.avni_ai_server_url#}}validate-pipeline-step'
+        variables: []
+      height: 177
+      id: '1800000000770'
+      parentId: '1800000000700'
+      position:
+        x: 1700
+        y: 1260
+      positionAbsolute:
+        x: 5220
+        y: 1260
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        cases:
+        - case_id: gate-has-questions
+          conditions:
+          - comparison_operator: is
+            id: gate-check-1
+            value: present_questions
+            varType: string
+            variable_selector:
+            - '1800000000770'
+            - body
+            - next_action
+          id: gate-has-questions
+          logical_operator: and
+        desc: If pipeline gate returned questions, break loop to present to user
+        isInLoop: true
+        loop_id: '1800000000700'
+        selected: false
+        title: Gate Check
+        type: if-else
+      height: 148
+      id: '1800000000775'
+      parentId: '1800000000700'
+      position:
+        x: 2020
+        y: 1260
+      positionAbsolute:
+        x: 5540
+        y: 1260
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
     viewport:
       x: -5006.25
       y: -334.15
