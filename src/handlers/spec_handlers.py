@@ -821,7 +821,9 @@ def _load_spec_format() -> dict:
     if _SPEC_FORMAT_CACHE is None:
         from pathlib import Path
 
-        fmt_path = Path(__file__).resolve().parents[2] / "avni-comprehensive-spec-format.yaml"
+        fmt_path = (
+            Path(__file__).resolve().parents[2] / "avni-comprehensive-spec-format.yaml"
+        )
         if fmt_path.exists():
             _SPEC_FORMAT_CACHE = yaml.safe_load(fmt_path.read_text()) or {}
         else:
@@ -847,12 +849,17 @@ async def handle_get_spec_format(request: Request) -> JSONResponse:
 
     section = request.query_params.get("section")
     if not section:
-        return JSONResponse({
-            "sections": list(spec_format.keys()),
-            "spec_format": yaml.dump(
-                spec_format, allow_unicode=True, default_flow_style=False, sort_keys=False
-            ),
-        })
+        return JSONResponse(
+            {
+                "sections": list(spec_format.keys()),
+                "spec_format": yaml.dump(
+                    spec_format,
+                    allow_unicode=True,
+                    default_flow_style=False,
+                    sort_keys=False,
+                ),
+            }
+        )
 
     # Special case: 'fields' returns the field-level reference from within
     # subjectTypes → registrationForm → sections → fields
@@ -864,13 +871,17 @@ async def handle_get_spec_format(request: Request) -> JSONResponse:
             if sections:
                 field_ref = sections[0].get("fields", [])
                 if field_ref:
-                    return JSONResponse({
-                        "section": "fields",
-                        "reference": yaml.dump(
-                            {"fields": field_ref},
-                            allow_unicode=True, default_flow_style=False, sort_keys=False,
-                        ),
-                    })
+                    return JSONResponse(
+                        {
+                            "section": "fields",
+                            "reference": yaml.dump(
+                                {"fields": field_ref},
+                                allow_unicode=True,
+                                default_flow_style=False,
+                                sort_keys=False,
+                            ),
+                        }
+                    )
         return JSONResponse({"error": "No field reference found"}, status_code=404)
 
     if section not in spec_format:
@@ -882,10 +893,14 @@ async def handle_get_spec_format(request: Request) -> JSONResponse:
             status_code=404,
         )
 
-    return JSONResponse({
-        "section": section,
-        "reference": yaml.dump(
-            {section: spec_format[section]},
-            allow_unicode=True, default_flow_style=False, sort_keys=False,
-        ),
-    })
+    return JSONResponse(
+        {
+            "section": section,
+            "reference": yaml.dump(
+                {section: spec_format[section]},
+                allow_unicode=True,
+                default_flow_style=False,
+                sort_keys=False,
+            ),
+        }
+    )

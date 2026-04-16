@@ -53,8 +53,8 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 | Spec exists? | User message | Action |
 |---|---|---|
 | No | (any) | Full pipeline: extract entities → validate → generate spec → generate bundle |
-| Yes | User gives correction instructions (e.g. "remove X", "map Y to Z", "change subject type") | Apply surgical edits: (1) `update_spec_section` to fix the spec, (2) `get_bundle_file` + `put_bundle_file` to fix the corresponding bundle files (encounterTypes.json, formMappings.json, etc.) |
-| Yes | Inspector routed back with `[ROUTE_TO:spec]` | Read the specific fix instructions from Agent Memory. Apply surgical edits to spec AND bundle files as above. |
+| Yes | User gives correction instructions (e.g. "remove X", "map Y to Z", "change subject type") | First call `get_spec_format(section=X)` to see valid fields for the section being edited. Then apply surgical edits: (1) `update_spec_section` to fix the spec, (2) `get_bundle_file` + `put_bundle_file` to fix the corresponding bundle files (encounterTypes.json, formMappings.json, etc.) |
+| Yes | Inspector routed back with `[ROUTE_TO:spec]` | Read the fix instructions from Agent Memory. Call `get_spec_format(section=X)` if editing a section. Apply surgical edits to spec AND bundle files as above. |
 | Yes | User says "approved" / "looks good" / "proceed" | Call `generate_bundle` if not yet generated, then STOP |
 | Yes | No correction or approval (just re-invoked) | STOP — spec and bundle already exist |
 
@@ -91,8 +91,9 @@ The user uploads an Excel SRS / scoping sheet.
 ### Path 2: Chat-Based Questionnaire
 No document uploaded — build the spec through conversation.
 1. Detect or ask for the sector (MCH, Livelihoods, Education, Nutrition, WASH, etc.)
-2. Load sector defaults as starting point
-3. Walk through the 10 questionnaire sections below
+2. Call `get_spec_format()` (no section param) to get the full list of available spec sections — use this as your checklist of what to gather from the user
+3. Load sector defaults as starting point
+4. Walk through the 10 questionnaire sections below
 4. After all sections are covered, generate spec for review
 
 ### Path 3: Existing Organisation
@@ -101,7 +102,7 @@ The user wants to update an existing Avni organisation.
 2. Convert to spec (bundle_to_spec)
 3. Show current configuration for review
 4. Ask what changes are needed
-5. Apply changes via surgical spec edits
+5. Apply changes via surgical spec edits — call `get_spec_format(section=X)` before editing any section to see valid fields
 
 ---
 
