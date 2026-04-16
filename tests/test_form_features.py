@@ -216,9 +216,13 @@ class TestQuestionGroupGeneration:
 
 
 class TestDeclarativeRuleGeneration:
-    """Skip logic should generate proper declarativeRule on form elements."""
+    """Skip logic: skipLogic field should NOT produce declarativeRule.
 
-    def test_declarative_rule_attached(self):
+    New skip logic is generated as JS FormElementRules by the rules agent.
+    Only pre-existing declarativeRule from bundles should pass through.
+    """
+
+    def test_skip_logic_does_not_generate_declarative_rule(self):
         fg = FormGenerator()
         fg.concept_map = {
             "Activity Type": {
@@ -242,8 +246,22 @@ class TestDeclarativeRuleGeneration:
             },
         }
         elements = fg._generate_form_element(field, 2.0)
+        assert "declarativeRule" not in elements[0]
+
+    def test_existing_declarative_rule_passes_through(self):
+        fg = FormGenerator()
+        fg.concept_map = {
+            "Specify Details": {"uuid": "sd-uuid", "dataType": "Text"},
+        }
+        fg.form_uuid = "test"
+        fg.form_type = "Encounter"
+        existing_rule = [
+            {"actions": [{"actionType": "showFormElement"}], "conditions": []}
+        ]
+        field = {
+            "name": "Specify Details",
+            "declarativeRule": existing_rule,
+        }
+        elements = fg._generate_form_element(field, 2.0)
         assert "declarativeRule" in elements[0]
-        rule = elements[0]["declarativeRule"][0]
-        assert rule["actions"][0]["actionType"] == "showFormElement"
-        lhs = rule["conditions"][0]["compoundRule"]["rules"][0]["lhs"]
-        assert lhs["conceptName"] == "Activity Type"
+        assert elements[0]["declarativeRule"] == existing_rule
