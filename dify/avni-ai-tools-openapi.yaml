@@ -1367,6 +1367,133 @@ paths:
         '404':
           description: No stored spec for conversation_id
 
+  /validate-pipeline-step:
+    post:
+      operationId: validate_pipeline_step
+      summary: Deterministic validation gate — run after each agent completes
+      description: |
+        Validates the current pipeline state for the given phase. Auto-fixes
+        what it can (duplicate concepts, missing default values) and returns
+        structured questions for anything needing user input. The agent
+        presents questions to the user, then calls resolve-pipeline-questions
+        with the answers.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - phase
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID
+                phase:
+                  type: string
+                  description: Current pipeline phase (spec_generation, bundle_config, rules_generation, reports_generation, inspection)
+      responses:
+        '200':
+          description: Validation result with auto-fixes and questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    description: True if no questions and no errors — safe to proceed
+                  phase:
+                    type: string
+                  auto_fixed:
+                    type: array
+                    items:
+                      type: string
+                    description: Actions taken automatically (no user input needed)
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        question:
+                          type: string
+                        options:
+                          type: array
+                          items:
+                            type: string
+                        default:
+                          type: string
+                    description: Questions to present to the user
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+                  next_action:
+                    type: string
+                    description: '"present_questions" (questions need answers), "continue" (proceed to next agent), "retry_agent" (agent needs to re-run)'
+                    enum: [present_questions, continue, retry_agent]
+
+  /resolve-pipeline-questions:
+    post:
+      operationId: resolve_pipeline_questions
+      summary: Apply user answers to pipeline validation questions
+      description: |
+        Takes user answers from validate-pipeline-step questions and applies
+        them deterministically (remove encounters, assign subject types, fix
+        formMappings). Call this after presenting questions to the user, then
+        call validate-pipeline-step again to confirm resolution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - answers
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID
+                answers:
+                  type: array
+                  description: User answers to questions from validate-pipeline-step
+                  items:
+                    type: object
+                    required:
+                      - id
+                      - answer
+                    properties:
+                      id:
+                        type: string
+                        description: Question ID from validate-pipeline-step
+                      answer:
+                        type: string
+                        description: User's chosen option
+                      entity:
+                        type: string
+                        description: Entity name (optional, aids resolution)
+      responses:
+        '200':
+          description: Answers applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  applied:
+                    type: array
+                    items:
+                      type: string
+                    description: Actions taken based on user answers
+                  applied_count:
+                    type: integer
+
   /spec-format:
     get:
       operationId: get_spec_format

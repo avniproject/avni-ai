@@ -56,6 +56,10 @@ from .handlers.spec_handlers import (
     handle_get_spec_format,
     handle_enrich_spec,
 )
+from .handlers.pipeline_gate import (
+    handle_validate_pipeline_step,
+    handle_resolve_pipeline_questions,
+)
 from .handlers.sandbox_handlers import handle_execute_python, handle_read_silo_file
 from .handlers.log_handlers import handle_append_agent_log, handle_get_agent_logs
 from .handlers.ambiguity_handlers import (
@@ -404,6 +408,15 @@ async def create_server():
     @server.custom_route("/spec-format", methods=["GET"])
     async def get_spec_format_endpoint(request: Request):
         return await handle_get_spec_format(request)
+
+    # --- Pipeline Validation Gate ---
+    @server.custom_route("/validate-pipeline-step", methods=["POST"])
+    async def validate_pipeline_step_endpoint(request: Request):
+        return await handle_validate_pipeline_step(request)
+
+    @server.custom_route("/resolve-pipeline-questions", methods=["POST"])
+    async def resolve_pipeline_questions_endpoint(request: Request):
+        return await handle_resolve_pipeline_questions(request)
 
     @server.custom_route("/enrich-spec", methods=["POST"])
     async def enrich_spec_endpoint(request: Request):
