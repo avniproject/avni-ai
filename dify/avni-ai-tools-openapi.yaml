@@ -603,6 +603,11 @@ paths:
     get:
       operationId: upload_status
       summary: Check the status of a bundle upload task
+      description: |
+        By default (wait=true), blocks until the upload completes or fails (max 60s),
+        so you get a definitive result in one call. If the upload fails, the error
+        field contains the Avni server error message — use this to decide whether
+        to route back for fixes.
       parameters:
         - name: task_id
           in: path
@@ -610,6 +615,13 @@ paths:
           schema:
             type: string
           description: The upload task ID returned by upload-bundle
+        - name: wait
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: Wait for the task to complete before returning (default true). Set to false for immediate status check.
       responses:
         '200':
           description: Upload status

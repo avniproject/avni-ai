@@ -226,11 +226,30 @@ async def handle_upload_bundle(request: Request) -> JSONResponse:
 
 async def handle_upload_status(request: Request) -> JSONResponse:
     """
-    GET /upload-status/{task_id}
+    GET /upload-status/{task_id}?wait=true
     Returns task status dict.
+
+    When wait=true (default): polls until the task completes or fails (max 60s).
+    This ensures the agent gets a definitive result in a single call instead of
+    having to poll repeatedly.
+    When wait=false: returns current status immediately (legacy behaviour).
     """
+    import asyncio
+
     task_id = request.path_params.get("task_id", "")
     task = task_manager.get_task(task_id)
+    if not task:
+        return JSONResponse({"error": f"Task {task_id} not found"}, status_code=404)
+
+    wait = request.query_params.get("wait", "true").lower() != "false"
+    if wait and task.status in ("pending", "processing"):
+        # Poll until complete or timeout (5 min)
+        for _ in range(20):
+            await asyncio.sleep(15)
+            task = task_manager.get_task(task_id)
+            if not task or task.status not in ("pending", "processing"):
+                break
+
     if not task:
         return JSONResponse({"error": f"Task {task_id} not found"}, status_code=404)
     return JSONResponse(task.to_dict())

@@ -188,9 +188,10 @@ Issues Found:
    - **Deterministic fix** → include `[ROUTE_TO:agent]` with specific instructions
    - **Ambiguous fix** → include `[USER_CHOICE]` blocks with full context
 5. **If routing or presenting choices** → call `append_agent_log` (status=routed or status=user_choice) → STOP
-6. **Call `upload_bundle`** → then **call `upload_status`** with the task_id
-7. **Call `append_agent_log`** — log the upload result (status=success or status=error, include task_id and upload status)
-8. **Your final response MUST say "Bundle uploaded successfully" if upload worked**, or describe the error
+6. **Call `upload_bundle`** → then **call `upload_status`** with the task_id. `upload_status` waits up to 60s for the upload to complete — you will get a definitive result (completed/failed), not just "pending".
+7. **If upload_status returns status=failed**: Read the error message. If it mentions fixable issues (duplicate concepts, bad formMappings), use `[ROUTE_TO:bundle_config]` with the specific error details. If the error is ambiguous, present `[USER_CHOICE]` blocks.
+8. **If upload_status returns status=completed**: Call `append_agent_log` with phase=upload, status=success.
+9. **Your final response MUST say "Bundle uploaded successfully" if upload worked**, or describe the error and what routing was done to fix it.
 
 4. **For deterministic fixes** — include `[ROUTE_TO:agent]` with:
    - What file has the problem, what's wrong, what the fix should be
