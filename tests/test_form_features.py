@@ -265,3 +265,170 @@ class TestDeclarativeRuleGeneration:
         elements = fg._generate_form_element(field, 2.0)
         assert "declarativeRule" in elements[0]
         assert elements[0]["declarativeRule"] == existing_rule
+
+
+class TestDuplicateConceptDedup:
+    """Forms must not use the same concept twice — Avni rejects this."""
+
+    def test_duplicate_concept_skipped_in_form_generation(self):
+        fg = FormGenerator()
+        fg.concept_map = {
+            "Gender": {"uuid": "g-uuid", "dataType": "Coded", "answers": []},
+            "Name": {"uuid": "n-uuid", "dataType": "Text"},
+        }
+        fields = [
+            {"name": "Name", "dataType": "Text"},
+            {"name": "Gender", "dataType": "Coded"},
+            {"name": "Gender", "dataType": "Coded"},  # duplicate
+        ]
+        concepts = fg.concept_map
+        form = fg.generate_form("Test Form", "Encounter", fields, concepts)
+        all_elements = [e for g in form["formElementGroups"] for e in g["formElements"]]
+        concept_names = [e["name"] for e in all_elements]
+        assert concept_names.count("Gender") == 1
+
+    def test_duplicate_across_groups_skipped(self):
+        fg = FormGenerator()
+        fg.concept_map = {
+            "Remarks": {"uuid": "r-uuid", "dataType": "Text"},
+            "Weight": {"uuid": "w-uuid", "dataType": "Numeric"},
+        }
+        fields = [
+            {"name": "Weight", "dataType": "Numeric", "group": "Vitals"},
+            {"name": "Remarks", "dataType": "Text", "group": "Vitals"},
+            {
+                "name": "Remarks",
+                "dataType": "Text",
+                "group": "Notes",
+            },  # dup across groups
+        ]
+        form = fg.generate_form("HCCM Daily", "Encounter", fields, fg.concept_map)
+        all_elements = [e for g in form["formElementGroups"] for e in g["formElements"]]
+        concept_names = [e["name"] for e in all_elements]
+        assert concept_names.count("Remarks") == 1
+        assert "Weight" in concept_names
+
+
+class TestBundleValidatorFormMappingRules:
+    """Validate formMapping type rules that Avni server enforces."""
+
+    def test_encounter_cancellation_requires_encounter_type(self):
+        from src.bundle.validators import BundleValidator
+
+        bundle = {
+            "concepts": [],
+            "forms": [],
+            "subjectTypes": [{"uuid": "st-1", "name": "Person"}],
+            "programs": [],
+            "encounterTypes": [{"uuid": "et-1", "name": "Visit"}],
+            "formMappings": [
+                {
+                    "formName": "Visit Cancel",
+                    "formType": "IndividualEncounterCancellation",
+                    "subjectTypeUUID": "st-1",
+                    # missing encounterTypeUUID
+                }
+            ],
+            "groups": [],
+            "groupPrivileges": [],
+            "addressLevelTypes": [],
+            "operationalSubjectTypes": {"operationalSubjectTypes": []},
+            "operationalPrograms": {"operationalPrograms": []},
+            "operationalEncounterTypes": {"operationalEncounterTypes": []},
+            "organisationConfig": {},
+            "reportCards": [],
+            "reportDashboards": [],
+            "groupDashboards": [],
+        }
+        v = BundleValidator(bundle)
+        result = v.validate()
+        assert not result["valid"]
+        assert any(
+            "IndividualEncounterCancellation" in e and "encounterTypeUUID" in e
+            for e in result["errors"]
+        )
+
+    def test_valid_encounter_cancellation_passes(self):
+        from src.bundle.validators import BundleValidator
+
+        bundle = {
+            "concepts": [],
+            "forms": [],
+            "subjectTypes": [{"uuid": "st-1", "name": "Person"}],
+            "programs": [],
+            "encounterTypes": [{"uuid": "et-1", "name": "Visit"}],
+            "formMappings": [
+                {
+                    "formName": "Visit Cancel",
+                    "formType": "IndividualEncounterCancellation",
+                    "subjectTypeUUID": "st-1",
+                    "encounterTypeUUID": "et-1",
+                }
+            ],
+            "groups": [],
+            "groupPrivileges": [],
+            "addressLevelTypes": [],
+            "operationalSubjectTypes": {"operationalSubjectTypes": []},
+            "operationalPrograms": {"operationalPrograms": []},
+            "operationalEncounterTypes": {"operationalEncounterTypes": []},
+            "organisationConfig": {},
+            "reportCards": [],
+            "reportDashboards": [],
+            "groupDashboards": [],
+        }
+        v = BundleValidator(bundle)
+        result = v.validate()
+        mapping_errors = [
+            e for e in result["errors"] if "IndividualEncounterCancellation" in e
+        ]
+        assert len(mapping_errors) == 0
+
+    def test_duplicate_concept_in_form_detected(self):
+        from src.bundle.validators import BundleValidator
+
+        bundle = {
+            "concepts": [
+                {"uuid": "c1", "name": "Gender", "dataType": "Coded", "answers": []},
+            ],
+            "forms": [
+                {
+                    "uuid": "f1",
+                    "name": "Draft",
+                    "formType": "Encounter",
+                    "formElementGroups": [
+                        {
+                            "formElements": [
+                                {
+                                    "uuid": "e1",
+                                    "name": "Gender",
+                                    "concept": {"name": "Gender", "uuid": "c1"},
+                                },
+                                {
+                                    "uuid": "e2",
+                                    "name": "Gender",
+                                    "concept": {"name": "Gender", "uuid": "c1"},
+                                },
+                            ]
+                        }
+                    ],
+                }
+            ],
+            "subjectTypes": [],
+            "programs": [],
+            "encounterTypes": [],
+            "formMappings": [],
+            "groups": [],
+            "groupPrivileges": [],
+            "addressLevelTypes": [],
+            "operationalSubjectTypes": {"operationalSubjectTypes": []},
+            "operationalPrograms": {"operationalPrograms": []},
+            "operationalEncounterTypes": {"operationalEncounterTypes": []},
+            "organisationConfig": {},
+            "reportCards": [],
+            "reportDashboards": [],
+            "groupDashboards": [],
+        }
+        v = BundleValidator(bundle)
+        result = v.validate()
+        assert not result["valid"]
+        assert any("Gender" in e and "twice" in e for e in result["errors"])
