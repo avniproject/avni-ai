@@ -55,12 +55,17 @@ async def handle_validate_pipeline_step(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Missing conversation_id"}, status_code=400)
 
     # Dispatch to phase-specific validator
+    # Accept both agent names (from conversation.active_agent) and phase names
     validators = {
+        "spec": _validate_after_spec,
         "spec_generation": _validate_after_spec,
         "bundle_config": _validate_after_bundle,
         "bundle_generation": _validate_after_bundle,
+        "rules": _validate_after_rules,
         "rules_generation": _validate_after_rules,
+        "reports": _validate_after_reports,
         "reports_generation": _validate_after_reports,
+        "inspect": _validate_after_inspection,
         "inspection": _validate_after_inspection,
     }
 

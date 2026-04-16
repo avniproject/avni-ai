@@ -936,38 +936,12 @@ workflow:
         isInLoop: true
         loop_id: '1800000000700'
         sourceType: http-request
-        targetType: if-else
-      id: 1800000000770-source-1800000000775-target
+        targetType: code
+      id: 1800000000770-fail-branch-1800000000761-target
       selected: false
       source: '1800000000770'
-      sourceHandle: source
-      target: '1800000000775'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: assigner
-      id: 1800000000775-gate-has-questions-1800000000751-target
-      selected: false
-      source: '1800000000775'
-      sourceHandle: gate-has-questions
-      target: '1800000000751'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: code
-      id: 1800000000775-false-1800000000740-target
-      selected: false
-      source: '1800000000775'
-      sourceHandle: 'false'
-      target: '1800000000740'
+      sourceHandle: fail-branch
+      target: '1800000000761'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -976,11 +950,63 @@ workflow:
         loop_id: '1800000000700'
         sourceType: http-request
         targetType: code
-      id: 1800000000770-fail-branch-1800000000761-target
+      id: 1800000000770-source-1800000000776-target
       selected: false
       source: '1800000000770'
-      sourceHandle: fail-branch
-      target: '1800000000761'
+      sourceHandle: source
+      target: '1800000000776'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: code
+        targetType: if-else
+      id: 1800000000776-source-1800000000777-target
+      selected: false
+      source: '1800000000776'
+      sourceHandle: source
+      target: '1800000000777'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: if-else
+        targetType: code
+      id: 1800000000777-false-1800000000740-target
+      selected: false
+      source: '1800000000777'
+      sourceHandle: 'false'
+      target: '1800000000740'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: if-else
+        targetType: assigner
+      id: 1800000000777-gate-has-questions-1800000000778-target
+      selected: false
+      source: '1800000000777'
+      sourceHandle: gate-has-questions
+      target: '1800000000778'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: assigner
+      id: 1800000000778-source-1800000000751-target
+      selected: false
+      source: '1800000000778'
+      sourceHandle: source
+      target: '1800000000751'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -2622,6 +2648,46 @@ workflow:
                 questions for the user
               tool_label: enrich_spec
               tool_name: enrich_spec
+              type: api
+            - enabled: true
+              extra:
+                description: Deterministic validation gate — run after each agent
+                  completes
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                phase:
+                  auto: 1
+                  value: null
+              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
+              provider_show_name: Avni AI Staging SubAgents Openapi
+              settings: {}
+              tool_description: Validate pipeline state and get structured questions
+                for user
+              tool_label: validate_pipeline_step
+              tool_name: validate_pipeline_step
+              type: api
+            - enabled: true
+              extra:
+                description: Apply user answers to pipeline validation questions
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                answers:
+                  auto: 1
+                  value: null
+              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
+              provider_show_name: Avni AI Staging SubAgents Openapi
+              settings: {}
+              tool_description: Apply user answers to fix entities/bundle deterministically
+              tool_label: resolve_pipeline_questions
+              tool_name: resolve_pipeline_questions
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
@@ -4804,31 +4870,40 @@ workflow:
           instruction:
             type: constant
             value: "You are a friendly assistant that summarizes what happened during\
-              \ an Avni configuration workflow.\n\n  ## Step 1: Get the full activity\
-              \ log\n  Call `get_agent_logs` with the conversation_id to retrieve\
-              \ the structured activity log. This is more\n  reliable than the agent\
-              \ memory text below.\n\n  ## Step 2: Determine upload status\n\n  Look\
-              \ for these in the agent log entries:\n  - **Uploaded**: Any entry with\
-              \ phase=\"upload\" and status=\"success\", OR action contains \"uploaded\n\
-              \  successfully\" or \"Bundle uploaded\"\n  - **NOT uploaded**: No such\
-              \ entry exists\n\n  Also check the agent memory for backup signals:\n\
-              \  <agent_log>\n  {{#conversation.agent_memory#}}\n  </agent_log>\n\n\
-              \  Look for [UPLOAD_SUCCESS] tag or \"upload_bundle\" / \"uploaded successfully\"\
-              \ in the memory text.\n\n  Do NOT guess. If you cannot find an explicit\
-              \ upload indicator in either source, say the bundle was NOT\n  uploaded.\n\
-              \n  ## Step 3: Write the summary\n\n  1. Check if the log contains entries\
-              \ with status=\"error\". If yes, explain what went wrong simply and\n\
-              \  suggest retry.\n  2. Check if the log contains ROUTE_TO entries that\
-              \ were NOT followed by a successful upload. Tell the\n  user what was\
-              \ found and what fix was attempted.\n  3. **If uploaded**: Start with\
-              \ \"Your bundle has been uploaded to Avni successfully.\" Then summarize\
-              \ what\n   was built in 3-5 bullet points. Next steps: review forms\
-              \ in Avni, set up locations and users.\n  4. **If NOT uploaded**: Start\
-              \ with \"Your bundle has been generated but is NOT yet uploaded to Avni.\"\
-              \n  Explain what happened and what the user should do (retry, or ask\
-              \ the assistant to upload).\n  5. Keep it under 200 words, use markdown.\n\
-              \  6. Do NOT dump raw data or technical details.\n  7. Do NOT say \"\
-              ready to deploy\" — either it IS deployed (uploaded) or it is NOT."
+              \ an Avni configuration workflow.\n\n  \n\n  ## Step 0: Check for pipeline\
+              \ gate questions\n  Look in the agent memory for [QUESTION] entries.\
+              \ If found:\n  - These are questions that need the user's input before\
+              \ the pipeline can continue.\n  - Present each question clearly with\
+              \ the options listed.\n  - Do NOT summarize the workflow as if it's\
+              \ done — it's paused waiting for input.\n  - Format: \"Before we can\
+              \ proceed, I need your input on a few items:\" then list each question\
+              \ with numbered options.\n  - End with: \"Please answer these questions\
+              \ so we can continue.\"\n  - If [QUESTION] entries exist, SKIP all other\
+              \ summary steps.\n\n  ## Step 1: Get the full activity log\n  Call `get_agent_logs`\
+              \ with the conversation_id to retrieve the structured activity log.\
+              \ This is more\n  reliable than the agent memory text below.\n\n  ##\
+              \ Step 2: Determine upload status\n\n  Look for these in the agent log\
+              \ entries:\n  - **Uploaded**: Any entry with phase=\"upload\" and status=\"\
+              success\", OR action contains \"uploaded\n  successfully\" or \"Bundle\
+              \ uploaded\"\n  - **NOT uploaded**: No such entry exists\n\n  Also check\
+              \ the agent memory for backup signals:\n  <agent_log>\n  {{#conversation.agent_memory#}}\n\
+              \  </agent_log>\n\n  Look for [UPLOAD_SUCCESS] tag or \"upload_bundle\"\
+              \ / \"uploaded successfully\" in the memory text.\n\n  Do NOT guess.\
+              \ If you cannot find an explicit upload indicator in either source,\
+              \ say the bundle was NOT\n  uploaded.\n\n  ## Step 3: Write the summary\n\
+              \n  1. Check if the log contains entries with status=\"error\". If yes,\
+              \ explain what went wrong simply and\n  suggest retry.\n  2. Check if\
+              \ the log contains ROUTE_TO entries that were NOT followed by a successful\
+              \ upload. Tell the\n  user what was found and what fix was attempted.\n\
+              \  3. **If uploaded**: Start with \"Your bundle has been uploaded to\
+              \ Avni successfully.\" Then summarize what\n   was built in 3-5 bullet\
+              \ points. Next steps: review forms in Avni, set up locations and users.\n\
+              \  4. **If NOT uploaded**: Start with \"Your bundle has been generated\
+              \ but is NOT yet uploaded to Avni.\"\n  Explain what happened and what\
+              \ the user should do (retry, or ask the assistant to upload).\n  5.\
+              \ Keep it under 200 words, use markdown.\n  6. Do NOT dump raw data\
+              \ or technical details.\n  7. Do NOT say \"ready to deploy\" — either\
+              \ it IS deployed (uploaded) or it is NOT."
           model:
             type: constant
             value:
@@ -4993,27 +5068,49 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        cases:
-        - case_id: gate-has-questions
-          conditions:
-          - comparison_operator: is
-            id: gate-check-1
-            value: present_questions
-            varType: string
-            variable_selector:
-            - '1800000000770'
-            - body
-            - next_action
-          id: gate-has-questions
-          logical_operator: and
-        desc: If pipeline gate returned questions, break loop to present to user
+        code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
+          \ str) -> dict:\n    # Parse pipeline gate response\n    has_questions =\
+          \ False\n    gate_output = \"\"\n    try:\n        data = json.loads(gate_body)\
+          \ if gate_body else {}\n        next_action = data.get(\"next_action\",\
+          \ \"continue\")\n        has_questions = next_action == \"present_questions\"\
+          \n\n        # Build output for agent memory / user display\n        parts\
+          \ = []\n        for fix in data.get(\"auto_fixed\", []):\n            parts.append(f\"\
+          [AUTO-FIX] {fix}\")\n        for q in data.get(\"questions\", []):\n   \
+          \         parts.append(f\"[QUESTION] {q.get('question', '')} Options: {q.get('options',\
+          \ [])}\")\n        gate_output = \"\n\".join(parts) if parts else \"\"\n\
+          \    except Exception:\n        pass\n\n    if gate_status >= 400:\n   \
+          \     has_questions = False  # gate failed, just continue\n\n    return\
+          \ {\n        \"has_questions\": has_questions,\n        \"gate_output\"\
+          : gate_output,\n    }\n"
+        code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
+        outputs:
+          has_questions:
+            type: boolean
+          gate_output:
+            type: string
         selected: false
-        title: Gate Check
-        type: if-else
-      height: 148
-      id: '1800000000775'
+        title: Gate Parser
+        type: code
+        variables:
+        - value_selector:
+          - '1800000000770'
+          - status_code
+          value_type: number
+          variable: gate_status
+        - value_selector:
+          - '1800000000770'
+          - body
+          value_type: string
+          variable: gate_body
+        - value_selector:
+          - conversation
+          - agent_memory
+          value_type: string
+          variable: agent_memory
+      height: 52
+      id: '1800000000776'
       parentId: '1800000000700'
       position:
         x: 2020
@@ -5021,6 +5118,72 @@ workflow:
       positionAbsolute:
         x: 5540
         y: 1260
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        cases:
+        - case_id: gate-has-questions
+          conditions:
+          - comparison_operator: is
+            id: gate-check-bool
+            value: 'true'
+            varType: boolean
+            variable_selector:
+            - '1800000000776'
+            - has_questions
+          id: gate-has-questions
+          logical_operator: and
+        desc: If pipeline gate has questions, break loop
+        isInLoop: true
+        loop_id: '1800000000700'
+        selected: false
+        title: Gate Check
+        type: if-else
+      height: 148
+      id: '1800000000777'
+      parentId: '1800000000700'
+      position:
+        x: 2340
+        y: 1260
+      positionAbsolute:
+        x: 5860
+        y: 1260
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000776'
+          - gate_output
+          variable_selector:
+          - conversation
+          - agent_memory
+          write_mode: append
+        loop_id: '1800000000700'
+        selected: false
+        title: Gate Questions to Memory
+        type: assigner
+        version: '2'
+      height: 84
+      id: '1800000000778'
+      parentId: '1800000000700'
+      position:
+        x: 2660
+        y: 1200
+      positionAbsolute:
+        x: 6180
+        y: 1200
       selected: false
       sourcePosition: right
       targetPosition: left
