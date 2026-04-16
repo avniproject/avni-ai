@@ -1294,6 +1294,54 @@ paths:
         '404':
           description: No log entries found for conversation_id
 
+  /spec-format:
+    get:
+      operationId: get_spec_format
+      summary: Get the comprehensive YAML spec reference schema
+      description: |
+        Returns the reference schema showing all valid fields for each section
+        of the YAML spec. Call this before editing a spec section to know what
+        fields are valid. Without a section param, returns all section names.
+        With a section param, returns just that section's reference.
+        Use section=fields to get the field-level reference (dataType, skipLogic,
+        keyValues, validFormat, declarativeRule, etc.).
+      parameters:
+        - name: section
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            Section to fetch reference for. Valid values: settings, addressLevels,
+            subjectTypes, programs, encounterTypes, groups, groupRoles,
+            identifierSources, relationshipTypes, checklists, videos,
+            documentations, customQueries, reportCards, reportDashboards, fields.
+            Omit to get the full schema with all sections listed.
+      responses:
+        '200':
+          description: Spec format reference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sections:
+                    type: array
+                    items:
+                      type: string
+                    description: Available section names (when no section param)
+                  section:
+                    type: string
+                    description: The requested section name
+                  reference:
+                    type: string
+                    description: YAML-formatted reference for the section
+                  spec_format:
+                    type: string
+                    description: Full YAML spec format (when no section param)
+        '404':
+          description: Unknown section or spec format file not found
+
   /execute-python:
     post:
       operationId: execute_python

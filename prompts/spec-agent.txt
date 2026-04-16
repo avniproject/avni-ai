@@ -33,8 +33,11 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 14. **Call `chat_srs_update_section`** to update a section of the chat SRS.
 15. **Call `chat_srs_build_entities`** to convert completed chat sections into standard entities.
 
+### Spec format reference
+16. **Call `get_spec_format`** with `section` param to get the valid fields for a spec section before editing it. Use `section=subjectTypes` to see all valid subject type fields, `section=fields` for field-level reference (dataType, skipLogic, keyValues, etc.). Call without section param to see all available sections.
+
 ### Existing org support
-16. **Call `download_bundle_b64`** to download an existing org's bundle and store it server-side.
+17. **Call `download_bundle_b64`** to download an existing org's bundle and store it server-side.
 
 ### Utility tools
 17. **Call `execute_python`** for complex transformations.

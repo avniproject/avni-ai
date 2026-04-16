@@ -53,6 +53,7 @@ from .handlers.spec_handlers import (
     handle_validate_spec,
     handle_spec_to_entities,
     handle_bundle_to_spec,
+    handle_get_spec_format,
 )
 from .handlers.sandbox_handlers import handle_execute_python, handle_read_silo_file
 from .handlers.log_handlers import handle_append_agent_log, handle_get_agent_logs
@@ -398,6 +399,10 @@ async def create_server():
     @server.custom_route("/bundle-to-spec", methods=["POST"])
     async def bundle_to_spec_endpoint(request: Request):
         return await handle_bundle_to_spec(request)
+
+    @server.custom_route("/spec-format", methods=["GET"])
+    async def get_spec_format_endpoint(request: Request):
+        return await handle_get_spec_format(request)
 
     # --- Bundle Generation ---
     @server.custom_route("/generate-bundle", methods=["POST"])

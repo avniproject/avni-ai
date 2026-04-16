@@ -9,6 +9,7 @@ Endpoints:
   POST /validate-spec        YAML spec string → validation result
   POST /spec-to-entities     YAML spec string → full entities dict
   POST /bundle-to-spec       existing bundle JSON → YAML spec string
+  GET  /spec-format          returns the comprehensive YAML spec reference schema
 """
 
 from __future__ import annotations
@@ -805,3 +806,86 @@ def _bundle_to_entities(bundle: dict) -> dict:
             ]
 
     return entities
+
+
+# ---------------------------------------------------------------------------
+# Spec format reference
+# ---------------------------------------------------------------------------
+
+_SPEC_FORMAT_CACHE: dict | None = None
+
+
+def _load_spec_format() -> dict:
+    """Load and parse the comprehensive spec format YAML. Cached after first call."""
+    global _SPEC_FORMAT_CACHE
+    if _SPEC_FORMAT_CACHE is None:
+        from pathlib import Path
+
+        fmt_path = Path(__file__).resolve().parents[2] / "avni-comprehensive-spec-format.yaml"
+        if fmt_path.exists():
+            _SPEC_FORMAT_CACHE = yaml.safe_load(fmt_path.read_text()) or {}
+        else:
+            _SPEC_FORMAT_CACHE = {}
+    return _SPEC_FORMAT_CACHE
+
+
+async def handle_get_spec_format(request: Request) -> JSONResponse:
+    """
+    GET /spec-format?section=subjectTypes
+    Returns the comprehensive YAML spec reference schema.
+
+    Without section param: returns all top-level section names + the full schema.
+    With section param: returns just that section's reference (e.g. subjectTypes
+    with all valid fields, or 'fields' for the field-level reference).
+    """
+    spec_format = _load_spec_format()
+    if not spec_format:
+        return JSONResponse(
+            {"error": "avni-comprehensive-spec-format.yaml not found"},
+            status_code=404,
+        )
+
+    section = request.query_params.get("section")
+    if not section:
+        return JSONResponse({
+            "sections": list(spec_format.keys()),
+            "spec_format": yaml.dump(
+                spec_format, allow_unicode=True, default_flow_style=False, sort_keys=False
+            ),
+        })
+
+    # Special case: 'fields' returns the field-level reference from within
+    # subjectTypes → registrationForm → sections → fields
+    if section == "fields":
+        st_list = spec_format.get("subjectTypes", [])
+        if st_list and isinstance(st_list, list):
+            reg_form = st_list[0].get("registrationForm", {})
+            sections = reg_form.get("sections", [])
+            if sections:
+                field_ref = sections[0].get("fields", [])
+                if field_ref:
+                    return JSONResponse({
+                        "section": "fields",
+                        "reference": yaml.dump(
+                            {"fields": field_ref},
+                            allow_unicode=True, default_flow_style=False, sort_keys=False,
+                        ),
+                    })
+        return JSONResponse({"error": "No field reference found"}, status_code=404)
+
+    if section not in spec_format:
+        return JSONResponse(
+            {
+                "error": f"Unknown section '{section}'",
+                "valid_sections": list(spec_format.keys()) + ["fields"],
+            },
+            status_code=404,
+        )
+
+    return JSONResponse({
+        "section": section,
+        "reference": yaml.dump(
+            {section: spec_format[section]},
+            allow_unicode=True, default_flow_style=False, sort_keys=False,
+        ),
+    })
