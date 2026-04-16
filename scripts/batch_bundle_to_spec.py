@@ -598,6 +598,267 @@ def bundle_to_comprehensive_spec(
         # Already captured in settings.languages
         pass
 
+    # ── Menu items ─────────────────────────────────────────────────────────
+    menu_items = bundle.get("menuItem", [])
+    if menu_items:
+        active_mi = [m for m in menu_items if not m.get("voided", False)]
+        if active_mi:
+            spec["menuItems"] = []
+            for mi in active_mi:
+                mi_spec: dict[str, Any] = {
+                    "displayKey": mi.get("displayKey", ""),
+                    "type": mi.get("type", ""),
+                }
+                if mi.get("icon"):
+                    mi_spec["icon"] = mi["icon"]
+                if mi.get("group"):
+                    mi_spec["group"] = mi["group"]
+                if mi.get("linkFunction"):
+                    mi_spec["linkFunction"] = mi["linkFunction"]
+                spec["menuItems"].append(mi_spec)
+
+    # ── Message rules ──────────────────────────────────────────────────────
+    message_rules = bundle.get("messageRule", [])
+    if message_rules:
+        active_mr = [m for m in message_rules if not m.get("voided", False) and not m.get("isVoided", False)]
+        if active_mr:
+            spec["messageRules"] = []
+            for mr in active_mr:
+                mr_spec: dict[str, Any] = {"name": mr.get("name", "")}
+                if mr.get("entityType"):
+                    mr_spec["entityType"] = mr["entityType"]
+                if mr.get("messageRule"):
+                    mr_spec["messageRule"] = mr["messageRule"]
+                if mr.get("scheduleRule"):
+                    mr_spec["scheduleRule"] = mr["scheduleRule"]
+                if mr.get("messageTemplateId"):
+                    mr_spec["messageTemplateId"] = mr["messageTemplateId"]
+                if mr.get("receiverType"):
+                    mr_spec["receiverType"] = mr["receiverType"]
+                # Resolve entity type UUID to name
+                entity_uuid = mr.get("entityTypeUuid")
+                if entity_uuid:
+                    resolved = (
+                        st_uuid_to_name.get(entity_uuid)
+                        or prog_uuid_to_name.get(entity_uuid)
+                        or enc_uuid_to_name.get(entity_uuid)
+                    )
+                    if resolved:
+                        mr_spec["entityTypeName"] = resolved
+                spec["messageRules"].append(mr_spec)
+
+    # ── Operational encounter types ────────────────────────────────────────
+    op_enc_raw = bundle.get("operationalEncounterTypes", {})
+    if isinstance(op_enc_raw, dict):
+        op_enc_list = op_enc_raw.get("operationalEncounterTypes", [])
+    elif isinstance(op_enc_raw, list):
+        op_enc_list = op_enc_raw
+    else:
+        op_enc_list = []
+    if op_enc_list:
+        active_oet = [o for o in op_enc_list if not o.get("voided", False)]
+        if active_oet:
+            spec["operationalEncounterTypes"] = []
+            for oet in active_oet:
+                oet_spec: dict[str, Any] = {"name": oet.get("name", "")}
+                enc_ref = oet.get("encounterType", {})
+                if isinstance(enc_ref, dict) and enc_ref.get("uuid"):
+                    enc_name = enc_uuid_to_name.get(enc_ref["uuid"], "")
+                    if enc_name:
+                        oet_spec["encounterType"] = enc_name
+                spec["operationalEncounterTypes"].append(oet_spec)
+
+    # ── Operational subject types ──────────────────────────────────────────
+    op_st_raw = bundle.get("operationalSubjectTypes", {})
+    if isinstance(op_st_raw, dict):
+        op_st_list = op_st_raw.get("operationalSubjectTypes", [])
+    elif isinstance(op_st_raw, list):
+        op_st_list = op_st_raw
+    else:
+        op_st_list = []
+    if op_st_list:
+        active_ost = [o for o in op_st_list if not o.get("voided", False)]
+        if active_ost:
+            spec["operationalSubjectTypes"] = []
+            for ost in active_ost:
+                ost_spec: dict[str, Any] = {"name": ost.get("name", "")}
+                st_ref = ost.get("subjectType", {})
+                if isinstance(st_ref, dict) and st_ref.get("uuid"):
+                    st_name = st_uuid_to_name.get(st_ref["uuid"], "")
+                    if st_name:
+                        ost_spec["subjectType"] = st_name
+                spec["operationalSubjectTypes"].append(ost_spec)
+
+    # ── Group privileges ───────────────────────────────────────────────────
+    group_privs = bundle.get("groupPrivilege", [])
+    if group_privs:
+        # Build group UUID → name map
+        grp_uuid_to_name: dict[str, str] = {}
+        for grp in bundle.get("groups", []):
+            if grp.get("uuid"):
+                grp_uuid_to_name[grp["uuid"]] = grp.get("name", "")
+
+        active_gp = [g for g in group_privs if not g.get("voided", False) and g.get("allow", True)]
+        if active_gp:
+            # Group by group name for readability
+            priv_by_group: dict[str, list] = {}
+            for gp in active_gp:
+                group_name = gp.get("groupName", "") or grp_uuid_to_name.get(gp.get("groupUUID", ""), "")
+                if not group_name:
+                    group_name = "Unknown"
+                priv_by_group.setdefault(group_name, []).append(gp)
+
+            spec["groupPrivileges"] = []
+            for group_name, privs in sorted(priv_by_group.items()):
+                gp_spec: dict[str, Any] = {
+                    "group": group_name,
+                    "privileges": [],
+                }
+                for gp in privs:
+                    p: dict[str, Any] = {"type": gp.get("privilegeType", "")}
+                    # Resolve subject type
+                    st_name = st_uuid_to_name.get(gp.get("subjectTypeUUID", ""), "")
+                    if st_name:
+                        p["subjectType"] = st_name
+                    # Resolve program
+                    prog_name = prog_uuid_to_name.get(gp.get("programUUID", ""), "")
+                    if prog_name:
+                        p["program"] = prog_name
+                    # Resolve encounter type
+                    enc_name = enc_uuid_to_name.get(gp.get("encounterTypeUUID", ""), "")
+                    if enc_name:
+                        p["encounterType"] = enc_name
+                    gp_spec["privileges"].append(p)
+                spec["groupPrivileges"].append(gp_spec)
+
+    # ── Group dashboards ───────────────────────────────────────────────────
+    group_dashes = bundle.get("groupDashboards", [])
+    if group_dashes:
+        active_gd = [g for g in group_dashes if not g.get("voided", False)]
+        if active_gd:
+            spec["groupDashboards"] = []
+            for gd in active_gd:
+                gd_spec: dict[str, Any] = {
+                    "groupName": gd.get("groupName", ""),
+                    "dashboardName": gd.get("dashboardName", ""),
+                }
+                if gd.get("primaryDashboard"):
+                    gd_spec["primaryDashboard"] = True
+                if gd.get("secondaryDashboard"):
+                    gd_spec["secondaryDashboard"] = True
+                spec["groupDashboards"].append(gd_spec)
+
+    # ── Individual relations ───────────────────────────────────────────────
+    ind_relations = bundle.get("individualRelation", [])
+    if ind_relations:
+        active_ir = [r for r in ind_relations if not r.get("voided", False)]
+        if active_ir:
+            spec["individualRelations"] = []
+            for ir in active_ir:
+                ir_spec: dict[str, Any] = {"name": ir.get("name", "")}
+                genders = ir.get("genders", [])
+                if genders:
+                    ir_spec["genders"] = [
+                        g.get("name", "") for g in genders
+                        if isinstance(g, dict) and not g.get("voided", False)
+                    ]
+                spec["individualRelations"].append(ir_spec)
+
+    # ── Catchments ─────────────────────────────────────────────────────────
+    catchments_raw = bundle.get("catchments", [])
+    if isinstance(catchments_raw, dict):
+        catchments_raw = catchments_raw.get("catchments", [])
+    if not isinstance(catchments_raw, list):
+        catchments_raw = []
+    if catchments_raw:
+        active_catch = [c for c in catchments_raw if isinstance(c, dict) and not c.get("voided", False)]
+        if active_catch:
+            spec["catchments"] = []
+            for cat in active_catch:
+                cat_spec: dict[str, Any] = {"name": cat.get("name", "")}
+                locs = cat.get("locations", [])
+                if locs:
+                    cat_spec["locationCount"] = len(locs)
+                spec["catchments"].append(cat_spec)
+
+    # ── Locations ──────────────────────────────────────────────────────────
+    locations_raw = bundle.get("locations", [])
+    if locations_raw:
+        # Summarize by type rather than listing all (can be thousands)
+        type_counts: dict[str, int] = {}
+        for loc in locations_raw:
+            loc_type = loc.get("type", "Unknown")
+            type_counts[loc_type] = type_counts.get(loc_type, 0) + 1
+        spec["locations"] = {
+            "totalCount": len(locations_raw),
+            "byType": type_counts,
+        }
+
+    # ── Concepts (full detail) ────────────────────────────────────────────
+    concepts_raw = bundle.get("concepts", [])
+    if concepts_raw:
+        active_concepts = [c for c in concepts_raw if c.get("active", True) and not c.get("voided", False)]
+        spec["concepts"] = []
+        for c in active_concepts:
+            dt = c.get("dataType", "NA")
+            # Skip bare NA concepts with no keyValues (answer options, not real fields)
+            if dt == "NA" and not c.get("keyValues") and not c.get("answers"):
+                continue
+
+            c_spec: dict[str, Any] = {"name": c.get("name", ""), "dataType": dt}
+
+            # Coded answers
+            if c.get("answers"):
+                c_spec["answers"] = [
+                    a["name"] if isinstance(a, dict) else str(a)
+                    for a in c["answers"]
+                    if not (isinstance(a, dict) and a.get("voided"))
+                ]
+
+            # Numeric bounds and unit
+            if c.get("lowAbsolute") is not None:
+                c_spec["lowAbsolute"] = c["lowAbsolute"]
+            if c.get("highAbsolute") is not None:
+                c_spec["highAbsolute"] = c["highAbsolute"]
+            if c.get("lowNormal") is not None:
+                c_spec["lowNormal"] = c["lowNormal"]
+            if c.get("highNormal") is not None:
+                c_spec["highNormal"] = c["highNormal"]
+            if c.get("unit"):
+                c_spec["unit"] = c["unit"]
+
+            # KeyValues — capture all config
+            kv_list = c.get("keyValues", [])
+            if kv_list:
+                kv_dict = {}
+                for kv in kv_list:
+                    if isinstance(kv, dict):
+                        key = kv.get("key", "")
+                        val = kv.get("value")
+                        # Resolve UUIDs to names where possible
+                        if key == "subjectTypeUUID" and isinstance(val, str):
+                            resolved = st_uuid_to_name.get(val)
+                            if resolved:
+                                kv_dict["subjectType"] = resolved
+                                continue
+                        if key == "encounterTypeUUID" and isinstance(val, str):
+                            resolved = enc_uuid_to_name.get(val)
+                            if resolved:
+                                kv_dict["encounterType"] = resolved
+                                continue
+                        if key:
+                            kv_dict[key] = val
+                if kv_dict:
+                    c_spec["keyValues"] = kv_dict
+
+            spec["concepts"].append(c_spec)
+
+    # ── Rule dependency ────────────────────────────────────────────────────
+    rule_dep = bundle.get("ruleDependency", {})
+    if rule_dep:
+        if isinstance(rule_dep, dict) and rule_dep.get("code"):
+            spec["ruleDependency"] = {"hasCode": True, "codeLength": len(rule_dep["code"])}
+
     return spec
 
 
@@ -746,6 +1007,16 @@ def _form_to_spec(form: dict) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+def _unwrap_list(bundle: dict, key: str) -> list:
+    """Get a list from bundle, handling both raw lists and {key: [...]} wrappers."""
+    val = bundle.get(key, [])
+    if isinstance(val, dict):
+        val = val.get(key, [])
+    if not isinstance(val, list):
+        return []
+    return val
+
+
 def analyze_coverage(bundle: dict, spec: dict, org_name: str) -> dict[str, Any]:
     """Analyze what percentage of the bundle is captured in the spec."""
     report: dict[str, Any] = {"org": org_name}
@@ -777,6 +1048,13 @@ def analyze_coverage(bundle: dict, spec: dict, org_name: str) -> dict[str, Any]:
         "groups": len(
             [g for g in bundle.get("groups", []) if not g.get("voided", False)]
         ),
+        "menuItems": len([m for m in bundle.get("menuItem", []) if not m.get("voided", False)]),
+        "messageRules": len([m for m in bundle.get("messageRule", []) if not m.get("voided", False) and not m.get("isVoided", False)]),
+        "groupPrivileges": len([g for g in bundle.get("groupPrivilege", []) if not g.get("voided", False)]),
+        "groupDashboards": len([g for g in bundle.get("groupDashboards", []) if not g.get("voided", False)]),
+        "individualRelations": len([r for r in bundle.get("individualRelation", []) if not r.get("voided", False)]),
+        "catchments": len([c for c in (_unwrap_list(bundle, "catchments")) if isinstance(c, dict) and not c.get("voided", False)]),
+        "locations": len(_unwrap_list(bundle, "locations")),
     }
 
     # Count spec entities
@@ -841,6 +1119,28 @@ def analyze_coverage(bundle: dict, spec: dict, org_name: str) -> dict[str, Any]:
         extras.append(f"reportCards({len(spec['reportCards'])})")
     if spec.get("reportDashboards"):
         extras.append(f"reportDashboards({len(spec['reportDashboards'])})")
+    if spec.get("menuItems"):
+        extras.append(f"menuItems({len(spec['menuItems'])})")
+    if spec.get("messageRules"):
+        extras.append(f"messageRules({len(spec['messageRules'])})")
+    if spec.get("operationalEncounterTypes"):
+        extras.append(f"opEncTypes({len(spec['operationalEncounterTypes'])})")
+    if spec.get("operationalSubjectTypes"):
+        extras.append(f"opSubTypes({len(spec['operationalSubjectTypes'])})")
+    if spec.get("groupPrivileges"):
+        extras.append(f"groupPrivileges({len(spec['groupPrivileges'])})")
+    if spec.get("groupDashboards"):
+        extras.append(f"groupDashboards({len(spec['groupDashboards'])})")
+    if spec.get("individualRelations"):
+        extras.append(f"individualRelations({len(spec['individualRelations'])})")
+    if spec.get("catchments"):
+        extras.append(f"catchments({len(spec['catchments'])})")
+    if spec.get("locations"):
+        extras.append(f"locations({spec['locations']['totalCount']})")
+    if spec.get("concepts"):
+        extras.append(f"concepts({len(spec['concepts'])})")
+    if spec.get("ruleDependency"):
+        extras.append("ruleDependency")
     report["extras"] = extras
 
     # Coverage percentage (against active form mappings, not all form files)

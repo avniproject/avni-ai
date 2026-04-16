@@ -18,6 +18,7 @@ from scripts.batch_bundle_to_spec import (
     bundle_to_comprehensive_spec,
     read_bundle_dir,
     analyze_coverage,
+    _unwrap_list,
 )
 
 BUNDLE_DIR = Path.home() / "Downloads" / "orgs-bundle"
@@ -326,3 +327,222 @@ class TestComprehensiveSpec:
             if form.get("decisionRule") or form.get("visitScheduleRule"):
                 return
         pytest.skip("No form-level rules found in this org")
+
+    # ── New entity type tests ─────────────────────────────────────────────
+
+    def test_menu_items_captured(self):
+        """Menu items should be in spec when present in bundle."""
+        bundle, spec = _load_org("GDGSGOM")
+        menu_items = spec.get("menuItems", [])
+        assert len(menu_items) >= 1
+        assert menu_items[0].get("displayKey")
+        assert menu_items[0].get("type")
+
+    def test_message_rules_captured(self):
+        """Message rules should be in spec when present in bundle."""
+        bundle, spec = _load_org("GDGSGOM")
+        msg_rules = spec.get("messageRules", [])
+        assert len(msg_rules) >= 1
+        assert msg_rules[0].get("name")
+        assert msg_rules[0].get("entityType")
+
+    def test_operational_encounter_types_captured(self):
+        """Operational encounter types should be in spec."""
+        bundle, spec = _load_org("JNPCT")
+        op_encs = spec.get("operationalEncounterTypes", [])
+        assert len(op_encs) >= 10
+        assert op_encs[0].get("name")
+
+    def test_operational_subject_types_captured(self):
+        """Operational subject types should be in spec."""
+        bundle, spec = _load_org("JNPCT")
+        op_sts = spec.get("operationalSubjectTypes", [])
+        assert len(op_sts) >= 1
+        assert op_sts[0].get("name")
+
+    def test_group_privileges_captured(self):
+        """Group privileges should be grouped by group name with resolved entities."""
+        bundle, spec = _load_org("JNPCT")
+        gp = spec.get("groupPrivileges", [])
+        assert len(gp) >= 1
+        for entry in gp:
+            assert entry.get("group"), "groupPrivilege entry missing group name"
+            assert len(entry.get("privileges", [])) > 0
+            for p in entry["privileges"]:
+                assert p.get("type"), "privilege missing type"
+
+    def test_group_privileges_resolve_subject_types(self):
+        """Group privilege subject types should be resolved to names."""
+        bundle, spec = _load_org("JNPCT")
+        gp = spec.get("groupPrivileges", [])
+        has_resolved = False
+        for entry in gp:
+            for p in entry.get("privileges", []):
+                if p.get("subjectType"):
+                    has_resolved = True
+                    assert "-" not in p["subjectType"] or len(p["subjectType"]) < 36
+                    break
+        assert has_resolved, "No privileges have resolved subjectType"
+
+    def test_group_dashboards_captured(self):
+        """Group dashboards should be in spec."""
+        bundle, spec = _load_org("JNPCT")
+        gd = spec.get("groupDashboards", [])
+        assert len(gd) >= 5
+        assert gd[0].get("groupName")
+        assert gd[0].get("dashboardName")
+
+    def test_group_dashboards_primary_flag(self):
+        """At least one group dashboard should be marked as primary."""
+        bundle, spec = _load_org("APF Odisha")
+        gd = spec.get("groupDashboards", [])
+        has_primary = any(d.get("primaryDashboard") for d in gd)
+        assert has_primary, "No group dashboards marked as primary"
+
+    def test_individual_relations_captured(self):
+        """Individual relations should be in spec with gender constraints."""
+        bundle, spec = _load_org("JNPCT")
+        rels = spec.get("individualRelations", [])
+        assert len(rels) >= 5
+        assert rels[0].get("name")
+        has_gender = any(r.get("genders") for r in rels)
+        assert has_gender, "No individual relations have gender constraints"
+
+    def test_catchments_captured(self):
+        """Catchments should be in spec."""
+        bundle, spec = _load_org("Purna Clinic")
+        catchments = spec.get("catchments", [])
+        assert len(catchments) >= 1
+        assert catchments[0].get("name")
+
+    def test_catchments_dict_wrapper_handled(self):
+        """Catchments wrapped in {catchments: [...]} should be handled."""
+        bundle, spec = _load_org("Hasiru Dala")
+        catchments = spec.get("catchments", [])
+        assert len(catchments) >= 1
+
+    def test_locations_captured(self):
+        """Locations should be summarized by type."""
+        bundle, spec = _load_org("IPH Sickle Cell")
+        locs = spec.get("locations", {})
+        assert locs.get("totalCount", 0) > 0
+        assert isinstance(locs.get("byType"), dict)
+        assert len(locs["byType"]) >= 1
+
+    def test_concepts_full_detail(self):
+        """Concepts should be captured as full list with details, not just summary."""
+        bundle, spec = _load_org("JNPCT")
+        concepts = spec.get("concepts", [])
+        assert isinstance(concepts, list), "concepts should be a list, not a summary dict"
+        assert len(concepts) >= 100
+
+    def test_concepts_coded_have_answers(self):
+        """Coded concepts with answers in bundle should have them in spec."""
+        bundle, spec = _load_org("JNPCT")
+        concepts = spec.get("concepts", [])
+        coded = [c for c in concepts if c.get("dataType") == "Coded"]
+        assert len(coded) > 0
+        coded_with_answers = [c for c in coded if c.get("answers")]
+        assert len(coded_with_answers) > 0, "No coded concepts have answers"
+        assert len(coded_with_answers) >= len(coded) * 0.5, "Less than half of coded concepts have answers"
+
+    def test_concepts_numeric_have_bounds(self):
+        """Numeric concepts with bounds should have them captured."""
+        bundle, spec = _load_org("JNPCT")
+        concepts = spec.get("concepts", [])
+        with_bounds = [c for c in concepts if c.get("highAbsolute") is not None]
+        assert len(with_bounds) > 0, "No numeric concepts with bounds found"
+        c = with_bounds[0]
+        assert c.get("dataType") == "Numeric"
+        assert c.get("unit") or c.get("highAbsolute") is not None
+
+    def test_concepts_keyvalues_captured(self):
+        """Concepts with keyValues should have them captured."""
+        bundle, spec = _load_org("JNPCT")
+        concepts = spec.get("concepts", [])
+        with_kv = [c for c in concepts if c.get("keyValues")]
+        assert len(with_kv) > 0, "No concepts with keyValues found"
+
+    def test_concepts_keyvalues_resolve_uuids(self):
+        """Concept keyValues should resolve subjectTypeUUID to name."""
+        bundle, spec = _load_org("JNPCT")
+        concepts = spec.get("concepts", [])
+        for c in concepts:
+            kv = c.get("keyValues", {})
+            if kv.get("subjectType"):
+                assert "-" not in kv["subjectType"] or len(kv["subjectType"]) < 36
+                return
+        pytest.skip("No concepts with subjectTypeUUID keyValue")
+
+    def test_concepts_na_without_config_skipped(self):
+        """Bare NA concepts (answer options) without keyValues should be skipped."""
+        bundle, spec = _load_org("JNPCT")
+        concepts = spec.get("concepts", [])
+        bare_na = [c for c in concepts if c["dataType"] == "NA" and not c.get("keyValues") and not c.get("answers")]
+        assert len(bare_na) == 0, f"Found {len(bare_na)} bare NA concepts that should be skipped"
+
+    def test_rule_dependency_captured(self):
+        """Rule dependency should be captured when present."""
+        bundle, spec = _load_org("JNPCT")
+        rd = spec.get("ruleDependency", {})
+        assert rd.get("hasCode") is True
+        assert rd.get("codeLength", 0) > 0
+
+    def test_unwrap_list_raw_list(self):
+        """_unwrap_list should handle raw list values."""
+        bundle = {"items": [{"a": 1}, {"a": 2}]}
+        result = _unwrap_list(bundle, "items")
+        assert result == [{"a": 1}, {"a": 2}]
+
+    def test_unwrap_list_dict_wrapper(self):
+        """_unwrap_list should unwrap {key: [...]} dicts."""
+        bundle = {"catchments": {"catchments": [{"name": "A"}]}}
+        result = _unwrap_list(bundle, "catchments")
+        assert result == [{"name": "A"}]
+
+    def test_unwrap_list_missing_key(self):
+        """_unwrap_list should return empty list for missing keys."""
+        result = _unwrap_list({}, "missing")
+        assert result == []
+
+    def test_unwrap_list_string_value(self):
+        """_unwrap_list should return empty list for non-list/dict values."""
+        result = _unwrap_list({"key": "string"}, "key")
+        assert result == []
+
+    def test_coverage_report_includes_new_entities(self):
+        """Coverage report should count new entity types in bundle stats."""
+        bundle, spec = _load_org("JNPCT")
+        report = analyze_coverage(bundle, spec, "JNPCT")
+        b = report["bundle"]
+        assert "menuItems" in b
+        assert "messageRules" in b
+        assert "groupPrivileges" in b
+        assert "groupDashboards" in b
+        assert "individualRelations" in b
+        assert b["groupPrivileges"] > 0
+        assert b["groupDashboards"] > 0
+
+    def test_coverage_extras_include_new_entities(self):
+        """Coverage extras should list new entity types."""
+        bundle, spec = _load_org("JNPCT")
+        report = analyze_coverage(bundle, spec, "JNPCT")
+        extras = report.get("extras", [])
+        extras_str = " ".join(extras)
+        assert "concepts(" in extras_str
+        assert "groupPrivileges(" in extras_str
+        assert "groupDashboards(" in extras_str
+        assert "individualRelations(" in extras_str
+        assert "opEncTypes(" in extras_str
+
+    def test_all_orgs_have_concepts(self):
+        """Every org should have concepts captured in spec."""
+        org_dirs = [
+            d for d in sorted(BUNDLE_DIR.iterdir())
+            if d.is_dir() and not d.name.startswith(".") and d.name != "specs"
+        ]
+        for org_dir in org_dirs:
+            bundle = read_bundle_dir(org_dir)
+            spec = bundle_to_comprehensive_spec(bundle, org_name=org_dir.name)
+            if bundle.get("concepts"):
+                assert spec.get("concepts"), f"{org_dir.name} has concepts in bundle but not in spec"
