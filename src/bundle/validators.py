@@ -121,6 +121,9 @@ class BundleValidator:
                 )
             form_uuids.add(form["uuid"])
 
+            # Check for duplicate concept usage within the same form
+            # (Avni server rejects: "Cannot use same concept twice")
+            concept_names_in_form: set[str] = set()
             for group in form.get("formElementGroups", []):
                 for elem in group.get("formElements", []):
                     if elem["uuid"] in element_uuids:
@@ -128,6 +131,16 @@ class BundleValidator:
                             f'Duplicate form element UUID: "{elem["uuid"]}" for "{elem["name"]}"'
                         )
                     element_uuids.add(elem["uuid"])
+
+                    concept_name = elem.get("concept", {}).get("name", "")
+                    if concept_name:
+                        lower_name = concept_name.lower()
+                        if lower_name in concept_names_in_form:
+                            self.errors.append(
+                                f'Form "{form["name"]}" uses concept "{concept_name}" twice '
+                                f"— Avni server will reject this"
+                            )
+                        concept_names_in_form.add(lower_name)
 
                     elem_type = elem.get("type", "")
                     if elem_type and elem_type not in self._VALID_FORM_ELEMENT_TYPES:
@@ -175,6 +188,28 @@ class BundleValidator:
                 self.errors.append(
                     f'Form mapping "{m["formName"]}" references unknown encounterTypeUUID'
                 )
+
+            # Avni form mapping type rules (check_form_mapping_uniqueness constraint):
+            # IndividualProfile: no program, no encounter type
+            # ProgramEnrolment/ProgramExit: with program, no encounter type
+            # ProgramEncounter/ProgramEncounterCancellation: with program and encounter type
+            # Encounter/IndividualEncounterCancellation: no program, with encounter type
+            ft = m.get("formType", "")
+            has_prog = bool(m.get("programUUID"))
+            has_enc = bool(m.get("encounterTypeUUID"))
+            if ft in ("Encounter", "IndividualEncounterCancellation"):
+                if not has_enc:
+                    self.errors.append(
+                        f'Form mapping "{m.get("formName", "?")}" is type {ft} '
+                        f"but missing encounterTypeUUID (required by Avni)"
+                    )
+            elif ft in ("ProgramEncounter", "ProgramEncounterCancellation"):
+                if not has_prog or not has_enc:
+                    self.errors.append(
+                        f'Form mapping "{m.get("formName", "?")}" is type {ft} '
+                        f"but missing {'programUUID' if not has_prog else 'encounterTypeUUID'} "
+                        f"(required by Avni)"
+                    )
 
     # ── Encounter completeness ──────────────────────────────────────
 

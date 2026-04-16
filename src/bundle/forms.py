@@ -6,7 +6,11 @@ readOnly (keyValues.editable=false), mandatory, lowAbsolute/highAbsolute.
 
 from __future__ import annotations
 
+import logging
+
 from .uuid_utils import generate_deterministic_uuid
+
+logger = logging.getLogger(__name__)
 
 
 class FormGenerator:
@@ -196,6 +200,19 @@ class FormGenerator:
         group_uuid = generate_deterministic_uuid(f"group:{self.form_uuid}:{group_name}")
         elements = []
         for idx, field in enumerate(fields):
+            # Skip duplicate concepts within the same form
+            # (Avni rejects: "Cannot use same concept twice")
+            field_name = field.get("name", "")
+            if field_name and field_name.lower() in self._seen_concepts_in_form:
+                logger.warning(
+                    "Skipping duplicate concept '%s' in form %s group '%s'",
+                    field_name,
+                    self.form_uuid,
+                    group_name,
+                )
+                continue
+            if field_name:
+                self._seen_concepts_in_form.add(field_name.lower())
             field_elements = self._generate_form_element(field, idx + 1)
             elements.extend(field_elements)
         return {
@@ -218,6 +235,7 @@ class FormGenerator:
         self.form_type = form_type
         self.form_uuid = generate_deterministic_uuid(f"form:{name}")
         self.concept_map = concepts
+        self._seen_concepts_in_form: set[str] = set()
 
         grouped = self._group_fields_by_section(fields)
         form_element_groups = [
