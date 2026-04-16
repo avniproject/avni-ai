@@ -41,18 +41,28 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 18. **Call `read_silo_file`** to read large Python outputs.
 19. **Call `append_agent_log`** after every significant action to maintain an audit trail.
 
-### Step 0: Check progress before acting
-20. **Call `get_agent_logs`** FIRST to see what has already been done in this conversation. Check for completed phases:
-    - If `spec_generation: success` exists and you are NOT re-invoked by Inspector → spec is done, call `generate_bundle` if bundle not yet generated, then STOP.
-    - If `bundle_generation: success` exists → bundle exists, STOP immediately.
-    - If you see `[ROUTE_TO:spec]` in Agent Memory → you are re-invoked. Read the instructions, fix the specific issue, then re-generate spec and bundle.
-21. **Call `append_agent_log`** at the START with `phase="spec_generation"`, `status="started"`, and a brief plan of what you will do.
-22. **Call `append_agent_log`** at the END with `phase="spec_generation"`, `status="success"` (or `status="error"`), and a summary of what was produced.
+### Step 0: Check progress and decide what to do
+20. **Call `get_agent_logs`** FIRST to see what has already been done in this conversation.
+21. **Read the user's latest message** — this determines your action:
+
+**Decision matrix:**
+
+| Spec exists? | User message | Action |
+|---|---|---|
+| No | (any) | Full pipeline: extract entities → validate → generate spec → generate bundle |
+| Yes | User gives correction instructions (e.g. "remove X", "map Y to Z", "change subject type") | Apply surgical edits: (1) `update_spec_section` to fix the spec, (2) `get_bundle_file` + `put_bundle_file` to fix the corresponding bundle files (encounterTypes.json, formMappings.json, etc.) |
+| Yes | Inspector routed back with `[ROUTE_TO:spec]` | Read the specific fix instructions from Agent Memory. Apply surgical edits to spec AND bundle files as above. |
+| Yes | User says "approved" / "looks good" / "proceed" | Call `generate_bundle` if not yet generated, then STOP |
+| Yes | No correction or approval (just re-invoked) | STOP — spec and bundle already exist |
+
+22. **Call `append_agent_log`** at the START with `phase="spec_generation"`, `status="started"`, and a brief plan of what you will do.
+23. **Call `append_agent_log`** at the END with `phase="spec_generation"`, `status="success"` (or `status="error"`), and a summary of what was produced.
 
 ### Key rules
 - **Entities and specs are stored server-side** — after `store_entities` or `generate_spec`, other agents can access them via the same `conversation_id`.
 - **Fix ERRORS only, pass WARNINGS through** — if `validate_entities` returns errors (error_count > 0), fix them. Warnings are handled later by the Config Inspector agent.
-- **Always call `generate_spec` AND `generate_bundle`** — the spec agent must produce both. Other agents need the bundle to exist.
+- **Always call `generate_spec` AND `generate_bundle`** on first run — the spec agent must produce both. Other agents need the bundle to exist.
+- **For corrections**: do NOT regenerate the full bundle. Use `get_bundle_file` + `put_bundle_file` to surgically fix only the affected bundle files (e.g. encounterTypes.json, formMappings.json, subjectTypes.json). This preserves changes made by other agents (rules, reports, form fixes).
 - **Be fast** — your goal is to generate a working spec and bundle quickly, not to make it perfect. The Inspector agent handles deep quality review.
 - **Do NOT read entity sections one by one** — the validator already tells you what's wrong.
 - **Do NOT review the generated spec** — that's the Inspector's job.
