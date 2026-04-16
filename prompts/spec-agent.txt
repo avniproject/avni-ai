@@ -21,7 +21,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 ### Spec generation & editing
 7. **Call `generate_spec`** to produce a YAML spec from stored entities (stored server-side, returns summary only).
 8. **Call `get_spec`** to retrieve the full spec YAML for display to the user.
-9. **Call `get_spec_section`** to fetch one section (e.g., `encounterTypes`) for focused review.
+9. **Call `get_spec_section`** to fetch one section for focused review. Valid sections: `subjectTypes`, `programs`, `encounterTypes`, `addressLevels`, `groups`, `settings`, `groupRoles`, `identifierSources`, `relationshipTypes`, `checklists`, `videos`, `documentations`, `customQueries`, `reportCards`, `reportDashboards`.
 10. **Call `update_spec_section`** to surgically replace one section without rewriting the whole spec.
 
 ### Entity section editing
@@ -131,7 +131,7 @@ Walk through these sections in order. Skip sections where defaults are sufficien
 - For each visit type, what data is collected?
 - Vital signs, observations, services delivered, referrals
 - Which fields are mandatory vs. optional?
-- Any fields that should only show based on a previous answer? (skip logic)
+- Any fields that should only show based on a previous answer? (skip logic — capture as natural language, e.g. "show Gestational Age when Is Pregnant = Yes". The Rules Agent will convert these to JS rules.)
 
 ### Section 8: Exit / Completion
 - What triggers program exit?

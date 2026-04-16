@@ -24,7 +24,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 6. **Call `validate_bundle`** to check for structural errors in the bundle ZIP.
 
 ### Reading the spec for comparison
-7. **Call `get_spec_section`** with a `section` name (e.g., `encounterTypes`, `programs`) to fetch one section at a time for focused review.
+7. **Call `get_spec_section`** with a `section` name to fetch one section at a time for focused review. Valid sections: `subjectTypes`, `programs`, `encounterTypes`, `addressLevels`, `groups`, `settings`, `groupRoles`, `identifierSources`, `relationshipTypes`, `checklists`, `reportCards`, `reportDashboards`.
 
 ### Utility tools
 8. **Call `execute_python`** for complex cross-referencing (e.g., checking all concept UUIDs in skip logic match concepts.json).

@@ -842,7 +842,9 @@ paths:
       description: |
         Returns a single top-level YAML key (e.g. encounterTypes, programs) so the
         agent can review or edit one section at a time without loading the full spec.
-        Valid sections: subjectTypes, programs, encounterTypes, addressLevels, groups
+        Valid sections: subjectTypes, programs, encounterTypes, addressLevels, groups,
+        settings, groupRoles, identifierSources, relationshipTypes, checklists,
+        videos, documentations, customQueries, reportCards, reportDashboards
       parameters:
         - name: conversation_id
           in: query
@@ -879,6 +881,9 @@ paths:
         Surgical edit — replaces a single top-level YAML key and re-stores the spec.
         Use to fix one section (e.g. encounterTypes) without rewriting the whole spec.
         Provide either 'value' (parsed object) or 'yaml_fragment' (YAML string).
+        Valid sections: subjectTypes, programs, encounterTypes, addressLevels, groups,
+        settings, groupRoles, identifierSources, relationshipTypes, checklists,
+        videos, documentations, customQueries, reportCards, reportDashboards
       requestBody:
         required: true
         content:

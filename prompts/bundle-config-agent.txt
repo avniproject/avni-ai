@@ -26,7 +26,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 ### Designing and writing forms
 4. **Call `generate_form`** with a form name, type, and field list to produce complete AVNI form JSON with concepts, elements, and groups.
 5. **Call `suggest_form_fields`** with an encounter name and optional sector to get recommended field definitions.
-6. **Call `generate_skip_logic`** with natural language rules to convert them into AVNI declarative rule JSON.
+6. **Do NOT generate skip logic** — skip logic is handled by the Rules Agent using JS FormElementRules. If you see conditional field requirements, note them for the Rules Agent.
 
 ### Updating the bundle
 7. **Call `put_bundle_file`** to write a new or updated file into the generated bundle.
