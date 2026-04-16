@@ -62,15 +62,28 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
 
     # Subject types
     for st in spec.get("subjectTypes", []):
-        entities["subject_types"].append(
-            {
-                "name": st["name"],
-                "type": st.get("type", "Person"),
-                "allowProfilePicture": st.get("allowProfilePicture", False),
-                "uniqueName": st.get("uniqueName", False),
-                "lastNameOptional": st.get("lastNameOptional", True),
-            }
-        )
+        st_entry: dict[str, Any] = {
+            "name": st["name"],
+            "type": st.get("type", "Person"),
+            "allowProfilePicture": st.get("allowProfilePicture", False),
+            "uniqueName": st.get("uniqueName", False),
+            "lastNameOptional": st.get("lastNameOptional", True),
+        }
+        # Comprehensive fields
+        for key in [
+            "group", "household", "allowEmptyLocation", "allowMiddleName",
+        ]:
+            if st.get(key):
+                st_entry[key] = True
+        for key in [
+            "validFirstNameFormat", "iconFileS3Key", "subjectSummaryRule",
+            "programEligibilityCheckRule", "syncRegistrationConcept1",
+        ]:
+            if st.get(key):
+                st_entry[key] = st[key]
+        if isinstance(st.get("settings"), dict) and st["settings"]:
+            st_entry["settings"] = st["settings"]
+        entities["subject_types"].append(st_entry)
         if "registrationForm" in st:
             entities["forms"].append(
                 _parse_form(st["registrationForm"], "IndividualProfile", st["name"])
@@ -78,37 +91,51 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
 
     # Programs
     for prog in spec.get("programs", []):
-        entities["programs"].append(
-            {
-                "name": prog["name"],
-                "target_subject_type": prog.get("targetSubjectType", ""),
-                "colour": prog.get("colour", "#4A148C"),
-                "allow_multiple_enrolments": prog.get("allowMultipleEnrolments", False),
-            }
-        )
+        prog_entry: dict[str, Any] = {
+            "name": prog["name"],
+            "target_subject_type": prog.get("targetSubjectType", ""),
+            "colour": prog.get("colour", "#4A148C"),
+            "allow_multiple_enrolments": prog.get("allowMultipleEnrolments", False),
+        }
+        for key in [
+            "programSubjectLabel", "enrolmentSummaryRule",
+            "enrolmentEligibilityCheckRule", "manualEnrolmentEligibilityCheckRule",
+        ]:
+            if prog.get(key):
+                prog_entry[key] = prog[key]
+        entities["programs"].append(prog_entry)
+
+        target_st = prog.get("targetSubjectType")
         if "enrolmentForm" in prog:
             entities["forms"].append(
                 _parse_form(
-                    prog["enrolmentForm"], "ProgramEnrolment", program=prog["name"]
+                    prog["enrolmentForm"], "ProgramEnrolment",
+                    subject_type=target_st, program=prog["name"],
                 )
             )
         if "exitForm" in prog:
             entities["forms"].append(
-                _parse_form(prog["exitForm"], "ProgramExit", program=prog["name"])
+                _parse_form(
+                    prog["exitForm"], "ProgramExit",
+                    subject_type=target_st, program=prog["name"],
+                )
             )
 
     # Encounter types
     for enc in spec.get("encounterTypes", []):
         is_program_enc = bool(enc.get("program"))
-        entities["encounter_types"].append(
-            {
-                "name": enc["name"],
-                "program_name": enc.get("program", ""),
-                "subject_type": enc.get("subjectType", ""),
-                "is_program_encounter": is_program_enc,
-                "is_scheduled": enc.get("scheduled", True),
-            }
-        )
+        enc_entry: dict[str, Any] = {
+            "name": enc["name"],
+            "program_name": enc.get("program", ""),
+            "subject_type": enc.get("subjectType", ""),
+            "is_program_encounter": is_program_enc,
+            "is_scheduled": enc.get("scheduled", True),
+        }
+        if enc.get("encounterEligibilityCheckRule"):
+            enc_entry["encounterEligibilityCheckRule"] = enc["encounterEligibilityCheckRule"]
+        if enc.get("immutable"):
+            enc_entry["immutable"] = True
+        entities["encounter_types"].append(enc_entry)
         form_type = "ProgramEncounter" if is_program_enc else "Encounter"
         if "form" in enc:
             entities["forms"].append(
@@ -121,10 +148,14 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
                 )
             )
         if "cancellationForm" in enc:
+            cancel_type = (
+                "ProgramEncounterCancellation" if is_program_enc
+                else "IndividualEncounterCancellation"
+            )
             entities["forms"].append(
                 _parse_form(
                     enc["cancellationForm"],
-                    "ProgramEncounterCancellation",
+                    cancel_type,
                     subject_type=enc.get("subjectType"),
                     program=enc.get("program"),
                     encounter_type=enc["name"],

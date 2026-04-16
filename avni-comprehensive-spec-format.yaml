@@ -1,0 +1,241 @@
+# Avni Comprehensive Spec Format
+# Generated from 21 real org bundles. Zero missed keys. E2E verified.
+# This is the reference schema — every field here is used by at least one real org.
+
+org: "Organisation Name"
+
+settings:
+  languages: [en, hi_IN]
+  enableComments: true
+  enableMessaging: false
+  saveDrafts: true
+  skipRuleExecution: false
+  enableRuleDesigner: false
+  metabaseSetupEnabled: true
+  showHierarchicalLocation: false
+  searchFilters:
+    - type: Name|Age|Address|SearchAll|Concept|GroupSubject
+      widget: Default
+      titleKey: "Display Title"
+      subjectTypeUUID: "..."
+      # For Concept type:
+      conceptName: "..."
+      conceptUUID: "..."
+      conceptDataType: Coded|Id|Text
+      scope: registration|programEnrolment|programEncounter
+      scopeParameters:
+        programUUIDs: [...]
+        encounterTypeUUIDs: [...]
+  myDashboardFilters:
+    - type: Address|EncounterDate|Concept|GroupSubject
+      widget: Default
+      titleKey: "..."
+      subjectTypeUUID: "..."
+  customRegistrationLocations:
+    - subjectTypeUUID: "..."
+      locationTypeUUIDs: ["..."]
+  searchResultFields:
+    - subjectTypeUUID: "..."
+      searchResultConcepts: ["concept-name"]
+  worklistUpdationRule: |
+    // JavaScript rule for routing encounters
+
+addressLevels:
+  - name: State
+    level: 4
+  - name: District
+    level: 3
+    parent: State
+  - name: Block
+    level: 2
+    parent: District
+  - name: Village
+    level: 1
+    parent: Block
+
+subjectTypes:
+  - name: Individual
+    type: Person  # Person | Household | Individual | Group | User
+    # Boolean flags
+    group: true                    # For Group/Household types
+    household: true                # For Household type
+    allowProfilePicture: true
+    uniqueName: true
+    allowEmptyLocation: true
+    allowMiddleName: true
+    lastNameOptional: false        # Only emitted when false (default true)
+    # String/object fields
+    validFirstNameFormat:
+      regex: "^[A-Z].*"
+      descriptionKey: "Must start with capital letter"
+    iconFileS3Key: "s3://bucket/icon.png"
+    syncRegistrationConcept1: "concept-uuid"
+    syncRegistrationConcept1Usable: true
+    # Rules (JavaScript)
+    subjectSummaryRule: |
+      'use strict';
+      ({params, imports}) => { ... }
+    programEligibilityCheckRule: |
+      'use strict';
+      ({params, imports}) => { ... }
+    memberAdditionEligibilityCheckRule: |
+      'use strict';
+      ({params, imports}) => { ... }
+    # Display settings
+    settings:
+      displayRegistrationDetails: true
+      displayPlannedEncounters: true
+    # Registration form
+    registrationForm:
+      decisionRule: "..."          # Form-level decision rule
+      visitScheduleRule: "..."     # Form-level visit scheduling
+      validationRule: "..."        # Form-level validation
+      checklistsRule: "..."        # Form-level checklist rule
+      sections:
+        - name: "Basic Details"
+          fields:
+            - name: "Field Name"
+              dataType: Text  # Text|Numeric|Coded|Date|DateTime|Duration|PhoneNumber|Audio|Image|ImageV2|Video|File|Location|Subject|GroupAffiliation|Id|Time|Notes|QuestionGroup
+              selectionType: Single  # Single | Multi (for Coded fields)
+              mandatory: true
+              # Numeric-specific
+              min: 0                        # lowAbsolute
+              max: 100                      # hiAbsolute
+              lowNormal: 10                 # Normal range lower bound
+              hiNormal: 90                  # Normal range upper bound
+              unit: "kg"
+              # Coded-specific
+              options: ["Option A", "Option B"]
+              # Skip logic
+              skipLogic:
+                dependsOn: "Other Field"
+                condition: "="
+                value: "Yes"
+              # Key-value metadata
+              keyValues:
+                editable: false
+                ExcludedAnswers: ["uuid1"]
+              # Validation format
+              validFormat:
+                regex: "^[6-9]\\d{9}$"
+                descriptionKey: "Must be 10 digit mobile number"
+              # Element-level rule (JavaScript)
+              rule: |
+                'use strict';
+                ({params, imports}) => { ... }
+              # Declarative rule (newer format, 18/21 orgs)
+              declarativeRule: [...]
+              # Inline help text for field workers (7/21 orgs)
+              documentation: "Help text shown in app"
+              # Parent element UUID for QuestionGroup children (13/21 orgs)
+              parentFormElementUuid: "uuid-of-parent-question-group"
+
+programs:
+  - name: Pregnancy
+    targetSubjectType: Individual   # Resolved from formMappings
+    colour: "#ff0000"               # Hex or CSS named color (darkmagenta, darkorange)
+    allowMultipleEnrolments: true
+    programSubjectLabel: "Mother"
+    showGrowthChart: true           # 9/21 orgs (MCH programs)
+    # Rules (JavaScript)
+    enrolmentSummaryRule: |
+      'use strict';
+      ({params, imports}) => { ... }
+    enrolmentEligibilityCheckRule: |
+      'use strict';
+      ({params, imports}) => { ... }
+    manualEnrolmentEligibilityCheckRule: |
+      'use strict';
+      ({params, imports}) => { ... }
+    # Declarative rules (newer format, 5/21 orgs)
+    enrolmentEligibilityCheckDeclarativeRule: [...]
+    # Forms
+    enrolmentForm:
+      sections: [...]               # Same structure as registrationForm sections
+    exitForm:
+      sections: [...]
+
+encounterTypes:
+  - name: ANC
+    program: Pregnancy              # Resolved from formMappings
+    subjectType: Individual         # Resolved from formMappings
+    scheduled: true
+    immutable: true
+    # Rules (JavaScript)
+    encounterEligibilityCheckRule: |
+      'use strict';
+      ({params, imports}) => { ... }
+    # Declarative rule (newer format, 3/21 orgs)
+    entityEligibilityCheckDeclarativeRule: [...]
+    # Forms
+    form:
+      decisionRule: "..."
+      visitScheduleRule: "..."
+      validationRule: "..."
+      checklistsRule: "..."
+      sections: [...]
+    cancellationForm:
+      sections:
+        - name: "Cancellation Details"
+          fields:
+            - name: "Reason for cancellation"
+              dataType: Coded
+              options: [...]
+
+groups:
+  - name: Everyone
+  - name: Field Workers
+    hasAllPrivileges: true
+
+groupRoles:
+  - role: "Head of household"
+    groupSubjectType: Household
+    memberSubjectType: Individual
+    maximumNumberOfMembers: 1
+  - role: "Member"
+    groupSubjectType: Household
+    memberSubjectType: Individual
+    maximumNumberOfMembers: 100
+
+identifierSources:
+  - name: "Patient registration ID"
+    type: userPoolBasedIdentifierGenerator
+    prefix: "HBP"
+    minLength: 2
+    maxLength: 6
+    batchGenerationSize: 100
+
+relationshipTypes:
+  - aIsToB: "father"
+    bIsToA: "son"
+  - aIsToB: "husband"
+    bIsToA: "wife"
+
+checklists:
+  - name: Vaccination
+    items:
+      - name: IPV
+        states: [Due, Expired]
+      - name: BCG
+        states: [Due, Overdue, Critical, Expired]
+
+videos:
+  - title: "Caring for newborn baby during first month"
+    filePath: ""
+
+documentations:
+  - name: "Field help text"
+    content: "Explanation shown to field workers"
+
+customQueries:
+  - name: "Inactive users"
+    query: "SELECT ... FROM ..."
+
+reportCards:
+  - name: "Total Population"
+    colour: "#e6eefa"
+    description: ""
+
+reportDashboards:
+  - name: "Overview Dashboard"
+    description: ""
