@@ -409,7 +409,9 @@ async def handle_bundle_to_spec(request: Request) -> JSONResponse:
 def _bundle_to_entities(bundle: dict) -> dict:
     """
     Convert a generated bundle dict back to an entities dict suitable for spec generation.
-    Strips all UUIDs and id fields.
+    Strips all UUIDs and id fields. Filters voided entities.
+
+    Comprehensive: captures all real-world patterns found across 21+ org bundles.
     """
     entities: dict = {
         "subject_types": [],
@@ -420,71 +422,333 @@ def _bundle_to_entities(bundle: dict) -> dict:
         "forms": [],
     }
 
-    # Address level types → address_levels
-    for alt in bundle.get("addressLevelTypes", []):
-        entities["address_levels"].append(
-            {
-                "name": alt.get("name", ""),
-                "level": alt.get("level", 1),
-                "parent": alt.get("parent", {}).get("name")
-                if isinstance(alt.get("parent"), dict)
-                else alt.get("parent"),
-            }
-        )
-
-    # Subject types
+    # ── Build UUID lookup maps for cross-references ────────────────────────
+    st_uuid_to_name: dict[str, str] = {}
     for st in bundle.get("subjectTypes", []):
-        entities["subject_types"].append(
-            {
-                "name": st.get("name", ""),
-                "type": st.get("type", "Person"),
-                "allowProfilePicture": st.get("allowProfilePicture", False),
-                "uniqueName": st.get("uniqueName", False),
-            }
-        )
+        if st.get("uuid"):
+            st_uuid_to_name[st["uuid"]] = st.get("name", "")
 
-    # Programs
+    prog_uuid_to_name: dict[str, str] = {}
     for prog in bundle.get("programs", []):
-        entities["programs"].append(
-            {
-                "name": prog.get("name", ""),
-                "target_subject_type": prog.get("operationalPrograms", {}).get(
-                    "subjectType", ""
-                ),
-                "colour": prog.get("colour", "#4A148C"),
-                "allow_multiple_enrolments": prog.get("allowMultipleEnrolments", False),
-            }
-        )
+        if prog.get("uuid"):
+            prog_uuid_to_name[prog["uuid"]] = prog.get("name", "")
+    # Also from operationalPrograms
+    op_progs = bundle.get("operationalPrograms", {})
+    if isinstance(op_progs, dict):
+        op_progs = op_progs.get("operationalPrograms", [])
+    if isinstance(op_progs, list):
+        for op in op_progs:
+            prog_ref = op.get("program", {})
+            if isinstance(prog_ref, dict) and prog_ref.get("uuid"):
+                prog_uuid_to_name[prog_ref["uuid"]] = op.get("name", "")
 
-    # Encounter types — derive from operational encounter types for cross-refs
-    op_enc = bundle.get("operationalEncounterTypes", {}).get(
-        "operationalEncounterTypes", []
-    )
-    op_enc_by_uuid = {e.get("encounterTypeUUID"): e for e in op_enc}
+    enc_uuid_to_name: dict[str, str] = {}
     for enc in bundle.get("encounterTypes", []):
-        op = op_enc_by_uuid.get(enc.get("uuid"), {})
-        entities["encounter_types"].append(
-            {
-                "name": enc.get("name", ""),
-                "program_name": op.get("programName", ""),
-                "subject_type": op.get("subjectTypeName", ""),
-                "is_program_encounter": bool(op.get("programName")),
-                "is_scheduled": True,
-            }
-        )
+        if enc.get("uuid"):
+            enc_uuid_to_name[enc["uuid"]] = enc.get("name", "")
 
-    # Forms — iterate forms subdirectory contents
+    # formMappings: build encounter→program and program→subjectType links
+    enc_uuid_to_prog: dict[str, str] = {}
+    enc_uuid_to_st: dict[str, str] = {}
+    prog_uuid_to_st: dict[str, str] = {}
+    for fm in bundle.get("formMappings", []):
+        if fm.get("voided"):
+            continue
+        enc_uuid = fm.get("encounterTypeUUID")
+        prog_uuid = fm.get("programUUID")
+        st_uuid = fm.get("subjectTypeUUID")
+        if enc_uuid and prog_uuid:
+            enc_uuid_to_prog[enc_uuid] = prog_uuid_to_name.get(prog_uuid, "")
+        if enc_uuid and st_uuid:
+            enc_uuid_to_st[enc_uuid] = st_uuid_to_name.get(st_uuid, "")
+        if prog_uuid and st_uuid and fm.get("formType") == "ProgramEnrolment":
+            prog_uuid_to_st[prog_uuid] = st_uuid_to_name.get(st_uuid, "")
+
+    # Address level UUID→name for parent resolution
+    addr_uuid_to_name: dict[str, str] = {}
+    for alt in bundle.get("addressLevelTypes", []):
+        if alt.get("uuid") and not alt.get("voided"):
+            addr_uuid_to_name[alt["uuid"]] = alt.get("name", "")
+
+    # ── Address level types → address_levels ───────────────────────────────
+    for alt in bundle.get("addressLevelTypes", []):
+        if alt.get("voided"):
+            continue
+        parent = alt.get("parent")
+        parent_name = None
+        if isinstance(parent, dict):
+            parent_name = parent.get("name") or addr_uuid_to_name.get(parent.get("uuid", ""))
+        elif isinstance(parent, str) and parent:
+            parent_name = parent
+        entry = {
+            "name": alt.get("name", ""),
+            "level": alt.get("level", 1),
+        }
+        if parent_name:
+            entry["parent"] = parent_name
+        entities["address_levels"].append(entry)
+
+    # ── Subject types ──────────────────────────────────────────────────────
+    for st in bundle.get("subjectTypes", []):
+        if st.get("voided"):
+            continue
+        st_entry: dict = {
+            "name": st.get("name", ""),
+            "type": st.get("type", "Person"),
+        }
+        # Comprehensive fields
+        for key in [
+            "group", "household", "allowProfilePicture", "uniqueName",
+            "allowEmptyLocation", "allowMiddleName",
+        ]:
+            if st.get(key):
+                st_entry[key] = True
+        if st.get("lastNameOptional") is False:
+            st_entry["lastNameOptional"] = False
+        for key in [
+            "validFirstNameFormat", "iconFileS3Key", "subjectSummaryRule",
+            "programEligibilityCheckRule", "syncRegistrationConcept1",
+            "syncRegistrationConcept1Usable", "memberAdditionEligibilityCheckRule",
+        ]:
+            if st.get(key):
+                st_entry[key] = st[key]
+        if isinstance(st.get("settings"), dict) and st["settings"]:
+            st_entry["settings"] = st["settings"]
+        entities["subject_types"].append(st_entry)
+
+    # ── Programs ───────────────────────────────────────────────────────────
+    for prog in bundle.get("programs", []):
+        if prog.get("voided"):
+            continue
+        prog_uuid = prog.get("uuid", "")
+        prog_entry: dict = {
+            "name": prog.get("name", ""),
+            "target_subject_type": prog_uuid_to_st.get(prog_uuid, ""),
+            "colour": prog.get("colour", "#4A148C"),
+        }
+        if prog.get("allowMultipleEnrolments"):
+            prog_entry["allow_multiple_enrolments"] = True
+        if prog.get("showGrowthChart"):
+            prog_entry["showGrowthChart"] = True
+        for key in [
+            "programSubjectLabel", "enrolmentSummaryRule",
+            "enrolmentEligibilityCheckRule", "manualEnrolmentEligibilityCheckRule",
+            "enrolmentEligibilityCheckDeclarativeRule",
+        ]:
+            if prog.get(key):
+                prog_entry[key] = prog[key]
+        entities["programs"].append(prog_entry)
+
+    # ── Encounter types ────────────────────────────────────────────────────
+    for enc in bundle.get("encounterTypes", []):
+        if enc.get("voided"):
+            continue
+        enc_uuid = enc.get("uuid", "")
+        prog_name = enc_uuid_to_prog.get(enc_uuid, "")
+        st_name = enc_uuid_to_st.get(enc_uuid, "")
+        enc_entry: dict = {
+            "name": enc.get("name", ""),
+            "program_name": prog_name,
+            "subject_type": st_name,
+            "is_program_encounter": bool(prog_name),
+            "is_scheduled": True,
+        }
+        elig_rule = enc.get("encounterEligibilityCheckRule") or enc.get("entityEligibilityCheckRule")
+        if elig_rule:
+            enc_entry["encounterEligibilityCheckRule"] = elig_rule
+        if enc.get("entityEligibilityCheckDeclarativeRule"):
+            enc_entry["entityEligibilityCheckDeclarativeRule"] = enc["entityEligibilityCheckDeclarativeRule"]
+        if enc.get("immutable"):
+            enc_entry["immutable"] = True
+        entities["encounter_types"].append(enc_entry)
+
+    # ── Forms (enriched with entity links from formMappings) ─────────────
+    # Build formName → formMapping lookup for cross-ref enrichment
+    fm_by_form_name: dict[str, dict] = {}
+    fm_by_form_uuid: dict[str, dict] = {}
+    for fm in bundle.get("formMappings", []):
+        if fm.get("voided"):
+            continue
+        if fm.get("formName"):
+            fm_by_form_name[fm["formName"]] = fm
+        if fm.get("formUUID"):
+            fm_by_form_uuid[fm["formUUID"]] = fm
+
     for form in bundle.get("forms", []):
-        if isinstance(form, dict):
-            entities["forms"].append(form)
+        if not isinstance(form, dict):
+            continue
+        # Find the matching formMapping to get entity cross-refs
+        fm = fm_by_form_name.get(form.get("name", "")) or fm_by_form_uuid.get(form.get("uuid", ""))
+        if fm:
+            # Enrich form with entity names resolved from UUIDs
+            form_type = fm.get("formType", form.get("formType", ""))
+            if form_type:
+                form["formType"] = form_type
+            st_uuid = fm.get("subjectTypeUUID")
+            if st_uuid:
+                form["subjectType"] = st_uuid_to_name.get(st_uuid, "")
+            prog_uuid_val = fm.get("programUUID")
+            if prog_uuid_val:
+                form["program"] = prog_uuid_to_name.get(prog_uuid_val, "")
+            enc_uuid_val = fm.get("encounterTypeUUID")
+            if enc_uuid_val:
+                form["encounterType"] = enc_uuid_to_name.get(enc_uuid_val, "")
+        entities["forms"].append(form)
 
-    # Groups
+    # ── Groups ─────────────────────────────────────────────────────────────
     for grp in bundle.get("groups", []):
+        if grp.get("voided"):
+            continue
         entities["groups"].append(
             {
                 "name": grp.get("name", ""),
                 "has_all_privileges": grp.get("hasAllPrivileges", False),
             }
         )
+
+    # ── Settings from organisationConfig ───────────────────────────────────
+    org_config = bundle.get("organisationConfig", {})
+    if isinstance(org_config, list) and org_config:
+        org_config = org_config[0]
+    if isinstance(org_config, dict):
+        config_settings = org_config.get("settings", org_config.get("organisationConfig", {}))
+        if isinstance(config_settings, dict) and config_settings:
+            settings: dict = {}
+            languages = config_settings.get("languages", ["en"])
+            settings["languages"] = languages if languages else ["en"]
+            for key in [
+                "enableComments", "enableMessaging", "saveDrafts",
+                "skipRuleExecution", "enableRuleDesigner",
+                "metabaseSetupEnabled", "showHierarchicalLocation",
+                "searchFilters", "myDashboardFilters",
+                "customRegistrationLocations", "searchResultFields",
+                "worklistUpdationRule",
+            ]:
+                if config_settings.get(key) is not None:
+                    settings[key] = config_settings[key]
+            entities["settings"] = settings
+
+    # ── Group roles ────────────────────────────────────────────────────────
+    group_roles = bundle.get("groupRole", bundle.get("groupRoles", []))
+    if group_roles:
+        active_roles = [r for r in group_roles if not r.get("voided", False)]
+        if active_roles:
+            entities["group_roles"] = [
+                {
+                    "role": r.get("role", ""),
+                    **({"groupSubjectType": st_uuid_to_name.get(r.get("groupSubjectTypeUUID", ""), "")}
+                       if r.get("groupSubjectTypeUUID") else {}),
+                    **({"memberSubjectType": st_uuid_to_name.get(r.get("memberSubjectTypeUUID", ""), "")}
+                       if r.get("memberSubjectTypeUUID") else {}),
+                    **({"maximumNumberOfMembers": r["maximumNumberOfMembers"]}
+                       if r.get("maximumNumberOfMembers") else {}),
+                }
+                for r in active_roles
+            ]
+
+    # ── Identifier sources ─────────────────────────────────────────────────
+    id_sources = bundle.get("identifierSource", [])
+    if id_sources:
+        active_ids = [s for s in id_sources if not s.get("voided", False)]
+        if active_ids:
+            entities["identifier_sources"] = [
+                {
+                    "name": s.get("name", ""),
+                    "type": s.get("type", ""),
+                    **({"prefix": s["prefix"]} if s.get("prefix") else {}),
+                    **({"minLength": s["minLength"]} if s.get("minLength") else {}),
+                    **({"maxLength": s["maxLength"]} if s.get("maxLength") else {}),
+                    **({"batchGenerationSize": s["batchGenerationSize"]} if s.get("batchGenerationSize") else {}),
+                }
+                for s in active_ids
+            ]
+
+    # ── Relationship types ─────────────────────────────────────────────────
+    rel_types = bundle.get("relationshipType", [])
+    if rel_types:
+        active_rels = [r for r in rel_types if not r.get("voided", False)]
+        if active_rels:
+            entities["relationship_types"] = []
+            for rel in active_rels:
+                rel_entry: dict = {}
+                ind_a = rel.get("individualAIsToBRelation", {})
+                ind_b = rel.get("individualBIsToARelation", {})
+                if isinstance(ind_a, dict):
+                    rel_entry["aIsToB"] = ind_a.get("name", "")
+                if isinstance(ind_b, dict):
+                    rel_entry["bIsToA"] = ind_b.get("name", "")
+                entities["relationship_types"].append(rel_entry)
+
+    # ── Checklists ─────────────────────────────────────────────────────────
+    checklists = bundle.get("checklist", [])
+    if checklists:
+        active_cl = [c for c in checklists if not c.get("voided", False)]
+        if active_cl:
+            entities["checklists"] = []
+            for cl in active_cl:
+                cl_entry: dict = {"name": cl.get("name", "")}
+                items = cl.get("items", [])
+                if items:
+                    cl_items = []
+                    for item in items:
+                        if item.get("voided"):
+                            continue
+                        concept = item.get("concept", {})
+                        item_entry: dict = {
+                            "name": concept.get("name", "") if isinstance(concept, dict) else "",
+                        }
+                        status = item.get("status")
+                        if isinstance(status, list):
+                            states = [s.get("state", "") for s in status if isinstance(s, dict) and s.get("state")]
+                            if states:
+                                item_entry["states"] = states
+                        cl_items.append(item_entry)
+                    if cl_items:
+                        cl_entry["items"] = cl_items
+                entities["checklists"].append(cl_entry)
+
+    # ── Videos ─────────────────────────────────────────────────────────────
+    videos = bundle.get("video", [])
+    if videos:
+        active_vids = [v for v in videos if not v.get("voided", False)]
+        if active_vids:
+            entities["videos"] = [
+                {"title": v.get("title", ""), "filePath": v.get("filePath", "")}
+                for v in active_vids
+            ]
+
+    # ── Documentations ─────────────────────────────────────────────────────
+    docs = bundle.get("documentations", [])
+    if docs:
+        active_docs = [d for d in docs if not d.get("voided", False)]
+        if active_docs:
+            entities["documentations"] = [
+                {"name": d.get("name", ""), "content": d.get("content", "")}
+                for d in active_docs[:20]
+            ]
+
+    # ── Report cards ───────────────────────────────────────────────────────
+    report_cards = bundle.get("reportCard", [])
+    if report_cards:
+        active_cards = [c for c in report_cards if not c.get("voided", False)]
+        if active_cards:
+            entities["report_cards"] = [
+                {
+                    "name": c.get("name", ""),
+                    "colour": c.get("colour", c.get("color", "")),
+                    "description": c.get("description", ""),
+                }
+                for c in active_cards
+            ]
+
+    # ── Report dashboards ──────────────────────────────────────────────────
+    report_dashboards = bundle.get("reportDashboard", [])
+    if report_dashboards:
+        active_dashes = [d for d in report_dashboards if not d.get("voided", False)]
+        if active_dashes:
+            entities["report_dashboards"] = [
+                {"name": d.get("name", ""), "description": d.get("description", "")}
+                for d in active_dashes
+            ]
 
     return entities
