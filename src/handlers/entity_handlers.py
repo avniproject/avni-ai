@@ -264,9 +264,44 @@ def _validate(entities: dict) -> dict:
 
     # Encounter cross-reference checks
     for r in enc_rows:
+        subject = r.get("subject_type", "")
+        if not subject:
+            issues.append(
+                {
+                    "severity": "error",
+                    "entity_type": "encounter",
+                    "message": (
+                        f"Encounter '{r['name']}' has no subject_type — "
+                        f"every encounter must be linked to a subject type"
+                    ),
+                }
+            )
+        elif not _fuzzy_match(subject, subject_type_names):
+            issues.append(
+                {
+                    "severity": "warning",
+                    "entity_type": "encounter",
+                    "message": (
+                        f"Encounter '{r['name']}' references subject type "
+                        f"'{subject}' which doesn't match any defined subject type"
+                    ),
+                }
+            )
+
         if r.get("is_program_encounter"):
             program = r.get("program_name", "")
-            if program and not _fuzzy_match(program, program_names):
+            if not program:
+                issues.append(
+                    {
+                        "severity": "error",
+                        "entity_type": "program_encounter",
+                        "message": (
+                            f"Program encounter '{r['name']}' has no program_name — "
+                            f"which program does this encounter belong to?"
+                        ),
+                    }
+                )
+            elif not _fuzzy_match(program, program_names):
                 issues.append(
                     {
                         "severity": "warning",
@@ -274,19 +309,6 @@ def _validate(entities: dict) -> dict:
                         "message": (
                             f"Program encounter '{r['name']}' references "
                             f"program '{program}' which doesn't match any defined program"
-                        ),
-                    }
-                )
-        else:
-            subject = r.get("subject_type", "")
-            if subject and not _fuzzy_match(subject, subject_type_names):
-                issues.append(
-                    {
-                        "severity": "warning",
-                        "entity_type": "encounter",
-                        "message": (
-                            f"Encounter '{r['name']}' references subject type "
-                            f"'{subject}' which doesn't match any defined subject type"
                         ),
                     }
                 )

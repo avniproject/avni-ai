@@ -244,10 +244,11 @@ class BundleGenerator:
         self.bundle["concepts"] = self.concept_generator.generated_concepts
 
     def _generate_form_mapping(self, form_spec: dict, form_uuid: str) -> None:
+        form_type = form_spec.get("formType", "Encounter")
         mapping: dict[str, Any] = {
             "uuid": generate_deterministic_uuid(f"mapping:{form_spec['name']}"),
             "formUUID": form_uuid,
-            "formType": form_spec.get("formType", "Encounter"),
+            "formType": form_type,
             "formName": form_spec["name"],
             "enableApproval": False,
         }
@@ -276,6 +277,37 @@ class BundleGenerator:
             ),
             None,
         )
+
+        # Fallback: if no subject type resolved, use the first available one
+        # (Avni requires subjectTypeUUID on every formMapping)
+        if not st and self.bundle["subjectTypes"]:
+            st = self.bundle["subjectTypes"][0]
+            logger.warning(
+                "formMapping '%s': no subjectType specified, defaulting to '%s'",
+                form_spec["name"], st["name"],
+            )
+
+        # Fallback: if program encounter but no program, try to find a program
+        # that targets the same subject type, or fall back to the first program
+        if not prog and form_type in (
+            "ProgramEnrolment", "ProgramExit",
+            "ProgramEncounter", "ProgramEncounterCancellation",
+        ) and self.bundle["programs"]:
+            # Try matching by subject type
+            if st:
+                prog = next(
+                    (p for p in self.bundle["programs"]
+                     if p.get("programSubjectLabel") == st["name"]),
+                    None,
+                )
+            # Fall back to first program
+            if not prog:
+                prog = self.bundle["programs"][0]
+            logger.warning(
+                "formMapping '%s': no program specified for %s, defaulting to '%s'",
+                form_spec["name"], form_type, prog["name"],
+            )
+
         if st:
             mapping["subjectTypeUUID"] = st["uuid"]
         if prog:

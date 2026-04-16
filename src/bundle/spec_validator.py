@@ -223,9 +223,18 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
             errors.append(
                 f"Encounter type '{name}' references unknown subject type '{subject}'"
             )
-        if not program and not subject:
+        if not subject:
+            errors.append(
+                f"Encounter type '{name}' has no 'subjectType' — Avni requires every encounter to be linked to a subject type"
+            )
+        if program and not subject:
+            errors.append(
+                f"Encounter type '{name}' has program '{program}' but no 'subjectType' — both are required for program encounters"
+            )
+        if not program and enc.get("scheduled") and subject:
+            # Scheduled encounter without a program — likely should be a ProgramEncounter
             warnings.append(
-                f"Encounter type '{name}' has neither 'program' nor 'subjectType'"
+                f"Encounter type '{name}' is scheduled but has no 'program' — should this be a program encounter?"
             )
 
         if "form" not in enc:
