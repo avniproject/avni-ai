@@ -143,12 +143,16 @@ class TestFlowCIncremental:
         recorder.record(step)
         assert step.ok, f"generate-spec failed: {step.detail}"
 
-        # Retrieve the generated spec for patching
+        # Retrieve the generated spec for patching.
+        # Use get-spec but fall back to the original (non-truncated) spec_yaml
+        # from bundle-to-spec if get-spec truncates it (large orgs exceed 8000 chars).
         resp_spec = await client.get(
             "/get-spec",
             params={"conversation_id": conversation_id},
         )
         new_spec_yaml = resp_spec.json().get("spec_yaml", spec_yaml)
+        if resp_spec.json().get("truncated"):
+            new_spec_yaml = spec_yaml  # use the full spec from bundle-to-spec
 
         # ------------------------------------------------------------------
         # Step 6: patch-bundle

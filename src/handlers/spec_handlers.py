@@ -477,7 +477,9 @@ def _bundle_to_entities(bundle: dict) -> dict:
         parent = alt.get("parent")
         parent_name = None
         if isinstance(parent, dict):
-            parent_name = parent.get("name") or addr_uuid_to_name.get(parent.get("uuid", ""))
+            parent_name = parent.get("name") or addr_uuid_to_name.get(
+                parent.get("uuid", "")
+            )
         elif isinstance(parent, str) and parent:
             parent_name = parent
         entry = {
@@ -498,17 +500,25 @@ def _bundle_to_entities(bundle: dict) -> dict:
         }
         # Comprehensive fields
         for key in [
-            "group", "household", "allowProfilePicture", "uniqueName",
-            "allowEmptyLocation", "allowMiddleName",
+            "group",
+            "household",
+            "allowProfilePicture",
+            "uniqueName",
+            "allowEmptyLocation",
+            "allowMiddleName",
         ]:
             if st.get(key):
                 st_entry[key] = True
         if st.get("lastNameOptional") is False:
             st_entry["lastNameOptional"] = False
         for key in [
-            "validFirstNameFormat", "iconFileS3Key", "subjectSummaryRule",
-            "programEligibilityCheckRule", "syncRegistrationConcept1",
-            "syncRegistrationConcept1Usable", "memberAdditionEligibilityCheckRule",
+            "validFirstNameFormat",
+            "iconFileS3Key",
+            "subjectSummaryRule",
+            "programEligibilityCheckRule",
+            "syncRegistrationConcept1",
+            "syncRegistrationConcept1Usable",
+            "memberAdditionEligibilityCheckRule",
         ]:
             if st.get(key):
                 st_entry[key] = st[key]
@@ -531,8 +541,10 @@ def _bundle_to_entities(bundle: dict) -> dict:
         if prog.get("showGrowthChart"):
             prog_entry["showGrowthChart"] = True
         for key in [
-            "programSubjectLabel", "enrolmentSummaryRule",
-            "enrolmentEligibilityCheckRule", "manualEnrolmentEligibilityCheckRule",
+            "programSubjectLabel",
+            "enrolmentSummaryRule",
+            "enrolmentEligibilityCheckRule",
+            "manualEnrolmentEligibilityCheckRule",
             "enrolmentEligibilityCheckDeclarativeRule",
         ]:
             if prog.get(key):
@@ -553,11 +565,15 @@ def _bundle_to_entities(bundle: dict) -> dict:
             "is_program_encounter": bool(prog_name),
             "is_scheduled": True,
         }
-        elig_rule = enc.get("encounterEligibilityCheckRule") or enc.get("entityEligibilityCheckRule")
+        elig_rule = enc.get("encounterEligibilityCheckRule") or enc.get(
+            "entityEligibilityCheckRule"
+        )
         if elig_rule:
             enc_entry["encounterEligibilityCheckRule"] = elig_rule
         if enc.get("entityEligibilityCheckDeclarativeRule"):
-            enc_entry["entityEligibilityCheckDeclarativeRule"] = enc["entityEligibilityCheckDeclarativeRule"]
+            enc_entry["entityEligibilityCheckDeclarativeRule"] = enc[
+                "entityEligibilityCheckDeclarativeRule"
+            ]
         if enc.get("immutable"):
             enc_entry["immutable"] = True
         entities["encounter_types"].append(enc_entry)
@@ -578,7 +594,9 @@ def _bundle_to_entities(bundle: dict) -> dict:
         if not isinstance(form, dict):
             continue
         # Find the matching formMapping to get entity cross-refs
-        fm = fm_by_form_name.get(form.get("name", "")) or fm_by_form_uuid.get(form.get("uuid", ""))
+        fm = fm_by_form_name.get(form.get("name", "")) or fm_by_form_uuid.get(
+            form.get("uuid", "")
+        )
         if fm:
             # Enrich form with entity names resolved from UUIDs
             form_type = fm.get("formType", form.get("formType", ""))
@@ -611,17 +629,25 @@ def _bundle_to_entities(bundle: dict) -> dict:
     if isinstance(org_config, list) and org_config:
         org_config = org_config[0]
     if isinstance(org_config, dict):
-        config_settings = org_config.get("settings", org_config.get("organisationConfig", {}))
+        config_settings = org_config.get(
+            "settings", org_config.get("organisationConfig", {})
+        )
         if isinstance(config_settings, dict) and config_settings:
             settings: dict = {}
             languages = config_settings.get("languages", ["en"])
             settings["languages"] = languages if languages else ["en"]
             for key in [
-                "enableComments", "enableMessaging", "saveDrafts",
-                "skipRuleExecution", "enableRuleDesigner",
-                "metabaseSetupEnabled", "showHierarchicalLocation",
-                "searchFilters", "myDashboardFilters",
-                "customRegistrationLocations", "searchResultFields",
+                "enableComments",
+                "enableMessaging",
+                "saveDrafts",
+                "skipRuleExecution",
+                "enableRuleDesigner",
+                "metabaseSetupEnabled",
+                "showHierarchicalLocation",
+                "searchFilters",
+                "myDashboardFilters",
+                "customRegistrationLocations",
+                "searchResultFields",
                 "worklistUpdationRule",
             ]:
                 if config_settings.get(key) is not None:
@@ -636,12 +662,29 @@ def _bundle_to_entities(bundle: dict) -> dict:
             entities["group_roles"] = [
                 {
                     "role": r.get("role", ""),
-                    **({"groupSubjectType": st_uuid_to_name.get(r.get("groupSubjectTypeUUID", ""), "")}
-                       if r.get("groupSubjectTypeUUID") else {}),
-                    **({"memberSubjectType": st_uuid_to_name.get(r.get("memberSubjectTypeUUID", ""), "")}
-                       if r.get("memberSubjectTypeUUID") else {}),
-                    **({"maximumNumberOfMembers": r["maximumNumberOfMembers"]}
-                       if r.get("maximumNumberOfMembers") else {}),
+                    **(
+                        {
+                            "groupSubjectType": st_uuid_to_name.get(
+                                r.get("groupSubjectTypeUUID", ""), ""
+                            )
+                        }
+                        if r.get("groupSubjectTypeUUID")
+                        else {}
+                    ),
+                    **(
+                        {
+                            "memberSubjectType": st_uuid_to_name.get(
+                                r.get("memberSubjectTypeUUID", ""), ""
+                            )
+                        }
+                        if r.get("memberSubjectTypeUUID")
+                        else {}
+                    ),
+                    **(
+                        {"maximumNumberOfMembers": r["maximumNumberOfMembers"]}
+                        if r.get("maximumNumberOfMembers")
+                        else {}
+                    ),
                 }
                 for r in active_roles
             ]
@@ -658,7 +701,11 @@ def _bundle_to_entities(bundle: dict) -> dict:
                     **({"prefix": s["prefix"]} if s.get("prefix") else {}),
                     **({"minLength": s["minLength"]} if s.get("minLength") else {}),
                     **({"maxLength": s["maxLength"]} if s.get("maxLength") else {}),
-                    **({"batchGenerationSize": s["batchGenerationSize"]} if s.get("batchGenerationSize") else {}),
+                    **(
+                        {"batchGenerationSize": s["batchGenerationSize"]}
+                        if s.get("batchGenerationSize")
+                        else {}
+                    ),
                 }
                 for s in active_ids
             ]
@@ -695,11 +742,17 @@ def _bundle_to_entities(bundle: dict) -> dict:
                             continue
                         concept = item.get("concept", {})
                         item_entry: dict = {
-                            "name": concept.get("name", "") if isinstance(concept, dict) else "",
+                            "name": concept.get("name", "")
+                            if isinstance(concept, dict)
+                            else "",
                         }
                         status = item.get("status")
                         if isinstance(status, list):
-                            states = [s.get("state", "") for s in status if isinstance(s, dict) and s.get("state")]
+                            states = [
+                                s.get("state", "")
+                                for s in status
+                                if isinstance(s, dict) and s.get("state")
+                            ]
                             if states:
                                 item_entry["states"] = states
                         cl_items.append(item_entry)

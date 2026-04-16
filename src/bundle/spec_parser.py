@@ -71,13 +71,19 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
         }
         # Comprehensive fields
         for key in [
-            "group", "household", "allowEmptyLocation", "allowMiddleName",
+            "group",
+            "household",
+            "allowEmptyLocation",
+            "allowMiddleName",
         ]:
             if st.get(key):
                 st_entry[key] = True
         for key in [
-            "validFirstNameFormat", "iconFileS3Key", "subjectSummaryRule",
-            "programEligibilityCheckRule", "syncRegistrationConcept1",
+            "validFirstNameFormat",
+            "iconFileS3Key",
+            "subjectSummaryRule",
+            "programEligibilityCheckRule",
+            "syncRegistrationConcept1",
         ]:
             if st.get(key):
                 st_entry[key] = st[key]
@@ -98,8 +104,10 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
             "allow_multiple_enrolments": prog.get("allowMultipleEnrolments", False),
         }
         for key in [
-            "programSubjectLabel", "enrolmentSummaryRule",
-            "enrolmentEligibilityCheckRule", "manualEnrolmentEligibilityCheckRule",
+            "programSubjectLabel",
+            "enrolmentSummaryRule",
+            "enrolmentEligibilityCheckRule",
+            "manualEnrolmentEligibilityCheckRule",
         ]:
             if prog.get(key):
                 prog_entry[key] = prog[key]
@@ -109,15 +117,19 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
         if "enrolmentForm" in prog:
             entities["forms"].append(
                 _parse_form(
-                    prog["enrolmentForm"], "ProgramEnrolment",
-                    subject_type=target_st, program=prog["name"],
+                    prog["enrolmentForm"],
+                    "ProgramEnrolment",
+                    subject_type=target_st,
+                    program=prog["name"],
                 )
             )
         if "exitForm" in prog:
             entities["forms"].append(
                 _parse_form(
-                    prog["exitForm"], "ProgramExit",
-                    subject_type=target_st, program=prog["name"],
+                    prog["exitForm"],
+                    "ProgramExit",
+                    subject_type=target_st,
+                    program=prog["name"],
                 )
             )
 
@@ -132,7 +144,9 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
             "is_scheduled": enc.get("scheduled", True),
         }
         if enc.get("encounterEligibilityCheckRule"):
-            enc_entry["encounterEligibilityCheckRule"] = enc["encounterEligibilityCheckRule"]
+            enc_entry["encounterEligibilityCheckRule"] = enc[
+                "encounterEligibilityCheckRule"
+            ]
         if enc.get("immutable"):
             enc_entry["immutable"] = True
         entities["encounter_types"].append(enc_entry)
@@ -149,7 +163,8 @@ def spec_to_entities(spec_yaml: str) -> dict[str, Any]:
             )
         if "cancellationForm" in enc:
             cancel_type = (
-                "ProgramEncounterCancellation" if is_program_enc
+                "ProgramEncounterCancellation"
+                if is_program_enc
                 else "IndividualEncounterCancellation"
             )
             entities["forms"].append(

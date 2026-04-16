@@ -15,7 +15,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -76,7 +75,9 @@ def read_bundle_dir(bundle_path: Path) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def bundle_to_comprehensive_spec(bundle: dict[str, Any], org_name: str = "") -> dict[str, Any]:
+def bundle_to_comprehensive_spec(
+    bundle: dict[str, Any], org_name: str = ""
+) -> dict[str, Any]:
     """
     Convert a full Avni bundle dict to a comprehensive YAML spec.
 
@@ -115,9 +116,13 @@ def bundle_to_comprehensive_spec(bundle: dict[str, Any], org_name: str = "") -> 
 
     # Capture org config settings that matter
     for key in [
-        "enableComments", "enableMessaging", "saveDrafts",
-        "skipRuleExecution", "enableRuleDesigner",
-        "metabaseSetupEnabled", "showHierarchicalLocation",
+        "enableComments",
+        "enableMessaging",
+        "saveDrafts",
+        "skipRuleExecution",
+        "enableRuleDesigner",
+        "metabaseSetupEnabled",
+        "showHierarchicalLocation",
     ]:
         if config_settings.get(key) is not None:
             settings[key] = config_settings[key]
@@ -232,7 +237,9 @@ def bundle_to_comprehensive_spec(bundle: dict[str, Any], org_name: str = "") -> 
             }
             parent = alt.get("parent")
             if isinstance(parent, dict):
-                parent_name = parent.get("name") or addr_uuid_to_name.get(parent.get("uuid", ""))
+                parent_name = parent.get("name") or addr_uuid_to_name.get(
+                    parent.get("uuid", "")
+                )
                 if parent_name:
                     entry["parent"] = parent_name
             elif isinstance(parent, str) and parent:
@@ -271,7 +278,9 @@ def bundle_to_comprehensive_spec(bundle: dict[str, Any], org_name: str = "") -> 
             if st.get("subjectSummaryRule"):
                 st_spec["subjectSummaryRule"] = st["subjectSummaryRule"]
             if st.get("programEligibilityCheckRule"):
-                st_spec["programEligibilityCheckRule"] = st["programEligibilityCheckRule"]
+                st_spec["programEligibilityCheckRule"] = st[
+                    "programEligibilityCheckRule"
+                ]
 
             # Settings sub-object
             st_settings = st.get("settings", {})
@@ -282,9 +291,13 @@ def bundle_to_comprehensive_spec(bundle: dict[str, Any], org_name: str = "") -> 
             if st.get("syncRegistrationConcept1"):
                 st_spec["syncRegistrationConcept1"] = st["syncRegistrationConcept1"]
             if st.get("syncRegistrationConcept1Usable"):
-                st_spec["syncRegistrationConcept1Usable"] = st["syncRegistrationConcept1Usable"]
+                st_spec["syncRegistrationConcept1Usable"] = st[
+                    "syncRegistrationConcept1Usable"
+                ]
             if st.get("memberAdditionEligibilityCheckRule"):
-                st_spec["memberAdditionEligibilityCheckRule"] = st["memberAdditionEligibilityCheckRule"]
+                st_spec["memberAdditionEligibilityCheckRule"] = st[
+                    "memberAdditionEligibilityCheckRule"
+                ]
 
             # Attach registration form
             reg_form = _find_form_for_entity(
@@ -317,11 +330,17 @@ def bundle_to_comprehensive_spec(bundle: dict[str, Any], org_name: str = "") -> 
             if prog.get("enrolmentSummaryRule"):
                 prog_spec["enrolmentSummaryRule"] = prog["enrolmentSummaryRule"]
             if prog.get("enrolmentEligibilityCheckRule"):
-                prog_spec["enrolmentEligibilityCheckRule"] = prog["enrolmentEligibilityCheckRule"]
+                prog_spec["enrolmentEligibilityCheckRule"] = prog[
+                    "enrolmentEligibilityCheckRule"
+                ]
             if prog.get("manualEnrolmentEligibilityCheckRule"):
-                prog_spec["manualEnrolmentEligibilityCheckRule"] = prog["manualEnrolmentEligibilityCheckRule"]
+                prog_spec["manualEnrolmentEligibilityCheckRule"] = prog[
+                    "manualEnrolmentEligibilityCheckRule"
+                ]
             if prog.get("enrolmentEligibilityCheckDeclarativeRule"):
-                prog_spec["enrolmentEligibilityCheckDeclarativeRule"] = prog["enrolmentEligibilityCheckDeclarativeRule"]
+                prog_spec["enrolmentEligibilityCheckDeclarativeRule"] = prog[
+                    "enrolmentEligibilityCheckDeclarativeRule"
+                ]
             if prog.get("showGrowthChart"):
                 prog_spec["showGrowthChart"] = True
 
@@ -358,30 +377,31 @@ def bundle_to_comprehensive_spec(bundle: dict[str, Any], org_name: str = "") -> 
             if st_name:
                 enc_spec["subjectType"] = st_name
 
-            elig_rule = enc.get("encounterEligibilityCheckRule") or enc.get("entityEligibilityCheckRule")
+            elig_rule = enc.get("encounterEligibilityCheckRule") or enc.get(
+                "entityEligibilityCheckRule"
+            )
             if elig_rule:
                 enc_spec["encounterEligibilityCheckRule"] = elig_rule
             if enc.get("entityEligibilityCheckDeclarativeRule"):
-                enc_spec["entityEligibilityCheckDeclarativeRule"] = enc["entityEligibilityCheckDeclarativeRule"]
+                enc_spec["entityEligibilityCheckDeclarativeRule"] = enc[
+                    "entityEligibilityCheckDeclarativeRule"
+                ]
             if enc.get("immutable"):
                 enc_spec["immutable"] = True
 
             # Find the encounter form
             form_type = "ProgramEncounter" if is_program_enc else "Encounter"
-            enc_form = _find_form_for_entity(
-                bundle, form_type, enc_uuid=enc_uuid
-            )
+            enc_form = _find_form_for_entity(bundle, form_type, enc_uuid=enc_uuid)
             if enc_form:
                 enc_spec["form"] = _form_to_spec(enc_form)
 
             # Cancellation form
             cancel_type = (
-                "ProgramEncounterCancellation" if is_program_enc
+                "ProgramEncounterCancellation"
+                if is_program_enc
                 else "IndividualEncounterCancellation"
             )
-            cancel_form = _find_form_for_entity(
-                bundle, cancel_type, enc_uuid=enc_uuid
-            )
+            cancel_form = _find_form_for_entity(bundle, cancel_type, enc_uuid=enc_uuid)
             if cancel_form:
                 enc_spec["cancellationForm"] = _form_to_spec(cancel_form)
 
@@ -476,17 +496,27 @@ def bundle_to_comprehensive_spec(bundle: dict[str, Any], org_name: str = "") -> 
                             continue
                         concept = item.get("concept", {})
                         item_spec: dict[str, Any] = {
-                            "name": concept.get("name", "") if isinstance(concept, dict) else "",
+                            "name": concept.get("name", "")
+                            if isinstance(concept, dict)
+                            else "",
                         }
                         # Status can be a list of state objects or a dict with statuses
                         status = item.get("status")
                         if isinstance(status, list):
-                            states = [s.get("state", "") for s in status if isinstance(s, dict) and s.get("state")]
+                            states = [
+                                s.get("state", "")
+                                for s in status
+                                if isinstance(s, dict) and s.get("state")
+                            ]
                             if states:
                                 item_spec["states"] = states
                         elif isinstance(status, dict):
                             statuses = status.get("statuses", [])
-                            states = [s.get("state", "") for s in statuses if isinstance(s, dict) and s.get("state")]
+                            states = [
+                                s.get("state", "")
+                                for s in statuses
+                                if isinstance(s, dict) and s.get("state")
+                            ]
                             if states:
                                 item_spec["states"] = states
                         cl_items.append(item_spec)
@@ -729,9 +759,13 @@ def analyze_coverage(bundle: dict, spec: dict, org_name: str) -> dict[str, Any]:
     active_encs = [e for e in all_encs if not e.get("voided", False)]
 
     # Count active form mappings (not voided) to get actual expected forms
-    active_fm = [fm for fm in bundle.get("formMappings", []) if not fm.get("voided", False)]
+    active_fm = [
+        fm for fm in bundle.get("formMappings", []) if not fm.get("voided", False)
+    ]
     # Count unique form names from active mappings
-    active_form_names = {fm.get("formName", "") for fm in active_fm if fm.get("formName")}
+    active_form_names = {
+        fm.get("formName", "") for fm in active_fm if fm.get("formName")
+    }
 
     report["bundle"] = {
         "subjectTypes": len(active_sts),
@@ -740,7 +774,9 @@ def analyze_coverage(bundle: dict, spec: dict, org_name: str) -> dict[str, Any]:
         "forms": len(bundle.get("forms", [])),
         "activeForms": len(active_form_names),
         "concepts": len(bundle.get("concepts", [])),
-        "groups": len([g for g in bundle.get("groups", []) if not g.get("voided", False)]),
+        "groups": len(
+            [g for g in bundle.get("groups", []) if not g.get("voided", False)]
+        ),
     }
 
     # Count spec entities
@@ -809,7 +845,9 @@ def analyze_coverage(bundle: dict, spec: dict, org_name: str) -> dict[str, Any]:
 
     # Coverage percentage (against active form mappings, not all form files)
     active_form_count = report["bundle"]["activeForms"]
-    form_coverage = (form_count / active_form_count * 100) if active_form_count > 0 else 0
+    form_coverage = (
+        (form_count / active_form_count * 100) if active_form_count > 0 else 0
+    )
     report["formCoverage"] = f"{form_coverage:.0f}%"
 
     return report
@@ -824,7 +862,9 @@ def main():
     parser = argparse.ArgumentParser(
         description="Convert Avni org bundles to comprehensive YAML specs"
     )
-    parser.add_argument("bundle_dir", help="Directory containing org bundle subdirectories")
+    parser.add_argument(
+        "bundle_dir", help="Directory containing org bundle subdirectories"
+    )
     parser.add_argument(
         "--output-dir",
         default=None,
@@ -847,10 +887,13 @@ def main():
         output_dir.mkdir(parents=True, exist_ok=True)
 
     # Find all org directories
-    org_dirs = sorted([
-        d for d in bundle_root.iterdir()
-        if d.is_dir() and not d.name.startswith(".") and d.name != "specs"
-    ])
+    org_dirs = sorted(
+        [
+            d
+            for d in bundle_root.iterdir()
+            if d.is_dir() and not d.name.startswith(".") and d.name != "specs"
+        ]
+    )
 
     if not org_dirs:
         print(f"No org directories found in {bundle_root}")
@@ -877,8 +920,12 @@ def main():
             # Print summary
             b = report["bundle"]
             s = report["spec"]
-            print(f"  Bundle: {b['subjectTypes']} ST, {b['programs']} Prog, {b['encounterTypes']} Enc, {b['forms']} Forms, {b['concepts']} Concepts")
-            print(f"  Spec:   {s['subjectTypes']} ST, {s['programs']} Prog, {s['encounterTypes']} Enc, {s['formsAttached']} Forms, {s['totalFields']} Fields")
+            print(
+                f"  Bundle: {b['subjectTypes']} ST, {b['programs']} Prog, {b['encounterTypes']} Enc, {b['forms']} Forms, {b['concepts']} Concepts"
+            )
+            print(
+                f"  Spec:   {s['subjectTypes']} ST, {s['programs']} Prog, {s['encounterTypes']} Enc, {s['formsAttached']} Forms, {s['totalFields']} Fields"
+            )
             print(f"  Form coverage: {report['formCoverage']}")
             if report["extras"]:
                 print(f"  Extras: {', '.join(report['extras'])}")
@@ -902,6 +949,7 @@ def main():
             logger.error("  FAILED: %s — %s", org_name, exc)
             errors.append({"org": org_name, "error": str(exc)})
             import traceback
+
             traceback.print_exc()
 
     # ── Summary ────────────────────────────────────────────────────────────
@@ -920,7 +968,7 @@ def main():
         total_fields = sum(r["spec"]["totalFields"] for r in all_reports)
         total_forms_attached = sum(r["spec"]["formsAttached"] for r in all_reports)
 
-        print(f"\n  Across all orgs:")
+        print("\n  Across all orgs:")
         print(f"    Subject types:  {total_sts}")
         print(f"    Programs:       {total_progs}")
         print(f"    Encounter types:{total_encs}")
@@ -928,10 +976,12 @@ def main():
         print(f"    Concepts:       {total_concepts}")
         print(f"    Spec forms:     {total_forms_attached}")
         print(f"    Spec fields:    {total_fields}")
-        print(f"    Avg form coverage: {sum(float(r['formCoverage'].rstrip('%')) for r in all_reports) / len(all_reports):.0f}%")
+        print(
+            f"    Avg form coverage: {sum(float(r['formCoverage'].rstrip('%')) for r in all_reports) / len(all_reports):.0f}%"
+        )
 
     if errors:
-        print(f"\n  Failed orgs:")
+        print("\n  Failed orgs:")
         for e in errors:
             print(f"    - {e['org']}: {e['error']}")
 

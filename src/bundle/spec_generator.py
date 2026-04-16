@@ -97,13 +97,19 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
             if st.get("subjectSummaryRule"):
                 st_spec["subjectSummaryRule"] = st["subjectSummaryRule"]
             if st.get("programEligibilityCheckRule"):
-                st_spec["programEligibilityCheckRule"] = st["programEligibilityCheckRule"]
+                st_spec["programEligibilityCheckRule"] = st[
+                    "programEligibilityCheckRule"
+                ]
             if st.get("syncRegistrationConcept1"):
                 st_spec["syncRegistrationConcept1"] = st["syncRegistrationConcept1"]
             if st.get("syncRegistrationConcept1Usable"):
-                st_spec["syncRegistrationConcept1Usable"] = st["syncRegistrationConcept1Usable"]
+                st_spec["syncRegistrationConcept1Usable"] = st[
+                    "syncRegistrationConcept1Usable"
+                ]
             if st.get("memberAdditionEligibilityCheckRule"):
-                st_spec["memberAdditionEligibilityCheckRule"] = st["memberAdditionEligibilityCheckRule"]
+                st_spec["memberAdditionEligibilityCheckRule"] = st[
+                    "memberAdditionEligibilityCheckRule"
+                ]
             st_settings = st.get("settings")
             if isinstance(st_settings, dict) and st_settings:
                 st_spec["settings"] = st_settings
@@ -134,11 +140,17 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
             if prog.get("enrolmentSummaryRule"):
                 prog_spec["enrolmentSummaryRule"] = prog["enrolmentSummaryRule"]
             if prog.get("enrolmentEligibilityCheckRule"):
-                prog_spec["enrolmentEligibilityCheckRule"] = prog["enrolmentEligibilityCheckRule"]
+                prog_spec["enrolmentEligibilityCheckRule"] = prog[
+                    "enrolmentEligibilityCheckRule"
+                ]
             if prog.get("manualEnrolmentEligibilityCheckRule"):
-                prog_spec["manualEnrolmentEligibilityCheckRule"] = prog["manualEnrolmentEligibilityCheckRule"]
+                prog_spec["manualEnrolmentEligibilityCheckRule"] = prog[
+                    "manualEnrolmentEligibilityCheckRule"
+                ]
             if prog.get("enrolmentEligibilityCheckDeclarativeRule"):
-                prog_spec["enrolmentEligibilityCheckDeclarativeRule"] = prog["enrolmentEligibilityCheckDeclarativeRule"]
+                prog_spec["enrolmentEligibilityCheckDeclarativeRule"] = prog[
+                    "enrolmentEligibilityCheckDeclarativeRule"
+                ]
             if prog.get("showGrowthChart"):
                 prog_spec["showGrowthChart"] = True
 
@@ -171,9 +183,13 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
             if enc.get("subject_type"):
                 enc_spec["subjectType"] = enc["subject_type"]
             if enc.get("encounterEligibilityCheckRule"):
-                enc_spec["encounterEligibilityCheckRule"] = enc["encounterEligibilityCheckRule"]
+                enc_spec["encounterEligibilityCheckRule"] = enc[
+                    "encounterEligibilityCheckRule"
+                ]
             if enc.get("entityEligibilityCheckDeclarativeRule"):
-                enc_spec["entityEligibilityCheckDeclarativeRule"] = enc["entityEligibilityCheckDeclarativeRule"]
+                enc_spec["entityEligibilityCheckDeclarativeRule"] = enc[
+                    "entityEligibilityCheckDeclarativeRule"
+                ]
             if enc.get("immutable"):
                 enc_spec["immutable"] = True
             enc_spec["scheduled"] = bool(enc.get("is_scheduled", True))

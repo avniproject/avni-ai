@@ -5,7 +5,6 @@ Verifies the batch bundle→spec pipeline captures all real-world patterns
 found across 21 Avni org bundles.
 """
 
-import json
 import sys
 from pathlib import Path
 
@@ -38,7 +37,8 @@ class TestComprehensiveSpec:
     def test_all_21_orgs_process_without_error(self):
         """Every org bundle should convert to spec without errors."""
         org_dirs = [
-            d for d in sorted(BUNDLE_DIR.iterdir())
+            d
+            for d in sorted(BUNDLE_DIR.iterdir())
             if d.is_dir() and not d.name.startswith(".") and d.name != "specs"
         ]
         assert len(org_dirs) >= 20, f"Expected 20+ orgs, found {len(org_dirs)}"
@@ -53,7 +53,7 @@ class TestComprehensiveSpec:
             except Exception as exc:
                 errors.append(f"{org_dir.name}: {exc}")
 
-        assert not errors, f"Failed orgs:\n" + "\n".join(errors)
+        assert not errors, "Failed orgs:\n" + "\n".join(errors)
 
     def test_voided_entities_filtered(self):
         """Voided subject types, programs, encounter types should not appear in spec."""
@@ -63,7 +63,9 @@ class TestComprehensiveSpec:
         voided_count = sum(1 for st in raw_sts if st.get("voided"))
         spec_sts = spec.get("subjectTypes", [])
         # Spec should have fewer than raw (voided removed)
-        assert len(spec_sts) <= len(raw_sts) - voided_count + 1  # tolerance for edge cases
+        assert (
+            len(spec_sts) <= len(raw_sts) - voided_count + 1
+        )  # tolerance for edge cases
 
     def test_address_hierarchy_parents_resolved(self):
         """Address level parents should be resolved to names, not UUIDs."""
@@ -155,7 +157,10 @@ class TestComprehensiveSpec:
             form = enc.get("form", {})
             for section in form.get("sections", []):
                 for field in section.get("fields", []):
-                    if field.get("dataType") == "Numeric" and field.get("min") is not None:
+                    if (
+                        field.get("dataType") == "Numeric"
+                        and field.get("min") is not None
+                    ):
                         return  # Found one, test passes
         pytest.skip("No numeric fields with bounds found")
 
@@ -296,12 +301,16 @@ class TestComprehensiveSpec:
     def test_spec_yaml_serializable(self):
         """Generated spec should be valid YAML that roundtrips."""
         bundle, spec = _load_org("JK Lakshmi Cement")
-        spec_yaml = yaml.dump(spec, allow_unicode=True, default_flow_style=False, sort_keys=False)
+        spec_yaml = yaml.dump(
+            spec, allow_unicode=True, default_flow_style=False, sort_keys=False
+        )
         parsed = yaml.safe_load(spec_yaml)
         assert parsed["org"] == "JK Lakshmi Cement"
         assert len(parsed.get("subjectTypes", [])) == len(spec.get("subjectTypes", []))
         assert len(parsed.get("programs", [])) == len(spec.get("programs", []))
-        assert len(parsed.get("encounterTypes", [])) == len(spec.get("encounterTypes", []))
+        assert len(parsed.get("encounterTypes", [])) == len(
+            spec.get("encounterTypes", [])
+        )
 
     def test_form_level_rules_captured(self):
         """Form-level rules (decisionRule, visitScheduleRule) should be in spec."""
