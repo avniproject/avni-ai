@@ -5069,19 +5069,18 @@ workflow:
       zIndex: 1002
     - data:
         code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
-          \ str) -> dict:\n    # Parse pipeline gate response\n    has_questions =\
-          \ False\n    gate_output = \"\"\n    try:\n        data = json.loads(gate_body)\
-          \ if gate_body else {}\n        next_action = data.get(\"next_action\",\
-          \ \"continue\")\n        has_questions = next_action == \"present_questions\"\
-          \n\n        # Build output for agent memory / user display\n        parts\
-          \ = []\n        for fix in data.get(\"auto_fixed\", []):\n            parts.append(f\"\
-          [AUTO-FIX] {fix}\")\n        for q in data.get(\"questions\", []):\n   \
-          \         parts.append(f\"[QUESTION] {q.get('question', '')} Options: {q.get('options',\
-          \ [])}\")\n        gate_output = \"\n\".join(parts) if parts else \"\"\n\
-          \    except Exception:\n        pass\n\n    if gate_status >= 400:\n   \
-          \     has_questions = False  # gate failed, just continue\n\n    return\
-          \ {\n        \"has_questions\": has_questions,\n        \"gate_output\"\
-          : gate_output,\n    }\n"
+          \ str) -> dict:\n    has_questions = False\n    gate_output = str()\n  \
+          \  try:\n        parsed = json.loads(gate_body) if gate_body else {}\n \
+          \       next_action = parsed.get(\"next_action\", \"continue\")\n      \
+          \  has_questions = (next_action == \"present_questions\")\n        parts\
+          \ = []\n        for fix in parsed.get(\"auto_fixed\", []):\n           \
+          \ parts.append(\"[AUTO-FIX] \" + str(fix))\n        for q in parsed.get(\"\
+          questions\", []):\n            question_text = q.get(\"question\", \"\"\
+          )\n            options_text = str(q.get(\"options\", []))\n            parts.append(\"\
+          [QUESTION] \" + question_text + \" Options: \" + options_text)\n       \
+          \ gate_output = chr(10).join(parts)\n    except Exception:\n        pass\n\
+          \    if gate_status >= 400:\n        has_questions = False\n    return {\"\
+          has_questions\": has_questions, \"gate_output\": gate_output}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
