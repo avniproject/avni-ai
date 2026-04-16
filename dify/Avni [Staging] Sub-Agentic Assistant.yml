@@ -4171,16 +4171,24 @@ workflow:
       width: 242
       zIndex: 1002
     - data:
-        code: "def main(active_agent: str, existing_memory: str,\n         spec_text:\
-          \ str, bundle_text: str, rules_text: str,\n         reports_text: str, inspect_text:\
-          \ str, admin_text: str) -> dict:\n    texts = {\n        \"spec\": spec_text,\n\
-          \        \"bundle_config\": bundle_text,\n        \"rules\": rules_text,\n\
-          \        \"reports\": reports_text,\n        \"inspect\": inspect_text,\n\
-          \        \"admin\": admin_text,\n    }\n    agent_text = texts.get(active_agent,\
-          \ \"\") or \"\"\n    entry = f\"[{active_agent}] {agent_text[:1000]}\"\n\
-          \    sep = \"\\n---\\n\"\n    memory_entry = (existing_memory + sep + entry)\
-          \ if existing_memory else entry\n    return {\n        \"memory_entry\"\
-          : memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
+        code: "import re\n\ndef main(active_agent: str, existing_memory: str,\n\
+          \         spec_text: str, bundle_text: str, rules_text: str,\n         reports_text:\
+          \ str, inspect_text: str, admin_text: str) -> dict:\n    texts = {\n   \
+          \     \"spec\": spec_text,\n        \"bundle_config\": bundle_text,\n   \
+          \     \"rules\": rules_text,\n        \"reports\": reports_text,\n       \
+          \ \"inspect\": inspect_text,\n        \"admin\": admin_text,\n    }\n   \
+          \ agent_text = texts.get(active_agent, \"\") or \"\"\n    t_lower = agent_text.lower()\n\
+          \n    # Extract key status signals BEFORE truncation so they survive the\
+          \ 1000-char cut\n    status_prefix = \"\"\n    upload_signals = [\"uploaded\
+          \ successfully\", \"bundle uploaded\", \"upload complete\"]\n    if any(s\
+          \ in t_lower for s in upload_signals):\n        status_prefix = \"[UPLOAD_SUCCESS]\
+          \ \"\n    elif \"upload_bundle\" in t_lower and \"error\" not in t_lower:\n\
+          \        status_prefix = \"[UPLOAD_ATTEMPTED] \"\n    elif \"[error]\" in\
+          \ t_lower or \"status=error\" in t_lower:\n        status_prefix = \"[ERROR]\
+          \ \"\n\n    entry = f\"[{active_agent}] {status_prefix}{agent_text[:1000]}\"\
+          \n    sep = \"\\n---\\n\"\n    memory_entry = (existing_memory + sep + entry)\
+          \ if existing_memory else entry\n    return {\n        \"memory_entry\":\
+          \ memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4598,9 +4606,11 @@ workflow:
             \ produce a concise, well-formatted summary for the end user.\n\n<agent_log>\n\
             {{#conversation.agent_memory#}}\n</agent_log>\n\n## How to determine\
             \ upload status\n\nLook for these EXACT indicators in the log:\n- **Uploaded**:\
-            \ log contains \"upload_bundle\", \"upload_status\", \"uploaded successfully\"\
-            , \"upload: success\", or \"Bundle uploaded\"\n- **NOT uploaded**: none\
-            \ of the above appear anywhere in the log\n\nDo NOT guess. If you cannot\
+            \ log contains [UPLOAD_SUCCESS], upload_bundle, upload_status, uploaded\
+            \ successfully, upload: success, or Bundle uploaded\n- **NOT uploaded**:\
+            \ none of the above appear anywhere in the log\n\nThe [UPLOAD_SUCCESS]\
+            \ tag is the most reliable indicator. It is added automatically when the\
+            \ inspector reports a successful upload.\n\nDo NOT guess. If you cannot\
             \ find an explicit upload indicator, say the bundle was NOT uploaded.\n\
             \n## Instructions\n\n1. Check if the log contains [ERROR] entries. If\
             \ yes, explain what went wrong simply and suggest retry.\n2. Check if\

@@ -1,6 +1,6 @@
 """
 Form generator — produces AVNI form JSON from fields + concepts.
-Supports: MultiSelect, QuestionGroup, Repeatable QG, skip logic (declarativeRule),
+Supports: MultiSelect, QuestionGroup, Repeatable QG, skip logic (JS FormElementRules via rules agent),
 readOnly (keyValues.editable=false), mandatory, lowAbsolute/highAbsolute.
 """
 
@@ -152,13 +152,11 @@ class FormGenerator:
             if field.get("max") is not None:
                 element["highAbsolute"] = field["max"]
 
-        # Add declarative rule (skip logic)
-        skip_logic = field.get("skipLogic")
-        if skip_logic:
-            scope = "enrolment" if self.form_type == "ProgramEnrolment" else "encounter"
-            decl = self._build_declarative_rule(skip_logic, scope)
-            if decl:
-                element["declarativeRule"] = decl
+        # Skip logic: pass through existing declarativeRule from bundles,
+        # but do NOT generate new declarativeRules from skipLogic specs.
+        # New skip logic should be generated as JS FormElementRules by the rules agent.
+        if field.get("declarativeRule"):
+            element["declarativeRule"] = field["declarativeRule"]
 
         elements = [element]
 
