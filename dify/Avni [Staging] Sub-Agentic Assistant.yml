@@ -124,6 +124,17 @@ workflow:
       allowed_file_upload_methods:
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -398,30 +409,6 @@ workflow:
       source: '1775800000002'
       sourceHandle: fail-branch
       target: '1800000000112'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: loop
-        targetType: answer
-      id: 1800000000700-source-1800000000801-target
-      selected: false
-      source: '1800000000700'
-      sourceHandle: source
-      target: '1800000000801'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: llm
-        targetType: answer
-      id: 1800000000801-source-1800000000800-target
-      selected: false
-      source: '1800000000801'
-      sourceHandle: source
-      target: '1800000000800'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -919,6 +906,32 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: loop
+        targetType: agent
+      id: 1800000000700-source-1776327635368-target
+      selected: false
+      source: '1800000000700'
+      sourceHandle: source
+      target: '1776327635368'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: agent
+        targetType: answer
+      id: 1776327635368-source-1800000000800-target
+      selected: false
+      source: '1776327635368'
+      sourceHandle: source
+      target: '1800000000800'
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         desc: Define the initial parameters for launching a workflow
@@ -967,7 +980,7 @@ workflow:
           required: false
           type: text-input
           variable: avni_ai_server_url
-      height: 257
+      height: 255
       id: '1711528708197'
       position:
         x: 0
@@ -1177,7 +1190,7 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1757492907627'
       position:
         x: 1026
@@ -1189,7 +1202,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         code: "def main(files: list) -> dict:\n    if files and len(files) > 0:\n\
           \        names = [f.get(\"filename\", f.get(\"name\", \"unknown\")) for\
@@ -1212,7 +1225,7 @@ workflow:
           - files
           value_type: array[file]
           variable: files
-      height: 52
+      height: 50
       id: '1757492907628'
       position:
         x: 684
@@ -1224,7 +1237,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 3489d477-53a2-4b99-9f40-af010262a1c1
@@ -1299,7 +1312,7 @@ workflow:
         selected: false
         title: IF/ELSE
         type: if-else
-      height: 414
+      height: 484
       id: '1757493270484'
       position:
         x: 1368
@@ -1311,7 +1324,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         context:
           enabled: true
@@ -1363,7 +1376,7 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 88
+      height: 86
       id: '1757495664531'
       position:
         x: 1730
@@ -1375,7 +1388,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: '{{#1757495664531.text#}}'
         desc: ''
@@ -1383,7 +1396,7 @@ workflow:
         title: RAG Answer
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1757495688732'
       position:
         x: 2072
@@ -1395,14 +1408,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: Hey {{#1711528708197.user_name#}}I need some clarification.{{#1757492907627.structured_output.clarifying_questions#}}
         selected: false
         title: Clarify the question
         type: answer
         variables: []
-      height: 137
+      height: 136
       id: '1758608702077'
       position:
         x: 1730
@@ -1414,7 +1427,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: This assistant can help you with any questions related to Avni. This
           does not seem relevant to Avni.
@@ -1422,7 +1435,7 @@ workflow:
         title: Unrelated Question
         type: answer
         variables: []
-      height: 132
+      height: 130
       id: '1758699378772'
       position:
         x: 1730
@@ -1434,7 +1447,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         dataset_ids:
         - 9TmCqtDyQNUaJCKXT7rPGCd21br8q6JzrrUr4xib3E9uqcfMf6t6rxJkkXFK7EzL
@@ -1458,7 +1471,7 @@ workflow:
         selected: false
         title: Knowledge Retrieval
         type: knowledge-retrieval
-      height: 90
+      height: 88
       id: '1758713692744'
       position:
         x: 342
@@ -1470,7 +1483,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         code: "import json\n\ndef main(files: list) -> dict:\n    if not files:\n\
           \        return {\"file_infos_json\": \"[]\"}\n    infos = [           \
@@ -1494,7 +1507,7 @@ workflow:
           - sys
           - files
           variable: files
-      height: 112
+      height: 110
       id: '1775800000001'
       position:
         x: 2454
@@ -1506,7 +1519,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         authorization:
           config: null
@@ -1537,7 +1550,7 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_ai_server_url#}}parse-srs-file'
         variables: []
-      height: 177
+      height: 175
       id: '1775800000002'
       position:
         x: 2796
@@ -1549,7 +1562,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         authorization:
           config: null
@@ -1580,7 +1593,7 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_ai_server_url#}}store-auth-token'
         variables: []
-      height: 177
+      height: 175
       id: '1775648480416'
       position:
         x: 3158
@@ -1592,7 +1605,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         items:
         - input_type: variable
@@ -1626,7 +1639,7 @@ workflow:
         title: Conversation Variables Assigner
         type: assigner
         version: '2'
-      height: 136
+      height: 134
       id: '1775657870619'
       position:
         x: 362
@@ -1638,7 +1651,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         cases:
         - case_id: 'true'
@@ -1655,7 +1668,7 @@ workflow:
         selected: false
         title: IF/ELSE
         type: if-else
-      height: 124
+      height: 122
       id: '1775719228711'
       position:
         x: 2092
@@ -1667,7 +1680,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         items:
         - input_type: variable
@@ -1703,7 +1716,7 @@ workflow:
         title: Set Initial Agent
         type: assigner
         version: '2'
-      height: 136
+      height: 134
       id: '1800000000040'
       position:
         x: 1730
@@ -1715,7 +1728,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         break_conditions:
         - comparison_operator: is
@@ -1860,7 +1873,7 @@ workflow:
         selected: false
         title: Agent Dispatcher
         type: if-else
-      height: 364
+      height: 362
       id: '1800000000710'
       parentId: '1800000000700'
       position:
@@ -1873,7 +1886,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         authorization:
@@ -1902,7 +1915,7 @@ workflow:
         type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/spec-agent.txt
         variables: []
-      height: 205
+      height: 203
       id: '1800000000101'
       parentId: '1800000000700'
       position:
@@ -1915,7 +1928,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         authorization:
@@ -1944,7 +1957,7 @@ workflow:
         type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/bundle-config-agent.txt
         variables: []
-      height: 221
+      height: 219
       id: '1800000000201'
       parentId: '1800000000700'
       position:
@@ -1957,7 +1970,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         authorization:
@@ -1986,7 +1999,7 @@ workflow:
         type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/rules-agent.txt
         variables: []
-      height: 205
+      height: 203
       id: '1800000000301'
       parentId: '1800000000700'
       position:
@@ -1999,7 +2012,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         authorization:
@@ -2028,7 +2041,7 @@ workflow:
         type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/reports-agent.txt
         variables: []
-      height: 205
+      height: 203
       id: '1800000000401'
       parentId: '1800000000700'
       position:
@@ -2041,7 +2054,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         authorization:
@@ -2070,7 +2083,7 @@ workflow:
         type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/config-inspector-agent.txt
         variables: []
-      height: 221
+      height: 219
       id: '1800000000501'
       parentId: '1800000000700'
       position:
@@ -2083,7 +2096,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         authorization:
@@ -2112,7 +2125,7 @@ workflow:
         type: http-request
         url: https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/prompts/admin-agent.txt
         variables: []
-      height: 205
+      height: 203
       id: '1800000000601'
       parentId: '1800000000700'
       position:
@@ -2125,7 +2138,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         agent_parameters:
@@ -2140,11 +2153,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES:
-              1. Use conversation_id for ALL tool calls.
-              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
-              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
-              4. Always state your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
+              append_agent_log at the START (what you plan to do) and END (what you
+              did, result) of your work. 3. If a tool call fails or returns an error,
+              log it immediately and try an alternative approach. 4. Always state
+              your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 8
@@ -2526,7 +2539,7 @@ workflow:
         title: Spec Agent
         tool_node_version: '2'
         type: agent
-      height: 274
+      height: 272
       id: '1800000000110'
       parentId: '1800000000700'
       position:
@@ -2539,7 +2552,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         agent_parameters:
@@ -2554,11 +2567,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES:
-              1. Use conversation_id for ALL tool calls.
-              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
-              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
-              4. Always state your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
+              append_agent_log at the START (what you plan to do) and END (what you
+              did, result) of your work. 3. If a tool call fails or returns an error,
+              log it immediately and try an alternative approach. 4. Always state
+              your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 5
@@ -2928,7 +2941,7 @@ workflow:
         title: Bundle Config Agent
         tool_node_version: '2'
         type: agent
-      height: 290
+      height: 288
       id: '1800000000210'
       parentId: '1800000000700'
       position:
@@ -2941,7 +2954,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         agent_parameters:
@@ -2956,11 +2969,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES:
-              1. Use conversation_id for ALL tool calls.
-              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
-              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
-              4. Always state your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
+              append_agent_log at the START (what you plan to do) and END (what you
+              did, result) of your work. 3. If a tool call fails or returns an error,
+              log it immediately and try an alternative approach. 4. Always state
+              your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 5
@@ -3137,10 +3150,10 @@ workflow:
                 description: Search Avni documentation and guides for rules, forms,
                   reports, best practices, and examples
               parameters:
-                query:
+                category:
                   auto: 1
                   value: null
-                category:
+                query:
                   auto: 1
                   value: null
                 top_k:
@@ -3175,7 +3188,7 @@ workflow:
         title: Rules Agent
         tool_node_version: '2'
         type: agent
-      height: 252
+      height: 250
       id: '1800000000310'
       parentId: '1800000000700'
       position:
@@ -3184,11 +3197,11 @@ workflow:
       positionAbsolute:
         x: 4388
         y: 1160
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         agent_parameters:
@@ -3203,11 +3216,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES:
-              1. Use conversation_id for ALL tool calls.
-              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
-              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
-              4. Always state your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
+              append_agent_log at the START (what you plan to do) and END (what you
+              did, result) of your work. 3. If a tool call fails or returns an error,
+              log it immediately and try an alternative approach. 4. Always state
+              your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 5
@@ -3383,10 +3396,10 @@ workflow:
                 description: Search Avni documentation and guides for rules, forms,
                   reports, best practices, and examples
               parameters:
-                query:
+                category:
                   auto: 1
                   value: null
-                category:
+                query:
                   auto: 1
                   value: null
                 top_k:
@@ -3421,7 +3434,7 @@ workflow:
         title: Reports Agent
         tool_node_version: '2'
         type: agent
-      height: 252
+      height: 250
       id: '1800000000410'
       parentId: '1800000000700'
       position:
@@ -3434,7 +3447,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         agent_parameters:
@@ -3449,12 +3462,13 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES:
-              1. Use conversation_id for ALL tool calls.
-              2. Call append_agent_log at the START and END of your work.
-              3. Do NOT fix bundle files yourself — if you find issues, use [ROUTE_TO:agent] to send fixes back to the right agent.
-              4. Your workflow: log_start → validate_bundle → upload_bundle → upload_status → log_end. If errors, read 1 file then [ROUTE_TO:agent].
-              5. Your final response MUST include "Bundle uploaded successfully" or describe the error. This text is shown to the user.'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
+              append_agent_log at the START and END of your work. 3. Do NOT fix bundle
+              files yourself — if you find issues, use [ROUTE_TO:agent] to send fixes
+              back to the right agent. 4. Your workflow: log_start → validate_bundle
+              → upload_bundle → upload_status → log_end. If errors, read 1 file then
+              [ROUTE_TO:agent]. 5. Your final response MUST include "Bundle uploaded
+              successfully" or describe the error. This text is shown to the user.'
           maximum_iterations:
             type: constant
             value: 8
@@ -3638,10 +3652,10 @@ workflow:
                 description: Search Avni documentation and guides for rules, forms,
                   reports, best practices, and examples
               parameters:
-                query:
+                category:
                   auto: 1
                   value: null
-                category:
+                query:
                   auto: 1
                   value: null
                 top_k:
@@ -3676,7 +3690,7 @@ workflow:
         title: Config Inspector
         tool_node_version: '2'
         type: agent
-      height: 252
+      height: 250
       id: '1800000000510'
       parentId: '1800000000700'
       position:
@@ -3689,7 +3703,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         agent_parameters:
@@ -3704,11 +3718,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES:
-              1. Use conversation_id for ALL tool calls.
-              2. Call append_agent_log at the START (what you plan to do) and END (what you did, result) of your work.
-              3. If a tool call fails or returns an error, log it immediately and try an alternative approach.
-              4. Always state your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
+              append_agent_log at the START (what you plan to do) and END (what you
+              did, result) of your work. 3. If a tool call fails or returns an error,
+              log it immediately and try an alternative approach. 4. Always state
+              your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 10
@@ -4155,7 +4169,7 @@ workflow:
         title: Admin Agent
         tool_node_version: '2'
         type: agent
-      height: 274
+      height: 272
       id: '1800000000610'
       parentId: '1800000000700'
       position:
@@ -4168,16 +4182,16 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
-        code: "import re\n\ndef main(active_agent: str, existing_memory: str,\n\
-          \         spec_text: str, bundle_text: str, rules_text: str,\n         reports_text:\
+        code: "import re\n\ndef main(active_agent: str, existing_memory: str,\n  \
+          \       spec_text: str, bundle_text: str, rules_text: str,\n         reports_text:\
           \ str, inspect_text: str, admin_text: str) -> dict:\n    texts = {\n   \
-          \     \"spec\": spec_text,\n        \"bundle_config\": bundle_text,\n   \
-          \     \"rules\": rules_text,\n        \"reports\": reports_text,\n       \
-          \ \"inspect\": inspect_text,\n        \"admin\": admin_text,\n    }\n   \
-          \ agent_text = texts.get(active_agent, \"\") or \"\"\n    t_lower = agent_text.lower()\n\
+          \     \"spec\": spec_text,\n        \"bundle_config\": bundle_text,\n  \
+          \      \"rules\": rules_text,\n        \"reports\": reports_text,\n    \
+          \    \"inspect\": inspect_text,\n        \"admin\": admin_text,\n    }\n\
+          \    agent_text = texts.get(active_agent, \"\") or \"\"\n    t_lower = agent_text.lower()\n\
           \n    # Extract key status signals BEFORE truncation so they survive the\
           \ 1000-char cut\n    status_prefix = \"\"\n    upload_signals = [\"uploaded\
           \ successfully\", \"bundle uploaded\", \"upload complete\"]\n    if any(s\
@@ -4187,8 +4201,8 @@ workflow:
           \ t_lower or \"status=error\" in t_lower:\n        status_prefix = \"[ERROR]\
           \ \"\n\n    entry = f\"[{active_agent}] {status_prefix}{agent_text[:1000]}\"\
           \n    sep = \"\\n---\\n\"\n    memory_entry = (existing_memory + sep + entry)\
-          \ if existing_memory else entry\n    return {\n        \"memory_entry\":\
-          \ memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
+          \ if existing_memory else entry\n    return {\n        \"memory_entry\"\
+          : memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4241,7 +4255,7 @@ workflow:
           - text
           value_type: string
           variable: admin_text
-      height: 52
+      height: 50
       id: '1800000000720'
       parentId: '1800000000700'
       position:
@@ -4254,7 +4268,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         isInLoop: true
@@ -4273,7 +4287,7 @@ workflow:
         title: State Update
         type: assigner
         version: '2'
-      height: 136
+      height: 82
       id: '1800000000730'
       parentId: '1800000000700'
       position:
@@ -4286,70 +4300,71 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         code: "import re\n\ndef main(active_agent: str, workflow_mode: str,\n    \
           \     agent_output: str, agent_memory: str) -> dict:\n    if workflow_mode\
           \ == \"targeted\":\n        return {\"next_agent\": \"done\", \"loop_done\"\
           : True,\n                \"reason\": \"Targeted mode — single agent only\"\
-          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or \"\
-          \").lower()\n    has_output = len(t.strip()) > 50\n\n    # Inspector backward\
-          \ routing: [ROUTE_TO:agent_name]\n    route_match = re.search(r\"\\[route_to:(\\\
-          w+)\\]\", t)\n    if route_match and active_agent == \"inspect\":\n       \
-          \ target = route_match.group(1)\n        valid_targets = [\"spec\", \"bundle_config\"\
-          , \"rules\", \"reports\"]\n        already_rerouted = \"[rerouted from inspect]\"\
-          \ in mem\n        if target in valid_targets and not already_rerouted:\n  \
-          \          return {\"next_agent\": target, \"loop_done\": False,\n        \
-          \            \"reason\": f\"Inspector found issues, routing to {target} for\
-          \ fixes\"}\n\n    # Detect if agent is asking user a question\n    question_signals\
-          \ = [\"could you\", \"can you please\", \"would you like\",\n            \
-          \         \"please provide\", \"please confirm\", \"please share\",\n    \
-          \                 \"let me know\", \"what would you\", \"which option\",\n\
-          \                     \"do you want\", \"shall i\"]\n    asking_user = any(q\
-          \ in t for q in question_signals) and t.rstrip().endswith(\"?\")\n\n    #\
-          \ Phase-based completion: check if agent logged success via append_agent_log\n\
-          \    phase_map = {\n        \"spec\": \"spec_generation\",\n        \"bundle_config\"\
-          : \"bundle_config\",\n        \"rules\": \"rules_generation\",\n        \"\
-          reports\": \"reports_generation\",\n        \"inspect\": \"upload\",\n    }\n\
-          \    phase = phase_map.get(active_agent, \"\")\n    phase_done = phase and\
-          \ (f'\"phase\":\"{phase}\"' in mem.replace(' ','') or\n                  \
-          \   f'phase=\"{phase}\"' in mem or\n                     f'{phase}: success'\
-          \ in mem or\n                     f'status=\"success\"' in t and phase in\
-          \ t)\n\n    # Keyword-based completion signals (fallback)\n    completion\
-          \ = {\n        \"spec\": [\"generate_spec\", \"spec generated\", \"stored=true\"\
-          ,\n                 \"approved\", \"spec summary\", \"configuration summary\"\
-          ,\n                 \"generate_bundle\", \"bundle stored\"],\n        \"bundle_config\"\
-          : [\"validate_bundle\", \"put_bundle_file\",\n                    \"generate_form\"\
-          , \"concepts.json\",\n                    \"bundle complete\", \"bundle is\
-          \ ready\", \"validation passed\",\n                    \"0 errors\", \"no\
-          \ errors\"],\n        \"rules\": [\"generate_rule\", \"validate_rule\", \"\
-          rule code\",\n                 \"visitschedule\", \"decision rule\", \"formElementRule\"\
+          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
+          \ \"\").lower()\n    has_output = len(t.strip()) > 50\n\n    # Inspector\
+          \ backward routing: [ROUTE_TO:agent_name]\n    route_match = re.search(r\"\
+          \\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent == \"inspect\"\
+          :\n        target = route_match.group(1)\n        valid_targets = [\"spec\"\
+          , \"bundle_config\", \"rules\", \"reports\"]\n        already_rerouted =\
+          \ \"[rerouted from inspect]\" in mem\n        if target in valid_targets\
+          \ and not already_rerouted:\n            return {\"next_agent\": target,\
+          \ \"loop_done\": False,\n                    \"reason\": f\"Inspector found\
+          \ issues, routing to {target} for fixes\"}\n\n    # Detect if agent is asking\
+          \ user a question\n    question_signals = [\"could you\", \"can you please\"\
+          , \"would you like\",\n                     \"please provide\", \"please\
+          \ confirm\", \"please share\",\n                     \"let me know\", \"\
+          what would you\", \"which option\",\n                     \"do you want\"\
+          , \"shall i\"]\n    asking_user = any(q in t for q in question_signals)\
+          \ and t.rstrip().endswith(\"?\")\n\n    # Phase-based completion: check\
+          \ if agent logged success via append_agent_log\n    phase_map = {\n    \
+          \    \"spec\": \"spec_generation\",\n        \"bundle_config\": \"bundle_config\"\
+          ,\n        \"rules\": \"rules_generation\",\n        \"reports\": \"reports_generation\"\
+          ,\n        \"inspect\": \"upload\",\n    }\n    phase = phase_map.get(active_agent,\
+          \ \"\")\n    phase_done = phase and (f'\"phase\":\"{phase}\"' in mem.replace('\
+          \ ','') or\n                     f'phase=\"{phase}\"' in mem or\n      \
+          \               f'{phase}: success' in mem or\n                     f'status=\"\
+          success\"' in t and phase in t)\n\n    # Keyword-based completion signals\
+          \ (fallback)\n    completion = {\n        \"spec\": [\"generate_spec\",\
+          \ \"spec generated\", \"stored=true\",\n                 \"approved\", \"\
+          spec summary\", \"configuration summary\",\n                 \"generate_bundle\"\
+          , \"bundle stored\"],\n        \"bundle_config\": [\"validate_bundle\",\
+          \ \"put_bundle_file\",\n                    \"generate_form\", \"concepts.json\"\
+          ,\n                    \"bundle complete\", \"bundle is ready\", \"validation\
+          \ passed\",\n                    \"0 errors\", \"no errors\"],\n       \
+          \ \"rules\": [\"generate_rule\", \"validate_rule\", \"rule code\",\n   \
+          \              \"visitschedule\", \"decision rule\", \"formElementRule\"\
           ],\n        \"reports\": [\"generate_report_cards\", \"suggest_dashboard\"\
           ,\n                   \"reportcard\", \"dashboard\", \"report cards\"],\n\
-          \        \"inspect\": [\"upload_bundle\", \"upload_status\",\n          \
-          \         \"uploaded successfully\", \"upload complete\",\n              \
-          \     \"bundle uploaded\"],\n    }\n\n    chain = [\"spec\", \"bundle_config\"\
+          \        \"inspect\": [\"upload_bundle\", \"upload_status\",\n         \
+          \          \"uploaded successfully\", \"upload complete\",\n           \
+          \        \"bundle uploaded\"],\n    }\n\n    chain = [\"spec\", \"bundle_config\"\
           , \"rules\", \"reports\", \"inspect\"]\n    try:\n        idx = chain.index(active_agent)\n\
           \    except ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\"\
-          : True,\n                \"reason\": f\"Unknown agent: {active_agent}\"}\n\
-          \n    signals = completion.get(active_agent, [])\n    keyword_done = has_output\
-          \ and any(s in t for s in signals)\n    completed = phase_done or keyword_done\n\
-          \n    if asking_user and not completed:\n        return {\"next_agent\": \"\
-          done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
-          \ is asking the user a question\"}\n\n    if not has_output and not phase_done:\n\
-          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n        \
-          \        \"reason\": f\"{active_agent} produced no output\"}\n\n    if completed\
-          \ and idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n        return\
-          \ {\"next_agent\": next_a, \"loop_done\": False,\n                \"reason\"\
-          : f\"{active_agent} done, advancing to {next_a}\"}\n\n    if completed and\
-          \ idx >= len(chain) - 1:\n        return {\"next_agent\": \"done\", \"loop_done\"\
-          : True,\n                \"reason\": \"End of chain\"}\n\n    if idx < len(chain)\
-          \ - 1:\n        next_a = chain[idx + 1]\n        return {\"next_agent\":\
-          \ next_a, \"loop_done\": False,\n                \"reason\": f\"{active_agent}\
-          \ output unclear but advancing to {next_a}\"}\n\n    return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n            \"reason\": \"End of chain\"\
-          }\n"
+          : True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
+          }\n\n    signals = completion.get(active_agent, [])\n    keyword_done =\
+          \ has_output and any(s in t for s in signals)\n    completed = phase_done\
+          \ or keyword_done\n\n    if asking_user and not completed:\n        return\
+          \ {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\"\
+          : f\"{active_agent} is asking the user a question\"}\n\n    if not has_output\
+          \ and not phase_done:\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": f\"{active_agent} produced no output\"\
+          }\n\n    if completed and idx < len(chain) - 1:\n        next_a = chain[idx\
+          \ + 1]\n        return {\"next_agent\": next_a, \"loop_done\": False,\n\
+          \                \"reason\": f\"{active_agent} done, advancing to {next_a}\"\
+          }\n\n    if completed and idx >= len(chain) - 1:\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": \"End of chain\"\
+          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n   \
+          \     return {\"next_agent\": next_a, \"loop_done\": False,\n          \
+          \      \"reason\": f\"{active_agent} output unclear but advancing to {next_a}\"\
+          }\n\n    return {\"next_agent\": \"done\", \"loop_done\": True,\n      \
+          \      \"reason\": \"End of chain\"}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4384,7 +4399,7 @@ workflow:
           - agent_memory
           value_type: string
           variable: agent_memory
-      height: 52
+      height: 50
       id: '1800000000740'
       parentId: '1800000000700'
       position:
@@ -4397,7 +4412,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         cases:
@@ -4418,7 +4433,7 @@ workflow:
         selected: false
         title: Loop Done Check
         type: if-else
-      height: 148
+      height: 146
       id: '1800000000745'
       parentId: '1800000000700'
       position:
@@ -4431,7 +4446,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         isInLoop: true
@@ -4450,7 +4465,7 @@ workflow:
         title: Break Loop
         type: assigner
         version: '2'
-      height: 84
+      height: 82
       id: '1800000000751'
       parentId: '1800000000700'
       position:
@@ -4463,7 +4478,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         isInLoop: true
@@ -4482,7 +4497,7 @@ workflow:
         title: Continue Loop
         type: assigner
         version: '2'
-      height: 84
+      height: 82
       id: '1800000000752'
       parentId: '1800000000700'
       position:
@@ -4495,7 +4510,7 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         code: "def main(active_agent: str, existing_memory: str) -> dict:\n    error_msg\
@@ -4523,20 +4538,20 @@ workflow:
           - agent_memory
           value_type: string
           variable: existing_memory
-      height: 52
+      height: 50
       id: '1800000000761'
       parentId: '1800000000700'
       position:
         x: 1250
-        y: 750
+        y: 862
       positionAbsolute:
         x: 4770
-        y: 750
+        y: 862
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         isInLoop: true
@@ -4564,78 +4579,119 @@ workflow:
         title: Error Handler
         type: assigner
         version: '2'
-      height: 84
+      height: 108
       id: '1800000000760'
       parentId: '1800000000700'
       position:
-        x: 1250
-        y: 847
+        x: 1572
+        y: 846
       positionAbsolute:
-        x: 4770
-        y: 847
+        x: 5092
+        y: 846
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
-        context:
-          enabled: false
-        desc: Summarizes agent work for the user
-        memory:
-          query_prompt_template: ''
-          role_prefix:
-            assistant: ''
-            user: ''
-          window:
-            enabled: false
-            size: 0
-        model:
-          completion_params:
-            max_tokens: 1024
-            temperature: 0.3
-          mode: chat
-          name: claude-haiku-4-5-20251001
-          provider: langgenius/anthropic/anthropic
-        prompt_template:
-        - id: a1b2c3d4-summary-prompt-01
-          role: system
-          text: "You are a friendly assistant that summarizes what happened during\
-            \ an Avni configuration workflow. Read the agent activity log below and\
-            \ produce a concise, well-formatted summary for the end user.\n\n<agent_log>\n\
-            {{#conversation.agent_memory#}}\n</agent_log>\n\n## How to determine\
-            \ upload status\n\nLook for these EXACT indicators in the log:\n- **Uploaded**:\
-            \ log contains [UPLOAD_SUCCESS], upload_bundle, upload_status, uploaded\
-            \ successfully, upload: success, or Bundle uploaded\n- **NOT uploaded**:\
-            \ none of the above appear anywhere in the log\n\nThe [UPLOAD_SUCCESS]\
-            \ tag is the most reliable indicator. It is added automatically when the\
-            \ inspector reports a successful upload.\n\nDo NOT guess. If you cannot\
-            \ find an explicit upload indicator, say the bundle was NOT uploaded.\n\
-            \n## Instructions\n\n1. Check if the log contains [ERROR] entries. If\
-            \ yes, explain what went wrong simply and suggest retry.\n2. Check if\
-            \ the log contains ROUTE_TO entries that were NOT followed by a successful\
-            \ upload. Tell the user what was found and what fix was attempted.\n3.\
-            \ **If uploaded**: Start with \"Your bundle has been uploaded to Avni\
-            \ successfully.\" Then summarize what was built in 3-5 bullet points.\
-            \ Next steps: review forms in Avni, set up locations and users.\n4. **If\
-            \ NOT uploaded**: Start with \"Your bundle has been generated but is NOT\
-            \ yet uploaded to Avni.\" Explain what happened and what the user should\
-            \ do (retry, or ask the assistant to upload).\n5. Keep it under 200 words,\
-            \ use markdown.\n6. Do NOT dump raw data or technical details.\n7. Do\
-            \ NOT say \"ready to deploy\" — either it IS deployed (uploaded) or it\
-            \ is NOT."
-        - id: a1b2c3d4-summary-prompt-02
-          role: user
-          text: Summarize what was done and what the user should do next.
+        agent_parameters:
+          instruction:
+            type: constant
+            value: "You are a friendly assistant that summarizes what happened during\
+              \ an Avni configuration workflow.\n\n  ## Step 1: Get the full activity\
+              \ log\n  Call `get_agent_logs` with the conversation_id to retrieve\
+              \ the structured activity log. This is more\n  reliable than the agent\
+              \ memory text below.\n\n  ## Step 2: Determine upload status\n\n  Look\
+              \ for these in the agent log entries:\n  - **Uploaded**: Any entry with\
+              \ phase=\"upload\" and status=\"success\", OR action contains \"uploaded\n\
+              \  successfully\" or \"Bundle uploaded\"\n  - **NOT uploaded**: No such\
+              \ entry exists\n\n  Also check the agent memory for backup signals:\n\
+              \  <agent_log>\n  {{#conversation.agent_memory#}}\n  </agent_log>\n\n\
+              \  Look for [UPLOAD_SUCCESS] tag or \"upload_bundle\" / \"uploaded successfully\"\
+              \ in the memory text.\n\n  Do NOT guess. If you cannot find an explicit\
+              \ upload indicator in either source, say the bundle was NOT\n  uploaded.\n\
+              \n  ## Step 3: Write the summary\n\n  1. Check if the log contains entries\
+              \ with status=\"error\". If yes, explain what went wrong simply and\n\
+              \  suggest retry.\n  2. Check if the log contains ROUTE_TO entries that\
+              \ were NOT followed by a successful upload. Tell the\n  user what was\
+              \ found and what fix was attempted.\n  3. **If uploaded**: Start with\
+              \ \"Your bundle has been uploaded to Avni successfully.\" Then summarize\
+              \ what\n   was built in 3-5 bullet points. Next steps: review forms\
+              \ in Avni, set up locations and users.\n  4. **If NOT uploaded**: Start\
+              \ with \"Your bundle has been generated but is NOT yet uploaded to Avni.\"\
+              \n  Explain what happened and what the user should do (retry, or ask\
+              \ the assistant to upload).\n  5. Keep it under 200 words, use markdown.\n\
+              \  6. Do NOT dump raw data or technical details.\n  7. Do NOT say \"\
+              ready to deploy\" — either it IS deployed (uploaded) or it is NOT."
+          model:
+            type: constant
+            value:
+              completion_params:
+                max_tokens: 10240
+              mode: chat
+              model: claude-haiku-4-5-20251001
+              model_type: llm
+              provider: langgenius/anthropic/anthropic
+              type: model-selector
+          query:
+            type: constant
+            value: Summarize what was done and what the user should do next.
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: 'Returns all structured log entries for the conversation.
+                  Use this at the
+
+                  START of your work to check what previous agents have already done
+                  — look
+
+                  for phase/status entries like spec_generation:success, bundle_config:success,
+
+                  rules_generation:success, upload:success to avoid redoing completed
+                  work.
+
+                  '
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
+              provider_show_name: Avni AI Staging SubAgents Openapi
+              settings: {}
+              tool_description: 'Returns all structured log entries for the conversation.
+                Use this at the
+
+                START of your work to check what previous agents have already done
+                — look
+
+                for phase/status entries like spec_generation:success, bundle_config:success,
+
+                rules_generation:success, upload:success to avoid redoing completed
+                work.
+
+                '
+              tool_label: get_agent_logs
+              tool_name: get_agent_logs
+              type: api
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        meta:
+          minimum_dify_version: 1.7.0
+          version: 0.0.2
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.34@4b41a374567eb7cb226ee2f851513794566956008f1166c63205efc921be72d8
         selected: false
         title: Summarize Results
-        type: llm
-        variables: []
-        vision:
-          enabled: false
-      height: 88
-      id: '1800000000801'
+        tool_node_version: '2'
+        type: agent
+      height: 186
+      id: '1776327635368'
       position:
         x: 7620
         y: 1182
@@ -4646,14 +4702,14 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
-        answer: '{{#1800000000801.text#}}'
+        answer: '{{#1776327635368.text#}}'
         selected: false
         title: Post-Loop Answer
         type: answer
         variables: []
-      height: 103
+      height: 101
       id: '1800000000800'
       position:
         x: 7962
@@ -4661,18 +4717,18 @@ workflow:
       positionAbsolute:
         x: 7962
         y: 1174
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     - data:
         answer: An error occurred while setting up. Please try again or contact support.
         selected: false
         title: Pre-Loop Error
         type: answer
         variables: []
-      height: 116
+      height: 114
       id: '1800000000112'
       position:
         x: 3520
@@ -4684,9 +4740,9 @@ workflow:
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
     viewport:
-      x: 0
-      y: 0
+      x: -5006.25
+      y: -334.15
       zoom: 0.7
   rag_pipeline_variables: []
