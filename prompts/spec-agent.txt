@@ -41,6 +41,14 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 18. **Call `read_silo_file`** to read large Python outputs.
 19. **Call `append_agent_log`** after every significant action to maintain an audit trail.
 
+### Step 0: Check progress before acting
+20. **Call `get_agent_logs`** FIRST to see what has already been done in this conversation. Check for completed phases:
+    - If `spec_generation: success` exists and you are NOT re-invoked by Inspector → spec is done, call `generate_bundle` if bundle not yet generated, then STOP.
+    - If `bundle_generation: success` exists → bundle exists, STOP immediately.
+    - If you see `[ROUTE_TO:spec]` in Agent Memory → you are re-invoked. Read the instructions, fix the specific issue, then re-generate spec and bundle.
+21. **Call `append_agent_log`** at the START with `phase="spec_generation"`, `status="started"`, and a brief plan of what you will do.
+22. **Call `append_agent_log`** at the END with `phase="spec_generation"`, `status="success"` (or `status="error"`), and a summary of what was produced.
+
 ### Key rules
 - **Entities and specs are stored server-side** — after `store_entities` or `generate_spec`, other agents can access them via the same `conversation_id`.
 - **Fix ERRORS only, pass WARNINGS through** — if `validate_entities` returns errors (error_count > 0), fix them. Warnings are handled later by the Config Inspector agent.
@@ -49,7 +57,8 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Do NOT read entity sections one by one** — the validator already tells you what's wrong.
 - **Do NOT review the generated spec** — that's the Inspector's job.
 - **Use `conversation_id` on every tool call.**
-- **If re-invoked by the Inspector**: check `Agent Memory` for instructions from the inspector (e.g., "[ROUTE_TO:spec] missing encounter types"). Focus on fixing the specific issue described, then re-generate spec and bundle.
+- **If re-invoked by the Inspector**: check Agent Memory AND `get_agent_logs` for instructions (e.g., "[ROUTE_TO:spec] missing encounter types"). Focus on fixing the specific issue described, then re-generate spec and bundle.
+- **Log phase transitions**: Always log `spec_generation: started` before you begin and `spec_generation: success` when done. If you also generate the bundle, log `bundle_generation: success` separately.
 
 ---
 

@@ -39,10 +39,15 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 18. **Call `read_silo_file`** to read large outputs.
 19. **Call `append_agent_log`** after every significant action.
 
+### Step 0: Check progress before acting
+1. **Call `get_agent_logs`** FIRST to see what has already been done and what task you should focus on.
+2. **Call `append_agent_log`** with `phase="admin"`, `status="started"` and a summary of what you plan to do.
+
 ### Key rules
 - **Always call `get_locations` or `get_catchments` before creating** — avoid duplicates.
 - **For `delete_implementation`, always ask for explicit user confirmation** — this is destructive and irreversible.
 - **Use `conversation_id` on every tool call.**
+- **Log completion**: Log `phase="admin"`, `status="success"` with a summary of actions taken.
 
 ---
 

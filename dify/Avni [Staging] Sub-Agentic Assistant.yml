@@ -4285,31 +4285,37 @@ workflow:
           \     agent_output: str, agent_memory: str) -> dict:\n    if workflow_mode\
           \ == \"targeted\":\n        return {\"next_agent\": \"done\", \"loop_done\"\
           : True,\n                \"reason\": \"Targeted mode — single agent only\"\
-          }\n\n    t = (agent_output or \"\").lower()\n    has_output = len(t.strip())\
-          \ > 50\n\n    # Inspector backward routing: [ROUTE_TO:agent_name]\n    route_match\
-          \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
-          \ == \"inspect\":\n        target = route_match.group(1)\n        valid_targets\
-          \ = [\"spec\", \"bundle_config\", \"rules\", \"reports\"]\n        # Prevent\
-          \ infinite loops: only reroute if we haven't already rerouted\n        already_rerouted\
-          \ = \"[rerouted from inspect]\" in (agent_memory or \"\").lower()\n      \
-          \  if target in valid_targets and not already_rerouted:\n            return\
-          \ {\"next_agent\": target, \"loop_done\": False,\n                    \"\
-          reason\": f\"Inspector found issues, routing to {target} for fixes\"}\n\n\
-          \    # Detect if agent is asking user a question\n    question_signals =\
-          \ [\"could you\", \"can you please\", \"would you like\",\n             \
-          \        \"please provide\", \"please confirm\", \"please share\",\n    \
+          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or \"\
+          \").lower()\n    has_output = len(t.strip()) > 50\n\n    # Inspector backward\
+          \ routing: [ROUTE_TO:agent_name]\n    route_match = re.search(r\"\\[route_to:(\\\
+          w+)\\]\", t)\n    if route_match and active_agent == \"inspect\":\n       \
+          \ target = route_match.group(1)\n        valid_targets = [\"spec\", \"bundle_config\"\
+          , \"rules\", \"reports\"]\n        already_rerouted = \"[rerouted from inspect]\"\
+          \ in mem\n        if target in valid_targets and not already_rerouted:\n  \
+          \          return {\"next_agent\": target, \"loop_done\": False,\n        \
+          \            \"reason\": f\"Inspector found issues, routing to {target} for\
+          \ fixes\"}\n\n    # Detect if agent is asking user a question\n    question_signals\
+          \ = [\"could you\", \"can you please\", \"would you like\",\n            \
+          \         \"please provide\", \"please confirm\", \"please share\",\n    \
           \                 \"let me know\", \"what would you\", \"which option\",\n\
           \                     \"do you want\", \"shall i\"]\n    asking_user = any(q\
           \ in t for q in question_signals) and t.rstrip().endswith(\"?\")\n\n    #\
-          \ Completion signals per agent\n    completion = {\n        \"spec\": [\"\
-          generate_spec\", \"spec generated\", \"stored=true\",\n                 \"\
-          approved\", \"encounter types\", \"subject types\",\n                 \"\
-          spec summary\", \"configuration summary\",\n                 \"generate_bundle\"\
-          , \"bundle stored\"],\n        \"bundle_config\": [\"generate_bundle\", \"\
-          bundle generated\",\n                    \"validate_bundle\", \"put_bundle_file\"\
-          ,\n                    \"generate_form\", \"concepts.json\", \"formmappings\"\
-          ,\n                    \"bundle complete\", \"bundle is ready\", \"validation\
-          \ passed\"],\n        \"rules\": [\"generate_rule\", \"validate_rule\", \"\
+          \ Phase-based completion: check if agent logged success via append_agent_log\n\
+          \    phase_map = {\n        \"spec\": \"spec_generation\",\n        \"bundle_config\"\
+          : \"bundle_config\",\n        \"rules\": \"rules_generation\",\n        \"\
+          reports\": \"reports_generation\",\n        \"inspect\": \"upload\",\n    }\n\
+          \    phase = phase_map.get(active_agent, \"\")\n    phase_done = phase and\
+          \ (f'\"phase\":\"{phase}\"' in mem.replace(' ','') or\n                  \
+          \   f'phase=\"{phase}\"' in mem or\n                     f'{phase}: success'\
+          \ in mem or\n                     f'status=\"success\"' in t and phase in\
+          \ t)\n\n    # Keyword-based completion signals (fallback)\n    completion\
+          \ = {\n        \"spec\": [\"generate_spec\", \"spec generated\", \"stored=true\"\
+          ,\n                 \"approved\", \"spec summary\", \"configuration summary\"\
+          ,\n                 \"generate_bundle\", \"bundle stored\"],\n        \"bundle_config\"\
+          : [\"validate_bundle\", \"put_bundle_file\",\n                    \"generate_form\"\
+          , \"concepts.json\",\n                    \"bundle complete\", \"bundle is\
+          \ ready\", \"validation passed\",\n                    \"0 errors\", \"no\
+          \ errors\"],\n        \"rules\": [\"generate_rule\", \"validate_rule\", \"\
           rule code\",\n                 \"visitschedule\", \"decision rule\", \"formElementRule\"\
           ],\n        \"reports\": [\"generate_report_cards\", \"suggest_dashboard\"\
           ,\n                   \"reportcard\", \"dashboard\", \"report cards\"],\n\
@@ -4319,22 +4325,23 @@ workflow:
           , \"rules\", \"reports\", \"inspect\"]\n    try:\n        idx = chain.index(active_agent)\n\
           \    except ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\"\
           : True,\n                \"reason\": f\"Unknown agent: {active_agent}\"}\n\
-          \n    signals = completion.get(active_agent, [])\n    completed = has_output\
-          \ and any(s in t for s in signals)\n\n    if asking_user and not completed:\n\
-          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n       \
-          \         \"reason\": f\"{active_agent} is asking the user a question\"}\n\
-          \n    if not has_output:\n        return {\"next_agent\": \"done\", \"loop_done\"\
-          : True,\n                \"reason\": f\"{active_agent} produced no output\"\
-          }\n\n    if completed and idx < len(chain) - 1:\n        next_a = chain[idx\
-          \ + 1]\n        return {\"next_agent\": next_a, \"loop_done\": False,\n \
-          \               \"reason\": f\"{active_agent} done, advancing to {next_a}\"\
-          }\n\n    if completed and idx >= len(chain) - 1:\n        return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n                \"reason\": \"End of chain\"\
-          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n    \
-          \    return {\"next_agent\": next_a, \"loop_done\": False,\n             \
-          \   \"reason\": f\"{active_agent} output unclear but advancing to {next_a}\"\
-          }\n\n    return {\"next_agent\": \"done\", \"loop_done\": True,\n       \
-          \     \"reason\": \"End of chain\"}\n"
+          \n    signals = completion.get(active_agent, [])\n    keyword_done = has_output\
+          \ and any(s in t for s in signals)\n    completed = phase_done or keyword_done\n\
+          \n    if asking_user and not completed:\n        return {\"next_agent\": \"\
+          done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
+          \ is asking the user a question\"}\n\n    if not has_output and not phase_done:\n\
+          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n        \
+          \        \"reason\": f\"{active_agent} produced no output\"}\n\n    if completed\
+          \ and idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n        return\
+          \ {\"next_agent\": next_a, \"loop_done\": False,\n                \"reason\"\
+          : f\"{active_agent} done, advancing to {next_a}\"}\n\n    if completed and\
+          \ idx >= len(chain) - 1:\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": \"End of chain\"}\n\n    if idx < len(chain)\
+          \ - 1:\n        next_a = chain[idx + 1]\n        return {\"next_agent\":\
+          \ next_a, \"loop_done\": False,\n                \"reason\": f\"{active_agent}\
+          \ output unclear but advancing to {next_a}\"}\n\n    return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n            \"reason\": \"End of chain\"\
+          }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4586,32 +4593,28 @@ workflow:
         prompt_template:
         - id: a1b2c3d4-summary-prompt-01
           role: system
-          text: 'You are a friendly assistant that summarizes what happened during
-            an Avni configuration workflow. Read the agent activity log below and
-            produce a concise, well-formatted summary for the end user.
-
-
-            <agent_log>
-
-            {{#conversation.agent_memory#}}
-
-            </agent_log>
-
-
-            ## Instructions
-
-
-            1. Check if the log contains [ERROR] entries. If yes, explain what
-            went wrong simply and suggest retry.\n2. Check if the log contains ROUTE_TO
-            entries that were NOT followed by a successful upload. This means a fix
-            was attempted but did not fully resolve it. Tell the user what was found,
-            what fix was attempted, and ask if they want to try again or review the
-            issue manually.\n3. If the bundle was uploaded successfully, summarize
-            what was accomplished in 3-5 bullet points.\n4. If the bundle was NOT
-            uploaded (no upload_bundle in log), clearly state the bundle is not yet
-            live and what the user should do.\n5. End with clear next steps.\n6.
-            Keep it under 200 words, use markdown.\n7. Do NOT dump raw data or
-            technical details.'
+          text: "You are a friendly assistant that summarizes what happened during\
+            \ an Avni configuration workflow. Read the agent activity log below and\
+            \ produce a concise, well-formatted summary for the end user.\n\n<agent_log>\n\
+            {{#conversation.agent_memory#}}\n</agent_log>\n\n## How to determine\
+            \ upload status\n\nLook for these EXACT indicators in the log:\n- **Uploaded**:\
+            \ log contains \"upload_bundle\", \"upload_status\", \"uploaded successfully\"\
+            , \"upload: success\", or \"Bundle uploaded\"\n- **NOT uploaded**: none\
+            \ of the above appear anywhere in the log\n\nDo NOT guess. If you cannot\
+            \ find an explicit upload indicator, say the bundle was NOT uploaded.\n\
+            \n## Instructions\n\n1. Check if the log contains [ERROR] entries. If\
+            \ yes, explain what went wrong simply and suggest retry.\n2. Check if\
+            \ the log contains ROUTE_TO entries that were NOT followed by a successful\
+            \ upload. Tell the user what was found and what fix was attempted.\n3.\
+            \ **If uploaded**: Start with \"Your bundle has been uploaded to Avni\
+            \ successfully.\" Then summarize what was built in 3-5 bullet points.\
+            \ Next steps: review forms in Avni, set up locations and users.\n4. **If\
+            \ NOT uploaded**: Start with \"Your bundle has been generated but is NOT\
+            \ yet uploaded to Avni.\" Explain what happened and what the user should\
+            \ do (retry, or ask the assistant to upload).\n5. Keep it under 200 words,\
+            \ use markdown.\n6. Do NOT dump raw data or technical details.\n7. Do\
+            \ NOT say \"ready to deploy\" — either it IS deployed (uploaded) or it\
+            \ is NOT."
         - id: a1b2c3d4-summary-prompt-02
           role: user
           text: Summarize what was done and what the user should do next.

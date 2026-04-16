@@ -92,7 +92,38 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
         return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
 
     conversation_id = body.get("conversation_id")
+    force = body.get("force", False)
     entities = body.get("entities")
+
+    # Noop if a bundle already exists — prevents wiping surgical changes
+    # made by downstream agents (bundle_config, rules, reports).
+    # Pass force=true to explicitly regenerate when needed.
+    if not force and conversation_id:
+        existing = _bundle_store.get(conversation_id)
+        if existing:
+            bundle = existing["bundle"]
+            summary = {
+                "concepts": len(bundle.get("concepts", [])),
+                "forms": len(bundle.get("forms", [])),
+                "subjectTypes": len(bundle.get("subjectTypes", [])),
+                "programs": len(bundle.get("programs", [])),
+                "encounterTypes": len(bundle.get("encounterTypes", [])),
+                "formMappings": len(bundle.get("formMappings", [])),
+                "groups": len(bundle.get("groups", [])),
+            }
+            logger.info(
+                "generate-bundle: noop — bundle already exists for conversation_id=%s "
+                "(pass force=true to regenerate)",
+                conversation_id,
+            )
+            return JSONResponse(
+                {
+                    "success": True,
+                    "stored": True,
+                    "already_existed": True,
+                    "summary": summary,
+                }
+            )
 
     if not entities:
         # Try to resolve from entity store via conversation_id

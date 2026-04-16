@@ -72,7 +72,7 @@ async def handle_append_agent_log(request: Request) -> JSONResponse:
     Body: {
       "conversation_id": "...",
       "step": 1,
-      "phase": "entity_extraction|spec_generation|bundle_generation|bundle_fix|upload|done",
+      "phase": "entity_extraction|spec_generation|bundle_generation|bundle_config|rules_generation|reports_generation|inspection|upload|admin|done",
       "action": "Called generate_bundle",
       "tool": "generate_bundle",        // optional
       "status": "success|error|info",
