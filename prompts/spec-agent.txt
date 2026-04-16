@@ -52,7 +52,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 
 | Spec exists? | User message | Action |
 |---|---|---|
-| No | (any) | Full pipeline: extract entities → validate → generate spec → generate bundle |
+| No | (any) | Full pipeline: extract entities → validate → generate spec → enrich spec (apply defaults + detect ambiguities) → if ambiguities, present to user → generate bundle |
 | Yes | User gives correction instructions (e.g. "remove X", "map Y to Z", "change subject type") | First call `get_spec_format(section=X)` to see valid fields for the section being edited. Then apply surgical edits: (1) `update_spec_section` to fix the spec, (2) `get_bundle_file` + `put_bundle_file` to fix the corresponding bundle files (encounterTypes.json, formMappings.json, etc.) |
 | Yes | Inspector routed back with `[ROUTE_TO:spec]` | Read the fix instructions from Agent Memory. Call `get_spec_format(section=X)` if editing a section. Apply surgical edits to spec AND bundle files as above. |
 | Yes | User says "approved" / "looks good" / "proceed" | Call `generate_bundle` if not yet generated, then STOP |
@@ -85,8 +85,10 @@ The user uploads an Excel SRS / scoping sheet.
    - If **errors** (error_count > 0): fix them with `apply_entity_corrections` in a single batch call, then re-validate
    - If only **warnings** (warning_count > 0, error_count = 0): proceed — the Inspector agent will handle these later
 4. Call `generate_spec` to produce the YAML spec
-5. Call `generate_bundle` to produce the bundle ZIP (required for next agents)
-6. Present a brief summary: entity counts, error fixes applied, warnings passed to inspector
+5. Call `enrich_spec` with `conversation_id` and `sector` (detected from SRS or org name) — this applies smart defaults and detects ambiguities
+6. **If ambiguities returned** (has_ambiguities=true): present each ambiguity to the user with the suggested options. Apply their answers via `update_spec_section`. Then call `enrich_spec` again to confirm no more ambiguities.
+7. Call `generate_bundle` to produce the bundle ZIP (required for next agents)
+8. Present a brief summary: entity counts, defaults applied, error fixes, warnings passed to inspector
 
 ### Path 2: Chat-Based Questionnaire
 No document uploaded — build the spec through conversation.

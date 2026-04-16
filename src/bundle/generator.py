@@ -284,20 +284,31 @@ class BundleGenerator:
             st = self.bundle["subjectTypes"][0]
             logger.warning(
                 "formMapping '%s': no subjectType specified, defaulting to '%s'",
-                form_spec["name"], st["name"],
+                form_spec["name"],
+                st["name"],
             )
 
         # Fallback: if program encounter but no program, try to find a program
         # that targets the same subject type, or fall back to the first program
-        if not prog and form_type in (
-            "ProgramEnrolment", "ProgramExit",
-            "ProgramEncounter", "ProgramEncounterCancellation",
-        ) and self.bundle["programs"]:
+        if (
+            not prog
+            and form_type
+            in (
+                "ProgramEnrolment",
+                "ProgramExit",
+                "ProgramEncounter",
+                "ProgramEncounterCancellation",
+            )
+            and self.bundle["programs"]
+        ):
             # Try matching by subject type
             if st:
                 prog = next(
-                    (p for p in self.bundle["programs"]
-                     if p.get("programSubjectLabel") == st["name"]),
+                    (
+                        p
+                        for p in self.bundle["programs"]
+                        if p.get("programSubjectLabel") == st["name"]
+                    ),
                     None,
                 )
             # Fall back to first program
@@ -305,7 +316,9 @@ class BundleGenerator:
                 prog = self.bundle["programs"][0]
             logger.warning(
                 "formMapping '%s': no program specified for %s, defaulting to '%s'",
-                form_spec["name"], form_type, prog["name"],
+                form_spec["name"],
+                form_type,
+                prog["name"],
             )
 
         if st:

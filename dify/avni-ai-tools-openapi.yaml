@@ -1294,6 +1294,75 @@ paths:
         '404':
           description: No log entries found for conversation_id
 
+  /enrich-spec:
+    post:
+      operationId: enrich_spec
+      summary: Apply smart defaults and detect ambiguities in a stored spec
+      description: |
+        Reads the stored spec, compares against the comprehensive format schema,
+        fills in sensible defaults for missing fields (based on sector), and returns
+        a list of ambiguities that need user input (e.g. "which subject type does
+        encounter X belong to?"). The enriched spec replaces the stored one.
+
+        Call this AFTER generate_spec and BEFORE generate_bundle. Present the
+        ambiguities to the user, apply their answers via update_spec_section,
+        then proceed with bundle generation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+              properties:
+                conversation_id:
+                  type: string
+                  description: Dify conversation ID
+                sector:
+                  type: string
+                  description: Sector (MCH, Livelihoods, Education, Nutrition, WASH) for sector-specific defaults
+      responses:
+        '200':
+          description: Enrichment result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enriched:
+                    type: boolean
+                  defaults_applied:
+                    type: array
+                    items:
+                      type: string
+                    description: Human-readable list of defaults that were applied
+                  ambiguities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        section:
+                          type: string
+                        entity:
+                          type: string
+                        field:
+                          type: string
+                        question:
+                          type: string
+                        options:
+                          type: array
+                          items:
+                            type: string
+                        default:
+                          type: string
+                    description: Questions to present to the user with choice options
+                  has_ambiguities:
+                    type: boolean
+                    description: True if there are ambiguities needing user input
+        '404':
+          description: No stored spec for conversation_id
+
   /spec-format:
     get:
       operationId: get_spec_format

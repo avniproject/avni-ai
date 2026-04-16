@@ -304,6 +304,9 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
             "No report cards defined — standard report cards will be auto-generated"
         )
 
+    # ── Schema-driven field validation ───────────────────────────────
+    _validate_against_schema(spec, warnings)
+
     return {
         "valid": len(errors) == 0,
         "errors": errors,
@@ -371,3 +374,75 @@ def _validate_form_spec(form: dict, label: str, errors: list, warnings: list) ->
                         f"{label}: field '{fname}' skipLogic.dependsOn '{dep}' "
                         "references a field not yet seen in this section"
                     )
+
+
+def _load_schema() -> dict:
+    """Load the comprehensive spec format as a schema reference."""
+    try:
+        from ..handlers.spec_handlers import _load_spec_format
+
+        return _load_spec_format()
+    except Exception:
+        return {}
+
+
+def _validate_against_schema(spec: dict, warnings: list[str]) -> None:
+    """Check spec fields against the comprehensive format schema.
+
+    Flags unknown field names (likely LLM hallucinations or typos) as warnings.
+    """
+    schema = _load_schema()
+    if not schema:
+        return
+
+    # Build valid field sets per section from schema examples
+    valid_fields: dict[str, set[str]] = {}
+    for section_name, section_val in schema.items():
+        if (
+            isinstance(section_val, list)
+            and section_val
+            and isinstance(section_val[0], dict)
+        ):
+            valid_fields[section_name] = set(section_val[0].keys())
+        elif isinstance(section_val, dict):
+            valid_fields[section_name] = set(section_val.keys())
+
+    # Check each section in the spec
+    sections_to_check = [
+        ("subjectTypes", "subjectTypes"),
+        ("programs", "programs"),
+        ("encounterTypes", "encounterTypes"),
+        ("addressLevels", "addressLevels"),
+        ("groupRoles", "groupRoles"),
+        ("identifierSources", "identifierSources"),
+        ("relationshipTypes", "relationshipTypes"),
+        ("reportCards", "reportCards"),
+        ("reportDashboards", "reportDashboards"),
+    ]
+
+    for spec_key, schema_key in sections_to_check:
+        schema_fields = valid_fields.get(schema_key)
+        if not schema_fields:
+            continue
+        items = spec.get(spec_key, [])
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            entity_name = item.get("name", "?")
+            for field_name in item:
+                if field_name not in schema_fields:
+                    warnings.append(
+                        f"{spec_key} '{entity_name}': unknown field '{field_name}' "
+                        f"(valid fields: {sorted(schema_fields)})"
+                    )
+
+    # Check top-level sections
+    valid_sections = set(schema.keys())
+    for key in spec:
+        if key not in valid_sections:
+            warnings.append(
+                f"Unknown top-level section '{key}' "
+                f"(valid sections: {sorted(valid_sections)})"
+            )

@@ -54,6 +54,7 @@ from .handlers.spec_handlers import (
     handle_spec_to_entities,
     handle_bundle_to_spec,
     handle_get_spec_format,
+    handle_enrich_spec,
 )
 from .handlers.sandbox_handlers import handle_execute_python, handle_read_silo_file
 from .handlers.log_handlers import handle_append_agent_log, handle_get_agent_logs
@@ -403,6 +404,10 @@ async def create_server():
     @server.custom_route("/spec-format", methods=["GET"])
     async def get_spec_format_endpoint(request: Request):
         return await handle_get_spec_format(request)
+
+    @server.custom_route("/enrich-spec", methods=["POST"])
+    async def enrich_spec_endpoint(request: Request):
+        return await handle_enrich_spec(request)
 
     # --- Bundle Generation ---
     @server.custom_route("/generate-bundle", methods=["POST"])

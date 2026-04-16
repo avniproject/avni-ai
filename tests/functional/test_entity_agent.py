@@ -112,12 +112,11 @@ class TestValidateEntities:
             "has no program_name",
         ]
         unexpected = [
-            e for e in errors
+            e
+            for e in errors
             if not any(p in e.get("message", "") for p in acceptable_patterns)
         ]
-        assert len(unexpected) == 0, (
-            f"Unexpected errors for {org_name}: {unexpected}"
-        )
+        assert len(unexpected) == 0, f"Unexpected errors for {org_name}: {unexpected}"
 
     @org_parametrize()
     async def test_detects_bad_refs(

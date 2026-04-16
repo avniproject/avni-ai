@@ -831,6 +831,192 @@ def _load_spec_format() -> dict:
     return _SPEC_FORMAT_CACHE
 
 
+def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
+    """
+    Enrich a generated spec with smart defaults from the comprehensive format.
+
+    Reads the spec, compares each section against the comprehensive format,
+    applies sensible defaults for missing fields, and flags ambiguities that
+    need user input.
+
+    Returns:
+        {
+            "enriched_spec_yaml": str,    # spec with defaults applied
+            "defaults_applied": [...],     # what was auto-filled
+            "ambiguities": [...],          # questions for the user
+        }
+    """
+    schema = _load_spec_format()
+    if not schema:
+        return {
+            "enriched_spec_yaml": spec_yaml,
+            "defaults_applied": [],
+            "ambiguities": [],
+        }
+
+    try:
+        spec = yaml.safe_load(spec_yaml) or {}
+    except Exception:
+        return {
+            "enriched_spec_yaml": spec_yaml,
+            "defaults_applied": [],
+            "ambiguities": [],
+        }
+
+    defaults_applied: list[str] = []
+    ambiguities: list[dict] = []
+    sector_lower = (sector or "").lower()
+
+    # ── Settings defaults ─────────────────────────────────────────────
+    if "settings" not in spec or not spec["settings"]:
+        spec["settings"] = {
+            "languages": ["en"],
+            "enableComments": True,
+            "saveDrafts": True,
+        }
+        defaults_applied.append(
+            "Added default settings (languages=en, enableComments, saveDrafts)"
+        )
+
+    # ── Subject type defaults ─────────────────────────────────────────
+    for st in spec.get("subjectTypes", []):
+        if "lastNameOptional" not in st:
+            st["lastNameOptional"] = True
+            defaults_applied.append(
+                f"subjectType '{st['name']}': set lastNameOptional=true"
+            )
+        if st.get("type") in ("Group", "Household") and "group" not in st:
+            st["group"] = True
+            defaults_applied.append(
+                f"subjectType '{st['name']}': set group=true (type={st['type']})"
+            )
+        if st.get("type") == "Household" and "household" not in st:
+            st["household"] = True
+            defaults_applied.append(f"subjectType '{st['name']}': set household=true")
+
+    # ── Program defaults ──────────────────────────────────────────────
+    for prog in spec.get("programs", []):
+        if not prog.get("colour"):
+            prog["colour"] = "#4A148C"
+            defaults_applied.append(
+                f"program '{prog['name']}': set default colour=#4A148C"
+            )
+        # MCH/Nutrition sector: suggest showGrowthChart
+        if (
+            sector_lower in ("mch", "nutrition", "child health")
+            and "showGrowthChart" not in prog
+        ):
+            ambiguities.append(
+                {
+                    "section": "programs",
+                    "entity": prog["name"],
+                    "field": "showGrowthChart",
+                    "question": f"Should program '{prog['name']}' show growth charts? (common for {sector} programs)",
+                    "options": ["Yes", "No"],
+                    "default": "Yes",
+                }
+            )
+
+    # ── Encounter type defaults ───────────────────────────────────────
+    for enc in spec.get("encounterTypes", []):
+        if "scheduled" not in enc:
+            enc["scheduled"] = True
+            defaults_applied.append(
+                f"encounterType '{enc['name']}': set scheduled=true"
+            )
+        # Ambiguity: encounter without subject type
+        if not enc.get("subjectType") and not enc.get("program"):
+            st_names = [s["name"] for s in spec.get("subjectTypes", [])]
+            if st_names:
+                ambiguities.append(
+                    {
+                        "section": "encounterTypes",
+                        "entity": enc["name"],
+                        "field": "subjectType",
+                        "question": f"Which subject type does encounter '{enc['name']}' belong to?",
+                        "options": st_names,
+                        "default": st_names[0],
+                    }
+                )
+        # Ambiguity: program encounter without program
+        if enc.get("program") == "" or (
+            not enc.get("program") and enc.get("scheduled")
+        ):
+            prog_names = [p["name"] for p in spec.get("programs", [])]
+            if prog_names and not enc.get("subjectType"):
+                ambiguities.append(
+                    {
+                        "section": "encounterTypes",
+                        "entity": enc["name"],
+                        "field": "program",
+                        "question": f"Does encounter '{enc['name']}' belong to a program? If yes, which one?",
+                        "options": ["No program (general encounter)"] + prog_names,
+                        "default": "No program (general encounter)",
+                    }
+                )
+
+    # ── Groups default ────────────────────────────────────────────────
+    if not spec.get("groups"):
+        spec["groups"] = [{"name": "Everyone"}]
+        defaults_applied.append("Added default group 'Everyone'")
+
+    enriched_yaml = yaml.dump(
+        spec, allow_unicode=True, default_flow_style=False, sort_keys=False
+    )
+    return {
+        "enriched_spec_yaml": enriched_yaml,
+        "defaults_applied": defaults_applied,
+        "ambiguities": ambiguities,
+    }
+
+
+async def handle_enrich_spec(request: Request) -> JSONResponse:
+    """
+    POST /enrich-spec
+    Body: { "conversation_id": "...", "sector": "MCH" }
+
+    Reads the stored spec, applies smart defaults from the comprehensive format,
+    and returns a list of defaults applied + ambiguities needing user input.
+    The enriched spec is stored back (replaces the original).
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    conversation_id = body.get("conversation_id")
+    if not conversation_id:
+        return JSONResponse({"error": "Missing conversation_id"}, status_code=400)
+
+    spec_yaml = _spec_store.get(conversation_id)
+    if spec_yaml is None:
+        return JSONResponse(
+            {"error": f"No stored spec for conversation_id={conversation_id}"},
+            status_code=404,
+        )
+
+    sector = body.get("sector", "")
+    result = enrich_spec_with_defaults(spec_yaml, sector)
+
+    # Store enriched spec back
+    _spec_store.put(conversation_id, result["enriched_spec_yaml"])
+    logger.info(
+        "enrich-spec: conversation_id=%s defaults=%d ambiguities=%d",
+        conversation_id,
+        len(result["defaults_applied"]),
+        len(result["ambiguities"]),
+    )
+
+    return JSONResponse(
+        {
+            "enriched": True,
+            "defaults_applied": result["defaults_applied"],
+            "ambiguities": result["ambiguities"],
+            "has_ambiguities": len(result["ambiguities"]) > 0,
+        }
+    )
+
+
 async def handle_get_spec_format(request: Request) -> JSONResponse:
     """
     GET /spec-format?section=subjectTypes

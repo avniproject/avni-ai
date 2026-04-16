@@ -2550,6 +2550,27 @@ workflow:
               tool_label: get_spec_format
               tool_name: get_spec_format
               type: api
+            - enabled: true
+              extra:
+                description: Apply smart defaults and detect ambiguities in a stored
+                  spec
+              parameters:
+                conversation_id:
+                  auto: 0
+                  value:
+                    type: mixed
+                    value: '{{#sys.conversation_id#}}'
+                sector:
+                  auto: 1
+                  value: null
+              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
+              provider_show_name: Avni AI Staging SubAgents Openapi
+              settings: {}
+              tool_description: Apply smart defaults and detect ambiguities — returns
+                questions for the user
+              tool_label: enrich_spec
+              tool_name: enrich_spec
+              type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
         agent_strategy_provider_name: langgenius/agent/agent
