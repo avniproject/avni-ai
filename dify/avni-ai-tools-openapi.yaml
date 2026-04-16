@@ -1227,6 +1227,61 @@ paths:
                     type: integer
                     description: Total log entries for this conversation so far
 
+  /agent-logs/{conversation_id}:
+    get:
+      operationId: get_agent_logs
+      summary: Retrieve the full agent activity log for a conversation
+      description: |
+        Returns all structured log entries for the conversation. Use this at the
+        START of your work to check what previous agents have already done — look
+        for phase/status entries like spec_generation:success, bundle_config:success,
+        rules_generation:success, upload:success to avoid redoing completed work.
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Dify conversation ID
+      responses:
+        '200':
+          description: Agent log entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversation_id:
+                    type: string
+                  found:
+                    type: boolean
+                  entry_count:
+                    type: integer
+                  entries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        step:
+                          type: integer
+                        phase:
+                          type: string
+                        action:
+                          type: string
+                        tool:
+                          type: string
+                        status:
+                          type: string
+                          enum: [success, error, info]
+                        summary:
+                          type: string
+                        error:
+                          type: string
+        '404':
+          description: No log entries found for conversation_id
+
   /execute-python:
     post:
       operationId: execute_python
