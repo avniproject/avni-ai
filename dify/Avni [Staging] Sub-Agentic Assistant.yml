@@ -5075,12 +5075,14 @@ workflow:
           \  has_questions = (next_action == \"present_questions\")\n        parts\
           \ = []\n        for fix in parsed.get(\"auto_fixed\", []):\n           \
           \ parts.append(\"[AUTO-FIX] \" + str(fix))\n        for q in parsed.get(\"\
-          questions\", []):\n            question_text = q.get(\"question\", \"\"\
-          )\n            options_text = str(q.get(\"options\", []))\n            parts.append(\"\
-          [QUESTION] \" + question_text + \" Options: \" + options_text)\n       \
-          \ gate_output = chr(10).join(parts)\n    except Exception:\n        pass\n\
-          \    if gate_status >= 400:\n        has_questions = False\n    return {\"\
-          has_questions\": has_questions, \"gate_output\": gate_output}\n"
+          questions\", []):\n            q_id = q.get(\"id\", \"\")\n            question_text\
+          \ = q.get(\"question\", \"\")\n            options_text = str(q.get(\"options\"\
+          , []))\n            default_text = q.get(\"default\", \"\")\n          \
+          \  parts.append(\"[QUESTION id=\" + q_id + \"] \" + question_text + \" Options:\
+          \ \" + options_text + \" Default: \" + default_text)\n        gate_output\
+          \ = chr(10).join(parts)\n    except Exception:\n        pass\n    if gate_status\
+          \ >= 400:\n        has_questions = False\n    return {\"has_questions\"\
+          : has_questions, \"gate_output\": gate_output}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'

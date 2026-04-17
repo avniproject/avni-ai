@@ -48,12 +48,13 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 20. **Call `get_agent_logs`** FIRST to see what has already been done in this conversation.
 21. **Read the user's latest message** — this determines your action:
 
-**Decision matrix:**
+**Decision matrix (check rows in order, first match wins):**
 
 | Spec exists? | User message | Action |
 |---|---|---|
+| (any) | Agent Memory contains `[QUESTION id=...]` entries | User is answering pipeline gate questions. Parse each `[QUESTION id=X]` from Agent Memory to extract question IDs and options. Map the user's answer to the best matching option. Synonyms: "ignore"/"discard"/"skip"/"remove"/"delete" all mean "Remove this encounter" or "Remove this form mapping". Call `resolve_pipeline_questions` with `[{"id": "<question_id>", "answer": "<matched option>", "entity": "<entity name>"}]`. Then STOP. |
 | No | (any) | Full pipeline: extract entities → validate → generate spec. STOP — the pipeline gate will validate and present questions if needed. |
-| Yes | User answers pipeline questions (e.g. "remove Draft", "assign to Beneficiary", picks from options) | Call `resolve_pipeline_questions` with the user's answers formatted as `[{"id": "question_id", "answer": "chosen option", "entity": "entity name"}]`. Then log `phase="spec_correction", status="success"`. |
+| Yes | User answers with specific corrections (e.g. "assign Draft to Beneficiary") | Call `resolve_pipeline_questions` with the user's answers formatted as `[{"id": "question_id", "answer": "chosen option", "entity": "entity name"}]`. Then log `phase="spec_correction", status="success"`. |
 | Yes | User gives other correction instructions (e.g. "change subject type X to Y") | Fix entities via `get_entities_section` + `update_entities_section`, then `generate_spec`. Log `phase="spec_correction", status="success"`. |
 | Yes | Inspector routed back with `[ROUTE_TO:spec]` | Read the fix instructions from Agent Memory. Fix entities, regenerate spec. |
 | Yes | User says "approved" / "looks good" / "proceed" | STOP — the bundle_config agent will generate the bundle next. |

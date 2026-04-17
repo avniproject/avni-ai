@@ -283,30 +283,81 @@ async def _validate_after_bundle(conversation_id: str) -> dict:
         validator = BundleValidator(bundle)
         result = validator.validate()
 
-    # formMappings missing encounterTypeUUID — generate questions
+    # formMappings missing encounterTypeUUID — group and generate questions
     enc_by_name = {e["name"]: e["uuid"] for e in bundle.get("encounterTypes", [])}
+    enc_requiring_types = {
+        "Encounter", "IndividualEncounterCancellation",
+        "ProgramEncounter", "ProgramEncounterCancellation",
+    }
+    cancellation_types = {"IndividualEncounterCancellation", "ProgramEncounterCancellation"}
+    main_types = {"Encounter", "ProgramEncounter"}
+
+    # Auto-fix: if no encounter types exist, remove all orphan encounter formMappings
+    if not enc_by_name:
+        orphan_mappings = [
+            m for m in bundle.get("formMappings", [])
+            if m.get("formType", "") in enc_requiring_types and not m.get("encounterTypeUUID")
+        ]
+        if orphan_mappings:
+            names = {m.get("formName", "?") for m in orphan_mappings}
+            bundle["formMappings"] = [
+                m for m in bundle["formMappings"] if m.get("formName") not in names
+            ]
+            auto_fixed.append(
+                f"Removed {len(orphan_mappings)} orphan form mapping(s) (no encounter types defined)"
+            )
+
+    # Collect main and cancellation forms missing encounterTypeUUID
+    main_missing = []
+    cancel_missing = []
     for m in bundle.get("formMappings", []):
         ft = m.get("formType", "")
-        if ft in (
-            "Encounter",
-            "IndividualEncounterCancellation",
-            "ProgramEncounter",
-            "ProgramEncounterCancellation",
-        ):
-            if not m.get("encounterTypeUUID"):
-                form_name = m.get("formName", "?")
-                options = list(enc_by_name.keys()) + ["Remove this form mapping"]
-                questions.append(
-                    {
-                        "id": f"fm_{_safe_id(form_name)}_encounter_type",
-                        "section": "formMappings",
-                        "entity": form_name,
-                        "field": "encounterTypeUUID",
-                        "question": f"Which encounter type should form '{form_name}' ({ft}) be mapped to?",
-                        "options": options,
-                        "default": options[-1],
-                    }
-                )
+        if not m.get("encounterTypeUUID"):
+            if ft in main_types:
+                main_missing.append(m)
+            elif ft in cancellation_types:
+                cancel_missing.append(m)
+
+    # Build cancel lookup by base name
+    cancel_by_base: dict[str, list] = {}
+    for m in cancel_missing:
+        base = m.get("formName", "").replace(" Cancellation", "").strip()
+        cancel_by_base.setdefault(base, []).append(m)
+
+    # One question per main form (covers its cancellation too)
+    for m in main_missing:
+        form_name = m.get("formName", "?")
+        ft = m.get("formType", "")
+        related = [cm.get("formName") for cm in cancel_by_base.pop(form_name, [])]
+        options = list(enc_by_name.keys()) + ["Remove this form mapping"]
+        label = f"'{form_name}'"
+        if related:
+            label += f" (and {len(related)} cancellation form(s))"
+        questions.append({
+            "id": f"fm_{_safe_id(form_name)}_encounter_type",
+            "section": "formMappings",
+            "entity": form_name,
+            "field": "encounterTypeUUID",
+            "question": f"Which encounter type should {label} be mapped to?",
+            "options": options,
+            "default": options[-1],
+        })
+
+    # Orphan cancellation forms with no matching main form
+    for base, cancels in cancel_by_base.items():
+        for cm in cancels:
+            form_name = cm.get("formName", "?")
+            ft = cm.get("formType", "")
+            options = list(enc_by_name.keys()) + ["Remove this form mapping"]
+            questions.append({
+                "id": f"fm_{_safe_id(form_name)}_encounter_type",
+                "section": "formMappings",
+                "entity": form_name,
+                "field": "encounterTypeUUID",
+                "question": f"Which encounter type should '{form_name}' ({ft}) be mapped to?",
+                "options": options,
+                "default": options[-1],
+            })
 
     warnings.extend(result.get("warnings", []))
     errors = result.get("errors", [])
@@ -423,7 +474,7 @@ async def handle_resolve_pipeline_questions(request: Request) -> JSONResponse:
 
     for ans in answers:
         q_id = ans.get("id", "")
-        answer = ans.get("answer", "")
+        answer = _normalize_answer(ans.get("answer", ""))
 
         # Entity-level fixes (encounter_types)
         if q_id.startswith("enc_") and q_id.endswith("_subject_type"):
@@ -461,30 +512,38 @@ async def handle_resolve_pipeline_questions(request: Request) -> JSONResponse:
                             f"Set program='{answer}' on encounter '{entity_name}'"
                         )
 
-        # Bundle-level fixes (formMappings)
+        # Bundle-level fixes (formMappings) — includes cancellation forms
         elif q_id.startswith("fm_") and q_id.endswith("_encounter_type"):
             form_name = ans.get("entity", _id_to_name(q_id, "fm_", "_encounter_type"))
             stored = get_bundle_store().get(conversation_id)
-            if stored and "Remove" in answer:
-                stored["bundle"]["formMappings"] = [
-                    m
+            if stored:
+                # Find related cancellation forms
+                cancel_names = [
+                    m.get("formName")
                     for m in stored["bundle"].get("formMappings", [])
-                    if m.get("formName") != form_name
+                    if m.get("formName", "").replace(" Cancellation", "").strip() == form_name
+                    and "Cancellation" in m.get("formName", "")
                 ]
-                applied.append(f"Removed formMapping for '{form_name}'")
-            elif stored:
-                enc_uuid = None
-                for et in stored["bundle"].get("encounterTypes", []):
-                    if et["name"] == answer:
-                        enc_uuid = et["uuid"]
-                        break
-                if enc_uuid:
-                    for m in stored["bundle"].get("formMappings", []):
-                        if m.get("formName") == form_name:
-                            m["encounterTypeUUID"] = enc_uuid
-                            applied.append(
-                                f"Mapped '{form_name}' to encounterType '{answer}'"
-                            )
+                target_names = {form_name} | set(cancel_names)
+
+                if "Remove" in answer:
+                    stored["bundle"]["formMappings"] = [
+                        m for m in stored["bundle"].get("formMappings", [])
+                        if m.get("formName") not in target_names
+                    ]
+                    suffix = f" and {len(cancel_names)} cancellation form(s)" if cancel_names else ""
+                    applied.append(f"Removed formMapping for '{form_name}'{suffix}")
+                else:
+                    enc_uuid = None
+                    for et in stored["bundle"].get("encounterTypes", []):
+                        if et["name"] == answer:
+                            enc_uuid = et["uuid"]
+                            break
+                    if enc_uuid:
+                        for m in stored["bundle"].get("formMappings", []):
+                            if m.get("formName") in target_names:
+                                m["encounterTypeUUID"] = enc_uuid
+                        applied.append(f"Mapped '{form_name}' to encounterType '{answer}'")
 
     # Re-store corrected entities
     if entities and applied:
@@ -509,6 +568,16 @@ async def handle_resolve_pipeline_questions(request: Request) -> JSONResponse:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+_REMOVE_SYNONYMS = {"ignore", "discard", "skip", "remove", "delete", "drop"}
+
+
+def _normalize_answer(answer: str) -> str:
+    """Map free-text synonyms to the canonical 'Remove' action."""
+    if answer.strip().lower() in _REMOVE_SYNONYMS:
+        return "Remove"
+    return answer
 
 
 def _safe_id(name: str) -> str:

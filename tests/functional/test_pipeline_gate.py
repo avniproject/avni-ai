@@ -277,3 +277,43 @@ class TestResolvePipelineQuestions:
         )
         q2_count = len(resp.json()["questions"])
         assert q2_count < q1_count
+
+    async def test_freetext_ignore_treated_as_remove(
+        self, client: httpx.AsyncClient, conversation_id: str
+    ):
+        """'ignore' should be treated as 'Remove this encounter'."""
+        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
+        resp = await client.post(
+            "/validate-pipeline-step",
+            json={"conversation_id": conversation_id, "phase": "spec_generation"},
+        )
+        questions = resp.json()["questions"]
+        draft_q = next(
+            (q for q in questions if q["entity"] == "Draft" and q["field"] == "subject_type"),
+            None,
+        )
+        assert draft_q is not None
+
+        for synonym in ["ignore", "discard", "skip", "delete"]:
+            # Re-setup each time since entities get modified
+            await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
+            resp = await client.post(
+                "/validate-pipeline-step",
+                json={"conversation_id": conversation_id, "phase": "spec_generation"},
+            )
+            draft_q = next(
+                q for q in resp.json()["questions"]
+                if q["entity"] == "Draft" and q["field"] == "subject_type"
+            )
+            resp = await client.post(
+                "/resolve-pipeline-questions",
+                json={
+                    "conversation_id": conversation_id,
+                    "answers": [{"id": draft_q["id"], "answer": synonym, "entity": "Draft"}],
+                },
+            )
+            body = resp.json()
+            assert body["ok"] is True
+            assert any("Removed" in a and "Draft" in a for a in body["applied"]), (
+                f"synonym '{synonym}' did not trigger removal: {body['applied']}"
+            )
