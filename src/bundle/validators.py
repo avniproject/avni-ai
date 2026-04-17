@@ -175,6 +175,25 @@ class BundleValidator:
         }
         st_names = [s["name"] for s in self.bundle.get("subjectTypes", [])]
 
+        # Detect duplicate formMappings (Avni rejects these on upload)
+        seen_keys: dict[str, str] = {}  # composite key → first formName
+        for m in self.bundle.get("formMappings", []):
+            form_name = m.get("formName", "?")
+            key = (
+                f"{m.get('formType', '')}|"
+                f"{m.get('subjectTypeUUID', '')}|"
+                f"{m.get('programUUID', '')}|"
+                f"{m.get('encounterTypeUUID', '')}"
+            )
+            if key in seen_keys:
+                self.errors.append(
+                    f'Duplicate form mapping: "{form_name}" has the same '
+                    f"formType+subjectType+program+encounterType as "
+                    f'"{seen_keys[key]}". Remove one via put_bundle_file.'
+                )
+            else:
+                seen_keys[key] = form_name
+
         for m in self.bundle.get("formMappings", []):
             form_name = m.get("formName", "?")
 

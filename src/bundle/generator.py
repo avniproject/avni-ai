@@ -408,6 +408,36 @@ class BundleGenerator:
         if et:
             mapping["encounterTypeUUID"] = et["uuid"]
 
+        # Deduplicate: Avni rejects duplicate formType+subjectType+program+encounterType
+        dup_key = (
+            f"{form_type}|{mapping.get('subjectTypeUUID', '')}|"
+            f"{mapping.get('programUUID', '')}|{mapping.get('encounterTypeUUID', '')}"
+        )
+        for existing in self.bundle["formMappings"]:
+            existing_key = (
+                f"{existing.get('formType', '')}|{existing.get('subjectTypeUUID', '')}|"
+                f"{existing.get('programUUID', '')}|{existing.get('encounterTypeUUID', '')}"
+            )
+            if dup_key == existing_key:
+                self.flags.append(
+                    {
+                        "type": "deduplicated",
+                        "entity": "formMapping",
+                        "name": form_spec["name"],
+                        "reason": (
+                            f"Skipped duplicate form mapping '{form_spec['name']}' — "
+                            f"same formType+subjectType+program+encounterType as "
+                            f"'{existing.get('formName', '?')}'. Void if the wrong one was kept."
+                        ),
+                    }
+                )
+                logger.warning(
+                    "formMapping '%s': skipped duplicate (same key as '%s')",
+                    form_spec["name"],
+                    existing.get("formName", "?"),
+                )
+                return
+
         self.bundle["formMappings"].append(mapping)
 
     # ── Auto-derive forms ─────────────────────────────────────────
