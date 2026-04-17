@@ -1001,12 +1001,12 @@ workflow:
         isInLoop: true
         loop_id: '1800000000700'
         sourceType: assigner
-        targetType: assigner
-      id: 1800000000778-source-1800000000751-target
+        targetType: code
+      id: 1800000000778-source-1800000000740-target
       selected: false
       source: '1800000000778'
       sourceHandle: source
-      target: '1800000000751'
+      target: '1800000000740'
       targetHandle: target
       type: custom
       zIndex: 1002
@@ -2669,25 +2669,6 @@ workflow:
                 for user
               tool_label: validate_pipeline_step
               tool_name: validate_pipeline_step
-              type: api
-            - enabled: true
-              extra:
-                description: Apply user answers to pipeline validation questions
-              parameters:
-                conversation_id:
-                  auto: 0
-                  value:
-                    type: mixed
-                    value: '{{#sys.conversation_id#}}'
-                answers:
-                  auto: 1
-                  value: null
-              provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
-              provider_show_name: Avni AI Staging SubAgents Openapi
-              settings: {}
-              tool_description: Apply user answers to fix entities/bundle deterministically
-              tool_label: resolve_pipeline_questions
-              tool_name: resolve_pipeline_questions
               type: api
         agent_strategy_label: FunctionCalling
         agent_strategy_name: function_calling
@@ -4578,44 +4559,49 @@ workflow:
           \     agent_output: str, agent_memory: str) -> dict:\n    if workflow_mode\
           \ == \"targeted\":\n        return {\"next_agent\": \"done\", \"loop_done\"\
           : True,\n                \"reason\": \"Targeted mode — single agent only\"\
-          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
-          \ \"\").lower()\n    has_output = len(t.strip()) > 50\n\n    # Inspector\
-          \ backward routing: [ROUTE_TO:agent_name]\n    route_match = re.search(r\"\
-          \\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent == \"inspect\"\
-          :\n        target = route_match.group(1)\n        valid_targets = [\"spec\"\
-          , \"bundle_config\", \"rules\", \"reports\"]\n        already_rerouted =\
-          \ \"[rerouted from inspect]\" in mem\n        if target in valid_targets\
-          \ and not already_rerouted:\n            return {\"next_agent\": target,\
-          \ \"loop_done\": False,\n                    \"reason\": f\"Inspector found\
-          \ issues, routing to {target} for fixes\"}\n\n    # Detect if agent is asking\
-          \ user a question\n    question_signals = [\"could you\", \"can you please\"\
-          , \"would you like\",\n                     \"please provide\", \"please\
-          \ confirm\", \"please share\",\n                     \"let me know\", \"\
-          what would you\", \"which option\",\n                     \"do you want\"\
-          , \"shall i\"]\n    asking_user = any(q in t for q in question_signals)\
-          \ and t.rstrip().endswith(\"?\")\n\n    # Phase-based completion: check\
-          \ if agent logged success via append_agent_log\n    phase_map = {\n    \
-          \    \"spec\": \"spec_generation\",\n        \"bundle_config\": \"bundle_config\"\
-          ,\n        \"rules\": \"rules_generation\",\n        \"reports\": \"reports_generation\"\
-          ,\n        \"inspect\": \"upload\",\n    }\n    phase = phase_map.get(active_agent,\
-          \ \"\")\n    phase_done = phase and (f'\"phase\":\"{phase}\"' in mem.replace('\
-          \ ','') or\n                     f'phase=\"{phase}\"' in mem or\n      \
-          \               f'{phase}: success' in mem or\n                     f'status=\"\
-          success\"' in t and phase in t)\n\n    # Keyword-based completion signals\
-          \ (fallback)\n    completion = {\n        \"spec\": [\"generate_spec\",\
-          \ \"spec generated\", \"stored=true\",\n                 \"approved\", \"\
-          spec summary\", \"configuration summary\",\n                 \"generate_bundle\"\
-          , \"bundle stored\"],\n        \"bundle_config\": [\"validate_bundle\",\
-          \ \"put_bundle_file\",\n                    \"generate_form\", \"concepts.json\"\
-          ,\n                    \"bundle complete\", \"bundle is ready\", \"validation\
-          \ passed\",\n                    \"0 errors\", \"no errors\"],\n       \
-          \ \"rules\": [\"generate_rule\", \"validate_rule\", \"rule code\",\n   \
-          \              \"visitschedule\", \"decision rule\", \"formElementRule\"\
-          ],\n        \"reports\": [\"generate_report_cards\", \"suggest_dashboard\"\
-          ,\n                   \"reportcard\", \"dashboard\", \"report cards\"],\n\
-          \        \"inspect\": [\"upload_bundle\", \"upload_status\",\n         \
-          \          \"uploaded successfully\", \"upload complete\",\n           \
-          \        \"bundle uploaded\"],\n    }\n\n    chain = [\"spec\", \"bundle_config\"\
+          }\n\n    # If gate reported errors, re-run same agent (once)\n    mem =\
+          \ (agent_memory or \"\").lower()\n    if \"[gate error]\" in mem and f\"\
+          [gate-retry:{active_agent}]\" not in mem:\n        return {\"next_agent\"\
+          : active_agent, \"loop_done\": False,\n                \"reason\": f\"Gate\
+          \ errors found, re-running {active_agent}\"}\n\n    t = (agent_output or\
+          \ \"\").lower()\n    mem = (agent_memory or \"\").lower()\n    has_output\
+          \ = len(t.strip()) > 50\n\n    # Inspector backward routing: [ROUTE_TO:agent_name]\n\
+          \    route_match = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match\
+          \ and active_agent == \"inspect\":\n        target = route_match.group(1)\n\
+          \        valid_targets = [\"spec\", \"bundle_config\", \"rules\", \"reports\"\
+          ]\n        already_rerouted = \"[rerouted from inspect]\" in mem\n     \
+          \   if target in valid_targets and not already_rerouted:\n            return\
+          \ {\"next_agent\": target, \"loop_done\": False,\n                    \"\
+          reason\": f\"Inspector found issues, routing to {target} for fixes\"}\n\n\
+          \    # Detect if agent is asking user a question\n    question_signals =\
+          \ [\"could you\", \"can you please\", \"would you like\",\n            \
+          \         \"please provide\", \"please confirm\", \"please share\",\n  \
+          \                   \"let me know\", \"what would you\", \"which option\"\
+          ,\n                     \"do you want\", \"shall i\"]\n    asking_user =\
+          \ any(q in t for q in question_signals) and t.rstrip().endswith(\"?\")\n\
+          \n    # Phase-based completion: check if agent logged success via append_agent_log\n\
+          \    phase_map = {\n        \"spec\": \"spec_generation\",\n        \"bundle_config\"\
+          : \"bundle_config\",\n        \"rules\": \"rules_generation\",\n       \
+          \ \"reports\": \"reports_generation\",\n        \"inspect\": \"upload\"\
+          ,\n    }\n    phase = phase_map.get(active_agent, \"\")\n    phase_done\
+          \ = phase and (f'\"phase\":\"{phase}\"' in mem.replace(' ','') or\n    \
+          \                 f'phase=\"{phase}\"' in mem or\n                     f'{phase}:\
+          \ success' in mem or\n                     f'status=\"success\"' in t and\
+          \ phase in t)\n\n    # Keyword-based completion signals (fallback)\n   \
+          \ completion = {\n        \"spec\": [\"generate_spec\", \"spec generated\"\
+          , \"stored=true\",\n                 \"approved\", \"spec summary\", \"\
+          configuration summary\",\n                 \"generate_bundle\", \"bundle\
+          \ stored\"],\n        \"bundle_config\": [\"validate_bundle\", \"put_bundle_file\"\
+          ,\n                    \"generate_form\", \"concepts.json\",\n         \
+          \           \"bundle complete\", \"bundle is ready\", \"validation passed\"\
+          ,\n                    \"0 errors\", \"no errors\"],\n        \"rules\"\
+          : [\"generate_rule\", \"validate_rule\", \"rule code\",\n              \
+          \   \"visitschedule\", \"decision rule\", \"formElementRule\"],\n      \
+          \  \"reports\": [\"generate_report_cards\", \"suggest_dashboard\",\n   \
+          \                \"reportcard\", \"dashboard\", \"report cards\"],\n   \
+          \     \"inspect\": [\"upload_bundle\", \"upload_status\",\n            \
+          \       \"uploaded successfully\", \"upload complete\",\n              \
+          \     \"bundle uploaded\"],\n    }\n\n    chain = [\"spec\", \"bundle_config\"\
           , \"rules\", \"reports\", \"inspect\"]\n    try:\n        idx = chain.index(active_agent)\n\
           \    except ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\"\
           : True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
@@ -4871,40 +4857,41 @@ workflow:
             type: constant
             value: "You are a friendly assistant that summarizes what happened during\
               \ an Avni configuration workflow.\n\n  \n\n  ## Step 0: Check for pipeline\
-              \ gate questions\n  Look in the agent memory for [QUESTION id=...] entries.\
-              \ If found:\n  - These are questions that need the user's input before\
-              \ the pipeline can continue.\n  - Present each question clearly with\
-              \ the options listed. Include the question ID (from id=...) so the user's\
-              \ answer can be matched back.\n  - Do NOT summarize the workflow as\
-              \ if it's done — it's paused waiting for input.\n  - Format: \"Before\
-              \ we can proceed, I need your input on a few items:\" then list each\
-              \ question with numbered options.\n  - End with: \"Please answer these\
-              \ questions so we can continue.\"\n  - If [QUESTION] entries exist,\
-              \ SKIP all other summary steps.\n\n  ## Step 1: Get the full activity\
-              \ log\n  Call `get_agent_logs` with the conversation_id to retrieve\
-              \ the structured activity log. This is more\n  reliable than the agent\
-              \ memory text below.\n\n  ## Step 2: Determine upload status\n\n  Look\
-              \ for these in the agent log entries:\n  - **Uploaded**: Any entry with\
-              \ phase=\"upload\" and status=\"success\", OR action contains \"uploaded\n\
-              \  successfully\" or \"Bundle uploaded\"\n  - **NOT uploaded**: No such\
-              \ entry exists\n\n  Also check the agent memory for backup signals:\n\
-              \  <agent_log>\n  {{#conversation.agent_memory#}}\n  </agent_log>\n\n\
-              \  Look for [UPLOAD_SUCCESS] tag or \"upload_bundle\" / \"uploaded successfully\"\
-              \ in the memory text.\n\n  Do NOT guess. If you cannot find an explicit\
-              \ upload indicator in either source, say the bundle was NOT\n  uploaded.\n\
-              \n  ## Step 3: Write the summary\n\n  1. Check if the log contains entries\
-              \ with status=\"error\". If yes, explain what went wrong simply and\n\
-              \  suggest retry.\n  2. Check if the log contains ROUTE_TO entries that\
-              \ were NOT followed by a successful upload. Tell the\n  user what was\
-              \ found and what fix was attempted.\n  3. **If uploaded**: Start with\
-              \ \"Your bundle has been uploaded to Avni successfully.\" Then summarize\
-              \ what\n   was built in 3-5 bullet points. Next steps: review forms\
-              \ in Avni, set up locations and users.\n  4. **If NOT uploaded**: Start\
-              \ with \"Your bundle has been generated but is NOT yet uploaded to Avni.\"\
-              \n  Explain what happened and what the user should do (retry, or ask\
-              \ the assistant to upload).\n  5. Keep it under 200 words, use markdown.\n\
-              \  6. Do NOT dump raw data or technical details.\n  7. Do NOT say \"\
-              ready to deploy\" — either it IS deployed (uploaded) or it is NOT."
+              \ gate questions\n  Look in the agent memory for [GATE ERROR] entries.\
+              \ If found:\n  - These are validation errors that the pipeline found.\
+              \ The agent should have addressed them, but if they persist, explain\
+              \ them to the user's input before the pipeline can continue.\n  - Present\
+              \ each error clearly and explain what needs fixing.\n  - Do NOT summarize\
+              \ the workflow as if it's done — it's paused waiting for input.\n  -\
+              \ Format: \"Before we can proceed, I need your input on a few items:\"\
+              \ then list each question with numbered options.\n  - End with: \"The\
+              \ system will attempt to fix these on the next run.\"\n  - If [QUESTION]\
+              \ entries exist, SKIP all other summary steps.\n\n  ## Step 1: Get the\
+              \ full activity log\n  Call `get_agent_logs` with the conversation_id\
+              \ to retrieve the structured activity log. This is more\n  reliable\
+              \ than the agent memory text below.\n\n  ## Step 2: Determine upload\
+              \ status\n\n  Look for these in the agent log entries:\n  - **Uploaded**:\
+              \ Any entry with phase=\"upload\" and status=\"success\", OR action\
+              \ contains \"uploaded\n  successfully\" or \"Bundle uploaded\"\n  -\
+              \ **NOT uploaded**: No such entry exists\n\n  Also check the agent memory\
+              \ for backup signals:\n  <agent_log>\n  {{#conversation.agent_memory#}}\n\
+              \  </agent_log>\n\n  Look for [UPLOAD_SUCCESS] tag or \"upload_bundle\"\
+              \ / \"uploaded successfully\" in the memory text.\n\n  Do NOT guess.\
+              \ If you cannot find an explicit upload indicator in either source,\
+              \ say the bundle was NOT\n  uploaded.\n\n  ## Step 3: Write the summary\n\
+              \n  1. Check if the log contains entries with status=\"error\". If yes,\
+              \ explain what went wrong simply and\n  suggest retry.\n  2. Check if\
+              \ the log contains ROUTE_TO entries that were NOT followed by a successful\
+              \ upload. Tell the\n  user what was found and what fix was attempted.\n\
+              \  3. **If uploaded**: Start with \"Your bundle has been uploaded to\
+              \ Avni successfully.\" Then summarize what\n   was built in 3-5 bullet\
+              \ points. Next steps: review forms in Avni, set up locations and users.\n\
+              \  4. **If NOT uploaded**: Start with \"Your bundle has been generated\
+              \ but is NOT yet uploaded to Avni.\"\n  Explain what happened and what\
+              \ the user should do (retry, or ask the assistant to upload).\n  5.\
+              \ Keep it under 200 words, use markdown.\n  6. Do NOT dump raw data\
+              \ or technical details.\n  7. Do NOT say \"ready to deploy\" — either\
+              \ it IS deployed (uploaded) or it is NOT."
           model:
             type: constant
             value:
@@ -5070,20 +5057,15 @@ workflow:
       zIndex: 1002
     - data:
         code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
-          \ str) -> dict:\n    has_questions = False\n    gate_output = str()\n  \
-          \  try:\n        parsed = json.loads(gate_body) if gate_body else {}\n \
-          \       next_action = parsed.get(\"next_action\", \"continue\")\n      \
-          \  has_questions = (next_action == \"present_questions\")\n        parts\
-          \ = []\n        for fix in parsed.get(\"auto_fixed\", []):\n           \
-          \ parts.append(\"[AUTO-FIX] \" + str(fix))\n        for q in parsed.get(\"\
-          questions\", []):\n            q_id = q.get(\"id\", \"\")\n            question_text\
-          \ = q.get(\"question\", \"\")\n            options_text = str(q.get(\"options\"\
-          , []))\n            default_text = q.get(\"default\", \"\")\n          \
-          \  parts.append(\"[QUESTION id=\" + q_id + \"] \" + question_text + \" Options:\
-          \ \" + options_text + \" Default: \" + default_text)\n        gate_output\
-          \ = chr(10).join(parts)\n    except Exception:\n        pass\n    if gate_status\
-          \ >= 400:\n        has_questions = False\n    return {\"has_questions\"\
-          : has_questions, \"gate_output\": gate_output}\n"
+          \ str) -> dict:\n    has_errors = False\n    gate_output = str()\n    try:\n\
+          \        parsed = json.loads(gate_body) if gate_body else {}\n        errors\
+          \ = parsed.get(\"errors\", [])\n        has_errors = len(errors) > 0\n \
+          \       parts = []\n        for err in errors:\n            parts.append(\"\
+          [GATE ERROR] \" + str(err))\n        for warn in parsed.get(\"warnings\"\
+          , [])[:5]:\n            parts.append(\"[GATE WARNING] \" + str(warn))\n\
+          \        gate_output = chr(10).join(parts)\n    except Exception:\n    \
+          \    pass\n    if gate_status >= 400:\n        has_errors = False\n    return\
+          \ {\"has_questions\": has_errors, \"gate_output\": gate_output}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5174,7 +5156,7 @@ workflow:
           write_mode: append
         loop_id: '1800000000700'
         selected: false
-        title: Gate Questions to Memory
+        title: Gate Errors to Memory
         type: assigner
         version: '2'
       height: 84

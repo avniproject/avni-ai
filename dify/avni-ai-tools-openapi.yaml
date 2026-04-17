@@ -1370,13 +1370,12 @@ paths:
   /validate-pipeline-step:
     post:
       operationId: validate_pipeline_step
-      summary: Deterministic validation gate — run after each agent completes
+      summary: Read-only validation gate — checks pipeline state after each agent
       description: |
-        Validates the current pipeline state for the given phase. Auto-fixes
-        what it can (duplicate concepts, missing default values) and returns
-        structured questions for anything needing user input. The agent
-        presents questions to the user, then calls resolve-pipeline-questions
-        with the answers.
+        Validates the current pipeline state for the given phase. Returns errors
+        and warnings. Does NOT modify any state — agents read the errors and
+        decide how to fix them using their own tools. If errors are found, they
+        appear as [GATE ERROR] entries in Agent Memory on the next loop iteration.
       requestBody:
         required: true
         content:
@@ -1395,7 +1394,7 @@ paths:
                   description: Current pipeline phase. Accepts both phase names (spec_generation, bundle_config, rules_generation, reports_generation, inspection) and agent names (spec, bundle_config, rules, reports, inspect).
       responses:
         '200':
-          description: Validation result with auto-fixes and questions
+          description: Validation result
           content:
             application/json:
               schema:
@@ -1403,109 +1402,23 @@ paths:
                 properties:
                   ok:
                     type: boolean
-                    description: True if no questions and no errors — safe to proceed
+                    description: True if no errors — safe to proceed to next agent
                   phase:
                     type: string
-                  auto_fixed:
+                  errors:
                     type: array
                     items:
                       type: string
-                    description: Actions taken automatically (no user input needed)
-                  questions:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: 'Unique question ID — pass this back to resolve-pipeline-questions. Format: enc_{name}_subject_type, enc_{name}_program, fm_{name}_encounter_type'
-                        entity:
-                          type: string
-                          description: Entity name this question is about (e.g. "Draft", "Child Monitoring")
-                        section:
-                          type: string
-                          description: Entity section (encounter_types, formMappings)
-                        field:
-                          type: string
-                          description: Field being asked about (subject_type, program_name, encounterTypeUUID)
-                        question:
-                          type: string
-                        options:
-                          type: array
-                          items:
-                            type: string
-                        default:
-                          type: string
-                    description: Questions to present to the user — each has an ID to pass back with the answer
+                    description: Errors that need fixing before the pipeline can proceed
                   warnings:
                     type: array
                     items:
                       type: string
+                    description: Non-blocking warnings
                   next_action:
                     type: string
-                    description: '"present_questions" (questions need answers), "continue" (proceed to next agent), "retry_agent" (agent needs to re-run)'
-                    enum: [present_questions, continue, retry_agent]
-
-  /resolve-pipeline-questions:
-    post:
-      operationId: resolve_pipeline_questions
-      summary: Apply user answers to pipeline validation questions
-      description: |
-        Takes user answers from validate-pipeline-step questions and applies
-        them deterministically (remove encounters, assign subject types, fix
-        formMappings). Answers are normalized: "ignore", "discard", "skip",
-        "remove", "delete" are all treated as "Remove". Removing a form also
-        removes its cancellation form mapping. Call this after presenting
-        questions to the user, then call validate-pipeline-step again to
-        confirm resolution.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - conversation_id
-                - answers
-              properties:
-                conversation_id:
-                  type: string
-                  description: Dify conversation ID
-                answers:
-                  type: array
-                  description: User answers to questions from validate-pipeline-step
-                  items:
-                    type: object
-                    required:
-                      - id
-                      - answer
-                    properties:
-                      id:
-                        type: string
-                        description: 'Question ID from validate-pipeline-step (e.g. enc_draft_subject_type, fm_draft_encounter_type). Found in [QUESTION id=X] entries in Agent Memory.'
-                      answer:
-                        type: string
-                        description: 'User''s chosen option from the question''s options list, or a synonym like "ignore"/"discard"/"skip" which maps to "Remove"'
-                      entity:
-                        type: string
-                        description: Entity name from the question (e.g. "Draft"). Helps resolve when ID parsing is ambiguous.
-      responses:
-        '200':
-          description: Answers applied
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                  applied:
-                    type: array
-                    items:
-                      type: string
-                    description: Actions taken based on user answers
-                  applied_count:
-                    type: integer
+                    description: '"continue" (no errors, proceed) or "fix_required" (agent should fix errors)'
+                    enum: [continue, fix_required]
 
   /spec-format:
     get:

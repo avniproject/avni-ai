@@ -1,8 +1,7 @@
 """
-Tests for the pipeline validation gate.
+Tests for the pipeline validation gate (read-only).
 
-POST /validate-pipeline-step — deterministic validation after each agent
-POST /resolve-pipeline-questions — apply user answers deterministically
+POST /validate-pipeline-step — validates state, returns errors/warnings
 """
 
 from __future__ import annotations
@@ -47,7 +46,6 @@ ENTITIES_WITH_ISSUES = {
     "forms": [],
 }
 
-
 CLEAN_ENTITIES = {
     "subject_types": [{"name": "Person", "type": "Person"}],
     "programs": [{"name": "Health", "target_subject_type": "Person"}],
@@ -77,70 +75,51 @@ async def _setup(client: httpx.AsyncClient, cid: str, entities: dict) -> None:
 
 @pytest.mark.asyncio(loop_scope="function")
 class TestValidatePipelineStep:
+
     async def test_detects_missing_subject_type(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
         await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
-
         resp = await client.post(
             "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
+            json={"conversation_id": conversation_id, "phase": "spec"},
         )
         assert resp.status_code == 200
         body = resp.json()
         assert body["ok"] is False
-        assert body["next_action"] == "present_questions"
+        assert body["next_action"] == "fix_required"
+        errors_text = " ".join(body["errors"])
+        assert "Draft" in errors_text
+        assert "subject_type" in errors_text
 
-        # Should have questions about Draft and Orphan Encounter
-        entity_names = {q["entity"] for q in body["questions"]}
-        assert "Draft" in entity_names
-        assert "Orphan Encounter" in entity_names
-
-    async def test_questions_have_options(
+    async def test_detects_missing_program(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
         await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
-
         resp = await client.post(
             "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
+            json={"conversation_id": conversation_id, "phase": "spec"},
         )
         body = resp.json()
-        for q in body["questions"]:
-            assert len(q["options"]) >= 2
-            assert q.get("default")
+        errors_text = " ".join(body["errors"])
+        assert "Orphan Encounter" in errors_text
+        assert "program_name" in errors_text
 
     async def test_clean_entities_pass(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
         await _setup(client, conversation_id, CLEAN_ENTITIES)
-
         resp = await client.post(
             "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
+            json={"conversation_id": conversation_id, "phase": "spec"},
         )
         body = resp.json()
-        # No entity-level questions (subject type and program are set)
-        entity_questions = [
-            q
-            for q in body["questions"]
-            if q.get("field") in ("subject_type", "program_name")
+        # Filter out schema warnings (unknown fields etc) — just check entity errors
+        entity_errors = [
+            e for e in body["errors"]
+            if "subject_type" in e or "program_name" in e
         ]
-        assert len(entity_questions) == 0
-
-    async def test_auto_fixes_applied(
-        self, client: httpx.AsyncClient, conversation_id: str
-    ):
-        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
-
-        resp = await client.post(
-            "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
-        )
-        body = resp.json()
-        assert len(body["auto_fixed"]) > 0
-        auto_text = " ".join(body["auto_fixed"])
-        assert "lastNameOptional" in auto_text
+        assert len(entity_errors) == 0
 
     async def test_unknown_phase_passes(
         self, client: httpx.AsyncClient, conversation_id: str
@@ -153,174 +132,44 @@ class TestValidatePipelineStep:
         assert body["ok"] is True
         assert body["next_action"] == "continue"
 
-
-@pytest.mark.asyncio(loop_scope="function")
-class TestResolvePipelineQuestions:
-    async def test_remove_encounter(
+    async def test_no_state_modification(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
+        """Gate should not modify entities or spec."""
         await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
 
-        # Get questions
+        # Get entities before gate
+        resp1 = await client.get(
+            "/entities-section",
+            params={"conversation_id": conversation_id, "section": "encounter_types"},
+        )
+        before = resp1.json()["count"]
+
+        # Run gate
+        await client.post(
+            "/validate-pipeline-step",
+            json={"conversation_id": conversation_id, "phase": "spec"},
+        )
+
+        # Get entities after gate — should be unchanged
+        resp2 = await client.get(
+            "/entities-section",
+            params={"conversation_id": conversation_id, "section": "encounter_types"},
+        )
+        after = resp2.json()["count"]
+        assert before == after
+
+    async def test_errors_include_available_options(
+        self, client: httpx.AsyncClient, conversation_id: str
+    ):
+        """Errors should tell the agent what options are available."""
+        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
         resp = await client.post(
             "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
-        )
-        questions = resp.json()["questions"]
-        draft_q = next(
-            (
-                q
-                for q in questions
-                if q["entity"] == "Draft" and q["field"] == "subject_type"
-            ),
-            None,
-        )
-        assert draft_q is not None
-
-        # Resolve: remove Draft
-        resp = await client.post(
-            "/resolve-pipeline-questions",
-            json={
-                "conversation_id": conversation_id,
-                "answers": [
-                    {
-                        "id": draft_q["id"],
-                        "answer": "Remove this encounter",
-                        "entity": "Draft",
-                    },
-                ],
-            },
+            json={"conversation_id": conversation_id, "phase": "spec"},
         )
         body = resp.json()
-        assert body["ok"] is True
-        assert any("Removed" in a and "Draft" in a for a in body["applied"])
-
-    async def test_assign_subject_type(
-        self, client: httpx.AsyncClient, conversation_id: str
-    ):
-        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
-
-        resp = await client.post(
-            "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
-        )
-        questions = resp.json()["questions"]
-        orphan_q = next(
-            (
-                q
-                for q in questions
-                if q["entity"] == "Orphan Encounter" and q["field"] == "subject_type"
-            ),
-            None,
-        )
-        assert orphan_q is not None
-
-        resp = await client.post(
-            "/resolve-pipeline-questions",
-            json={
-                "conversation_id": conversation_id,
-                "answers": [
-                    {
-                        "id": orphan_q["id"],
-                        "answer": "Beneficiary",
-                        "entity": "Orphan Encounter",
-                    },
-                ],
-            },
-        )
-        body = resp.json()
-        assert any("Beneficiary" in a for a in body["applied"])
-
-    async def test_resolve_then_revalidate_fewer_questions(
-        self, client: httpx.AsyncClient, conversation_id: str
-    ):
-        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
-
-        # First validation
-        resp = await client.post(
-            "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
-        )
-        q1_count = len(resp.json()["questions"])
-
-        # Resolve all entity questions
-        questions = resp.json()["questions"]
-        answers = []
-        for q in questions:
-            if q.get("field") == "subject_type" and q.get("entity") == "Draft":
-                answers.append(
-                    {
-                        "id": q["id"],
-                        "answer": "Remove this encounter",
-                        "entity": "Draft",
-                    }
-                )
-            elif q.get("field") == "subject_type":
-                answers.append(
-                    {"id": q["id"], "answer": "Beneficiary", "entity": q["entity"]}
-                )
-            elif q.get("field") == "program_name":
-                answers.append(
-                    {"id": q["id"], "answer": "Nourish", "entity": q["entity"]}
-                )
-
-        if answers:
-            await client.post(
-                "/resolve-pipeline-questions",
-                json={"conversation_id": conversation_id, "answers": answers},
-            )
-
-        # Re-validate — should have fewer questions
-        resp = await client.post(
-            "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
-        )
-        q2_count = len(resp.json()["questions"])
-        assert q2_count < q1_count
-
-    async def test_freetext_ignore_treated_as_remove(
-        self, client: httpx.AsyncClient, conversation_id: str
-    ):
-        """'ignore' should be treated as 'Remove this encounter'."""
-        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
-        resp = await client.post(
-            "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec_generation"},
-        )
-        questions = resp.json()["questions"]
-        draft_q = next(
-            (
-                q
-                for q in questions
-                if q["entity"] == "Draft" and q["field"] == "subject_type"
-            ),
-            None,
-        )
-        assert draft_q is not None
-
-        for synonym in ["ignore", "discard", "skip", "delete"]:
-            # Re-setup each time since entities get modified
-            await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
-            resp = await client.post(
-                "/validate-pipeline-step",
-                json={"conversation_id": conversation_id, "phase": "spec_generation"},
-            )
-            draft_q = next(
-                q
-                for q in resp.json()["questions"]
-                if q["entity"] == "Draft" and q["field"] == "subject_type"
-            )
-            resp = await client.post(
-                "/resolve-pipeline-questions",
-                json={
-                    "conversation_id": conversation_id,
-                    "answers": [
-                        {"id": draft_q["id"], "answer": synonym, "entity": "Draft"}
-                    ],
-                },
-            )
-            body = resp.json()
-            assert body["ok"] is True
-            assert any("Removed" in a and "Draft" in a for a in body["applied"]), (
-                f"synonym '{synonym}' did not trigger removal: {body['applied']}"
-            )
+        # Errors should mention available subject types
+        errors_text = " ".join(body["errors"])
+        assert "Beneficiary" in errors_text
+        assert "Anganwadi" in errors_text
