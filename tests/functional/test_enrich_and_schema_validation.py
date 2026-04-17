@@ -80,24 +80,29 @@ class TestEnrichSpec:
         assert "lastNameOptional" in defaults_text
         assert "group=true" in defaults_text
 
-    async def test_detects_missing_subject_type_ambiguity(
+    async def test_missing_subject_type_auto_resolved_with_flag(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
-        await _setup_spec(client, conversation_id)
-
-        resp = await client.post(
-            "/enrich-spec",
-            json={"conversation_id": conversation_id, "sector": ""},
+        """Draft has no subject_type — fall-forward resolves it and returns a flag."""
+        await client.post(
+            "/store-entities",
+            json={"conversation_id": conversation_id, "entities": SAMPLE_ENTITIES},
         )
+        resp = await client.post(
+            "/generate-spec",
+            json={"conversation_id": conversation_id, "org_name": "TestOrg"},
+        )
+        assert resp.status_code == 200
         body = resp.json()
-        # Draft has no subject type — should be flagged
-        ambiguities = body["ambiguities"]
-        draft_amb = [a for a in ambiguities if a["entity"] == "Draft"]
-        assert len(draft_amb) > 0
-        st_amb = [a for a in draft_amb if a["field"] == "subjectType"]
-        assert len(st_amb) == 1
-        assert "Beneficiary" in st_amb[0]["options"]
-        assert "Household" in st_amb[0]["options"]
+        # Fall-forward should auto-resolve Draft's missing subject_type and flag it
+        assert "flags" in body, (
+            "generate_spec should return flags for auto-resolved issues"
+        )
+        draft_flags = [f for f in body["flags"] if "Draft" in f]
+        assert len(draft_flags) > 0, f"Expected flag for Draft, got: {body['flags']}"
+        assert "Beneficiary" in draft_flags[0], (
+            "Draft should be defaulted to Beneficiary"
+        )
 
     async def test_mch_sector_suggests_growth_chart(
         self, client: httpx.AsyncClient, conversation_id: str

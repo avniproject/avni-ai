@@ -13,6 +13,7 @@ import logging
 import os
 import time
 import zipfile
+from typing import Any
 
 import httpx
 from starlette.requests import Request
@@ -38,9 +39,15 @@ class _BundleStore:
     def __init__(self) -> None:
         self._store: dict[str, tuple[dict, float]] = {}  # id -> (data, expiry)
 
-    def put(self, conversation_id: str, zip_b64: str, bundle_dict: dict) -> None:
+    def put(
+        self,
+        conversation_id: str,
+        zip_b64: str,
+        bundle_dict: dict,
+        flags: list[dict] | None = None,
+    ) -> None:
         self._store[conversation_id] = (
-            {"zip_b64": zip_b64, "bundle": bundle_dict},
+            {"zip_b64": zip_b64, "bundle": bundle_dict, "flags": flags or []},
             time.time() + _BUNDLE_STORE_TTL,
         )
 
@@ -178,35 +185,40 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
             "groups": len(result["bundle"]["groups"]),
         }
 
+        flags = result.get("flags", [])
+
         if conversation_id:
             # Store bundle server-side; do NOT return bundle_zip_b64 to LLM
-            _bundle_store.put(conversation_id, zip_b64, result["bundle"])
+            _bundle_store.put(conversation_id, zip_b64, result["bundle"], flags)
             logger.info(
-                "generate-bundle: stored bundle for conversation_id=%s zip_b64_len=%d",
+                "generate-bundle: stored bundle for conversation_id=%s zip_b64_len=%d flags=%d",
                 conversation_id,
                 len(zip_b64),
+                len(flags),
             )
-            return JSONResponse(
-                {
-                    "success": True,
-                    "stored": True,
-                    "validation": result["validation"],
-                    "confidence": result["confidence"],
-                    "summary": summary,
-                }
-            )
-
-        # Legacy: return full bundle_zip_b64 when no conversation_id
-        return JSONResponse(
-            {
+            resp: dict[str, Any] = {
                 "success": True,
-                "bundle": result["bundle"],
+                "stored": True,
                 "validation": result["validation"],
                 "confidence": result["confidence"],
-                "bundle_zip_b64": zip_b64,
                 "summary": summary,
             }
-        )
+            if flags:
+                resp["flags"] = [f["reason"] for f in flags]
+            return JSONResponse(resp)
+
+        # Legacy: return full bundle_zip_b64 when no conversation_id
+        resp = {
+            "success": True,
+            "bundle": result["bundle"],
+            "validation": result["validation"],
+            "confidence": result["confidence"],
+            "bundle_zip_b64": zip_b64,
+            "summary": summary,
+        }
+        if flags:
+            resp["flags"] = [f["reason"] for f in flags]
+        return JSONResponse(resp)
     except Exception as e:
         logger.exception("Bundle generation failed")
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)

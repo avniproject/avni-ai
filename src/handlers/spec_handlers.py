@@ -87,6 +87,122 @@ def get_spec_store() -> _SpecStore:
     return _spec_store
 
 
+def _resolve_entity_references(entities: dict) -> list[dict]:
+    """
+    Fall-forward: auto-resolve broken cross-references in entities.
+    Mutates entities in place. Returns a list of flags describing what was changed.
+    """
+    flags: list[dict] = []
+
+    st_names = {s["name"] for s in entities.get("subject_types", []) if s.get("name")}
+    prog_names = {p["name"] for p in entities.get("programs", []) if p.get("name")}
+
+    first_st = (
+        entities["subject_types"][0]["name"] if entities.get("subject_types") else None
+    )
+    first_prog = entities["programs"][0]["name"] if entities.get("programs") else None
+
+    # Build program → target subject type lookup
+    prog_to_st: dict[str, str] = {}
+    for p in entities.get("programs", []):
+        target = p.get("target_subject_type") or p.get("targetSubjectType", "")
+        if target:
+            prog_to_st[p["name"]] = target
+
+    for enc in entities.get("encounter_types", []):
+        name = enc.get("name", "")
+        subject = enc.get("subject_type", "")
+        program = enc.get("program_name", "")
+        is_program_enc = enc.get("is_program_encounter", False)
+
+        # Unknown subject type → default to first
+        if subject and subject not in st_names and first_st:
+            flags.append(
+                {
+                    "type": "defaulted",
+                    "entity": "encounter_type",
+                    "name": name,
+                    "field": "subject_type",
+                    "original": subject,
+                    "resolved_to": first_st,
+                    "reason": (
+                        f"Encounter '{name}' references unknown subject type '{subject}'. "
+                        f"Available: {sorted(st_names)}. Defaulted to '{first_st}'. "
+                        f"Void if not needed."
+                    ),
+                }
+            )
+            enc["subject_type"] = first_st
+
+        # Missing subject type → default to first
+        if not subject and first_st:
+            flags.append(
+                {
+                    "type": "defaulted",
+                    "entity": "encounter_type",
+                    "name": name,
+                    "field": "subject_type",
+                    "original": "",
+                    "resolved_to": first_st,
+                    "reason": (
+                        f"Encounter '{name}' has no subject type. "
+                        f"Available: {sorted(st_names)}. Defaulted to '{first_st}'. "
+                        f"Void if not needed."
+                    ),
+                }
+            )
+            enc["subject_type"] = first_st
+
+        # Program encounter missing program → default
+        if is_program_enc and not program and first_prog:
+            # Try matching by subject type first
+            resolved_prog = first_prog
+            enc_st = enc.get("subject_type", "")
+            for pname, pst in prog_to_st.items():
+                if pst == enc_st:
+                    resolved_prog = pname
+                    break
+            flags.append(
+                {
+                    "type": "defaulted",
+                    "entity": "encounter_type",
+                    "name": name,
+                    "field": "program_name",
+                    "original": "",
+                    "resolved_to": resolved_prog,
+                    "reason": (
+                        f"Program encounter '{name}' has no program. "
+                        f"Available: {sorted(prog_names)}. Defaulted to '{resolved_prog}'. "
+                        f"Void if not needed."
+                    ),
+                }
+            )
+            enc["program_name"] = resolved_prog
+
+        # Program encounter with unknown program → default
+        if is_program_enc and program and program not in prog_names and first_prog:
+            flags.append(
+                {
+                    "type": "defaulted",
+                    "entity": "encounter_type",
+                    "name": name,
+                    "field": "program_name",
+                    "original": program,
+                    "resolved_to": first_prog,
+                    "reason": (
+                        f"Program encounter '{name}' references unknown program '{program}'. "
+                        f"Available: {sorted(prog_names)}. Defaulted to '{first_prog}'. "
+                        f"Void if not needed."
+                    ),
+                }
+            )
+            enc["program_name"] = first_prog
+
+    if flags:
+        logger.info("resolve-entity-references: auto-resolved %d issues", len(flags))
+    return flags
+
+
 async def handle_generate_spec(request: Request) -> JSONResponse:
     """
     POST /generate-spec
@@ -126,6 +242,14 @@ async def handle_generate_spec(request: Request) -> JSONResponse:
         return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
 
     org_name = body.get("org_name", "")
+
+    # Fall-forward: auto-resolve broken references in entities before generating spec.
+    # This ensures generate_spec always succeeds. Flags are returned to the caller.
+    flags = _resolve_entity_references(entities)
+    if flags and conversation_id:
+        # Persist the fixed entities back so downstream consumers see them
+        _entity_store.put(conversation_id, entities)
+
     try:
         spec_yaml = entities_to_spec(entities, org_name=org_name)
     except Exception as exc:
@@ -150,14 +274,15 @@ async def handle_generate_spec(request: Request) -> JSONResponse:
             len(spec_yaml),
             summary,
         )
-        return JSONResponse(
-            {
-                "stored": True,
-                "char_count": len(spec_yaml),
-                "summary": summary,
-                "next_step": "Call get_spec(conversation_id) to retrieve and show the full spec to the user.",
-            }
-        )
+        resp: dict = {
+            "stored": True,
+            "char_count": len(spec_yaml),
+            "summary": summary,
+            "next_step": "Call get_spec(conversation_id) to retrieve and show the full spec to the user.",
+        }
+        if flags:
+            resp["flags"] = [f["reason"] for f in flags]
+        return JSONResponse(resp)
 
     # Legacy: return spec_yaml directly (no conversation_id)
     logger.info("generate-spec: produced spec for org='%s' (legacy mode)", org_name)

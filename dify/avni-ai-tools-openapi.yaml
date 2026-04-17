@@ -291,6 +291,11 @@ paths:
                     description: "Section-level counts (e.g. {encounterTypes: 5, programs: 3})"
                   next_step:
                     type: string
+                  flags:
+                    type: array
+                    items:
+                      type: string
+                    description: "Auto-resolved issues (e.g. missing subject type defaulted to first). Review these — void items that are not needed."
                   spec_yaml:
                     type: string
                     description: Only present in legacy mode (no conversation_id)
@@ -450,6 +455,11 @@ paths:
                     type: object
                   confidence:
                     type: object
+                  flags:
+                    type: array
+                    items:
+                      type: string
+                    description: "Auto-resolved issues during bundle generation (e.g. auto-created encounter type, defaulted subject type). Review these — void items that are not needed."
                   bundle_zip_b64:
                     type: string
                     description: Present only in legacy mode (no conversation_id)

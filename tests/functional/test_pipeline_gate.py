@@ -75,34 +75,37 @@ async def _setup(client: httpx.AsyncClient, cid: str, entities: dict) -> None:
 
 @pytest.mark.asyncio(loop_scope="function")
 class TestValidatePipelineStep:
-    async def test_detects_missing_subject_type(
+    async def test_missing_references_auto_resolved(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
-        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
+        """Fall-forward: missing subject_type and program are auto-resolved, gate passes."""
+        # generate_spec auto-resolves broken references and returns flags
+        await client.post(
+            "/store-entities",
+            json={"conversation_id": conversation_id, "entities": ENTITIES_WITH_ISSUES},
+        )
+        spec_resp = await client.post(
+            "/generate-spec",
+            json={"conversation_id": conversation_id, "org_name": "TestOrg"},
+        )
+        spec_body = spec_resp.json()
+        assert "flags" in spec_body, "generate_spec should return flags"
+        flags_text = " ".join(spec_body["flags"])
+        assert "Draft" in flags_text, "Draft missing subject_type should be flagged"
+        assert "Orphan Encounter" in flags_text, (
+            "Orphan missing program should be flagged"
+        )
+
+        # Gate should now pass clean (0 errors) since references were resolved
         resp = await client.post(
             "/validate-pipeline-step",
             json={"conversation_id": conversation_id, "phase": "spec"},
         )
         assert resp.status_code == 200
         body = resp.json()
-        assert body["ok"] is False
-        assert body["next_action"] == "fix_required"
-        errors_text = " ".join(body["errors"])
-        assert "Draft" in errors_text
-        assert "subject_type" in errors_text
-
-    async def test_detects_missing_program(
-        self, client: httpx.AsyncClient, conversation_id: str
-    ):
-        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
-        resp = await client.post(
-            "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec"},
+        assert body["ok"] is True, (
+            f"Gate should pass after auto-resolution, errors: {body['errors']}"
         )
-        body = resp.json()
-        errors_text = " ".join(body["errors"])
-        assert "Orphan Encounter" in errors_text
-        assert "program_name" in errors_text
 
     async def test_clean_entities_pass(
         self, client: httpx.AsyncClient, conversation_id: str
@@ -157,17 +160,20 @@ class TestValidatePipelineStep:
         after = resp2.json()["count"]
         assert before == after
 
-    async def test_errors_include_available_options(
+    async def test_flags_include_available_options(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
-        """Errors should tell the agent what options are available."""
-        await _setup(client, conversation_id, ENTITIES_WITH_ISSUES)
+        """Flags from auto-resolution should mention what was available."""
+        await client.post(
+            "/store-entities",
+            json={"conversation_id": conversation_id, "entities": ENTITIES_WITH_ISSUES},
+        )
         resp = await client.post(
-            "/validate-pipeline-step",
-            json={"conversation_id": conversation_id, "phase": "spec"},
+            "/generate-spec",
+            json={"conversation_id": conversation_id, "org_name": "TestOrg"},
         )
         body = resp.json()
-        # Errors should mention available subject types
-        errors_text = " ".join(body["errors"])
-        assert "Beneficiary" in errors_text
-        assert "Anganwadi" in errors_text
+        # Flags should mention available subject types
+        flags_text = " ".join(body.get("flags", []))
+        assert "Beneficiary" in flags_text
+        assert "Anganwadi" in flags_text

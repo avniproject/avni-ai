@@ -47,6 +47,7 @@ class BundleGenerator:
         }
         self.validation: dict[str, list] = {"errors": [], "warnings": []}
         self.confidence: dict[str, Any] = {}
+        self.flags: list[dict] = []  # auto-resolved decisions for user review
 
     # ── Entity processors ───────────────────────────────────────────
 
@@ -282,6 +283,16 @@ class BundleGenerator:
         # (Avni requires subjectTypeUUID on every formMapping)
         if not st and self.bundle["subjectTypes"]:
             st = self.bundle["subjectTypes"][0]
+            self.flags.append(
+                {
+                    "type": "defaulted",
+                    "entity": "formMapping",
+                    "name": form_spec["name"],
+                    "field": "subjectType",
+                    "resolved_to": st["name"],
+                    "reason": f"No subject type specified for form '{form_spec['name']}', defaulted to '{st['name']}'",
+                }
+            )
             logger.warning(
                 "formMapping '%s': no subjectType specified, defaulting to '%s'",
                 form_spec["name"],
@@ -314,12 +325,81 @@ class BundleGenerator:
             # Fall back to first program
             if not prog:
                 prog = self.bundle["programs"][0]
+            self.flags.append(
+                {
+                    "type": "defaulted",
+                    "entity": "formMapping",
+                    "name": form_spec["name"],
+                    "field": "program",
+                    "resolved_to": prog["name"],
+                    "reason": f"No program specified for form '{form_spec['name']}' (type {form_type}), defaulted to '{prog['name']}'",
+                }
+            )
             logger.warning(
                 "formMapping '%s': no program specified for %s, defaulting to '%s'",
                 form_spec["name"],
                 form_type,
                 prog["name"],
             )
+
+        # Auto-create missing encounter type when the form type requires one
+        needs_et = form_type in (
+            "Encounter",
+            "IndividualEncounterCancellation",
+            "ProgramEncounter",
+            "ProgramEncounterCancellation",
+        )
+        if needs_et and not et:
+            et_name = form_spec.get("encounterType") or form_spec["name"]
+            # Strip cancellation suffix to get base encounter type name
+            et_name = et_name.replace(" Cancellation", "").strip()
+            # Check if it already exists (may have been auto-created for a paired form)
+            et = next(
+                (e for e in self.bundle["encounterTypes"] if e["name"] == et_name),
+                None,
+            )
+            if not et:
+                is_program = form_type in (
+                    "ProgramEncounter",
+                    "ProgramEncounterCancellation",
+                )
+                et = {
+                    "name": et_name,
+                    "uuid": generate_deterministic_uuid(f"encounterType:{et_name}"),
+                    "encounterEligibilityCheckRule": "",
+                    "active": True,
+                    "immutable": False,
+                    "programEncounter": is_program,
+                }
+                self.bundle["encounterTypes"].append(et)
+                # Also create operational wrapper
+                self.bundle["operationalEncounterTypes"][
+                    "operationalEncounterTypes"
+                ].append(
+                    {
+                        "uuid": generate_deterministic_uuid(
+                            f"operationalEncounterType:{et_name}"
+                        ),
+                        "name": et_name,
+                        "encounterType": {"uuid": et["uuid"], "voided": False},
+                        "voided": False,
+                    }
+                )
+                self.flags.append(
+                    {
+                        "type": "auto_created",
+                        "entity": "encounterType",
+                        "name": et_name,
+                        "reason": f"Form '{form_spec['name']}' (type {form_type}) requires encounter type '{et_name}' but it was not in the entities. Auto-created it. Void if not needed.",
+                    }
+                )
+                logger.info(
+                    "formMapping '%s': auto-created encounter type '%s' "
+                    "(form type %s requires encounterTypeUUID)",
+                    form_spec["name"],
+                    et_name,
+                    form_type,
+                )
 
         if st:
             mapping["subjectTypeUUID"] = st["uuid"]
@@ -766,6 +846,7 @@ class BundleGenerator:
             "bundle": self.bundle,
             "validation": self.validation,
             "confidence": self.confidence,
+            "flags": self.flags,
         }
 
     # ── Export to ZIP ────────────────────────────────────────────────

@@ -189,6 +189,10 @@ async def _validate_after_bundle(conversation_id: str) -> dict:
     errors.extend(result.get("errors", []))
     warnings.extend(result.get("warnings", []))
 
+    # Surface generator flags (auto-created/defaulted items) as warnings
+    for flag in stored.get("flags", []):
+        warnings.append(f"[AUTO-RESOLVED] {flag['reason']}")
+
     ok = len(errors) == 0
     next_action = "continue" if ok else "fix_required"
     return {

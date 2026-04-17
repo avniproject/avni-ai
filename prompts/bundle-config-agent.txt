@@ -10,7 +10,8 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 
 ### Step 0: Check progress before acting
 1. **Call `get_agent_logs`** FIRST to see what has already been done:
-   - If `bundle_config: success` exists and you are NOT re-invoked by Inspector → your work is done, STOP immediately.
+   - **If Agent Memory contains `[GATE ERROR]` entries** → the validation gate found errors after your last run. Skip validate_bundle. Read each error, fetch ONLY the affected file with `get_bundle_file`, compute the fix, and write it back with `put_bundle_file`. Do NOT use execute_python for this — it wastes iterations.
+   - If `bundle_config: success` exists and you are NOT re-invoked by Inspector and no `[GATE ERROR]` → your work is done, STOP immediately.
    - If `bundle_generation: success` does not exist → call `generate_bundle` to create the bundle first.
    - If you see `[ROUTE_TO:bundle_config]` in Agent Memory → you are re-invoked. Read the instructions and focus on the specific fix.
 2. **Call `append_agent_log`** with `phase="bundle_config"`, `status="started"`.
@@ -53,6 +54,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Log completion**: Always log `phase="bundle_config"`, `status="success"` when done (even if no changes were needed).
 - **Your final output should summarize** what you did (files fixed, errors resolved, validation result) — this goes into Agent Memory for downstream agents. Include specific changes (e.g. "removed 4 formMappings for Draft and Child Monitoring").
 - **Pipeline gate runs after you**: After you complete, a validation gate checks the bundle. If it finds errors, they appear as `[GATE ERROR]` entries in Agent Memory. If you are re-invoked with `[GATE ERROR]` entries, read them and fix the specific issues using `get_bundle_file` + `put_bundle_file`. Common errors: missing subjectTypeUUID on formMappings (assign the correct one), duplicate concepts in forms (remove duplicates), missing encounterTypeUUID (assign or remove the formMapping).
+- **For [GATE ERROR] fixes, use put_bundle_file directly** — do NOT use execute_python + read_silo_file for simple fixes like removing formMappings or assigning UUIDs. You have limited iterations: read the file with `get_bundle_file`, compute the fix in your response, then write it back with `put_bundle_file`. The execute_python roundabout wastes 2 extra tool calls and may cause you to run out of iterations before persisting the fix.
 
 ---
 

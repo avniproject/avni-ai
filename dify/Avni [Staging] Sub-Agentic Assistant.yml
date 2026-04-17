@@ -2705,7 +2705,7 @@ workflow:
               your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 5
+            value: 10
           model:
             type: constant
             value:
@@ -5041,15 +5041,17 @@ workflow:
       zIndex: 1002
     - data:
         code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
-          \ str) -> dict:\n    has_errors = False\n    gate_output = str()\n    try:\n\
-          \        parsed = json.loads(gate_body) if gate_body else {}\n        errors\
-          \ = parsed.get(\"errors\", [])\n        has_errors = len(errors) > 0\n \
-          \       parts = []\n        for err in errors:\n            parts.append(\"\
-          [GATE ERROR] \" + str(err))\n        for warn in parsed.get(\"warnings\"\
-          , [])[:5]:\n            parts.append(\"[GATE WARNING] \" + str(warn))\n\
-          \        gate_output = chr(10).join(parts)\n    except Exception:\n    \
-          \    pass\n    if gate_status >= 400:\n        has_errors = False\n    return\
-          \ {\"has_questions\": has_errors, \"gate_output\": gate_output}\n"
+          \ str, active_agent: str) -> dict:\n    has_errors = False\n    gate_output\
+          \ = str()\n    try:\n        parsed = json.loads(gate_body) if gate_body\
+          \ else {}\n        errors = parsed.get(\"errors\", [])\n        has_errors\
+          \ = len(errors) > 0\n        parts = []\n        for err in errors:\n  \
+          \          parts.append(\"[GATE ERROR] \" + str(err))\n        for warn\
+          \ in parsed.get(\"warnings\", [])[:5]:\n            parts.append(\"[GATE\
+          \ WARNING] \" + str(warn))\n        if has_errors and active_agent:\n  \
+          \          parts.append(\"[gate-retry:\" + active_agent + \"]\")\n      \
+          \  gate_output = chr(10).join(parts)\n    except Exception:\n        pass\n\
+          \    if gate_status >= 400:\n        has_errors = False\n    return {\"has_questions\"\
+          : has_errors, \"gate_output\": gate_output}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5077,6 +5079,11 @@ workflow:
           - agent_memory
           value_type: string
           variable: agent_memory
+        - value_selector:
+          - conversation
+          - active_agent
+          value_type: string
+          variable: active_agent
       height: 52
       id: '1800000000776'
       parentId: '1800000000700'
