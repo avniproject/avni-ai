@@ -1078,7 +1078,7 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
         )
 
     # ── Subject type defaults ─────────────────────────────────────────
-    for st in spec.get("subjectTypes", []):
+    for st in spec.get("subjectTypes") or []:
         if "lastNameOptional" not in st:
             st["lastNameOptional"] = True
             defaults_applied.append(
@@ -1094,7 +1094,7 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
             defaults_applied.append(f"subjectType '{st['name']}': set household=true")
 
     # ── Program defaults ──────────────────────────────────────────────
-    for prog in spec.get("programs", []):
+    for prog in spec.get("programs") or []:
         if not prog.get("colour"):
             prog["colour"] = "#4A148C"
             defaults_applied.append(
@@ -1119,7 +1119,7 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
             )
 
     # ── Encounter type defaults ───────────────────────────────────────
-    for enc in spec.get("encounterTypes", []):
+    for enc in spec.get("encounterTypes") or []:
         if "scheduled" not in enc:
             enc["scheduled"] = True
             defaults_applied.append(
@@ -1127,7 +1127,7 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
             )
         # Ambiguity: encounter without subject type
         if not enc.get("subjectType") and not enc.get("program"):
-            st_names = [s["name"] for s in spec.get("subjectTypes", [])]
+            st_names = [s["name"] for s in spec.get("subjectTypes") or []]
             if st_names:
                 enc_id = enc["name"].lower().replace(" ", "_").replace("-", "_")[:30]
                 ambiguities.append(
@@ -1145,7 +1145,7 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
         if enc.get("program") == "" or (
             not enc.get("program") and enc.get("scheduled")
         ):
-            prog_names = [p["name"] for p in spec.get("programs", [])]
+            prog_names = [p["name"] for p in spec.get("programs") or []]
             if prog_names and not enc.get("subjectType"):
                 enc_id = enc["name"].lower().replace(" ", "_").replace("-", "_")[:30]
                 ambiguities.append(
