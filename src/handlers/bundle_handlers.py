@@ -911,11 +911,14 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
         # Re-store: update zip_b64 AND sync the in-memory bundle dict
         # so validators see the changes (not stale data)
         bundle_dict = stored["bundle"]
-        if filename.endswith(".json") and isinstance(parsed, (list, dict)):
-            # Map ZIP filenames to bundle dict keys
-            key = filename.replace(".json", "")
-            if key in bundle_dict:
-                bundle_dict[key] = parsed
+        try:
+            if filename.endswith(".json"):
+                synced = json.loads(file_bytes.decode("utf-8"))
+                key = filename.replace(".json", "").split("/")[-1]  # handle forms/X.json
+                if key in bundle_dict:
+                    bundle_dict[key] = synced
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            pass  # non-JSON file, skip sync
         _bundle_store.put(conversation_id, new_zip_b64, bundle_dict)
         logger.info(
             "put-bundle-file: updated filename=%s for conversation_id=%s new_size=%d",
