@@ -230,6 +230,22 @@ async def _validate_after_inspection(conversation_id: str) -> dict:
 
     if upload_error:
         error_msg = upload_error[-1].get("error", "Unknown upload error")
+        action = upload_error[-1].get("action", "")
+        full_error = f"{error_msg} {action}".lower()
+
+        # Auth failures can't be fixed by any agent — stop the pipeline
+        if "401" in full_error or "unauthorized" in full_error or "auth" in full_error:
+            return {
+                "ok": False,
+                "errors": [
+                    "Upload failed: authentication error (HTTP 401). "
+                    "The auth token has expired or is invalid. "
+                    "Please re-authenticate and retry."
+                ],
+                "warnings": [],
+                "next_action": "user_input_needed",
+            }
+
         return {
             "ok": False,
             "errors": [f"Upload failed: {error_msg}"],

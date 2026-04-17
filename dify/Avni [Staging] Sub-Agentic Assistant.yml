@@ -5043,15 +5043,17 @@ workflow:
         code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
           \ str, active_agent: str) -> dict:\n    has_errors = False\n    gate_output\
           \ = str()\n    try:\n        parsed = json.loads(gate_body) if gate_body\
-          \ else {}\n        errors = parsed.get(\"errors\", [])\n        has_errors\
-          \ = len(errors) > 0\n        parts = []\n        for err in errors:\n  \
-          \          parts.append(\"[GATE ERROR] \" + str(err))\n        for warn\
-          \ in parsed.get(\"warnings\", [])[:5]:\n            parts.append(\"[GATE\
-          \ WARNING] \" + str(warn))\n        if has_errors and active_agent:\n  \
-          \          parts.append(\"[gate-retry:\" + active_agent + \"]\")\n      \
-          \  gate_output = chr(10).join(parts)\n    except Exception:\n        pass\n\
-          \    if gate_status >= 400:\n        has_errors = False\n    return {\"has_questions\"\
-          : has_errors, \"gate_output\": gate_output}\n"
+          \ else {}\n        errors = parsed.get(\"errors\", [])\n        next_action\
+          \ = parsed.get(\"next_action\", \"\")\n        has_errors = len(errors)\
+          \ > 0\n        if next_action == \"user_input_needed\":\n            has_errors\
+          \ = False\n        parts = []\n        for err in errors:\n            parts.append(\"\
+          [GATE ERROR] \" + str(err))\n        for warn in parsed.get(\"warnings\"\
+          , [])[:5]:\n            parts.append(\"[GATE WARNING] \" + str(warn))\n\
+          \        if has_errors and active_agent:\n            parts.append(\"[gate-retry:\"\
+          \ + active_agent + \"]\")\n        gate_output = chr(10).join(parts)\n \
+          \   except Exception:\n        pass\n    if gate_status >= 400:\n       \
+          \ has_errors = False\n    return {\"has_questions\": has_errors, \"gate_output\"\
+          : gate_output}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
