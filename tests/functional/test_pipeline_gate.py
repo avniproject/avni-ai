@@ -289,7 +289,11 @@ class TestResolvePipelineQuestions:
         )
         questions = resp.json()["questions"]
         draft_q = next(
-            (q for q in questions if q["entity"] == "Draft" and q["field"] == "subject_type"),
+            (
+                q
+                for q in questions
+                if q["entity"] == "Draft" and q["field"] == "subject_type"
+            ),
             None,
         )
         assert draft_q is not None
@@ -302,14 +306,17 @@ class TestResolvePipelineQuestions:
                 json={"conversation_id": conversation_id, "phase": "spec_generation"},
             )
             draft_q = next(
-                q for q in resp.json()["questions"]
+                q
+                for q in resp.json()["questions"]
                 if q["entity"] == "Draft" and q["field"] == "subject_type"
             )
             resp = await client.post(
                 "/resolve-pipeline-questions",
                 json={
                     "conversation_id": conversation_id,
-                    "answers": [{"id": draft_q["id"], "answer": synonym, "entity": "Draft"}],
+                    "answers": [
+                        {"id": draft_q["id"], "answer": synonym, "entity": "Draft"}
+                    ],
                 },
             )
             body = resp.json()
