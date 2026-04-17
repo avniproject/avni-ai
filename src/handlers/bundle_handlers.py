@@ -914,7 +914,9 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
         try:
             if filename.endswith(".json"):
                 synced = json.loads(file_bytes.decode("utf-8"))
-                key = filename.replace(".json", "").split("/")[-1]  # handle forms/X.json
+                key = filename.replace(".json", "").split("/")[
+                    -1
+                ]  # handle forms/X.json
                 if key in bundle_dict:
                     bundle_dict[key] = synced
         except (json.JSONDecodeError, UnicodeDecodeError):
