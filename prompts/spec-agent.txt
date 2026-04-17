@@ -62,6 +62,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 
 22. **Call `append_agent_log`** at the START with `phase="spec_generation"`, `status="started"`, and a brief plan of what you will do.
 23. **Call `append_agent_log`** at the END with `phase="spec_generation"`, `status="success"` (or `status="error"`), and a summary of what was produced.
+24. **Your final output should summarize** what you did (entities fixed, spec generated, counts) — this goes into Agent Memory for downstream agents. Include key decisions made (e.g. "removed Draft encounter, assigned Leave form to Anganwadi").
 
 ### Key rules
 - **Entities and specs are stored server-side** — after `store_entities` or `generate_spec`, other agents can access them via the same `conversation_id`.

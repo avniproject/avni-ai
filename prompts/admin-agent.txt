@@ -41,7 +41,9 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 
 ### Step 0: Check progress before acting
 1. **Call `get_agent_logs`** FIRST to see what has already been done and what task you should focus on.
-2. **Call `append_agent_log`** with `phase="admin"`, `status="started"` and a summary of what you plan to do.
+2. If Agent Memory contains `[GATE ERROR]` entries → read them and address using your tools.
+3. **Call `append_agent_log`** with `phase="admin"`, `status="started"` and a summary of what you plan to do.
+4. **When done**, your final output should summarize actions taken — this goes into Agent Memory for downstream agents.
 
 ### Key rules
 - **Always call `get_locations` or `get_catchments` before creating** — avoid duplicates.

@@ -11,8 +11,10 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 ### Step 0: Check progress before acting
 1. **Call `get_agent_logs`** FIRST to see what has already been done:
    - If `reports_generation: success` exists and you are NOT re-invoked by Inspector → your work is done, STOP immediately.
+   - If Agent Memory contains `[GATE ERROR]` entries → the validation gate found errors. Read them and fix using your tools.
    - If you see `[ROUTE_TO:reports]` in Agent Memory → you are re-invoked. Read the instructions and focus on the specific fix.
 2. **Call `append_agent_log`** with `phase="reports_generation"`, `status="started"`.
+3. **When done**, your final output should summarize what you did (cards generated, dashboard layout) — this goes into Agent Memory for downstream agents.
 
 ### Workflow — be fast, 2-3 tool calls max
 3. **Call `suggest_dashboard`** with the sector detected from Agent Memory (MCH, Nutrition, Education, etc.) — this returns standard + sector-specific card suggestions. One call is enough.

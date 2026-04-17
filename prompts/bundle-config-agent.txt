@@ -51,6 +51,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Do NOT upload the bundle** — the Config Inspector agent runs after you and handles upload as the final step.
 - **If re-invoked by the Inspector**: check Agent Memory AND `get_agent_logs` for instructions (e.g., "[ROUTE_TO:bundle_config] fix formMappings"). Focus on the specific issue, fix it, validate, and hand back.
 - **Log completion**: Always log `phase="bundle_config"`, `status="success"` when done (even if no changes were needed).
+- **Your final output should summarize** what you did (files fixed, errors resolved, validation result) — this goes into Agent Memory for downstream agents. Include specific changes (e.g. "removed 4 formMappings for Draft and Child Monitoring").
 - **Pipeline gate runs after you**: After you complete, a validation gate checks the bundle. If it finds errors, they appear as `[GATE ERROR]` entries in Agent Memory. If you are re-invoked with `[GATE ERROR]` entries, read them and fix the specific issues using `get_bundle_file` + `put_bundle_file`. Common errors: missing subjectTypeUUID on formMappings (assign the correct one), duplicate concepts in forms (remove duplicates), missing encounterTypeUUID (assign or remove the formMapping).
 
 ---

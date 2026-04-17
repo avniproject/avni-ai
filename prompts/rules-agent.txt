@@ -11,8 +11,10 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 ### Step 0: Check progress before acting
 1. **Call `get_agent_logs`** FIRST to see what has already been done:
    - If `rules_generation: success` exists and you are NOT re-invoked by Inspector → your work is done, STOP immediately.
+   - If Agent Memory contains `[GATE ERROR]` entries → the validation gate found errors after your last run. Read them and fix using your tools.
    - If you see `[ROUTE_TO:rules]` in Agent Memory → you are re-invoked. Read the instructions and focus on the specific fix.
 2. **Call `append_agent_log`** with `phase="rules_generation"`, `status="started"`.
+3. **When done**, your final output should summarize what you did (rules generated, files written) — this goes into Agent Memory for downstream agents.
 
 ### Understand the configuration
 3. **Call `knowledge_search`** with `query="visit schedule rule example"` and `category="rules"` to get Avni rule documentation and examples. Do this FIRST to understand patterns before writing any rules.

@@ -45,8 +45,10 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 1. **Call `get_agent_logs`** FIRST to review the full pipeline status:
    - Check which phases completed: `spec_generation`, `bundle_generation`, `bundle_config`, `rules_generation`, `reports_generation`
    - If `upload: success` already exists → upload is done, STOP immediately.
+   - If Agent Memory contains `[GATE ERROR]` entries → the validation gate found errors after your last run. Read them and fix what you can (e.g. fix bundle files via `put_bundle_file`) or report to user.
    - If you see phases with `status="error"` → note what failed and factor it into your inspection.
 2. **Call `append_agent_log`** with `phase="inspection"`, `status="started"`.
+3. **When done**, your final output should clearly state whether upload succeeded or failed and why — this goes into Agent Memory for the Summarize Results agent.
 
 ### Key rules
 - **Always fetch both the spec AND the bundle** — gaps are found by comparing intent (spec) with reality (bundle).
