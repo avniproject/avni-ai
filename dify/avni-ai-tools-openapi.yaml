@@ -1392,7 +1392,7 @@ paths:
                   description: Dify conversation ID
                 phase:
                   type: string
-                  description: Current pipeline phase (spec_generation, bundle_config, rules_generation, reports_generation, inspection)
+                  description: Current pipeline phase. Accepts both phase names (spec_generation, bundle_config, rules_generation, reports_generation, inspection) and agent names (spec, bundle_config, rules, reports, inspect).
       responses:
         '200':
           description: Validation result with auto-fixes and questions
@@ -1443,8 +1443,11 @@ paths:
       description: |
         Takes user answers from validate-pipeline-step questions and applies
         them deterministically (remove encounters, assign subject types, fix
-        formMappings). Call this after presenting questions to the user, then
-        call validate-pipeline-step again to confirm resolution.
+        formMappings). Answers are normalized: "ignore", "discard", "skip",
+        "remove", "delete" are all treated as "Remove". Removing a form also
+        removes its cancellation form mapping. Call this after presenting
+        questions to the user, then call validate-pipeline-step again to
+        confirm resolution.
       requestBody:
         required: true
         content:
