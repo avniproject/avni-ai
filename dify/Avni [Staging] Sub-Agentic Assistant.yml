@@ -4444,17 +4444,22 @@ workflow:
           \      \"rules\": rules_text,\n        \"reports\": reports_text,\n    \
           \    \"inspect\": inspect_text,\n        \"admin\": admin_text,\n    }\n\
           \    agent_text = texts.get(active_agent, \"\") or \"\"\n    t_lower = agent_text.lower()\n\
-          \n    # Extract key status signals BEFORE truncation so they survive the\
-          \ 1000-char cut\n    status_prefix = \"\"\n    upload_signals = [\"uploaded\
-          \ successfully\", \"bundle uploaded\", \"upload complete\"]\n    if any(s\
-          \ in t_lower for s in upload_signals):\n        status_prefix = \"[UPLOAD_SUCCESS]\
-          \ \"\n    elif \"upload_bundle\" in t_lower and \"error\" not in t_lower:\n\
-          \        status_prefix = \"[UPLOAD_ATTEMPTED] \"\n    elif \"[error]\" in\
-          \ t_lower or \"status=error\" in t_lower:\n        status_prefix = \"[ERROR]\
-          \ \"\n\n    entry = f\"[{active_agent}] {status_prefix}{agent_text[:1000]}\"\
-          \n    sep = \"\\n---\\n\"\n    memory_entry = (existing_memory + sep + entry)\
-          \ if existing_memory else entry\n    return {\n        \"memory_entry\"\
-          : memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
+          \n    # Extract key status signals\n    status_prefix = \"\"\n    upload_signals\
+          \ = [\"uploaded successfully\", \"bundle uploaded\", \"upload complete\"\
+          ]\n    if any(s in t_lower for s in upload_signals):\n        status_prefix\
+          \ = \"[UPLOAD_SUCCESS] \"\n    elif \"upload_bundle\" in t_lower and \"\
+          error\" not in t_lower:\n        status_prefix = \"[UPLOAD_ATTEMPTED] \"\
+          \n    elif \"[error]\" in t_lower or \"status=error\" in t_lower:\n    \
+          \    status_prefix = \"[ERROR] \"\n\n    # Smart truncation: keep more text\
+          \ (3000 chars) per agent\n    entry = \"[\" + active_agent + \"] \" + status_prefix\
+          \ + agent_text[:3000]\n    sep = chr(10) + \"---\" + chr(10)\n    memory_entry\
+          \ = (existing_memory + sep + entry) if existing_memory else entry\n\n  \
+          \  # Cap total memory to 25000 chars to prevent context overflow\n    #\
+          \ Keep first 5000 (early agents) + last 20000 (recent work)\n    if len(memory_entry)\
+          \ > 25000:\n        memory_entry = memory_entry[:5000] + chr(10) + \"...[earlier\
+          \ entries truncated]...\" + chr(10) + memory_entry[-20000:]\n\n    return\
+          \ {\n        \"memory_entry\": memory_entry,\n        \"agent_output\":\
+          \ agent_text,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
