@@ -169,46 +169,68 @@ class BundleValidator:
         prog_uuids = {p["uuid"] for p in self.bundle.get("programs", [])}
         et_uuids = {e["uuid"] for e in self.bundle.get("encounterTypes", [])}
 
+        # Build name→UUID maps for diagnosis
+        et_by_name = {
+            e["name"]: e["uuid"] for e in self.bundle.get("encounterTypes", [])
+        }
+        st_names = [s["name"] for s in self.bundle.get("subjectTypes", [])]
+
         for m in self.bundle.get("formMappings", []):
-            # subjectTypeUUID is REQUIRED by Avni server (subject_type_check constraint)
+            form_name = m.get("formName", "?")
+
+            # subjectTypeUUID is REQUIRED by Avni server
             if not m.get("subjectTypeUUID"):
-                self.errors.append(
-                    f'Form mapping "{m.get("formName", "?")}" is missing subjectTypeUUID '
-                    f"(required by Avni — will fail on import)"
-                )
+                if st_names:
+                    self.errors.append(
+                        f'Form mapping "{form_name}" is missing subjectTypeUUID. '
+                        f"Available subject types: {st_names}. "
+                        f"Assign one via put_bundle_file on formMappings.json."
+                    )
+                else:
+                    self.errors.append(
+                        f'Form mapping "{form_name}" is missing subjectTypeUUID '
+                        f"and no subject types are defined."
+                    )
             elif m["subjectTypeUUID"] not in st_uuids:
                 self.errors.append(
-                    f'Form mapping "{m["formName"]}" references unknown subjectTypeUUID'
+                    f'Form mapping "{form_name}" references unknown subjectTypeUUID'
                 )
             if m.get("programUUID") and m["programUUID"] not in prog_uuids:
                 self.errors.append(
-                    f'Form mapping "{m["formName"]}" references unknown programUUID'
+                    f'Form mapping "{form_name}" references unknown programUUID'
                 )
             if m.get("encounterTypeUUID") and m["encounterTypeUUID"] not in et_uuids:
                 self.errors.append(
-                    f'Form mapping "{m["formName"]}" references unknown encounterTypeUUID'
+                    f'Form mapping "{form_name}" references unknown encounterTypeUUID'
                 )
 
-            # Avni form mapping type rules (check_form_mapping_uniqueness constraint):
-            # IndividualProfile: no program, no encounter type
-            # ProgramEnrolment/ProgramExit: with program, no encounter type
-            # ProgramEncounter/ProgramEncounterCancellation: with program and encounter type
-            # Encounter/IndividualEncounterCancellation: no program, with encounter type
+            # Avni form mapping type rules
             ft = m.get("formType", "")
             has_prog = bool(m.get("programUUID"))
             has_enc = bool(m.get("encounterTypeUUID"))
             if ft in ("Encounter", "IndividualEncounterCancellation"):
                 if not has_enc:
-                    self.errors.append(
-                        f'Form mapping "{m.get("formName", "?")}" is type {ft} '
-                        f"but missing encounterTypeUUID (required by Avni)"
-                    )
+                    # Check if a matching encounter type exists
+                    base_name = form_name.replace(" Cancellation", "").strip()
+                    matching_uuid = et_by_name.get(base_name)
+                    if matching_uuid:
+                        self.errors.append(
+                            f'Form mapping "{form_name}" is type {ft} but missing encounterTypeUUID. '
+                            f'Encounter type "{base_name}" exists (UUID: {matching_uuid}). '
+                            f"Assign this UUID to the formMapping via put_bundle_file."
+                        )
+                    else:
+                        self.errors.append(
+                            f'Form mapping "{form_name}" is type {ft} but missing encounterTypeUUID. '
+                            f'No encounter type named "{base_name}" exists in encounterTypes.json. '
+                            f"Remove this formMapping (and its cancellation) from formMappings.json via put_bundle_file."
+                        )
             elif ft in ("ProgramEncounter", "ProgramEncounterCancellation"):
                 if not has_prog or not has_enc:
+                    missing = "programUUID" if not has_prog else "encounterTypeUUID"
                     self.errors.append(
-                        f'Form mapping "{m.get("formName", "?")}" is type {ft} '
-                        f"but missing {'programUUID' if not has_prog else 'encounterTypeUUID'} "
-                        f"(required by Avni)"
+                        f'Form mapping "{form_name}" is type {ft} '
+                        f"but missing {missing} (required by Avni)"
                     )
 
     # ── Encounter completeness ──────────────────────────────────────

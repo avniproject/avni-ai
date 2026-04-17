@@ -908,8 +908,15 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
         new_zip_bytes = buf.getvalue()
         new_zip_b64 = base64.b64encode(new_zip_bytes).decode("ascii")
 
-        # Re-store (keep existing bundle dict, update zip_b64)
-        _bundle_store.put(conversation_id, new_zip_b64, stored["bundle"])
+        # Re-store: update zip_b64 AND sync the in-memory bundle dict
+        # so validators see the changes (not stale data)
+        bundle_dict = stored["bundle"]
+        if filename.endswith(".json") and isinstance(parsed, (list, dict)):
+            # Map ZIP filenames to bundle dict keys
+            key = filename.replace(".json", "")
+            if key in bundle_dict:
+                bundle_dict[key] = parsed
+        _bundle_store.put(conversation_id, new_zip_b64, bundle_dict)
         logger.info(
             "put-bundle-file: updated filename=%s for conversation_id=%s new_size=%d",
             filename,
