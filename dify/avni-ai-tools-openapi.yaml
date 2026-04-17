@@ -1418,6 +1418,16 @@ paths:
                       properties:
                         id:
                           type: string
+                          description: 'Unique question ID — pass this back to resolve-pipeline-questions. Format: enc_{name}_subject_type, enc_{name}_program, fm_{name}_encounter_type'
+                        entity:
+                          type: string
+                          description: Entity name this question is about (e.g. "Draft", "Child Monitoring")
+                        section:
+                          type: string
+                          description: Entity section (encounter_types, formMappings)
+                        field:
+                          type: string
+                          description: Field being asked about (subject_type, program_name, encounterTypeUUID)
                         question:
                           type: string
                         options:
@@ -1426,7 +1436,7 @@ paths:
                             type: string
                         default:
                           type: string
-                    description: Questions to present to the user
+                    description: Questions to present to the user — each has an ID to pass back with the answer
                   warnings:
                     type: array
                     items:
@@ -1472,13 +1482,13 @@ paths:
                     properties:
                       id:
                         type: string
-                        description: Question ID from validate-pipeline-step
+                        description: 'Question ID from validate-pipeline-step (e.g. enc_draft_subject_type, fm_draft_encounter_type). Found in [QUESTION id=X] entries in Agent Memory.'
                       answer:
                         type: string
-                        description: User's chosen option
+                        description: 'User''s chosen option from the question''s options list, or a synonym like "ignore"/"discard"/"skip" which maps to "Remove"'
                       entity:
                         type: string
-                        description: Entity name (optional, aids resolution)
+                        description: Entity name from the question (e.g. "Draft"). Helps resolve when ID parsing is ambiguous.
       responses:
         '200':
           description: Answers applied
