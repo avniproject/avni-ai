@@ -1105,8 +1105,10 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
             sector_lower in ("mch", "nutrition", "child health")
             and "showGrowthChart" not in prog
         ):
+            prog_id = prog["name"].lower().replace(" ", "_").replace("-", "_")[:30]
             ambiguities.append(
                 {
+                    "id": f"prog_{prog_id}_showGrowthChart",
                     "section": "programs",
                     "entity": prog["name"],
                     "field": "showGrowthChart",
@@ -1127,8 +1129,10 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
         if not enc.get("subjectType") and not enc.get("program"):
             st_names = [s["name"] for s in spec.get("subjectTypes", [])]
             if st_names:
+                enc_id = enc["name"].lower().replace(" ", "_").replace("-", "_")[:30]
                 ambiguities.append(
                     {
+                        "id": f"spec_enc_{enc_id}_subjectType",
                         "section": "encounterTypes",
                         "entity": enc["name"],
                         "field": "subjectType",
@@ -1143,8 +1147,10 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
         ):
             prog_names = [p["name"] for p in spec.get("programs", [])]
             if prog_names and not enc.get("subjectType"):
+                enc_id = enc["name"].lower().replace(" ", "_").replace("-", "_")[:30]
                 ambiguities.append(
                     {
+                        "id": f"spec_enc_{enc_id}_program",
                         "section": "encounterTypes",
                         "entity": enc["name"],
                         "field": "program",
