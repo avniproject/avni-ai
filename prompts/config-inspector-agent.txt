@@ -55,6 +55,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **ALWAYS upload the bundle as your final step** — you are the last agent in the chain. If you don't upload, the user's work is lost.
 - **Use `conversation_id` on every tool call.**
 - **Log phase transitions**: Log `phase="inspection"`, `status="success"` after validation, and `phase="upload"`, `status="success"` after successful upload.
+- **Pipeline gate runs after you**: After you complete, a deterministic validation gate checks upload status. If upload failed, the gate handles error routing. You do NOT need to implement retry logic for upload failures — focus on validate → upload → log result.
 
 ---
 
