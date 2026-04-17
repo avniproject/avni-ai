@@ -75,7 +75,6 @@ async def _setup(client: httpx.AsyncClient, cid: str, entities: dict) -> None:
 
 @pytest.mark.asyncio(loop_scope="function")
 class TestValidatePipelineStep:
-
     async def test_detects_missing_subject_type(
         self, client: httpx.AsyncClient, conversation_id: str
     ):
@@ -116,8 +115,7 @@ class TestValidatePipelineStep:
         body = resp.json()
         # Filter out schema warnings (unknown fields etc) — just check entity errors
         entity_errors = [
-            e for e in body["errors"]
-            if "subject_type" in e or "program_name" in e
+            e for e in body["errors"] if "subject_type" in e or "program_name" in e
         ]
         assert len(entity_errors) == 0
 

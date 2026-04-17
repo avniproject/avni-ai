@@ -59,33 +59,40 @@ async def handle_validate_pipeline_step(request: Request) -> JSONResponse:
 
     validator = validators.get(phase)
     if not validator:
-        return JSONResponse({
-            "ok": True,
-            "phase": phase,
-            "errors": [],
-            "warnings": [],
-            "next_action": "continue",
-        })
+        return JSONResponse(
+            {
+                "ok": True,
+                "phase": phase,
+                "errors": [],
+                "warnings": [],
+                "next_action": "continue",
+            }
+        )
 
     try:
         result = await validator(conversation_id)
         result["phase"] = phase
         logger.info(
             "pipeline-gate [%s] phase=%s ok=%s errors=%d warnings=%d",
-            conversation_id[:8], phase, result["ok"],
+            conversation_id[:8],
+            phase,
+            result["ok"],
             len(result.get("errors", [])),
             len(result.get("warnings", [])),
         )
         return JSONResponse(result)
     except Exception as exc:
         logger.exception("pipeline-gate error for phase=%s", phase)
-        return JSONResponse({
-            "ok": False,
-            "phase": phase,
-            "errors": [f"Gate internal error: {exc}"],
-            "warnings": [],
-            "next_action": "continue",
-        }, status_code=500)
+        return JSONResponse(
+            {
+                "ok": False,
+                "phase": phase,
+                "errors": [f"Gate internal error: {exc}"],
+                "warnings": [],
+                "next_action": "continue",
+            },
+            status_code=500,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -144,13 +151,19 @@ async def _validate_after_spec(conversation_id: str) -> dict:
 
     # Schema validation
     from ..bundle.spec_validator import validate_spec
+
     validation = validate_spec(spec_yaml)
     errors.extend(validation.get("errors", []))
     warnings.extend(validation.get("warnings", []))
 
     ok = len(errors) == 0
     next_action = "continue" if ok else "fix_required"
-    return {"ok": ok, "errors": errors, "warnings": warnings, "next_action": next_action}
+    return {
+        "ok": ok,
+        "errors": errors,
+        "warnings": warnings,
+        "next_action": next_action,
+    }
 
 
 async def _validate_after_bundle(conversation_id: str) -> dict:
@@ -178,7 +191,12 @@ async def _validate_after_bundle(conversation_id: str) -> dict:
 
     ok = len(errors) == 0
     next_action = "continue" if ok else "fix_required"
-    return {"ok": ok, "errors": errors, "warnings": warnings, "next_action": next_action}
+    return {
+        "ok": ok,
+        "errors": errors,
+        "warnings": warnings,
+        "next_action": next_action,
+    }
 
 
 async def _validate_after_rules(conversation_id: str) -> dict:
@@ -197,12 +215,10 @@ async def _validate_after_inspection(conversation_id: str) -> dict:
 
     entries = get_log_store().get(conversation_id)
     upload_success = any(
-        e.get("phase") == "upload" and e.get("status") == "success"
-        for e in entries
+        e.get("phase") == "upload" and e.get("status") == "success" for e in entries
     )
     upload_error = [
-        e for e in entries
-        if e.get("phase") == "upload" and e.get("status") == "error"
+        e for e in entries if e.get("phase") == "upload" and e.get("status") == "error"
     ]
 
     if upload_success:

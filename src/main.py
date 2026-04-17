@@ -411,7 +411,6 @@ async def create_server():
     async def validate_pipeline_step_endpoint(request: Request):
         return await handle_validate_pipeline_step(request)
 
-
     @server.custom_route("/enrich-spec", methods=["POST"])
     async def enrich_spec_endpoint(request: Request):
         return await handle_enrich_spec(request)

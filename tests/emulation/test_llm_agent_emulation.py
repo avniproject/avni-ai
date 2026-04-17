@@ -33,13 +33,16 @@ ASTITVA_FILES = [
 
 pytestmark = [
     pytest.mark.skipif(not ANTHROPIC_API_KEY, reason="No ANTHROPIC_API_KEY"),
-    pytest.mark.skipif(not all(f.exists() for f in ASTITVA_FILES), reason="Astitva files not present"),
+    pytest.mark.skipif(
+        not all(f.exists() for f in ASTITVA_FILES), reason="Astitva files not present"
+    ),
 ]
 
 
 @pytest.fixture(scope="module")
 def astitva_entities() -> dict:
     from src.bundle.scoping_parser import consolidate_and_audit
+
     result = consolidate_and_audit([str(f) for f in ASTITVA_FILES], org_name="astitva")
     return result["entities"]
 
@@ -53,16 +56,24 @@ async def _setup_and_get_gate_errors(
     client: httpx.AsyncClient, cid: str, entities: dict
 ) -> dict:
     """Set up entities + spec and return gate validation result."""
-    await client.post("/store-entities", json={"conversation_id": cid, "entities": entities})
-    await client.post("/generate-spec", json={"conversation_id": cid, "org_name": "astitva"})
-    resp = await client.post("/validate-pipeline-step", json={"conversation_id": cid, "phase": "spec"})
+    await client.post(
+        "/store-entities", json={"conversation_id": cid, "entities": entities}
+    )
+    await client.post(
+        "/generate-spec", json={"conversation_id": cid, "org_name": "astitva"}
+    )
+    resp = await client.post(
+        "/validate-pipeline-step", json={"conversation_id": cid, "phase": "spec"}
+    )
     return resp.json()
 
 
 def _build_agent_memory(gate_result: dict) -> str:
     """Build agent_memory string as the Dify Gate Parser would."""
     parts = []
-    parts.append("[spec] Spec generated successfully. 3 subject types, 3 programs, 19 encounter types.")
+    parts.append(
+        "[spec] Spec generated successfully. 3 subject types, 3 programs, 19 encounter types."
+    )
     parts.append("---")
     for err in gate_result.get("errors", []):
         parts.append(f"[GATE ERROR] {err}")
@@ -172,10 +183,12 @@ async def _call_claude(
     text_output = ""
     for block in response.content:
         if block.type == "tool_use":
-            tool_calls.append({
-                "name": block.name,
-                "input": block.input,
-            })
+            tool_calls.append(
+                {
+                    "name": block.name,
+                    "input": block.input,
+                }
+            )
         elif block.type == "text":
             text_output += block.text
 
@@ -191,11 +204,16 @@ class TestLLMSpecAgentGateHandling:
     """Test that the LLM spec agent correctly handles gate errors."""
 
     async def test_spec_agent_detects_gate_errors(
-        self, client: httpx.AsyncClient, conversation_id: str,
-        astitva_entities: dict, spec_agent_prompt: str,
+        self,
+        client: httpx.AsyncClient,
+        conversation_id: str,
+        astitva_entities: dict,
+        spec_agent_prompt: str,
     ):
         """When gate reports errors, spec agent should try to fix them."""
-        gate = await _setup_and_get_gate_errors(client, conversation_id, astitva_entities)
+        gate = await _setup_and_get_gate_errors(
+            client, conversation_id, astitva_entities
+        )
         agent_memory = _build_agent_memory(gate)
         tools = _build_tools()
 
@@ -207,7 +225,7 @@ class TestLLMSpecAgentGateHandling:
             conversation_id=conversation_id,
         )
 
-        print(f"\n--- LLM Response ---")
+        print("\n--- LLM Response ---")
         print(f"  Stop reason: {result['stop_reason']}")
         print(f"  Tool calls: {len(result['tool_calls'])}")
         for tc in result["tool_calls"]:
@@ -227,18 +245,22 @@ class TestLLMSpecAgentGateHandling:
         )
 
     async def test_spec_agent_reads_entities_for_fix(
-        self, client: httpx.AsyncClient, conversation_id: str,
-        astitva_entities: dict, spec_agent_prompt: str,
+        self,
+        client: httpx.AsyncClient,
+        conversation_id: str,
+        astitva_entities: dict,
+        spec_agent_prompt: str,
     ):
         """Agent should read encounter_types to understand and fix the errors."""
-        gate = await _setup_and_get_gate_errors(client, conversation_id, astitva_entities)
+        gate = await _setup_and_get_gate_errors(
+            client, conversation_id, astitva_entities
+        )
         agent_memory = _build_agent_memory(gate)
         tools = _build_tools()
 
         # Simulate agent already logged start, now needs to fix
         agent_memory_with_log = (
-            agent_memory + "\n---\n"
-            "[spec] Phase started. Will fix GATE ERRORs."
+            agent_memory + "\n---\n[spec] Phase started. Will fix GATE ERRORs."
         )
 
         result = await _call_claude(
@@ -250,21 +272,27 @@ class TestLLMSpecAgentGateHandling:
         )
 
         tool_names = [tc["name"] for tc in result["tool_calls"]]
-        print(f"\n--- Agent tool calls ---")
+        print("\n--- Agent tool calls ---")
         for tc in result["tool_calls"]:
             print(f"  {tc['name']}({json.dumps(tc['input'])[:120]})")
 
         # Agent should try to read entities to understand the error
-        assert "get_entities_section" in tool_names or "update_entities_section" in tool_names, (
-            f"Agent didn't try to read/fix entities. Calls: {tool_names}"
-        )
+        assert (
+            "get_entities_section" in tool_names
+            or "update_entities_section" in tool_names
+        ), f"Agent didn't try to read/fix entities. Calls: {tool_names}"
 
     async def test_spec_agent_asks_user_when_ambiguous(
-        self, client: httpx.AsyncClient, conversation_id: str,
-        astitva_entities: dict, spec_agent_prompt: str,
+        self,
+        client: httpx.AsyncClient,
+        conversation_id: str,
+        astitva_entities: dict,
+        spec_agent_prompt: str,
     ):
         """When the fix is ambiguous, agent should ask the user instead of guessing."""
-        gate = await _setup_and_get_gate_errors(client, conversation_id, astitva_entities)
+        gate = await _setup_and_get_gate_errors(
+            client, conversation_id, astitva_entities
+        )
 
         # Add a gate error that requires user input
         gate["errors"].append(
@@ -283,7 +311,7 @@ class TestLLMSpecAgentGateHandling:
             conversation_id=conversation_id,
         )
 
-        print(f"\n--- Agent response ---")
+        print("\n--- Agent response ---")
         print(f"  Stop reason: {result['stop_reason']}")
         if result["text"]:
             print(f"  Text: {result['text'][:500]}")
@@ -293,8 +321,7 @@ class TestLLMSpecAgentGateHandling:
         # Agent should either ask the user (text response with question)
         # or try to fix it (tool call to get/update entities)
         # Both are acceptable — the key is it doesn't crash or ignore the error
-        did_something = (
-            len(result["tool_calls"]) > 0
-            or ("?" in result["text"] or "which" in result["text"].lower())
+        did_something = len(result["tool_calls"]) > 0 or (
+            "?" in result["text"] or "which" in result["text"].lower()
         )
         assert did_something, "Agent ignored the gate errors entirely"
