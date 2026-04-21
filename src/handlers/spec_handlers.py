@@ -1530,7 +1530,26 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
             ]
             return f"subject_type '{target_name}': removed"
         if "registrationform" in opt_lower.replace(" ", ""):
-            entities.setdefault("forms", []).append(
+            # Adopt an existing orphan IndividualProfile form for this subject
+            # type (parser may have created one but with mismatched metadata).
+            # Avoids duplicates that later collide on UUID in the bundle.
+            forms = entities.setdefault("forms", [])
+            orphan = next(
+                (
+                    f
+                    for f in forms
+                    if f.get("formType") == "IndividualProfile"
+                    and (
+                        f.get("subjectType") == target_name
+                        or target_name.lower() in (f.get("name") or "").lower()
+                    )
+                ),
+                None,
+            )
+            if orphan is not None:
+                orphan["subjectType"] = target_name
+                return f"subject_type '{target_name}': adopted existing IndividualProfile form '{orphan.get('name')}'"
+            forms.append(
                 {
                     "name": f"{target_name} Registration",
                     "formType": "IndividualProfile",
@@ -1564,6 +1583,38 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
             form_type = (
                 "ProgramEncounter" if enc.get("is_program_encounter") else "Encounter"
             )
+            # Check for an existing orphan form that could legitimately belong
+            # to this encounter (matches by name or encounterType). The parser
+            # often creates the form but with program/subject metadata that
+            # doesn't line up with the encounter, so _find_form misses it and
+            # enrich_spec flags the encounter as "no form" even though a form
+            # exists. Adopt the orphan by correcting its metadata instead of
+            # adding a second form — two forms collide on deterministic UUIDs
+            # in the bundle.
+            forms = entities.setdefault("forms", [])
+            orphan = next(
+                (
+                    f
+                    for f in forms
+                    if (
+                        f.get("encounterType") == target_name
+                        or f.get("name") == target_name
+                    )
+                    and f.get("formType")
+                    in ("Encounter", "ProgramEncounter", form_type)
+                ),
+                None,
+            )
+            if orphan is not None:
+                orphan["formType"] = form_type
+                orphan["encounterType"] = target_name
+                if enc.get("subject_type"):
+                    orphan["subjectType"] = enc["subject_type"]
+                if enc.get("program_name"):
+                    orphan["program"] = enc["program_name"]
+                elif "program" in orphan and not enc.get("program_name"):
+                    orphan.pop("program", None)
+                return f"encounter_type '{target_name}': adopted existing form '{orphan.get('name')}' ({form_type})"
             new_form = {
                 "name": target_name,
                 "formType": form_type,
@@ -1573,7 +1624,7 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
             }
             if enc.get("program_name"):
                 new_form["program"] = enc["program_name"]
-            entities.setdefault("forms", []).append(new_form)
+            forms.append(new_form)
             return f"encounter_type '{target_name}': added basic {form_type} form"
         if "map to an existing" in opt_lower:
             return f"encounter_type '{target_name}': map-to-existing requires extra input (skipped)"
@@ -1593,7 +1644,26 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
         if "enrolmentform" in opt_lower.replace(" ", ""):
             if prog is None:
                 return f"program '{target_name}': not found"
-            entities.setdefault("forms", []).append(
+            forms = entities.setdefault("forms", [])
+            orphan = next(
+                (
+                    f
+                    for f in forms
+                    if f.get("formType") == "ProgramEnrolment"
+                    and (
+                        f.get("program") == target_name
+                        or target_name.lower() in (f.get("name") or "").lower()
+                    )
+                ),
+                None,
+            )
+            if orphan is not None:
+                orphan["program"] = target_name
+                orphan["subjectType"] = prog.get("target_subject_type") or prog.get(
+                    "targetSubjectType"
+                )
+                return f"program '{target_name}': adopted existing enrolmentForm '{orphan.get('name')}'"
+            forms.append(
                 {
                     "name": f"{target_name} Enrolment",
                     "formType": "ProgramEnrolment",
