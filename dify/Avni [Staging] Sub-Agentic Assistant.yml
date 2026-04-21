@@ -167,14 +167,14 @@ workflow:
     value_type: string
   - description: 'Per-agent retry counters, stored as a JSON string because Dify
       cloud only reliably accepts boolean / string / array[object] for conversation
-      variables. Shape after json.loads: {spec, bundle_config, rules, reports,
-      inspect, admin} -> int.'
+      variables. After json.loads (treating empty as {}), shape is
+      spec/bundle_config/rules/reports/inspect/admin -> int. Populated lazily.'
     id: 23a2d981-fad6-4438-9bb9-c277a1b44c42
     name: retries
     selector:
     - conversation
     - retries
-    value: '{}'
+    value: ''
     value_type: string
   - description: Append-only log of phase transitions as a newline-separated string
       for observability/debugging.
@@ -186,15 +186,15 @@ workflow:
     value: ''
     value_type: string
   - description: 'Structured payload returned by the most recent agent, stored
-      as a JSON string. Shape after json.loads: intent, message, ambiguities,
-      applied_changes, target_phase, reason. Consumed by deterministic IF-ELSE
-      routing nodes.'
+      as a JSON string. After json.loads (treating empty as empty-dict), fields
+      are intent, message, ambiguities, applied_changes, target_phase, reason.
+      Consumed by deterministic IF-ELSE routing nodes.'
     id: f81440ee-c8be-4235-915f-eceb4d47df9f
     name: agent_structured
     selector:
     - conversation
     - agent_structured
-    value: '{}'
+    value: ''
     value_type: string
   environment_variables:
   - description: ''
