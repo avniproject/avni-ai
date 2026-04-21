@@ -95,3 +95,6 @@ tools/agent-debugger/package-lock.json
 
 # Misc
 extract.txt
+# Local-only debug dumps (HAR exports, scratch API responses)
+conv_har_*.txt
+scratch_*.json
