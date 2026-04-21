@@ -102,9 +102,9 @@ workflow:
     value: ''
     value_type: string
   - description: 'Flag-driven routing: current state machine phase. Enum — intake,
-      spec_gathering, spec_awaiting_user, spec_correcting, bundle_generating,
-      bundle_correcting, bundle_awaiting_user, rules_generating, reports_generating,
-      inspecting, uploading, completed, failed, rag, assistant, out_of_scope.'
+      spec_gathering, spec_awaiting_user, spec_correcting, bundle_generating, bundle_correcting,
+      bundle_awaiting_user, rules_generating, reports_generating, inspecting, uploading,
+      completed, failed, rag, assistant, out_of_scope.'
     id: c5468d0e-dc76-4103-a1b0-c4d1da7fea4b
     name: active_phase
     selector:
@@ -112,8 +112,8 @@ workflow:
     - active_phase
     value: intake
     value_type: string
-  - description: 'True iff active_phase == spec_awaiting_user. Used by the pre-Orchestrator
-      short-circuit to bypass LLM classification on gap-fix continuation turns.'
+  - description: True iff active_phase == spec_awaiting_user. Used by the pre-Orchestrator
+      short-circuit to bypass LLM classification on gap-fix continuation turns.
     id: 1103bd6a-9f6d-4c17-a1ae-2efd2a2a2218
     name: spec_awaiting_user_input
     selector:
@@ -122,8 +122,8 @@ workflow:
     value: false
     value_type: boolean
   - description: 'Structured list of pending ambiguity questions from enrich_spec.
-      Survives across turns so the Spec Agent reading a user reply does not need
-      to refetch. Shape: {id, question, options, target_section, target_store}.'
+      Survives across turns so the Spec Agent reading a user reply does not need to
+      refetch. Shape: {id, question, options, target_section, target_store}.'
     id: 07169e52-4142-41fc-b21e-f404065cf936
     name: pending_ambiguities
     selector:
@@ -131,8 +131,7 @@ workflow:
     - pending_ambiguities
     value: []
     value_type: array[object]
-  - description: 'Last pipeline gate status. Enum — not_run, ok, errors,
-      user_input_needed.'
+  - description: Last pipeline gate status. Enum — not_run, ok, errors, user_input_needed.
     id: 2bf03c81-3bea-4703-886f-d34bcc8913bd
     name: last_gate_status
     selector:
@@ -141,8 +140,7 @@ workflow:
     value: not_run
     value_type: string
   - description: Last gate error snapshot as a newline-separated string (Dify only
-      reliably supports boolean / string / object / array[object] conversation
-      variables).
+      reliably supports boolean / string / object / array[object] conversation variables).
     id: 834e8612-cc1b-438b-acba-4b03cc85e67b
     name: last_gate_errors
     selector:
@@ -159,8 +157,7 @@ workflow:
     value: ''
     value_type: string
   - description: Raw user reply for the current turn. Populated from sys.query at
-      the start of every user message so downstream agents can read it without
-      re-parsing.
+      the start of every user message so downstream agents can read it without re-parsing.
     id: bbcfe39a-bc8e-4b6c-b042-f7a606366c15
     name: user_last_answer
     selector:
@@ -187,9 +184,9 @@ workflow:
     - phase_history
     value: ''
     value_type: string
-  - description: Structured payload returned by the most recent agent (intent,
-      message, ambiguities, applied_changes, target_phase, reason). Consumed by
-      deterministic IF-ELSE routing nodes.
+  - description: Structured payload returned by the most recent agent (intent, message,
+      ambiguities, applied_changes, target_phase, reason). Consumed by deterministic
+      IF-ELSE routing nodes.
     id: f81440ee-c8be-4235-915f-eceb4d47df9f
     name: agent_structured
     selector:
@@ -220,17 +217,6 @@ workflow:
       allowed_file_upload_methods:
       - local_file
       enabled: true
-      fileUploadConfig:
-        attachment_image_file_size_limit: 2
-        audio_file_size_limit: 50
-        batch_count_limit: 5
-        file_size_limit: 15
-        file_upload_limit: 50
-        image_file_batch_limit: 10
-        image_file_size_limit: 10
-        single_chunk_attachment_limit: 10
-        video_file_size_limit: 100
-        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -1291,116 +1277,116 @@ workflow:
             \ RAG and ASSISTANT**\n\n**HARD OVERRIDE — gap-fix continuation (defense-in-depth;\
             \ the workflow normally short-circuits past this classifier via the Spec\
             \ Awaiting Check IF-ELSE node when conversation.spec_awaiting_user_input\
-            \ is true, so this rule is only a fallback):**\nScan the MOST RECENT\
-            \ assistant turn in the conversation history. If it contains either (a)\
-            \ a fenced ```json``` block with `\\\"intent\\\": \\\"ask_user\\\"`, or\
-            \ (b) the legacy literal token `[AWAITING_USER_INPUT]` (pre-Stage-A agents),\
-            \ this user message is a reply to a pending Spec Agent gap-fix question.\
-            \ You MUST route:\n  service = BUNDLE_SETUP\n  initial_agent = spec\n\
-            \  workflow_mode = generic\n  clarification_needed = false\n  routing_reason\
-            \ = \"Continuation of Spec Agent gap-fix dialog (prior turn asked user).\"\
-            \nApply this rule even when the user's reply is terse (\"remove all\"\
-            , \"use defaults\", \"option B for all\", \"1:A, 2:B, 3:Remove\", \"yes\"\
-            , \"no\"), looks like a deletion request, looks out-of-scope, or mentions\
-            \ nothing about Avni. Terse corrections during an active setup are never\
-            \ RAG/ASSISTANT/OUT_OF_SCOPE.\n\n**Route BUNDLE_SETUP when ANY of the following:**\n\
-            1. The file upload status above shows files were uploaded (has_files =\
-            \ true)\n2. User's message mentions uploading a file, SRS, scoping sheet,\
-            \ or specification document\n3. The conversation already has BUNDLE_SETUP\
-            \ activity (earlier assistant turns produced spec/bundle/upload output,\
-            \ even if no ask_user JSON), AND the current user message is a short reply\
-            \ or continuation — e.g., \"proceed\", \"approve\", \"approved\", \"looks\
-            \ good\", \"yes go ahead\", \"no change\", \"remove X\", \"keep X\", \"\
-            option A\", \"1, 2, 3\", \"use defaults\", \"what's next?\", \"continue\"\
-            , any message under 200 chars that reads as a reply rather than a new question.\n\
+            \ is true, so this rule is only a fallback):**\nScan the MOST RECENT assistant\
+            \ turn in the conversation history. If it contains either (a) a fenced\
+            \ ```json``` block with `\\\"intent\\\": \\\"ask_user\\\"`, or (b) the\
+            \ legacy literal token `[AWAITING_USER_INPUT]` (pre-Stage-A agents), this\
+            \ user message is a reply to a pending Spec Agent gap-fix question. You\
+            \ MUST route:\n  service = BUNDLE_SETUP\n  initial_agent = spec\n  workflow_mode\
+            \ = generic\n  clarification_needed = false\n  routing_reason = \"Continuation\
+            \ of Spec Agent gap-fix dialog (prior turn asked user).\"\nApply this\
+            \ rule even when the user's reply is terse (\"remove all\", \"use defaults\"\
+            , \"option B for all\", \"1:A, 2:B, 3:Remove\", \"yes\", \"no\"), looks\
+            \ like a deletion request, looks out-of-scope, or mentions nothing about\
+            \ Avni. Terse corrections during an active setup are never RAG/ASSISTANT/OUT_OF_SCOPE.\n\
+            \n**Route BUNDLE_SETUP when ANY of the following:**\n1. The file upload\
+            \ status above shows files were uploaded (has_files = true)\n2. User's\
+            \ message mentions uploading a file, SRS, scoping sheet, or specification\
+            \ document\n3. The conversation already has BUNDLE_SETUP activity (earlier\
+            \ assistant turns produced spec/bundle/upload output, even if no ask_user\
+            \ JSON), AND the current user message is a short reply or continuation\
+            \ — e.g., \"proceed\", \"approve\", \"approved\", \"looks good\", \"yes\
+            \ go ahead\", \"no change\", \"remove X\", \"keep X\", \"option A\", \"\
+            1, 2, 3\", \"use defaults\", \"what's next?\", \"continue\", any message\
+            \ under 200 chars that reads as a reply rather than a new question.\n\
             4. User explicitly says \"upload SRS\", \"upload spec\", \"upload field\
-            \ workflow\", \"generate bundle from file\"\n\
-            \n**When routing BUNDLE_SETUP, ALWAYS set initial_agent = \\\"spec\\\" and\
-            \ workflow_mode = \\\"generic\\\"**. The spec agent must run first to parse\
-            \ the SRS and extract entities before bundle generation. For the HARD OVERRIDE\
-            \ case above, `initial_agent = spec` is non-negotiable — the Spec Agent\
-            \ is the only agent that can apply the user's gap-fix answers.\n\n**Do NOT\
-            \ route here for:**\n- Verbal SRS description without a file (and no prior\
-            \ BUNDLE_SETUP activity) → ASSISTANT\n- General Avni platform questions\
-            \ (when conversation has no active setup) → RAG\n\n\n### RAG -\
-            \ Platform Knowledge & Capabilities\n\n\n**Primary Intent**: Learning\
-            \ what Avni can/cannot do\n\n\n**Definitive Indicators** (Route to RAG\
-            \ even if complex):\n- \"What is Avni?\" → RAG (basic platform knowledge)\n\
-            - \"Tell me about Avni\" → RAG (platform overview)\n- \"Is it possible\
-            \ to...\" → RAG (capability inquiry)\n- \"Can Avni...\" → RAG (platform\
-            \ capability)\n- \"Does Avni support...\" → RAG (feature question)\n-\
-            \ \"Is there a way to...\" → RAG (method inquiry)\n- \"How can I...\"\
-            \ → RAG (step-by-step guidance inquiry)\n- \"What are the limitations\
-            \ of...\" → RAG (constraint question)\n- \"How does Avni handle...\" →\
-            \ RAG (mechanism inquiry)\n\n\n**Key Principle**: Complexity of the scenario\
-            \ does NOT change the\nintent. A detailed capability question is still\
-            \ a capability question.\n\n\n\n### ASSISTANT - Custom/Novel Requirements\n\
-            \n\n**Primary Intent**: Building something new or unique\n\n\n**Indicators**:\
-            \ - \"We need something that doesn't exist...\" - \"Can you\nbuild/create/develop...\"\
-            \ - \"We have unique requirements...\" -\n\"Integration with external\
-            \ system X...\" - \"Delete everything and start fresh...\" - \"Clean slate\
-            \ configuration...\" - \"Remove all my current setup...\"\n\n\n### OUT_OF_SCOPE\
-            \ - Not Avni Related\n\n\n**Primary Intent**: Questions completely unrelated\
-            \ to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n\
-            - Questions for which no relevant context available in this prompt\n-\
-            \ General programming/coding questions not specific to Avni\n- Questions\
-            \ about other software platforms (Salesforce, Excel, etc.)\n- Personal\
-            \ questions, weather, news, entertainment\n- Academic questions unrelated\
-            \ to health/social programs\n- Technical questions about non-Avni systems\n\
-            - \"What is the capital of...\" / \"How do I cook...\" / \"What's the\
-            \ weather...\"\n- Questions about competitors without Avni context\n\n\
-            \n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\"\
-            ) should NOT be marked as OUT_OF_SCOPE. These require clarification to\
-            \ understand the user's actual intent.\n\n\n## Decision Framework\n\n\n\
-            **Step 1**: Check relevance - If clearly NOT about Avni/data collection\
-            \ → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**: If greeting message → Set\
-            \ clarification_needed = true\n\n\n**Step 2**: Identify the question type\
-            \ - If starts with capability\nquestions → RAG (STOP HERE) - If describes\
-            \ implementation needs →\nASSISTANT - If requests deletion/configuration\
-            \ changes → ASSISTANT\n\n\n## Critical Examples\n\n✅ User uploads Excel/CSV/ZIP\
-            \ file → **BUNDLE_SETUP** (highest priority)\n✅ \"Proceed with the spec\"\
-            \ when setup_mode_active=true → **BUNDLE_SETUP** (follow-up)\n✅ \"Here\
-            \ is my SRS\" (with file attached) → **BUNDLE_SETUP**\n\n✅ \"What is Avni?\"\
-            \ → **RAG** (basic platform knowledge)\n\n✅ \"Tell me about Avni platform\"\
-            \ → **RAG** (platform overview)\n\n✅ \"What does Avni do?\" → **RAG**\
-            \ (platform purpose/functionality)\n\n✅ \"Is it possible to automatically\
-            \ show selected answers from Clinical\nAssessment in Follow-up Visit forms?\"\
-            \ → **RAG** (capability question,\nregardless of technical complexity)\n\
-            \n✅ \"Can Avni restrict encounter forms to single entry per individual?\"\
-            \ →\n**RAG** (capability question)\n\n✅ \"Is there a way to integrate\
-            \ complex multi-step approval workflows?\"\n→ **RAG** (capability question,\
-            \ even if the workflow is complex)\n\n✅ \"What are catchments\"\n✅ \"\
-            What are user groups\"\n✅ \"What are identifiers\"\n✅ \"What is an identifier\
-            \ source\"\n✅ \"How do I create a new catchment\"\n✅ \"What is a program\"\
-            \n✅ \"What is a subject type\"\n✅ \"How can I setup the assignment feature\
-            \ in Avni?\" → **RAG** (step-by-step guidance question)\n\n✅ \"I want\
-            \ to delete my entire configuration and start fresh\" → **ASSISTANT**\
-            \ (implementation request for complete deletion)\n\n✅ \"Can you help me\
-            \ clean slate my Avni setup?\" → **ASSISTANT** (configuration deletion\
-            \ and rebuild request)\n\n✅ \"Remove everything and build a new configuration\"\
-            \ → **ASSISTANT** (delete and create request)\n\n\n\n✅ \"What is the capital\
-            \ of France?\" → **OUT_OF_SCOPE** (not related to Avni)\n\n\n✅ \"How do\
-            \ I write Python code for web scraping?\" → **OUT_OF_SCOPE** (general\
-            \ programming, not Avni-specific)\n\n\n✅ \"Can you help me with my Excel\
-            \ formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅ \"Hello\"\
-            \ → **RAG** with clarification_needed = true (greeting requires clarification)\n\
-            \n\n✅ \"Hi there\" → **RAG** with clarification_needed = true (greeting\
-            \ requires clarification)\n\n\n❌ **WRONG**: \"Sounds complex/custom →\
-            \ ASSISTANT\" ✅ **CORRECT**:\n\"Starts with capability question → RAG\"\
-            \n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap 1**: Complexity\
-            \ Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\" - ✅ \"Capability\
-            \ question = platform inquiry = RAG\"\n\n\n**Trap 2**: Implementation\
-            \ Details Bias - ❌ \"Mentions specific\ntechnical details = ASSISTANT\"\
-            \ - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**: Domain Specificity\
-            \ Bias - ❌ \"Very specific use case =\nASSISTANT\" - ✅ \"Question format\
-            \ determines intent\"\n\n\n**Trap 4**: Relevance Assumption - ❌ \"Any\
-            \ question = must be Avni-related\" - ✅ \"Check if actually about Avni/data\
-            \ collection first\"\n\n\n**Trap 5**: Greeting Misrouting - ❌ \"Greeting\
-            \ = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification to understand\
-            \ intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"service\": \"\
-            RAG|ASSISTANT|BUNDLE_SETUP|OUT_OF_SCOPE\",\n  \"initial_agent\": \"spec|bundle_config|rules|reports|inspect|admin\"\
-            ,\n  \"workflow_mode\": \"targeted|generic\",\n  \"confidence\": 0.0-1.0,\n\
-            \  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
+            \ workflow\", \"generate bundle from file\"\n\n**When routing BUNDLE_SETUP,\
+            \ ALWAYS set initial_agent = \\\"spec\\\" and workflow_mode = \\\"generic\\\
+            \"**. The spec agent must run first to parse the SRS and extract entities\
+            \ before bundle generation. For the HARD OVERRIDE case above, `initial_agent\
+            \ = spec` is non-negotiable — the Spec Agent is the only agent that can\
+            \ apply the user's gap-fix answers.\n\n**Do NOT route here for:**\n- Verbal\
+            \ SRS description without a file (and no prior BUNDLE_SETUP activity)\
+            \ → ASSISTANT\n- General Avni platform questions (when conversation has\
+            \ no active setup) → RAG\n\n\n### RAG - Platform Knowledge & Capabilities\n\
+            \n\n**Primary Intent**: Learning what Avni can/cannot do\n\n\n**Definitive\
+            \ Indicators** (Route to RAG even if complex):\n- \"What is Avni?\" →\
+            \ RAG (basic platform knowledge)\n- \"Tell me about Avni\" → RAG (platform\
+            \ overview)\n- \"Is it possible to...\" → RAG (capability inquiry)\n-\
+            \ \"Can Avni...\" → RAG (platform capability)\n- \"Does Avni support...\"\
+            \ → RAG (feature question)\n- \"Is there a way to...\" → RAG (method inquiry)\n\
+            - \"How can I...\" → RAG (step-by-step guidance inquiry)\n- \"What are\
+            \ the limitations of...\" → RAG (constraint question)\n- \"How does Avni\
+            \ handle...\" → RAG (mechanism inquiry)\n\n\n**Key Principle**: Complexity\
+            \ of the scenario does NOT change the\nintent. A detailed capability question\
+            \ is still a capability question.\n\n\n\n### ASSISTANT - Custom/Novel\
+            \ Requirements\n\n\n**Primary Intent**: Building something new or unique\n\
+            \n\n**Indicators**: - \"We need something that doesn't exist...\" - \"\
+            Can you\nbuild/create/develop...\" - \"We have unique requirements...\"\
+            \ -\n\"Integration with external system X...\" - \"Delete everything and\
+            \ start fresh...\" - \"Clean slate configuration...\" - \"Remove all my\
+            \ current setup...\"\n\n\n### OUT_OF_SCOPE - Not Avni Related\n\n\n**Primary\
+            \ Intent**: Questions completely unrelated to Avni or data collection\
+            \ platforms\n\n\n**Definitive Indicators**:\n- Questions for which no\
+            \ relevant context available in this prompt\n- General programming/coding\
+            \ questions not specific to Avni\n- Questions about other software platforms\
+            \ (Salesforce, Excel, etc.)\n- Personal questions, weather, news, entertainment\n\
+            - Academic questions unrelated to health/social programs\n- Technical\
+            \ questions about non-Avni systems\n- \"What is the capital of...\" /\
+            \ \"How do I cook...\" / \"What's the weather...\"\n- Questions about\
+            \ competitors without Avni context\n\n\n\n**EXCEPTION**: Greeting messages\
+            \ (\"Hi\", \"Hello\", \"Good morning\") should NOT be marked as OUT_OF_SCOPE.\
+            \ These require clarification to understand the user's actual intent.\n\
+            \n\n## Decision Framework\n\n\n**Step 1**: Check relevance - If clearly\
+            \ NOT about Avni/data collection → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**:\
+            \ If greeting message → Set clarification_needed = true\n\n\n**Step 2**:\
+            \ Identify the question type - If starts with capability\nquestions →\
+            \ RAG (STOP HERE) - If describes implementation needs →\nASSISTANT - If\
+            \ requests deletion/configuration changes → ASSISTANT\n\n\n## Critical\
+            \ Examples\n\n✅ User uploads Excel/CSV/ZIP file → **BUNDLE_SETUP** (highest\
+            \ priority)\n✅ \"Proceed with the spec\" when setup_mode_active=true →\
+            \ **BUNDLE_SETUP** (follow-up)\n✅ \"Here is my SRS\" (with file attached)\
+            \ → **BUNDLE_SETUP**\n\n✅ \"What is Avni?\" → **RAG** (basic platform\
+            \ knowledge)\n\n✅ \"Tell me about Avni platform\" → **RAG** (platform\
+            \ overview)\n\n✅ \"What does Avni do?\" → **RAG** (platform purpose/functionality)\n\
+            \n✅ \"Is it possible to automatically show selected answers from Clinical\n\
+            Assessment in Follow-up Visit forms?\" → **RAG** (capability question,\n\
+            regardless of technical complexity)\n\n✅ \"Can Avni restrict encounter\
+            \ forms to single entry per individual?\" →\n**RAG** (capability question)\n\
+            \n✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
+            \n→ **RAG** (capability question, even if the workflow is complex)\n\n\
+            ✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"What are identifiers\"\
+            \n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\
+            \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n✅ \"How can I\
+            \ setup the assignment feature in Avni?\" → **RAG** (step-by-step guidance\
+            \ question)\n\n✅ \"I want to delete my entire configuration and start\
+            \ fresh\" → **ASSISTANT** (implementation request for complete deletion)\n\
+            \n✅ \"Can you help me clean slate my Avni setup?\" → **ASSISTANT** (configuration\
+            \ deletion and rebuild request)\n\n✅ \"Remove everything and build a new\
+            \ configuration\" → **ASSISTANT** (delete and create request)\n\n\n\n\
+            ✅ \"What is the capital of France?\" → **OUT_OF_SCOPE** (not related to\
+            \ Avni)\n\n\n✅ \"How do I write Python code for web scraping?\" → **OUT_OF_SCOPE**\
+            \ (general programming, not Avni-specific)\n\n\n✅ \"Can you help me with\
+            \ my Excel formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅\
+            \ \"Hello\" → **RAG** with clarification_needed = true (greeting requires\
+            \ clarification)\n\n\n✅ \"Hi there\" → **RAG** with clarification_needed\
+            \ = true (greeting requires clarification)\n\n\n❌ **WRONG**: \"Sounds\
+            \ complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"Starts with capability\
+            \ question → RAG\"\n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap\
+            \ 1**: Complexity Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\"\
+            \ - ✅ \"Capability question = platform inquiry = RAG\"\n\n\n**Trap 2**:\
+            \ Implementation Details Bias - ❌ \"Mentions specific\ntechnical details\
+            \ = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**:\
+            \ Domain Specificity Bias - ❌ \"Very specific use case =\nASSISTANT\"\
+            \ - ✅ \"Question format determines intent\"\n\n\n**Trap 4**: Relevance\
+            \ Assumption - ❌ \"Any question = must be Avni-related\" - ✅ \"Check if\
+            \ actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting\
+            \ Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification\
+            \ to understand intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"\
+            service\": \"RAG|ASSISTANT|BUNDLE_SETUP|OUT_OF_SCOPE\",\n  \"initial_agent\"\
+            : \"spec|bundle_config|rules|reports|inspect|admin\",\n  \"workflow_mode\"\
+            : \"targeted|generic\",\n  \"confidence\": 0.0-1.0,\n  \"question_type\"\
+            : \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
             ,\n  \"routing_reason\": \"Brief explanation focusing on question structure,\
             \ not content complexity\",\n  \"clarification_needed\": true|false,\n\
             \  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\
@@ -4745,119 +4731,79 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: |
-          import re
-
-          def main(active_agent: str, workflow_mode: str, agent_output: str,
-                   agent_memory: str, last_gate_status: str,
-                   agent_structured: dict) -> dict:
-              """Stage B decider: deterministic routing from typed conversation
-              variables. Replaces the old ~60-line keyword-matching logic.
-
-              Inputs:
-                active_agent       conversation.active_agent
-                workflow_mode      conversation.workflow_mode
-                agent_output       latest agent text (for legacy fallback)
-                agent_memory       conversation.agent_memory (for [gate-ran]
-                                   retry counter, still used as the bounded-loop
-                                   source of truth)
-                last_gate_status   conversation.last_gate_status — ok | errors |
-                                   user_input_needed | not_run
-                agent_structured   conversation.agent_structured — last agent's
-                                   parsed JSON payload (intent, target_phase, ...)
-
-              Rule order:
-                1. targeted mode  -> done
-                2. intent=ask_user  -> pause (done)
-                3. intent=error     -> pause (done)
-                4. legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])
-                5. gate errors + under retry cap  -> re-run same agent
-                6. gate errors + over retry cap   -> done (fail)
-                7. gate user_input_needed          -> pause
-                8. gate ok / not_run               -> advance in chain
-              """
-              if workflow_mode == "targeted":
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": "Targeted mode — single agent only"}
-
-              intent = ""
-              if isinstance(agent_structured, dict):
-                  intent = str(agent_structured.get("intent", "") or "")
-
-              if intent == "ask_user":
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"{active_agent} intent=ask_user (structured)"}
-              if intent == "error":
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"{active_agent} intent=error (structured)"}
-
-              # Structured Inspector re_route: typed replacement for [ROUTE_TO:agent].
-              if intent == "re_route" and active_agent == "inspect":
-                  target = ""
-                  if isinstance(agent_structured, dict):
-                      target = str(agent_structured.get("re_route_target", "") or "")
-                  valid_targets = ("spec", "bundle_config", "rules", "reports")
-                  if target in valid_targets:
-                      mem_lc = (agent_memory or "").lower()
-                      if "[rerouted from inspect]" not in mem_lc:
-                          return {"next_agent": target, "loop_done": False,
-                                  "reason": f"Inspector re_route -> {target} (structured)"}
-
-              t = (agent_output or "").lower()
-              mem = (agent_memory or "").lower()
-
-              # Legacy fallback 1: pre-Stage-A [AWAITING_USER_INPUT] marker. Kept so
-              # in-flight conversations that started before the prompt update still
-              # route correctly. Safe to remove in Stage D.
-              if "[awaiting_user_input]" in t:
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"{active_agent} legacy [AWAITING_USER_INPUT] marker"}
-
-              # Legacy fallback 2: Inspector text-marker routing. Will be removed in
-              # Stage D once all in-flight conversations drain.
-              route_match = re.search(r"\[route_to:(\w+)\]", t)
-              if route_match and active_agent == "inspect":
-                  target = route_match.group(1)
-                  valid_targets = ("spec", "bundle_config", "rules", "reports")
-                  if target in valid_targets and "[rerouted from inspect]" not in mem:
-                      return {"next_agent": target, "loop_done": False,
-                              "reason": f"Inspector routing to {target} for fixes"}
-
-              MAX_RETRIES = 3
-              runs_so_far = mem.count(f"[gate-ran:{active_agent}]")
-
-              if last_gate_status == "errors":
-                  if runs_so_far < MAX_RETRIES:
-                      return {"next_agent": active_agent, "loop_done": False,
-                              "reason": (
-                                  f"Gate errors after {runs_so_far} run(s), "
-                                  f"re-running {active_agent} "
-                                  f"({runs_so_far}/{MAX_RETRIES})"
-                              )}
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": (
-                              f"Gate errors persist after {MAX_RETRIES} retries "
-                              f"of {active_agent}"
-                          )}
-
-              if last_gate_status == "user_input_needed":
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"Gate requests user input from {active_agent}"}
-
-              chain = ["spec", "bundle_config", "rules", "reports", "inspect"]
-              try:
-                  idx = chain.index(active_agent)
-              except ValueError:
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"Unknown agent: {active_agent}"}
-
-              if idx < len(chain) - 1:
-                  next_a = chain[idx + 1]
-                  return {"next_agent": next_a, "loop_done": False,
-                          "reason": f"{active_agent} done, advancing to {next_a}"}
-
-              return {"next_agent": "done", "loop_done": True,
-                      "reason": "End of chain"}
+        code: "import re\n\ndef main(active_agent: str, workflow_mode: str, agent_output:\
+          \ str,\n         agent_memory: str, last_gate_status: str,\n         agent_structured:\
+          \ dict) -> dict:\n    \"\"\"Stage B decider: deterministic routing from\
+          \ typed conversation\n    variables. Replaces the old ~60-line keyword-matching\
+          \ logic.\n\n    Inputs:\n      active_agent       conversation.active_agent\n\
+          \      workflow_mode      conversation.workflow_mode\n      agent_output\
+          \       latest agent text (for legacy fallback)\n      agent_memory    \
+          \   conversation.agent_memory (for [gate-ran]\n                        \
+          \ retry counter, still used as the bounded-loop\n                      \
+          \   source of truth)\n      last_gate_status   conversation.last_gate_status\
+          \ — ok | errors |\n                         user_input_needed | not_run\n\
+          \      agent_structured   conversation.agent_structured — last agent's\n\
+          \                         parsed JSON payload (intent, target_phase, ...)\n\
+          \n    Rule order:\n      1. targeted mode  -> done\n      2. intent=ask_user\
+          \  -> pause (done)\n      3. intent=error     -> pause (done)\n      4.\
+          \ legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])\n      5. gate errors\
+          \ + under retry cap  -> re-run same agent\n      6. gate errors + over retry\
+          \ cap   -> done (fail)\n      7. gate user_input_needed          -> pause\n\
+          \      8. gate ok / not_run               -> advance in chain\n    \"\"\"\
+          \n    if workflow_mode == \"targeted\":\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": \"Targeted\
+          \ mode — single agent only\"}\n\n    intent = \"\"\n    if isinstance(agent_structured,\
+          \ dict):\n        intent = str(agent_structured.get(\"intent\", \"\") or\
+          \ \"\")\n\n    if intent == \"ask_user\":\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
+          \ intent=ask_user (structured)\"}\n    if intent == \"error\":\n       \
+          \ return {\"next_agent\": \"done\", \"loop_done\": True,\n             \
+          \   \"reason\": f\"{active_agent} intent=error (structured)\"}\n\n    #\
+          \ Structured Inspector re_route: typed replacement for [ROUTE_TO:agent].\n\
+          \    if intent == \"re_route\" and active_agent == \"inspect\":\n      \
+          \  target = \"\"\n        if isinstance(agent_structured, dict):\n     \
+          \       target = str(agent_structured.get(\"re_route_target\", \"\") or\
+          \ \"\")\n        valid_targets = (\"spec\", \"bundle_config\", \"rules\"\
+          , \"reports\")\n        if target in valid_targets:\n            mem_lc\
+          \ = (agent_memory or \"\").lower()\n            if \"[rerouted from inspect]\"\
+          \ not in mem_lc:\n                return {\"next_agent\": target, \"loop_done\"\
+          : False,\n                        \"reason\": f\"Inspector re_route -> {target}\
+          \ (structured)\"}\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory\
+          \ or \"\").lower()\n\n    # Legacy fallback 1: pre-Stage-A [AWAITING_USER_INPUT]\
+          \ marker. Kept so\n    # in-flight conversations that started before the\
+          \ prompt update still\n    # route correctly. Safe to remove in Stage D.\n\
+          \    if \"[awaiting_user_input]\" in t:\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
+          \ legacy [AWAITING_USER_INPUT] marker\"}\n\n    # Legacy fallback 2: Inspector\
+          \ text-marker routing. Will be removed in\n    # Stage D once all in-flight\
+          \ conversations drain.\n    route_match = re.search(r\"\\[route_to:(\\w+)\\\
+          ]\", t)\n    if route_match and active_agent == \"inspect\":\n        target\
+          \ = route_match.group(1)\n        valid_targets = (\"spec\", \"bundle_config\"\
+          , \"rules\", \"reports\")\n        if target in valid_targets and \"[rerouted\
+          \ from inspect]\" not in mem:\n            return {\"next_agent\": target,\
+          \ \"loop_done\": False,\n                    \"reason\": f\"Inspector routing\
+          \ to {target} for fixes\"}\n\n    MAX_RETRIES = 3\n    runs_so_far = mem.count(f\"\
+          [gate-ran:{active_agent}]\")\n\n    if last_gate_status == \"errors\":\n\
+          \        if runs_so_far < MAX_RETRIES:\n            return {\"next_agent\"\
+          : active_agent, \"loop_done\": False,\n                    \"reason\": (\n\
+          \                        f\"Gate errors after {runs_so_far} run(s), \"\n\
+          \                        f\"re-running {active_agent} \"\n             \
+          \           f\"({runs_so_far}/{MAX_RETRIES})\"\n                    )}\n\
+          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n      \
+          \          \"reason\": (\n                    f\"Gate errors persist after\
+          \ {MAX_RETRIES} retries \"\n                    f\"of {active_agent}\"\n\
+          \                )}\n\n    if last_gate_status == \"user_input_needed\"\
+          :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n    \
+          \            \"reason\": f\"Gate requests user input from {active_agent}\"\
+          }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"\
+          inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
+          \ ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\":\
+          \ True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
+          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n   \
+          \     return {\"next_agent\": next_a, \"loop_done\": False,\n          \
+          \      \"reason\": f\"{active_agent} done, advancing to {next_a}\"}\n\n\
+          \    return {\"next_agent\": \"done\", \"loop_done\": True,\n          \
+          \  \"reason\": \"End of chain\"}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5302,53 +5248,30 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: |
-          import json
-
-          def main(gate_status: int, gate_body: str, agent_memory: str,
-                   active_agent: str) -> dict:
-              has_errors = False
-              gate_output = ""
-              last_gate_status = "not_run"
-              last_gate_errors_str = ""
-              last_gate_warnings_str = ""
-              try:
-                  parsed = json.loads(gate_body) if gate_body else {}
-                  errors = parsed.get("errors", []) or []
-                  warnings = parsed.get("warnings", []) or []
-                  next_action = parsed.get("next_action", "")
-                  has_errors = len(errors) > 0
-                  last_gate_errors_str = chr(10).join(str(e) for e in errors)
-                  last_gate_warnings_str = chr(10).join(str(w) for w in warnings)
-                  if next_action == "user_input_needed":
-                      has_errors = False
-                      last_gate_status = "user_input_needed"
-                  elif has_errors:
-                      last_gate_status = "errors"
-                  else:
-                      last_gate_status = "ok"
-                  parts = []
-                  for err in errors:
-                      parts.append("[GATE ERROR] " + str(err))
-                  for warn in warnings[:5]:
-                      parts.append("[GATE WARNING] " + str(warn))
-                  # Always log this gate run so the decider can count attempts.
-                  if active_agent:
-                      parts.append("[gate-ran:" + active_agent + "]")
-                  gate_output = chr(10).join(parts)
-              except Exception:
-                  pass
-              if gate_status >= 400:
-                  has_errors = False
-                  last_gate_status = "errors"
-                  last_gate_errors_str = f"Gate HTTP {gate_status}"
-              return {
-                  "has_questions": has_errors,
-                  "gate_output": gate_output,
-                  "last_gate_status": last_gate_status,
-                  "last_gate_errors": last_gate_errors_str,
-                  "last_gate_warnings": last_gate_warnings_str,
-              }
+        code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
+          \ str,\n         active_agent: str) -> dict:\n    has_errors = False\n \
+          \   gate_output = \"\"\n    last_gate_status = \"not_run\"\n    last_gate_errors_str\
+          \ = \"\"\n    last_gate_warnings_str = \"\"\n    try:\n        parsed =\
+          \ json.loads(gate_body) if gate_body else {}\n        errors = parsed.get(\"\
+          errors\", []) or []\n        warnings = parsed.get(\"warnings\", []) or\
+          \ []\n        next_action = parsed.get(\"next_action\", \"\")\n        has_errors\
+          \ = len(errors) > 0\n        last_gate_errors_str = chr(10).join(str(e)\
+          \ for e in errors)\n        last_gate_warnings_str = chr(10).join(str(w)\
+          \ for w in warnings)\n        if next_action == \"user_input_needed\":\n\
+          \            has_errors = False\n            last_gate_status = \"user_input_needed\"\
+          \n        elif has_errors:\n            last_gate_status = \"errors\"\n\
+          \        else:\n            last_gate_status = \"ok\"\n        parts = []\n\
+          \        for err in errors:\n            parts.append(\"[GATE ERROR] \"\
+          \ + str(err))\n        for warn in warnings[:5]:\n            parts.append(\"\
+          [GATE WARNING] \" + str(warn))\n        # Always log this gate run so the\
+          \ decider can count attempts.\n        if active_agent:\n            parts.append(\"\
+          [gate-ran:\" + active_agent + \"]\")\n        gate_output = chr(10).join(parts)\n\
+          \    except Exception:\n        pass\n    if gate_status >= 400:\n     \
+          \   has_errors = False\n        last_gate_status = \"errors\"\n        last_gate_errors_str\
+          \ = f\"Gate HTTP {gate_status}\"\n    return {\n        \"has_questions\"\
+          : has_errors,\n        \"gate_output\": gate_output,\n        \"last_gate_status\"\
+          : last_gate_status,\n        \"last_gate_errors\": last_gate_errors_str,\n\
+          \        \"last_gate_warnings\": last_gate_warnings_str,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5357,9 +5280,9 @@ workflow:
             type: string
           has_questions:
             type: boolean
-          last_gate_status:
-            type: string
           last_gate_errors:
+            type: string
+          last_gate_status:
             type: string
           last_gate_warnings:
             type: string
@@ -5469,109 +5392,67 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: |
-          import json
-          import re
-
-          def main(agent_output: str, active_agent: str,
-                   current_active_phase: str,
-                   current_spec_awaiting: bool,
-                   current_pending_ambiguities: list) -> dict:
-              """Parse the structured JSON block emitted at the end of an agent's
-              response and compute new conversation-variable values. Pass-through
-              the current state when no JSON block is found so downstream assigners
-              can overwrite unconditionally without losing state.
-              """
-              intent = ""
-              target_phase = ""
-              ambiguities = []
-              applied_changes = []
-              reason = ""
-              parsed_ok = False
-              payload = None
-              text = agent_output or ""
-
-              # Prefer a fenced ```json ... ``` block.
-              m = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
-              if m:
-                  try:
-                      payload = json.loads(m.group(1))
-                  except Exception:
-                      payload = None
-
-              # Fall back: last brace-balanced object containing "intent".
-              if payload is None:
-                  for match in reversed(list(
-                      re.finditer(r"\{[^{}]*\"intent\"[^{}]*\}", text, re.DOTALL)
-                  )):
-                      try:
-                          payload = json.loads(match.group(0))
-                          break
-                      except Exception:
-                          continue
-
-              if isinstance(payload, dict):
-                  intent = str(payload.get("intent", "") or "")
-                  target_phase = str(payload.get("target_phase", "") or "")
-                  ambiguities = payload.get("ambiguities", []) or []
-                  applied_changes = payload.get("applied_changes", []) or []
-                  reason = str(payload.get("reason", "") or "")
-                  parsed_ok = True
-
-              # Computed pass-through outputs.
-              out_active_phase = (
-                  target_phase
-                  if (parsed_ok and target_phase)
-                  else (current_active_phase or "intake")
-              )
-              out_spec_awaiting = (
-                  bool(parsed_ok and intent == "ask_user" and active_agent == "spec")
-                  if parsed_ok
-                  else bool(current_spec_awaiting)
-              )
-              out_pending_ambiguities = (
-                  ambiguities
-                  if (parsed_ok and intent == "ask_user")
-                  else (current_pending_ambiguities or [])
-              )
-              raw_payload = payload if isinstance(payload, dict) else {}
-
-              return {
-                  "intent": intent,
-                  "target_phase": target_phase,
-                  "ambiguities": ambiguities,
-                  "applied_changes": applied_changes,
-                  "reason": reason,
-                  "parsed_ok": parsed_ok,
-                  "out_active_phase": out_active_phase,
-                  "out_spec_awaiting": out_spec_awaiting,
-                  "out_pending_ambiguities": out_pending_ambiguities,
-                  "raw_payload": raw_payload,
-              }
+        code: "import json\nimport re\n\ndef main(agent_output: str, active_agent:\
+          \ str,\n         current_active_phase: str,\n         current_spec_awaiting:\
+          \ bool,\n         current_pending_ambiguities: list) -> dict:\n    \"\"\"\
+          Parse the structured JSON block emitted at the end of an agent's\n    response\
+          \ and compute new conversation-variable values. Pass-through\n    the current\
+          \ state when no JSON block is found so downstream assigners\n    can overwrite\
+          \ unconditionally without losing state.\n    \"\"\"\n    intent = \"\"\n\
+          \    target_phase = \"\"\n    ambiguities = []\n    applied_changes = []\n\
+          \    reason = \"\"\n    parsed_ok = False\n    payload = None\n    text\
+          \ = agent_output or \"\"\n\n    # Prefer a fenced ```json ... ``` block.\n\
+          \    m = re.search(r\"```json\\s*(\\{.*?\\})\\s*```\", text, re.DOTALL)\n\
+          \    if m:\n        try:\n            payload = json.loads(m.group(1))\n\
+          \        except Exception:\n            payload = None\n\n    # Fall back:\
+          \ last brace-balanced object containing \"intent\".\n    if payload is None:\n\
+          \        for match in reversed(list(\n            re.finditer(r\"\\{[^{}]*\\\
+          \"intent\\\"[^{}]*\\}\", text, re.DOTALL)\n        )):\n            try:\n\
+          \                payload = json.loads(match.group(0))\n                break\n\
+          \            except Exception:\n                continue\n\n    if isinstance(payload,\
+          \ dict):\n        intent = str(payload.get(\"intent\", \"\") or \"\")\n\
+          \        target_phase = str(payload.get(\"target_phase\", \"\") or \"\"\
+          )\n        ambiguities = payload.get(\"ambiguities\", []) or []\n      \
+          \  applied_changes = payload.get(\"applied_changes\", []) or []\n      \
+          \  reason = str(payload.get(\"reason\", \"\") or \"\")\n        parsed_ok\
+          \ = True\n\n    # Computed pass-through outputs.\n    out_active_phase =\
+          \ (\n        target_phase\n        if (parsed_ok and target_phase)\n   \
+          \     else (current_active_phase or \"intake\")\n    )\n    out_spec_awaiting\
+          \ = (\n        bool(parsed_ok and intent == \"ask_user\" and active_agent\
+          \ == \"spec\")\n        if parsed_ok\n        else bool(current_spec_awaiting)\n\
+          \    )\n    out_pending_ambiguities = (\n        ambiguities\n        if\
+          \ (parsed_ok and intent == \"ask_user\")\n        else (current_pending_ambiguities\
+          \ or [])\n    )\n    raw_payload = payload if isinstance(payload, dict)\
+          \ else {}\n\n    return {\n        \"intent\": intent,\n        \"target_phase\"\
+          : target_phase,\n        \"ambiguities\": ambiguities,\n        \"applied_changes\"\
+          : applied_changes,\n        \"reason\": reason,\n        \"parsed_ok\":\
+          \ parsed_ok,\n        \"out_active_phase\": out_active_phase,\n        \"\
+          out_spec_awaiting\": out_spec_awaiting,\n        \"out_pending_ambiguities\"\
+          : out_pending_ambiguities,\n        \"raw_payload\": raw_payload,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
         outputs:
-          intent:
-            type: string
-          target_phase:
-            type: string
           ambiguities:
             type: array[object]
           applied_changes:
             type: array[object]
-          reason:
+          intent:
             type: string
-          parsed_ok:
-            type: boolean
           out_active_phase:
             type: string
-          out_spec_awaiting:
-            type: boolean
           out_pending_ambiguities:
             type: array[object]
+          out_spec_awaiting:
+            type: boolean
+          parsed_ok:
+            type: boolean
           raw_payload:
             type: object
+          reason:
+            type: string
+          target_phase:
+            type: string
         selected: false
         title: Agent Structured Parser
         type: code
@@ -5738,9 +5619,9 @@ workflow:
             - spec_awaiting_user_input
           id: spec-awaiting
           logical_operator: and
-        desc: 'Short-circuit when a Spec Agent gap-fix question is pending.
-          Bypasses the Orchestrator LLM entirely and re-enters the agent loop
-          with active_agent=spec so the user reply is applied by the Spec Agent.'
+        desc: Short-circuit when a Spec Agent gap-fix question is pending. Bypasses
+          the Orchestrator LLM entirely and re-enters the agent loop with active_agent=spec
+          so the user reply is applied by the Spec Agent.
         selected: false
         title: Spec Awaiting Check
         type: if-else
@@ -5758,28 +5639,23 @@ workflow:
       type: custom
       width: 241
     - data:
-        code: |
-          def main(user_query: str) -> dict:
-              """Emit constants needed to resume the Spec Agent on a user reply
-              during a pending gap-fix. The downstream assigner copies these into
-              conversation variables so the graph converges with the normal
-              Set-Initial-Agent path at the File Check IF.
-              """
-              return {
-                  "active_agent": "spec",
-                  "workflow_mode": "generic",
-                  "active_phase": "spec_correcting",
-                  "user_last_answer": user_query or "",
-              }
+        code: "def main(user_query: str) -> dict:\n    \"\"\"Emit constants needed\
+          \ to resume the Spec Agent on a user reply\n    during a pending gap-fix.\
+          \ The downstream assigner copies these into\n    conversation variables\
+          \ so the graph converges with the normal\n    Set-Initial-Agent path at\
+          \ the File Check IF.\n    \"\"\"\n    return {\n        \"active_agent\"\
+          : \"spec\",\n        \"workflow_mode\": \"generic\",\n        \"active_phase\"\
+          : \"spec_correcting\",\n        \"user_last_answer\": user_query or \"\"\
+          ,\n    }\n"
         code_language: python3
         outputs:
           active_agent:
             type: string
-          workflow_mode:
-            type: string
           active_phase:
             type: string
           user_last_answer:
+            type: string
+          workflow_mode:
             type: string
         selected: false
         title: Resume Awaiting Values
