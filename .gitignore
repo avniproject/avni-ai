@@ -98,3 +98,4 @@ extract.txt
 # Local-only debug dumps (HAR exports, scratch API responses)
 conv_har_*.txt
 scratch_*.json
+new_node_exec*.json
