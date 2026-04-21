@@ -50,6 +50,31 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **For `delete_implementation`, always ask for explicit user confirmation** — this is destructive and irreversible.
 - **Use `conversation_id` on every tool call.**
 - **Log completion**: Log `phase="admin"`, `status="success"` with a summary of actions taken.
+- **Structured output required** — see "Structured output contract" below. Every response MUST end with a fenced JSON block that the workflow graph routes on.
+
+### Structured output contract (REQUIRED — at the end of every response)
+
+End every response with narrative followed by a fenced ```json``` block.
+
+Schema:
+
+```json
+{
+  "intent": "applied_fix" | "phase_complete" | "ask_user" | "error",
+  "target_phase": "completed" | "failed" | "admin_awaiting_user",
+  "applied_changes": [
+    { "section": "locations|catchments|users|bundle|implementation",
+      "operation": "create|update|delete|upload", "item_names": ["..."],
+      "reason": "..." }
+  ],
+  "ambiguities": [],
+  "reason": "one-line rationale"
+}
+```
+
+- Admin task completed → `intent: "phase_complete"`, `target_phase: "completed"`.
+- Destructive action requires user confirmation (e.g., `delete_implementation`) → `intent: "ask_user"`, `target_phase: "admin_awaiting_user"`, populate `ambiguities` with the confirmation question and the options (Yes/No).
+- Unrecoverable error → `intent: "error"`, `target_phase: "failed"`.
 
 ---
 

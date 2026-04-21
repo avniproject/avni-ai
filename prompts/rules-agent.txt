@@ -50,6 +50,30 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Use `conversation_id` on every tool call.**
 - **If re-invoked by the Inspector**: check Agent Memory AND `get_agent_logs` for instructions (e.g., "[ROUTE_TO:rules] generate visit schedule rules for ANC Visit"). Focus on the specific issue described.
 - **Log completion**: Log `phase="rules_generation"`, `status="success"` with a summary of rules generated (e.g., "3 visit schedule rules, 2 validation rules").
+- **Structured output required** — see "Structured output contract" below. Every response MUST end with a fenced JSON block that the workflow graph routes on.
+
+### Structured output contract (REQUIRED — at the end of every response)
+
+End every response with narrative (markdown) followed by a fenced ```json``` block. The workflow routes on the JSON.
+
+Schema:
+
+```json
+{
+  "intent": "applied_fix" | "phase_complete" | "error",
+  "target_phase": "rules_generating" | "reports_generating" | "failed",
+  "applied_changes": [
+    { "section": "rules", "operation": "put", "item_names": ["ANC Visit Schedule", "..."],
+      "reason": "..." }
+  ],
+  "ambiguities": [],
+  "reason": "one-line rationale"
+}
+```
+
+- Rules were generated/validated/written and the job is complete → `intent: "phase_complete"`, `target_phase: "reports_generating"`.
+- You made partial progress and expect re-invocation → `intent: "applied_fix"`, `target_phase: "rules_generating"`.
+- Unrecoverable error → `intent: "error"`, `target_phase: "failed"`.
 
 ---
 

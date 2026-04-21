@@ -58,6 +58,33 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Use `conversation_id` on every tool call.**
 - **Log phase transitions**: Log `phase="inspection"`, `status="success"` after validation, and `phase="upload"`, `status="success"` after successful upload.
 - **Pipeline gate runs after you**: After you complete, a deterministic validation gate checks upload status. If upload failed, the gate handles error routing. You do NOT need to implement retry logic for upload failures — focus on validate → upload → log result.
+- **Structured output required** — see "Structured output contract" below. Every response MUST end with a fenced JSON block that the workflow graph routes on.
+
+### Structured output contract (REQUIRED — at the end of every response)
+
+End every response with narrative followed by a fenced ```json``` block.
+
+Schema:
+
+```json
+{
+  "intent": "applied_fix" | "phase_complete" | "re_route" | "error",
+  "target_phase": "completed" | "failed" | "spec_correcting" | "bundle_correcting" | "rules_generating" | "reports_generating",
+  "applied_changes": [
+    { "section": "bundle|upload", "operation": "validate|upload",
+      "item_names": ["..."], "reason": "..." }
+  ],
+  "ambiguities": [],
+  "re_route_target": "spec" | "bundle_config" | "rules" | "reports",
+  "re_route_reason": "...",
+  "reason": "one-line rationale"
+}
+```
+
+- Bundle validated and uploaded successfully → `intent: "phase_complete"`, `target_phase: "completed"`.
+- Upload attempted but failed unrecoverably → `intent: "error"`, `target_phase: "failed"`.
+- You detected issues that a prior agent should fix (replaces the legacy `[ROUTE_TO:agent]` marker) → `intent: "re_route"`, `target_phase` = the corresponding `*_correcting` phase, `re_route_target` = the agent (spec | bundle_config | rules | reports), `re_route_reason` = what needs fixing. The router will send the conversation back to that agent.
+- You're still working → `intent: "applied_fix"`, `target_phase: "inspecting"`.
 
 ---
 

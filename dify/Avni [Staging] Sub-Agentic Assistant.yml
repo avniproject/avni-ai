@@ -140,23 +140,24 @@ workflow:
     - last_gate_status
     value: not_run
     value_type: string
-  - description: Last gate error strings (typed snapshot for downstream IF-ELSE
-      routing).
+  - description: Last gate error snapshot as a newline-separated string (Dify only
+      reliably supports boolean / string / object / array[object] conversation
+      variables).
     id: 834e8612-cc1b-438b-acba-4b03cc85e67b
     name: last_gate_errors
     selector:
     - conversation
     - last_gate_errors
-    value: []
-    value_type: array[string]
-  - description: Last gate warning strings.
+    value: ''
+    value_type: string
+  - description: Last gate warning snapshot as a newline-separated string.
     id: 70446320-9878-411e-98ad-50245a5211b2
     name: last_gate_warnings
     selector:
     - conversation
     - last_gate_warnings
-    value: []
-    value_type: array[string]
+    value: ''
+    value_type: string
   - description: Raw user reply for the current turn. Populated from sys.query at
       the start of every user message so downstream agents can read it without
       re-parsing.
@@ -169,28 +170,23 @@ workflow:
     value_type: string
   - description: 'Per-agent retry counters for the agent-chain loop. Bounded at 3
       per agent before the phase transitions to failed. Shape: {spec, bundle_config,
-      rules, reports, inspect, admin}, all ints.'
+      rules, reports, inspect, admin}, all ints. Default empty; populated lazily.'
     id: 23a2d981-fad6-4438-9bb9-c277a1b44c42
     name: retries
     selector:
     - conversation
     - retries
-    value:
-      spec: 0
-      bundle_config: 0
-      rules: 0
-      reports: 0
-      inspect: 0
-      admin: 0
+    value: {}
     value_type: object
-  - description: Append-only log of phase transitions for observability/debugging.
+  - description: Append-only log of phase transitions as a newline-separated string
+      for observability/debugging.
     id: 25e6e1af-b1b4-4a33-b700-ebfed3e22069
     name: phase_history
     selector:
     - conversation
     - phase_history
-    value: []
-    value_type: array[string]
+    value: ''
+    value_type: string
   - description: Structured payload returned by the most recent agent (intent,
       message, ambiguities, applied_changes, target_phase, reason). Consumed by
       deterministic IF-ELSE routing nodes.
@@ -4795,17 +4791,30 @@ workflow:
                   return {"next_agent": "done", "loop_done": True,
                           "reason": f"{active_agent} intent=error (structured)"}
 
+              # Structured Inspector re_route: typed replacement for [ROUTE_TO:agent].
+              if intent == "re_route" and active_agent == "inspect":
+                  target = ""
+                  if isinstance(agent_structured, dict):
+                      target = str(agent_structured.get("re_route_target", "") or "")
+                  valid_targets = ("spec", "bundle_config", "rules", "reports")
+                  if target in valid_targets:
+                      mem_lc = (agent_memory or "").lower()
+                      if "[rerouted from inspect]" not in mem_lc:
+                          return {"next_agent": target, "loop_done": False,
+                                  "reason": f"Inspector re_route -> {target} (structured)"}
+
               t = (agent_output or "").lower()
               mem = (agent_memory or "").lower()
 
               # Legacy fallback 1: pre-Stage-A [AWAITING_USER_INPUT] marker. Kept so
               # in-flight conversations that started before the prompt update still
-              # route correctly. Safe to remove in Stage C.
+              # route correctly. Safe to remove in Stage D.
               if "[awaiting_user_input]" in t:
                   return {"next_agent": "done", "loop_done": True,
                           "reason": f"{active_agent} legacy [AWAITING_USER_INPUT] marker"}
 
-              # Legacy fallback 2: Inspector routing to a prior agent for fixes.
+              # Legacy fallback 2: Inspector text-marker routing. Will be removed in
+              # Stage D once all in-flight conversations drain.
               route_match = re.search(r"\[route_to:(\w+)\]", t)
               if route_match and active_agent == "inspect":
                   target = route_match.group(1)
@@ -5301,16 +5310,16 @@ workflow:
               has_errors = False
               gate_output = ""
               last_gate_status = "not_run"
-              last_gate_errors = []
-              last_gate_warnings = []
+              last_gate_errors_str = ""
+              last_gate_warnings_str = ""
               try:
                   parsed = json.loads(gate_body) if gate_body else {}
                   errors = parsed.get("errors", []) or []
                   warnings = parsed.get("warnings", []) or []
                   next_action = parsed.get("next_action", "")
                   has_errors = len(errors) > 0
-                  last_gate_errors = [str(e) for e in errors]
-                  last_gate_warnings = [str(w) for w in warnings]
+                  last_gate_errors_str = chr(10).join(str(e) for e in errors)
+                  last_gate_warnings_str = chr(10).join(str(w) for w in warnings)
                   if next_action == "user_input_needed":
                       has_errors = False
                       last_gate_status = "user_input_needed"
@@ -5332,13 +5341,13 @@ workflow:
               if gate_status >= 400:
                   has_errors = False
                   last_gate_status = "errors"
-                  last_gate_errors = [f"Gate HTTP {gate_status}"]
+                  last_gate_errors_str = f"Gate HTTP {gate_status}"
               return {
                   "has_questions": has_errors,
                   "gate_output": gate_output,
                   "last_gate_status": last_gate_status,
-                  "last_gate_errors": last_gate_errors,
-                  "last_gate_warnings": last_gate_warnings,
+                  "last_gate_errors": last_gate_errors_str,
+                  "last_gate_warnings": last_gate_warnings_str,
               }
         code_language: python3
         isInLoop: true
@@ -5351,9 +5360,9 @@ workflow:
           last_gate_status:
             type: string
           last_gate_errors:
-            type: array[string]
+            type: string
           last_gate_warnings:
-            type: array[string]
+            type: string
         selected: false
         title: Gate Parser
         type: code
@@ -5646,15 +5655,6 @@ workflow:
           - conversation
           - agent_structured
           write_mode: over-write
-        - input_type: variable
-          operation: append
-          value:
-          - '1800000000725'
-          - out_active_phase
-          variable_selector:
-          - conversation
-          - phase_history
-          write_mode: append
         loop_id: '1800000000700'
         selected: false
         title: Phase Transition

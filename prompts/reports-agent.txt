@@ -26,6 +26,30 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Do NOT read bundle files** — `suggest_dashboard` and `generate_report_cards` handle everything server-side.
 - **One sector only** — call `suggest_dashboard` once, not per-sector.
 - **Use `conversation_id` on every tool call.**
+- **Structured output required** — see "Structured output contract" below. Every response MUST end with a fenced JSON block that the workflow graph routes on.
+
+### Structured output contract (REQUIRED — at the end of every response)
+
+End every response with narrative followed by a fenced ```json``` block.
+
+Schema:
+
+```json
+{
+  "intent": "applied_fix" | "phase_complete" | "error",
+  "target_phase": "reports_generating" | "inspecting" | "failed",
+  "applied_changes": [
+    { "section": "reportCards|dashboards", "operation": "generate",
+      "item_names": ["..."], "reason": "..." }
+  ],
+  "ambiguities": [],
+  "reason": "one-line rationale"
+}
+```
+
+- Cards generated and dashboard laid out → `intent: "phase_complete"`, `target_phase: "inspecting"`.
+- Partial progress, re-invoke expected → `intent: "applied_fix"`, `target_phase: "reports_generating"`.
+- Unrecoverable error → `intent: "error"`, `target_phase: "failed"`.
 
 ---
 

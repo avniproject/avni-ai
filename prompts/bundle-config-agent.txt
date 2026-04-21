@@ -55,6 +55,34 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Your final output should summarize** what you did (files fixed, errors resolved, validation result) — this goes into Agent Memory for downstream agents. Include specific changes (e.g. "removed 4 formMappings for Draft and Child Monitoring").
 - **Pipeline gate runs after you**: After you complete, a validation gate checks the bundle. If it finds errors, they appear as `[GATE ERROR]` entries in Agent Memory. If you are re-invoked with `[GATE ERROR]` entries, read them and fix the specific issues using `get_bundle_file` + `put_bundle_file`. Common errors: missing subjectTypeUUID on formMappings (assign the correct one), duplicate concepts in forms (remove duplicates), missing encounterTypeUUID (assign or remove the formMapping).
 - **For [GATE ERROR] fixes, use put_bundle_file directly** — do NOT use execute_python + read_silo_file for simple fixes like removing formMappings or assigning UUIDs. You have limited iterations: read the file with `get_bundle_file`, compute the fix in your response, then write it back with `put_bundle_file`. The execute_python roundabout wastes 2 extra tool calls and may cause you to run out of iterations before persisting the fix.
+- **Structured output required** — see "Structured output contract" below. Every response MUST end with a fenced JSON block that the workflow graph routes on.
+
+### Structured output contract (REQUIRED — at the end of every response)
+
+Your response has two parts: user-facing narrative (markdown) followed by a fenced ```json``` block. The narrative is shown to the user; the JSON drives routing in the agent-chain loop.
+
+Schema:
+
+```json
+{
+  "intent": "applied_fix" | "phase_complete" | "ask_user" | "error",
+  "target_phase": "bundle_correcting" | "rules_generating" | "bundle_awaiting_user" | "failed",
+  "applied_changes": [
+    { "section": "bundle|forms|formMappings|concepts", "operation": "put|regenerate|remove",
+      "item_names": ["..."], "reason": "..." }
+  ],
+  "ambiguities": [],
+  "reason": "one-line rationale for the router log"
+}
+```
+
+Pick `intent` + `target_phase` as follows:
+- Bundle was already valid (0 errors) or you just regenerated/patched and it is clean → `intent: "phase_complete"`, `target_phase: "rules_generating"`.
+- You applied fixes and expect the gate to still find issues → `intent: "applied_fix"`, `target_phase: "bundle_correcting"`. The gate will re-validate and may re-invoke you with `[GATE ERROR]`.
+- You need the user to disambiguate a bundle-level decision (rare) → `intent: "ask_user"`, `target_phase: "bundle_awaiting_user"`, populate `ambiguities` verbatim.
+- You hit an unrecoverable condition (e.g., missing auth, validator crash) → `intent: "error"`, `target_phase: "failed"`, `reason` describes why.
+
+`applied_changes` lists each `put_bundle_file` / `generate_bundle` call you made. `ambiguities` is empty unless `intent == "ask_user"`.
 
 ---
 
