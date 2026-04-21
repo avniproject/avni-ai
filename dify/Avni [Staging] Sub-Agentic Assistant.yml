@@ -171,21 +171,18 @@ workflow:
         - local_file
         - remote_url
       number_limits: 3
-    opening_statement: Hey {{user_name}} ! I’m your AI assistant . I can help you
-      with any questions about Avni — from creating new forms automatically to guiding
-      you through the platform. How can I help you today?
+    opening_statement: Hey {{user_name}} ! I’m your AI assistant . I can help you with any questions about Avni — from creating
+      new forms automatically to guiding you through the platform. How can I help you today?
     retriever_resource:
       enabled: false
     sensitive_word_avoidance:
       config:
         inputs_config:
           enabled: true
-          preset_response: In-appropriate input, only designed to help with Avni implementation
-            tasks.
+          preset_response: In-appropriate input, only designed to help with Avni implementation tasks.
         outputs_config:
           enabled: true
-          preset_response: I apologize, but I can only provide assistance with Avni
-            implementation topics.
+          preset_response: I apologize, but I can only provide assistance with Avni implementation topics.
       enabled: true
       type: openai_moderation
     speech_to_text:
@@ -1205,166 +1202,112 @@ workflow:
         model:
           completion_params:
             temperature: 0
+            cache_system_message: true
           mode: chat
           name: claude-haiku-4-5-20251001
           provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: b14eb575-d615-41dd-aac1-00663db3a6eb
           role: system
-          text: "You are the Avni Platform Orchestrator of the Avni AI Assistant.\
-            \ Route user messages based on their PRIMARY INTENT, not the complexity\
-            \ or specificity of their\nquestion.\n\n<context>\n{{#context#}}\n</context>\n\
-            \nFile upload status: {{#1757492907628.file_info#}}\n\n## Core Routing\
-            \ Logic\n\n\n**OVERRIDE RULES**:\n1. If a message is clearly NOT about\
-            \ Avni or data collection platforms → OUT_OF_SCOPE\n2. If a message starts\
-            \ with capability questions (\"Is it possible\", \"Can Avni\", \"Does\
-            \ Avni support\", \"Is there a way\", \"How can I\"), it is ALWAYS RAG\
-            \ regardless of complexity.\n\n\n### BUNDLE_SETUP — Program Setup from\
-            \ Uploaded SRS/Specification Files\n\n**Priority: HIGHEST — evaluate before\
-            \ RAG and ASSISTANT**\n\n**HARD OVERRIDE — gap-fix continuation (defense-in-depth;\
-            \ the workflow normally short-circuits past this classifier via the Spec\
-            \ Awaiting Check IF-ELSE node when conversation.spec_awaiting_user_input\
-            \ is true, so this rule is only a fallback):**\nScan the MOST RECENT assistant\
-            \ turn in the conversation history. If it contains either (a) a fenced\
-            \ ```json``` block with `\\\"intent\\\": \\\"ask_user\\\"`, or (b) the\
-            \ legacy literal token `[AWAITING_USER_INPUT]` (pre-Stage-A agents), this\
-            \ user message is a reply to a pending Spec Agent gap-fix question. You\
-            \ MUST route:\n  service = BUNDLE_SETUP\n  initial_agent = spec\n  workflow_mode\
-            \ = generic\n  clarification_needed = false\n  routing_reason = \"Continuation\
-            \ of Spec Agent gap-fix dialog (prior turn asked user).\"\nApply this\
-            \ rule even when the user's reply is terse (\"remove all\", \"use defaults\"\
-            , \"option B for all\", \"1:A, 2:B, 3:Remove\", \"yes\", \"no\"), looks\
-            \ like a deletion request, looks out-of-scope, or mentions nothing about\
-            \ Avni. Terse corrections during an active setup are never RAG/ASSISTANT/OUT_OF_SCOPE.\n\
-            \n**Route BUNDLE_SETUP when ANY of the following:**\n1. The file upload\
-            \ status above shows files were uploaded (has_files = true)\n2. User's\
-            \ message mentions uploading a file, SRS, scoping sheet, or specification\
-            \ document\n3. The conversation already has BUNDLE_SETUP activity (earlier\
-            \ assistant turns produced spec/bundle/upload output, even if no ask_user\
-            \ JSON), AND the current user message is a short reply or continuation\
-            \ — e.g., \"proceed\", \"approve\", \"approved\", \"looks good\", \"yes\
-            \ go ahead\", \"no change\", \"remove X\", \"keep X\", \"option A\", \"\
-            1, 2, 3\", \"use defaults\", \"what's next?\", \"continue\", any message\
-            \ under 200 chars that reads as a reply rather than a new question.\n\
-            4. User explicitly says \"upload SRS\", \"upload spec\", \"upload field\
-            \ workflow\", \"generate bundle from file\"\n\n**When routing BUNDLE_SETUP,\
-            \ ALWAYS set initial_agent = \\\"spec\\\" and workflow_mode = \\\"generic\\\
-            \"**. The spec agent must run first to parse the SRS and extract entities\
-            \ before bundle generation. For the HARD OVERRIDE case above, `initial_agent\
-            \ = spec` is non-negotiable — the Spec Agent is the only agent that can\
-            \ apply the user's gap-fix answers.\n\n**Do NOT route here for:**\n- Verbal\
-            \ SRS description without a file (and no prior BUNDLE_SETUP activity)\
-            \ → ASSISTANT\n- General Avni platform questions (when conversation has\
-            \ no active setup) → RAG\n\n\n### RAG - Platform Knowledge & Capabilities\n\
-            \n\n**Primary Intent**: Learning what Avni can/cannot do\n\n\n**Definitive\
-            \ Indicators** (Route to RAG even if complex):\n- \"What is Avni?\" →\
-            \ RAG (basic platform knowledge)\n- \"Tell me about Avni\" → RAG (platform\
-            \ overview)\n- \"Is it possible to...\" → RAG (capability inquiry)\n-\
-            \ \"Can Avni...\" → RAG (platform capability)\n- \"Does Avni support...\"\
-            \ → RAG (feature question)\n- \"Is there a way to...\" → RAG (method inquiry)\n\
-            - \"How can I...\" → RAG (step-by-step guidance inquiry)\n- \"What are\
-            \ the limitations of...\" → RAG (constraint question)\n- \"How does Avni\
-            \ handle...\" → RAG (mechanism inquiry)\n\n\n**Key Principle**: Complexity\
-            \ of the scenario does NOT change the\nintent. A detailed capability question\
-            \ is still a capability question.\n\n\n\n### ASSISTANT - Custom/Novel\
-            \ Requirements\n\n\n**Primary Intent**: Building something new or unique\n\
-            \n\n**Indicators**: - \"We need something that doesn't exist...\" - \"\
-            Can you\nbuild/create/develop...\" - \"We have unique requirements...\"\
-            \ -\n\"Integration with external system X...\" - \"Delete everything and\
-            \ start fresh...\" - \"Clean slate configuration...\" - \"Remove all my\
-            \ current setup...\"\n\n\n### OUT_OF_SCOPE - Not Avni Related\n\n\n**Primary\
-            \ Intent**: Questions completely unrelated to Avni or data collection\
-            \ platforms\n\n\n**Definitive Indicators**:\n- Questions for which no\
-            \ relevant context available in this prompt\n- General programming/coding\
-            \ questions not specific to Avni\n- Questions about other software platforms\
-            \ (Salesforce, Excel, etc.)\n- Personal questions, weather, news, entertainment\n\
-            - Academic questions unrelated to health/social programs\n- Technical\
-            \ questions about non-Avni systems\n- \"What is the capital of...\" /\
-            \ \"How do I cook...\" / \"What's the weather...\"\n- Questions about\
-            \ competitors without Avni context\n\n\n\n**EXCEPTION**: Greeting messages\
-            \ (\"Hi\", \"Hello\", \"Good morning\") should NOT be marked as OUT_OF_SCOPE.\
-            \ These require clarification to understand the user's actual intent.\n\
-            \n\n## Decision Framework\n\n\n**Step 1**: Check relevance - If clearly\
-            \ NOT about Avni/data collection → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**:\
-            \ If greeting message → Set clarification_needed = true\n\n\n**Step 2**:\
-            \ Identify the question type - If starts with capability\nquestions →\
-            \ RAG (STOP HERE) - If describes implementation needs →\nASSISTANT - If\
-            \ requests deletion/configuration changes → ASSISTANT\n\n\n## Critical\
-            \ Examples\n\n✅ User uploads Excel/CSV/ZIP file → **BUNDLE_SETUP** (highest\
-            \ priority)\n✅ \"Proceed with the spec\" when setup_mode_active=true →\
-            \ **BUNDLE_SETUP** (follow-up)\n✅ \"Here is my SRS\" (with file attached)\
-            \ → **BUNDLE_SETUP**\n\n✅ \"What is Avni?\" → **RAG** (basic platform\
-            \ knowledge)\n\n✅ \"Tell me about Avni platform\" → **RAG** (platform\
-            \ overview)\n\n✅ \"What does Avni do?\" → **RAG** (platform purpose/functionality)\n\
-            \n✅ \"Is it possible to automatically show selected answers from Clinical\n\
-            Assessment in Follow-up Visit forms?\" → **RAG** (capability question,\n\
-            regardless of technical complexity)\n\n✅ \"Can Avni restrict encounter\
-            \ forms to single entry per individual?\" →\n**RAG** (capability question)\n\
-            \n✅ \"Is there a way to integrate complex multi-step approval workflows?\"\
-            \n→ **RAG** (capability question, even if the workflow is complex)\n\n\
-            ✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"What are identifiers\"\
-            \n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\
-            \n✅ \"What is a program\"\n✅ \"What is a subject type\"\n✅ \"How can I\
-            \ setup the assignment feature in Avni?\" → **RAG** (step-by-step guidance\
-            \ question)\n\n✅ \"I want to delete my entire configuration and start\
-            \ fresh\" → **ASSISTANT** (implementation request for complete deletion)\n\
-            \n✅ \"Can you help me clean slate my Avni setup?\" → **ASSISTANT** (configuration\
-            \ deletion and rebuild request)\n\n✅ \"Remove everything and build a new\
-            \ configuration\" → **ASSISTANT** (delete and create request)\n\n\n\n\
-            ✅ \"What is the capital of France?\" → **OUT_OF_SCOPE** (not related to\
-            \ Avni)\n\n\n✅ \"How do I write Python code for web scraping?\" → **OUT_OF_SCOPE**\
-            \ (general programming, not Avni-specific)\n\n\n✅ \"Can you help me with\
-            \ my Excel formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅\
-            \ \"Hello\" → **RAG** with clarification_needed = true (greeting requires\
-            \ clarification)\n\n\n✅ \"Hi there\" → **RAG** with clarification_needed\
-            \ = true (greeting requires clarification)\n\n\n❌ **WRONG**: \"Sounds\
-            \ complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\"Starts with capability\
-            \ question → RAG\"\n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap\
-            \ 1**: Complexity Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\"\
-            \ - ✅ \"Capability question = platform inquiry = RAG\"\n\n\n**Trap 2**:\
-            \ Implementation Details Bias - ❌ \"Mentions specific\ntechnical details\
-            \ = ASSISTANT\" - ✅ \"Asking IF it's possible = RAG\"\n\n\n**Trap 3**:\
-            \ Domain Specificity Bias - ❌ \"Very specific use case =\nASSISTANT\"\
-            \ - ✅ \"Question format determines intent\"\n\n\n**Trap 4**: Relevance\
-            \ Assumption - ❌ \"Any question = must be Avni-related\" - ✅ \"Check if\
-            \ actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting\
-            \ Misrouting - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification\
-            \ to understand intent\"\n\n\n## Response Format\n\n\n``` json\n{\n  \"\
-            service\": \"RAG|ASSISTANT|BUNDLE_SETUP|OUT_OF_SCOPE\",\n  \"initial_agent\"\
-            : \"spec|bundle_config|rules|reports|inspect|admin\",\n  \"workflow_mode\"\
-            : \"targeted|generic\",\n  \"confidence\": 0.0-1.0,\n  \"question_type\"\
-            : \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
-            ,\n  \"routing_reason\": \"Brief explanation focusing on question structure,\
-            \ not content complexity\",\n  \"clarification_needed\": true|false,\n\
-            \  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\
-            \n## Clarifying Questions Strategy\n\n\nAsk maximum 2 clarifying questions\
-            \ when:\n- Intent is ambiguous between RAG and Assistant\n- User provides\
-            \ insufficient context about their needs\n- Requirements could match multiple\
-            \ services\n- User sends only greeting messages without specific questions\n\
-            \n\n**Example clarifying questions:**\n- \"Could you describe what type\
-            \ of programs your organization runs?\"\n- \"Are you looking to learn\
-            \ about Avni's capabilities or need help setting something up?\"\n- \"\
-            Is this similar to typical community health/education programs?\"\n- \"\
-            How can I help you with Avni today?\" (for greetings)\n\n\n**General Prompt\
-            \ for Clarification:** When unsure, ask concise,\nopen-ended clarifying\
-            \ questions that help determine whether the user is\nasking about platform\
-            \ capabilities (RAG) or needs implementation help\n(ASSISTANT). Never\
-            \ ask more than two questions at once.\n\n\n## Mental Model Validation\n\
-            \n\nBefore routing, ask:\n1. **\"Is this just a greeting message?\"**\
-            \ - YES → RAG with clarification_needed = true\n2. **\"Is this question\
-            \ actually about Avni or data collection platforms?\"** - NO → OUT_OF_SCOPE\n\
-            3. **\"Is the user asking IF something is possible, or telling me they\
-            \ WANT something implemented?\"** - IF possible → RAG - WANT implemented\
-            \ → ASSISTANT\n\n\n## Decision Tree for Edge Cases\n\n\n    User Message\n\
-            \        │\n        ├── NOT about Avni/data collection (general questions,\
-            \ other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n        │\n \
-            \       ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does\
-            \ Avni...\" / \"How can I...\" ?\n        │   └── YES → RAG (regardless\
-            \ of complexity)\n        │\n        ├── Describes implementation needs\
-            \ (\"We need...\", \"Help us set up...\", \"Our org wants...\") or deletion\
-            \       requests (\"Delete everything...\", \"Clean slate...\", \"Remove\
-            \ all...\")?\n        │   └── YES → ASSISTANT\n        │\n        └──\
-            \ UNCLEAR → Default to RAG (safer for capability questions)"
+          text: "You are the Avni Platform Orchestrator of the Avni AI Assistant. Route user messages based on their PRIMARY\
+            \ INTENT, not the complexity or specificity of their\nquestion.\n\n<context>\n{{#context#}}\n</context>\n\nFile\
+            \ upload status: {{#1757492907628.file_info#}}\n\n## Core Routing Logic\n\n\n**OVERRIDE RULES**:\n1. If a message\
+            \ is clearly NOT about Avni or data collection platforms → OUT_OF_SCOPE\n2. If a message starts with capability\
+            \ questions (\"Is it possible\", \"Can Avni\", \"Does Avni support\", \"Is there a way\", \"How can I\"), it is\
+            \ ALWAYS RAG regardless of complexity.\n\n\n### BUNDLE_SETUP — Program Setup from Uploaded SRS/Specification Files\n\
+            \n**Priority: HIGHEST — evaluate before RAG and ASSISTANT**\n\n**HARD OVERRIDE — gap-fix continuation (defense-in-depth;\
+            \ the workflow normally short-circuits past this classifier via the Spec Awaiting Check IF-ELSE node when conversation.spec_awaiting_user_input\
+            \ is true, so this rule is only a fallback):**\nScan the MOST RECENT assistant turn in the conversation history.\
+            \ If it contains either (a) a fenced ```json``` block with `\\\"intent\\\": \\\"ask_user\\\"`, or (b) the legacy\
+            \ literal token `[AWAITING_USER_INPUT]` (pre-Stage-A agents), this user message is a reply to a pending Spec Agent\
+            \ gap-fix question. You MUST route:\n  service = BUNDLE_SETUP\n  initial_agent = spec\n  workflow_mode = generic\n\
+            \  clarification_needed = false\n  routing_reason = \"Continuation of Spec Agent gap-fix dialog (prior turn asked\
+            \ user).\"\nApply this rule even when the user's reply is terse (\"remove all\", \"use defaults\", \"option B\
+            \ for all\", \"1:A, 2:B, 3:Remove\", \"yes\", \"no\"), looks like a deletion request, looks out-of-scope, or mentions\
+            \ nothing about Avni. Terse corrections during an active setup are never RAG/ASSISTANT/OUT_OF_SCOPE.\n\n**Route\
+            \ BUNDLE_SETUP when ANY of the following:**\n1. The file upload status above shows files were uploaded (has_files\
+            \ = true)\n2. User's message mentions uploading a file, SRS, scoping sheet, or specification document\n3. The\
+            \ conversation already has BUNDLE_SETUP activity (earlier assistant turns produced spec/bundle/upload output,\
+            \ even if no ask_user JSON), AND the current user message is a short reply or continuation — e.g., \"proceed\"\
+            , \"approve\", \"approved\", \"looks good\", \"yes go ahead\", \"no change\", \"remove X\", \"keep X\", \"option\
+            \ A\", \"1, 2, 3\", \"use defaults\", \"what's next?\", \"continue\", any message under 200 chars that reads as\
+            \ a reply rather than a new question.\n4. User explicitly says \"upload SRS\", \"upload spec\", \"upload field\
+            \ workflow\", \"generate bundle from file\"\n\n**When routing BUNDLE_SETUP, ALWAYS set initial_agent = \\\"spec\\\
+            \" and workflow_mode = \\\"generic\\\"**. The spec agent must run first to parse the SRS and extract entities\
+            \ before bundle generation. For the HARD OVERRIDE case above, `initial_agent = spec` is non-negotiable — the Spec\
+            \ Agent is the only agent that can apply the user's gap-fix answers.\n\n**Do NOT route here for:**\n- Verbal SRS\
+            \ description without a file (and no prior BUNDLE_SETUP activity) → ASSISTANT\n- General Avni platform questions\
+            \ (when conversation has no active setup) → RAG\n\n\n### RAG - Platform Knowledge & Capabilities\n\n\n**Primary\
+            \ Intent**: Learning what Avni can/cannot do\n\n\n**Definitive Indicators** (Route to RAG even if complex):\n\
+            - \"What is Avni?\" → RAG (basic platform knowledge)\n- \"Tell me about Avni\" → RAG (platform overview)\n- \"\
+            Is it possible to...\" → RAG (capability inquiry)\n- \"Can Avni...\" → RAG (platform capability)\n- \"Does Avni\
+            \ support...\" → RAG (feature question)\n- \"Is there a way to...\" → RAG (method inquiry)\n- \"How can I...\"\
+            \ → RAG (step-by-step guidance inquiry)\n- \"What are the limitations of...\" → RAG (constraint question)\n- \"\
+            How does Avni handle...\" → RAG (mechanism inquiry)\n\n\n**Key Principle**: Complexity of the scenario does NOT\
+            \ change the\nintent. A detailed capability question is still a capability question.\n\n\n\n### ASSISTANT - Custom/Novel\
+            \ Requirements\n\n\n**Primary Intent**: Building something new or unique\n\n\n**Indicators**: - \"We need something\
+            \ that doesn't exist...\" - \"Can you\nbuild/create/develop...\" - \"We have unique requirements...\" -\n\"Integration\
+            \ with external system X...\" - \"Delete everything and start fresh...\" - \"Clean slate configuration...\" -\
+            \ \"Remove all my current setup...\"\n\n\n### OUT_OF_SCOPE - Not Avni Related\n\n\n**Primary Intent**: Questions\
+            \ completely unrelated to Avni or data collection platforms\n\n\n**Definitive Indicators**:\n- Questions for which\
+            \ no relevant context available in this prompt\n- General programming/coding questions not specific to Avni\n\
+            - Questions about other software platforms (Salesforce, Excel, etc.)\n- Personal questions, weather, news, entertainment\n\
+            - Academic questions unrelated to health/social programs\n- Technical questions about non-Avni systems\n- \"What\
+            \ is the capital of...\" / \"How do I cook...\" / \"What's the weather...\"\n- Questions about competitors without\
+            \ Avni context\n\n\n\n**EXCEPTION**: Greeting messages (\"Hi\", \"Hello\", \"Good morning\") should NOT be marked\
+            \ as OUT_OF_SCOPE. These require clarification to understand the user's actual intent.\n\n\n## Decision Framework\n\
+            \n\n**Step 1**: Check relevance - If clearly NOT about Avni/data collection → OUT_OF_SCOPE (STOP HERE)\n**EXCEPTION**:\
+            \ If greeting message → Set clarification_needed = true\n\n\n**Step 2**: Identify the question type - If starts\
+            \ with capability\nquestions → RAG (STOP HERE) - If describes implementation needs →\nASSISTANT - If requests\
+            \ deletion/configuration changes → ASSISTANT\n\n\n## Critical Examples\n\n✅ User uploads Excel/CSV/ZIP file →\
+            \ **BUNDLE_SETUP** (highest priority)\n✅ \"Proceed with the spec\" when setup_mode_active=true → **BUNDLE_SETUP**\
+            \ (follow-up)\n✅ \"Here is my SRS\" (with file attached) → **BUNDLE_SETUP**\n\n✅ \"What is Avni?\" → **RAG** (basic\
+            \ platform knowledge)\n\n✅ \"Tell me about Avni platform\" → **RAG** (platform overview)\n\n✅ \"What does Avni\
+            \ do?\" → **RAG** (platform purpose/functionality)\n\n✅ \"Is it possible to automatically show selected answers\
+            \ from Clinical\nAssessment in Follow-up Visit forms?\" → **RAG** (capability question,\nregardless of technical\
+            \ complexity)\n\n✅ \"Can Avni restrict encounter forms to single entry per individual?\" →\n**RAG** (capability\
+            \ question)\n\n✅ \"Is there a way to integrate complex multi-step approval workflows?\"\n→ **RAG** (capability\
+            \ question, even if the workflow is complex)\n\n✅ \"What are catchments\"\n✅ \"What are user groups\"\n✅ \"What\
+            \ are identifiers\"\n✅ \"What is an identifier source\"\n✅ \"How do I create a new catchment\"\n✅ \"What is a\
+            \ program\"\n✅ \"What is a subject type\"\n✅ \"How can I setup the assignment feature in Avni?\" → **RAG** (step-by-step\
+            \ guidance question)\n\n✅ \"I want to delete my entire configuration and start fresh\" → **ASSISTANT** (implementation\
+            \ request for complete deletion)\n\n✅ \"Can you help me clean slate my Avni setup?\" → **ASSISTANT** (configuration\
+            \ deletion and rebuild request)\n\n✅ \"Remove everything and build a new configuration\" → **ASSISTANT** (delete\
+            \ and create request)\n\n\n\n✅ \"What is the capital of France?\" → **OUT_OF_SCOPE** (not related to Avni)\n\n\
+            \n✅ \"How do I write Python code for web scraping?\" → **OUT_OF_SCOPE** (general programming, not Avni-specific)\n\
+            \n\n✅ \"Can you help me with my Excel formulas?\" → **OUT_OF_SCOPE** (different platform)\n\n\n✅ \"Hello\" → **RAG**\
+            \ with clarification_needed = true (greeting requires clarification)\n\n\n✅ \"Hi there\" → **RAG** with clarification_needed\
+            \ = true (greeting requires clarification)\n\n\n❌ **WRONG**: \"Sounds complex/custom → ASSISTANT\" ✅ **CORRECT**:\n\
+            \"Starts with capability question → RAG\"\n\n\n## Common Misrouting Traps to Avoid\n\n\n**Trap 1**: Complexity\
+            \ Bias - ❌ \"Complex scenario = custom work =\nASSISTANT\" - ✅ \"Capability question = platform inquiry = RAG\"\
+            \n\n\n**Trap 2**: Implementation Details Bias - ❌ \"Mentions specific\ntechnical details = ASSISTANT\" - ✅ \"\
+            Asking IF it's possible = RAG\"\n\n\n**Trap 3**: Domain Specificity Bias - ❌ \"Very specific use case =\nASSISTANT\"\
+            \ - ✅ \"Question format determines intent\"\n\n\n**Trap 4**: Relevance Assumption - ❌ \"Any question = must be\
+            \ Avni-related\" - ✅ \"Check if actually about Avni/data collection first\"\n\n\n**Trap 5**: Greeting Misrouting\
+            \ - ❌ \"Greeting = OUT_OF_SCOPE\" - ✅ \"Greeting = needs clarification to understand intent\"\n\n\n## Response\
+            \ Format\n\n\n``` json\n{\n  \"service\": \"RAG|ASSISTANT|BUNDLE_SETUP|OUT_OF_SCOPE\",\n  \"initial_agent\": \"\
+            spec|bundle_config|rules|reports|inspect|admin\",\n  \"workflow_mode\": \"targeted|generic\",\n  \"confidence\"\
+            : 0.0-1.0,\n  \"question_type\": \"capability_inquiry|implementation_request|novel_requirement|not_avni_related\"\
+            ,\n  \"routing_reason\": \"Brief explanation focusing on question structure, not content complexity\",\n  \"clarification_needed\"\
+            : true|false,\n  \"clarifying_questions\": [\"question1\", \"question2\"]\n}\n```\n\n\n## Clarifying Questions\
+            \ Strategy\n\n\nAsk maximum 2 clarifying questions when:\n- Intent is ambiguous between RAG and Assistant\n- User\
+            \ provides insufficient context about their needs\n- Requirements could match multiple services\n- User sends\
+            \ only greeting messages without specific questions\n\n\n**Example clarifying questions:**\n- \"Could you describe\
+            \ what type of programs your organization runs?\"\n- \"Are you looking to learn about Avni's capabilities or need\
+            \ help setting something up?\"\n- \"Is this similar to typical community health/education programs?\"\n- \"How\
+            \ can I help you with Avni today?\" (for greetings)\n\n\n**General Prompt for Clarification:** When unsure, ask\
+            \ concise,\nopen-ended clarifying questions that help determine whether the user is\nasking about platform capabilities\
+            \ (RAG) or needs implementation help\n(ASSISTANT). Never ask more than two questions at once.\n\n\n## Mental Model\
+            \ Validation\n\n\nBefore routing, ask:\n1. **\"Is this just a greeting message?\"** - YES → RAG with clarification_needed\
+            \ = true\n2. **\"Is this question actually about Avni or data collection platforms?\"** - NO → OUT_OF_SCOPE\n\
+            3. **\"Is the user asking IF something is possible, or telling me they WANT something implemented?\"** - IF possible\
+            \ → RAG - WANT implemented → ASSISTANT\n\n\n## Decision Tree for Edge Cases\n\n\n    User Message\n        │\n\
+            \        ├── NOT about Avni/data collection (general questions, other platforms)?\n        │   └── YES → OUT_OF_SCOPE\n\
+            \        │\n        ├── Starts with \"Is it possible...\" / \"Can Avni...\" / \"Does Avni...\" / \"How can I...\"\
+            \ ?\n        │   └── YES → RAG (regardless of complexity)\n        │\n        ├── Describes implementation needs\
+            \ (\"We need...\", \"Help us set up...\", \"Our org wants...\") or deletion       requests (\"Delete everything...\"\
+            , \"Clean slate...\", \"Remove all...\")?\n        │   └── YES → ASSISTANT\n        │\n        └── UNCLEAR → Default\
+            \ to RAG (safer for capability questions)"
         - id: 36b2faa1-0e45-4962-8107-74a07045af09
           role: user
           text: ''
@@ -1421,12 +1364,10 @@ workflow:
       type: custom
       width: 241
     - data:
-        code: "def main(files: list) -> dict:\n    if files and len(files) > 0:\n\
-          \        names = [f.get(\"filename\", f.get(\"name\", \"unknown\")) for\
-          \ f in files if isinstance(f, dict)]\n        return {\"has_files\": True,\
-          \ \"file_info\": f\"User uploaded {len(files)} file(s): {', '.join(names)}\"\
-          }\n    return {\"has_files\": False, \"file_info\": \"No files uploaded\"\
-          }\n"
+        code: "def main(files: list) -> dict:\n    if files and len(files) > 0:\n        names = [f.get(\"filename\", f.get(\"\
+          name\", \"unknown\")) for f in files if isinstance(f, dict)]\n        return {\"has_files\": True, \"file_info\"\
+          : f\"User uploaded {len(files)} file(s): {', '.join(names)}\"}\n    return {\"has_files\": False, \"file_info\"\
+          : \"No files uploaded\"}\n"
         code_language: python3
         outputs:
           file_info:
@@ -1564,29 +1505,24 @@ workflow:
           completion_params:
             max_tokens: 4096
             temperature: 0.3
+            cache_system_message: true
           mode: chat
           name: claude-sonnet-4-6
           provider: langgenius/anthropic/anthropic
         prompt_template:
         - id: 5aa1519b-cc32-4d81-aaa2-c2e8e6b46c0c
           role: system
-          text: "Use the following context as your learned knowledge, inside <context></context>\
-            \ XML tags.\n<context>\n{{#context#}}\n</context>\nYou are talking to\
-            \ {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\nYou\
-            \ are part of the Avni AI Assistant. The Avni AI Assistant is capable\
-            \ of the following\n1. Answering questions about the Avni system\n2. Assistance\
-            \ with designing workflows, forms, rules, reports, and full program setup\
-            \ on Avni\n\nYou must not guess or invent Avni features, workflows, or\
-            \ UI options that are not explicitly known.\n\nWhen answer to user:\n\
-            - If you don't know, just say that you don't know.\n- If you don't know\
-            \ when you are not sure, ask for clarification.\n- If greeting, greet\
-            \ professionaly by their name :  {{#1711528708197.user_name#}}\n- Do not\
-            \ greet repeatedly in every response.\n- Never infer or assume features\
-            \ (e.g., don't claim a program can be assigned to a catchment unless explicitly\
-            \ supported).\n- If there is any ambiguity, ask a clarifying question\
-            \ instead of guessing.\n  Avoid mentioning that you obtained the information\
-            \ from the context.\n  And answer according to the language of the user's\
-            \ question."
+          text: "Use the following context as your learned knowledge, inside <context></context> XML tags.\n<context>\n{{#context#}}\n\
+            </context>\nYou are talking to {{#1711528708197.user_name#}}from {{#1711528708197.org_name#}}\nYou are part of\
+            \ the Avni AI Assistant. The Avni AI Assistant is capable of the following\n1. Answering questions about the Avni\
+            \ system\n2. Assistance with designing workflows, forms, rules, reports, and full program setup on Avni\n\nYou\
+            \ must not guess or invent Avni features, workflows, or UI options that are not explicitly known.\n\nWhen answer\
+            \ to user:\n- If you don't know, just say that you don't know.\n- If you don't know when you are not sure, ask\
+            \ for clarification.\n- If greeting, greet professionaly by their name :  {{#1711528708197.user_name#}}\n- Do\
+            \ not greet repeatedly in every response.\n- Never infer or assume features (e.g., don't claim a program can be\
+            \ assigned to a catchment unless explicitly supported).\n- If there is any ambiguity, ask a clarifying question\
+            \ instead of guessing.\n  Avoid mentioning that you obtained the information from the context.\n  And answer according\
+            \ to the language of the user's question."
         selected: false
         title: RAG LLM
         type: llm
@@ -1646,8 +1582,7 @@ workflow:
       type: custom
       width: 241
     - data:
-        answer: This assistant can help you with any questions related to Avni. This
-          does not seem relevant to Avni.
+        answer: This assistant can help you with any questions related to Avni. This does not seem relevant to Avni.
         selected: false
         title: Unrelated Question
         type: answer
@@ -1702,14 +1637,11 @@ workflow:
       type: custom
       width: 241
     - data:
-        code: "import json\n\ndef main(files: list) -> dict:\n    if not files:\n\
-          \        return {\"file_infos_json\": \"[]\"}\n    infos = [           \
-          \                                                                \n    \
-          \    {\"url\": f.get(\"url\", \"\"), \"filename\": f.get(\"filename\", \"\
-          document.xlsx\")}\n        for f in files                              \
-          \                                    \n        if f.get(\"url\")       \
-          \                            \n    ]                                   \
-          \                                                \n    return {\"file_infos_json\"\
+        code: "import json\n\ndef main(files: list) -> dict:\n    if not files:\n        return {\"file_infos_json\": \"[]\"\
+          }\n    infos = [                                                                           \n        {\"url\": f.get(\"\
+          url\", \"\"), \"filename\": f.get(\"filename\", \"document.xlsx\")}\n        for f in files                    \
+          \                                              \n        if f.get(\"url\")                                   \n\
+          \    ]                                                                                   \n    return {\"file_infos_json\"\
           : json.dumps(infos)}"
         code_language: python3
         desc: Extract pre-signed URLs and filenames — backend downloads the files
@@ -1746,8 +1678,7 @@ workflow:
           - id: parse-srs-file-body
             key: ''
             type: text
-            value: '{"conversation_id": "{{#sys.conversation_id#}}", "file_infos":
-              {{#1775800000001.file_infos_json#}}}'
+            value: '{"conversation_id": "{{#sys.conversation_id#}}", "file_infos": {{#1775800000001.file_infos_json#}}}'
           type: json
         error_strategy: fail-branch
         headers: ''
@@ -1789,8 +1720,7 @@ workflow:
           - id: key-value-73
             key: ''
             type: text
-            value: '{"conversation_id": "{{#sys.conversation_id#}}", "auth_token":
-              "{{#conversation.auth_token#}}"}'
+            value: '{"conversation_id": "{{#sys.conversation_id#}}", "auth_token": "{{#conversation.auth_token#}}"}'
           type: json
         error_strategy: fail-branch
         headers: ''
@@ -2370,11 +2300,9 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
-              append_agent_log at the START (what you plan to do) and END (what you
-              did, result) of your work. 3. If a tool call fails or returns an error,
-              log it immediately and try an alternative approach. 4. Always state
-              your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call append_agent_log at the START (what you
+              plan to do) and END (what you did, result) of your work. 3. If a tool call fails or returns an error, log it
+              immediately and try an alternative approach. 4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 12
@@ -2384,6 +2312,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
+                cache_system_message: true
+                cache_tool_definitions: true
+                cache_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -2426,8 +2357,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Cache entities server-side by conversation_id (TTL
-                6h)
+              tool_description: Cache entities server-side by conversation_id (TTL 6h)
               tool_label: store_entities
               tool_name: store_entities
               type: api
@@ -2468,8 +2398,7 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Generate a YAML spec from stored entities and store it
-                  server-side
+                description: Generate a YAML spec from stored entities and store it server-side
               parameters:
                 conversation_id:
                   auto: 0
@@ -2482,15 +2411,13 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Generate a YAML spec from stored entities and store
-                it server-side
+              tool_description: Generate a YAML spec from stored entities and store it server-side
               tool_label: generate_spec
               tool_name: generate_spec
               type: api
             - enabled: true
               extra:
-                description: Retrieve the full stored spec YAML for display to the
-                  user
+                description: Retrieve the full stored spec YAML for display to the user
               parameters:
                 conversation_id:
                   auto: 0
@@ -2500,8 +2427,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Retrieve the full stored spec YAML for display to
-                the user
+              tool_description: Retrieve the full stored spec YAML for display to the user
               tool_label: get_spec
               tool_name: get_spec
               type: api
@@ -2687,8 +2613,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Transform completed chat SRS sections into standard
-                entities
+              tool_description: Transform completed chat SRS sections into standard entities
               tool_label: chat_srs_build_entities
               tool_name: chat_srs_build_entities
               type: api
@@ -2747,8 +2672,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Retrieve the full agent activity log — check what
-                previous agents have done before acting
+              tool_description: Retrieve the full agent activity log — check what previous agents have done before acting
               tool_label: get_agent_logs
               tool_name: get_agent_logs
               type: api
@@ -2762,15 +2686,13 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Get valid fields for a spec section (subjectTypes,
-                programs, encounterTypes, fields, etc.)
+              tool_description: Get valid fields for a spec section (subjectTypes, programs, encounterTypes, fields, etc.)
               tool_label: get_spec_format
               tool_name: get_spec_format
               type: api
             - enabled: true
               extra:
-                description: Apply smart defaults and detect ambiguities in a stored
-                  spec
+                description: Apply smart defaults and detect ambiguities in a stored spec
               parameters:
                 conversation_id:
                   auto: 0
@@ -2783,8 +2705,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Apply smart defaults and detect ambiguities — returns
-                questions for the user
+              tool_description: Apply smart defaults and detect ambiguities — returns questions for the user
               tool_label: enrich_spec
               tool_name: enrich_spec
               type: api
@@ -2837,11 +2758,9 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
-              append_agent_log at the START (what you plan to do) and END (what you
-              did, result) of your work. 3. If a tool call fails or returns an error,
-              log it immediately and try an alternative approach. 4. Always state
-              your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call append_agent_log at the START (what you
+              plan to do) and END (what you did, result) of your work. 3. If a tool call fails or returns an error, log it
+              immediately and try an alternative approach. 4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 10
@@ -2851,6 +2770,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
+                cache_system_message: true
+                cache_tool_definitions: true
+                cache_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -2965,8 +2887,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Read the content of a specific file from a stored
-                bundle
+              tool_description: Read the content of a specific file from a stored bundle
               tool_label: get_bundle_file
               tool_name: get_bundle_file
               type: api
@@ -3045,8 +2966,7 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Suggest sector-specific form fields for an encounter
-                  type
+                description: Suggest sector-specific form fields for an encounter type
               parameters:
                 encounter_name:
                   auto: 1
@@ -3057,15 +2977,13 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Suggest sector-specific form fields for an encounter
-                type
+              tool_description: Suggest sector-specific form fields for an encounter type
               tool_label: suggest_form_fields
               tool_name: suggest_form_fields
               type: api
             - enabled: true
               extra:
-                description: Parse natural language skip logic into AVNI declarative
-                  rules
+                description: Parse natural language skip logic into AVNI declarative rules
               parameters:
                 rules:
                   auto: 1
@@ -3073,8 +2991,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Parse natural language skip logic into AVNI declarative
-                rules
+              tool_description: Parse natural language skip logic into AVNI declarative rules
               tool_label: generate_skip_logic
               tool_name: generate_skip_logic
               type: api
@@ -3202,8 +3119,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Retrieve the full agent activity log — check what
-                previous agents have done before acting
+              tool_description: Retrieve the full agent activity log — check what previous agents have done before acting
               tool_label: get_agent_logs
               tool_name: get_agent_logs
               type: api
@@ -3256,11 +3172,9 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
-              append_agent_log at the START (what you plan to do) and END (what you
-              did, result) of your work. 3. If a tool call fails or returns an error,
-              log it immediately and try an alternative approach. 4. Always state
-              your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call append_agent_log at the START (what you
+              plan to do) and END (what you did, result) of your work. 3. If a tool call fails or returns an error, log it
+              immediately and try an alternative approach. 4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 5
@@ -3270,6 +3184,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
+                cache_system_message: true
+                cache_tool_definitions: true
+                cache_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -3316,8 +3233,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Read the content of a specific file from a stored
-                bundle
+              tool_description: Read the content of a specific file from a stored bundle
               tool_label: get_bundle_file
               tool_name: get_bundle_file
               type: api
@@ -3413,9 +3329,8 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Generates JavaScript rule code for one of 7 supported
-                  types (visitSchedule, decision, validation, eligibility, summary,
-                  worklist, checklist). Returns the code along with validation results.
+                description: Generates JavaScript rule code for one of 7 supported types (visitSchedule, decision, validation,
+                  eligibility, summary, worklist, checklist). Returns the code along with validation results.
               parameters:
                 params:
                   auto: 1
@@ -3426,16 +3341,14 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Generates JavaScript rule code for one of 7 supported
-                types (visitSchedule, decision, validation, eligibility, summary,
-                worklist, checklist). Returns the code along with validation results.
+              tool_description: Generates JavaScript rule code for one of 7 supported types (visitSchedule, decision, validation,
+                eligibility, summary, worklist, checklist). Returns the code along with validation results.
               tool_label: generate_rule
               tool_name: generate_rule
               type: api
             - enabled: true
               extra:
-                description: Search Avni documentation and guides for rules, forms,
-                  reports, best practices, and examples
+                description: Search Avni documentation and guides for rules, forms, reports, best practices, and examples
               parameters:
                 category:
                   auto: 1
@@ -3449,8 +3362,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Search Avni documentation and guides for rules, forms,
-                reports, best practices, and examples
+              tool_description: Search Avni documentation and guides for rules, forms, reports, best practices, and examples
               tool_label: knowledge_search
               tool_name: knowledge_search
               type: api
@@ -3466,8 +3378,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Retrieve the full agent activity log — check what
-                previous agents have done before acting
+              tool_description: Retrieve the full agent activity log — check what previous agents have done before acting
               tool_label: get_agent_logs
               tool_name: get_agent_logs
               type: api
@@ -3520,11 +3431,9 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
-              append_agent_log at the START (what you plan to do) and END (what you
-              did, result) of your work. 3. If a tool call fails or returns an error,
-              log it immediately and try an alternative approach. 4. Always state
-              your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call append_agent_log at the START (what you
+              plan to do) and END (what you did, result) of your work. 3. If a tool call fails or returns an error, log it
+              immediately and try an alternative approach. 4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 5
@@ -3534,6 +3443,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
+                cache_system_message: true
+                cache_tool_definitions: true
+                cache_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -3600,8 +3512,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Read the content of a specific file from a stored
-                bundle
+              tool_description: Read the content of a specific file from a stored bundle
               tool_label: get_bundle_file
               tool_name: get_bundle_file
               type: api
@@ -3697,8 +3608,7 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Search Avni documentation and guides for rules, forms,
-                  reports, best practices, and examples
+                description: Search Avni documentation and guides for rules, forms, reports, best practices, and examples
               parameters:
                 category:
                   auto: 1
@@ -3712,8 +3622,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Search Avni documentation and guides for rules, forms,
-                reports, best practices, and examples
+              tool_description: Search Avni documentation and guides for rules, forms, reports, best practices, and examples
               tool_label: knowledge_search
               tool_name: knowledge_search
               type: api
@@ -3729,8 +3638,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Retrieve the full agent activity log — check what
-                previous agents have done before acting
+              tool_description: Retrieve the full agent activity log — check what previous agents have done before acting
               tool_label: get_agent_logs
               tool_name: get_agent_logs
               type: api
@@ -3783,13 +3691,11 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
-              append_agent_log at the START and END of your work. 3. Do NOT fix bundle
-              files yourself — if you find issues, use [ROUTE_TO:agent] to send fixes
-              back to the right agent. 4. Your workflow: log_start → validate_bundle
-              → upload_bundle → upload_status → log_end. If errors, read 1 file then
-              [ROUTE_TO:agent]. 5. Your final response MUST include "Bundle uploaded
-              successfully" or describe the error. This text is shown to the user.'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call append_agent_log at the START and END of
+              your work. 3. Do NOT fix bundle files yourself — if you find issues, use [ROUTE_TO:agent] to send fixes back
+              to the right agent. 4. Your workflow: log_start → validate_bundle → upload_bundle → upload_status → log_end.
+              If errors, read 1 file then [ROUTE_TO:agent]. 5. Your final response MUST include "Bundle uploaded successfully"
+              or describe the error. This text is shown to the user.'
           maximum_iterations:
             type: constant
             value: 8
@@ -3799,6 +3705,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
+                cache_system_message: true
+                cache_tool_definitions: true
+                cache_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -3834,8 +3743,7 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Retrieve the full stored spec YAML for display to the
-                  user
+                description: Retrieve the full stored spec YAML for display to the user
               parameters:
                 conversation_id:
                   auto: 0
@@ -3845,8 +3753,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Retrieve the full stored spec YAML for display to
-                the user
+              tool_description: Retrieve the full stored spec YAML for display to the user
               tool_label: get_spec
               tool_name: get_spec
               type: api
@@ -3887,8 +3794,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Read the content of a specific file from a stored
-                bundle
+              tool_description: Read the content of a specific file from a stored bundle
               tool_label: get_bundle_file
               tool_name: get_bundle_file
               type: api
@@ -3970,8 +3876,7 @@ workflow:
               type: api
             - enabled: true
               extra:
-                description: Search Avni documentation and guides for rules, forms,
-                  reports, best practices, and examples
+                description: Search Avni documentation and guides for rules, forms, reports, best practices, and examples
               parameters:
                 category:
                   auto: 1
@@ -3985,8 +3890,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Search Avni documentation and guides for rules, forms,
-                reports, best practices, and examples
+              tool_description: Search Avni documentation and guides for rules, forms, reports, best practices, and examples
               tool_label: knowledge_search
               tool_name: knowledge_search
               type: api
@@ -4002,8 +3906,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Retrieve the full agent activity log — check what
-                previous agents have done before acting
+              tool_description: Retrieve the full agent activity log — check what previous agents have done before acting
               tool_label: get_agent_logs
               tool_name: get_agent_logs
               type: api
@@ -4017,8 +3920,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Get valid fields for a spec section (subjectTypes,
-                programs, encounterTypes, fields, etc.)
+              tool_description: Get valid fields for a spec section (subjectTypes, programs, encounterTypes, fields, etc.)
               tool_label: get_spec_format
               tool_name: get_spec_format
               type: api
@@ -4071,11 +3973,9 @@ workflow:
 
               Org Name: {{#conversation.org_name#}}
 
-              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call
-              append_agent_log at the START (what you plan to do) and END (what you
-              did, result) of your work. 3. If a tool call fails or returns an error,
-              log it immediately and try an alternative approach. 4. Always state
-              your plan before acting: "I will call X to do Y".'
+              IMPORTANT RULES: 1. Use conversation_id for ALL tool calls. 2. Call append_agent_log at the START (what you
+              plan to do) and END (what you did, result) of your work. 3. If a tool call fails or returns an error, log it
+              immediately and try an alternative approach. 4. Always state your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
             value: 10
@@ -4085,6 +3985,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
+                cache_system_message: true
+                cache_tool_definitions: true
+                cache_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -4513,8 +4416,7 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: Retrieve the full agent activity log — check what
-                previous agents have done before acting
+              tool_description: Retrieve the full agent activity log — check what previous agents have done before acting
               tool_label: get_agent_logs
               tool_name: get_agent_logs
               type: api
@@ -4555,29 +4457,21 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import re\n\ndef main(active_agent: str, existing_memory: str,\n  \
-          \       spec_text: str, bundle_text: str, rules_text: str,\n         reports_text:\
-          \ str, inspect_text: str, admin_text: str) -> dict:\n    texts = {\n   \
-          \     \"spec\": spec_text,\n        \"bundle_config\": bundle_text,\n  \
-          \      \"rules\": rules_text,\n        \"reports\": reports_text,\n    \
-          \    \"inspect\": inspect_text,\n        \"admin\": admin_text,\n    }\n\
-          \    agent_text = texts.get(active_agent, \"\") or \"\"\n    t_lower = agent_text.lower()\n\
-          \n    # Extract key status signals\n    status_prefix = \"\"\n    upload_signals\
-          \ = [\"uploaded successfully\", \"bundle uploaded\", \"upload complete\"\
-          ]\n    if any(s in t_lower for s in upload_signals):\n        status_prefix\
-          \ = \"[UPLOAD_SUCCESS] \"\n    elif \"upload_bundle\" in t_lower and \"\
-          error\" not in t_lower:\n        status_prefix = \"[UPLOAD_ATTEMPTED] \"\
-          \n    elif \"[error]\" in t_lower or \"status=error\" in t_lower:\n    \
-          \    status_prefix = \"[ERROR] \"\n\n    # Smart truncation: keep more text\
-          \ (3000 chars) per agent\n    entry = \"[\" + active_agent + \"] \" + status_prefix\
-          \ + agent_text[:3000]\n    sep = chr(10) + \"---\" + chr(10)\n    memory_entry\
-          \ = (existing_memory + sep + entry) if existing_memory else entry\n\n  \
-          \  # Cap total memory to 25000 chars to prevent context overflow\n    #\
-          \ Keep first 5000 (early agents) + last 20000 (recent work)\n    if len(memory_entry)\
-          \ > 25000:\n        memory_entry = memory_entry[:5000] + chr(10) + \"...[earlier\
-          \ entries truncated]...\" + chr(10) + memory_entry[-20000:]\n\n    return\
-          \ {\n        \"memory_entry\": memory_entry,\n        \"agent_output\":\
-          \ agent_text,\n    }\n"
+        code: "import re\n\ndef main(active_agent: str, existing_memory: str,\n         spec_text: str, bundle_text: str,\
+          \ rules_text: str,\n         reports_text: str, inspect_text: str, admin_text: str) -> dict:\n    texts = {\n  \
+          \      \"spec\": spec_text,\n        \"bundle_config\": bundle_text,\n        \"rules\": rules_text,\n        \"\
+          reports\": reports_text,\n        \"inspect\": inspect_text,\n        \"admin\": admin_text,\n    }\n    agent_text\
+          \ = texts.get(active_agent, \"\") or \"\"\n    t_lower = agent_text.lower()\n\n    # Extract key status signals\n\
+          \    status_prefix = \"\"\n    upload_signals = [\"uploaded successfully\", \"bundle uploaded\", \"upload complete\"\
+          ]\n    if any(s in t_lower for s in upload_signals):\n        status_prefix = \"[UPLOAD_SUCCESS] \"\n    elif \"\
+          upload_bundle\" in t_lower and \"error\" not in t_lower:\n        status_prefix = \"[UPLOAD_ATTEMPTED] \"\n    elif\
+          \ \"[error]\" in t_lower or \"status=error\" in t_lower:\n        status_prefix = \"[ERROR] \"\n\n    # Smart truncation:\
+          \ keep more text (3000 chars) per agent\n    entry = \"[\" + active_agent + \"] \" + status_prefix + agent_text[:3000]\n\
+          \    sep = chr(10) + \"---\" + chr(10)\n    memory_entry = (existing_memory + sep + entry) if existing_memory else\
+          \ entry\n\n    # Cap total memory to 25000 chars to prevent context overflow\n    # Keep first 5000 (early agents)\
+          \ + last 20000 (recent work)\n    if len(memory_entry) > 25000:\n        memory_entry = memory_entry[:5000] + chr(10)\
+          \ + \"...[earlier entries truncated]...\" + chr(10) + memory_entry[-20000:]\n\n    return {\n        \"memory_entry\"\
+          : memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4678,68 +4572,46 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\nimport re\n\ndef main(active_agent: str, workflow_mode:\
-          \ str, agent_output: str,\n         agent_memory: str, last_gate_status:\
-          \ str,\n         agent_structured: str) -> dict:\n    \"\"\"Stage B decider:\
-          \ deterministic routing from typed conversation\n    variables. Replaces\
-          \ the old ~60-line keyword-matching logic.\n\n    agent_structured arrives\
-          \ as a JSON-serialized string (Dify cloud\n    does not accept object-typed\
-          \ conversation variables), so we parse\n    it here before reading typed\
-          \ fields.\n\n    Rule order:\n      1. targeted mode  -> done\n      2.\
-          \ intent=ask_user  -> pause (done)\n      3. intent=error     -> pause (done)\n\
-          \      4. intent=re_route + Inspector  -> branch to re_route_target\n  \
-          \    5. legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])\n      6. gate\
-          \ errors + under retry cap  -> re-run same agent\n      7. gate errors +\
-          \ over retry cap   -> done (fail)\n      8. gate user_input_needed     \
-          \    -> pause\n      9. gate ok / not_run              -> advance in chain\n\
-          \    \"\"\"\n    if workflow_mode == \"targeted\":\n        return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n                \"reason\": \"Targeted\
-          \ mode — single agent only\"}\n\n    struct = {}\n    try:\n        if agent_structured:\n\
-          \            struct = json.loads(agent_structured) or {}\n    except Exception:\n\
-          \        struct = {}\n\n    intent = str(struct.get(\"intent\", \"\") or\
-          \ \"\")\n\n    if intent == \"ask_user\":\n        return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
-          \ intent=ask_user (structured)\"}\n    if intent == \"error\":\n       \
-          \ return {\"next_agent\": \"done\", \"loop_done\": True,\n             \
-          \   \"reason\": f\"{active_agent} intent=error (structured)\"}\n\n    if\
-          \ intent == \"re_route\" and active_agent == \"inspect\":\n        target\
-          \ = str(struct.get(\"re_route_target\", \"\") or \"\")\n        valid_targets\
-          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
-          \ in valid_targets:\n            mem_lc = (agent_memory or \"\").lower()\n\
-          \            if \"[rerouted from inspect]\" not in mem_lc:\n           \
-          \     return {\"next_agent\": target, \"loop_done\": False,\n          \
-          \              \"reason\": f\"Inspector re_route -> {target} (structured)\"\
-          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
-          \ \"\").lower()\n\n    if \"[awaiting_user_input]\" in t:\n        return\
-          \ {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\"\
-          : f\"{active_agent} legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match\
-          \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
-          \ == \"inspect\":\n        target = route_match.group(1)\n        valid_targets\
-          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
-          \ in valid_targets and \"[rerouted from inspect]\" not in mem:\n       \
-          \     return {\"next_agent\": target, \"loop_done\": False,\n          \
-          \          \"reason\": f\"Inspector routing to {target} for fixes\"}\n\n\
-          \    MAX_RETRIES = 3\n    runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
-          )\n\n    if last_gate_status == \"errors\":\n        if runs_so_far < MAX_RETRIES:\n\
-          \            return {\"next_agent\": active_agent, \"loop_done\": False,\n\
-          \                    \"reason\": (\n                        f\"Gate errors\
-          \ after {runs_so_far} run(s), \"\n                        f\"re-running\
-          \ {active_agent} \"\n                        f\"({runs_so_far}/{MAX_RETRIES})\"\
-          \n                    )}\n        return {\"next_agent\": \"done\", \"loop_done\"\
-          : True,\n                \"reason\": (\n                    f\"Gate errors\
-          \ persist after {MAX_RETRIES} retries \"\n                    f\"of {active_agent}\"\
-          \n                )}\n\n    if last_gate_status == \"user_input_needed\"\
-          :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n    \
-          \            \"reason\": f\"Gate requests user input from {active_agent}\"\
-          }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"\
-          inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
-          \ ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\":\
-          \ True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
-          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n   \
-          \     return {\"next_agent\": next_a, \"loop_done\": False,\n          \
-          \      \"reason\": f\"{active_agent} done, advancing to {next_a}\"}\n\n\
-          \    return {\"next_agent\": \"done\", \"loop_done\": True,\n          \
-          \  \"reason\": \"End of chain\"}\n"
+        code: "import json\nimport re\n\ndef main(active_agent: str, workflow_mode: str, agent_output: str,\n         agent_memory:\
+          \ str, last_gate_status: str,\n         agent_structured: str) -> dict:\n    \"\"\"Stage B decider: deterministic\
+          \ routing from typed conversation\n    variables. Replaces the old ~60-line keyword-matching logic.\n\n    agent_structured\
+          \ arrives as a JSON-serialized string (Dify cloud\n    does not accept object-typed conversation variables), so\
+          \ we parse\n    it here before reading typed fields.\n\n    Rule order:\n      1. targeted mode  -> done\n     \
+          \ 2. intent=ask_user  -> pause (done)\n      3. intent=error     -> pause (done)\n      4. intent=re_route + Inspector\
+          \  -> branch to re_route_target\n      5. legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])\n      6. gate errors\
+          \ + under retry cap  -> re-run same agent\n      7. gate errors + over retry cap   -> done (fail)\n      8. gate\
+          \ user_input_needed         -> pause\n      9. gate ok / not_run              -> advance in chain\n    \"\"\"\n\
+          \    if workflow_mode == \"targeted\":\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n       \
+          \         \"reason\": \"Targeted mode — single agent only\"}\n\n    struct = {}\n    try:\n        if agent_structured:\n\
+          \            struct = json.loads(agent_structured) or {}\n    except Exception:\n        struct = {}\n\n    intent\
+          \ = str(struct.get(\"intent\", \"\") or \"\")\n\n    if intent == \"ask_user\":\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent} intent=ask_user (structured)\"}\n\
+          \    if intent == \"error\":\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n                \"\
+          reason\": f\"{active_agent} intent=error (structured)\"}\n\n    if intent == \"re_route\" and active_agent == \"\
+          inspect\":\n        target = str(struct.get(\"re_route_target\", \"\") or \"\")\n        valid_targets = (\"spec\"\
+          , \"bundle_config\", \"rules\", \"reports\")\n        if target in valid_targets:\n            mem_lc = (agent_memory\
+          \ or \"\").lower()\n            if \"[rerouted from inspect]\" not in mem_lc:\n                return {\"next_agent\"\
+          : target, \"loop_done\": False,\n                        \"reason\": f\"Inspector re_route -> {target} (structured)\"\
+          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or \"\").lower()\n\n    if \"[awaiting_user_input]\"\
+          \ in t:\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
+          \ legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match\
+          \ and active_agent == \"inspect\":\n        target = route_match.group(1)\n        valid_targets = (\"spec\", \"\
+          bundle_config\", \"rules\", \"reports\")\n        if target in valid_targets and \"[rerouted from inspect]\" not\
+          \ in mem:\n            return {\"next_agent\": target, \"loop_done\": False,\n                    \"reason\": f\"\
+          Inspector routing to {target} for fixes\"}\n\n    MAX_RETRIES = 3\n    runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
+          )\n\n    if last_gate_status == \"errors\":\n        if runs_so_far < MAX_RETRIES:\n            return {\"next_agent\"\
+          : active_agent, \"loop_done\": False,\n                    \"reason\": (\n                        f\"Gate errors\
+          \ after {runs_so_far} run(s), \"\n                        f\"re-running {active_agent} \"\n                    \
+          \    f\"({runs_so_far}/{MAX_RETRIES})\"\n                    )}\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": (\n                    f\"Gate errors persist after {MAX_RETRIES} retries \"\
+          \n                    f\"of {active_agent}\"\n                )}\n\n    if last_gate_status == \"user_input_needed\"\
+          :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\": f\"Gate requests\
+          \ user input from {active_agent}\"}\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"inspect\"\
+          ]\n    try:\n        idx = chain.index(active_agent)\n    except ValueError:\n        return {\"next_agent\": \"\
+          done\", \"loop_done\": True,\n                \"reason\": f\"Unknown agent: {active_agent}\"}\n\n    if idx < len(chain)\
+          \ - 1:\n        next_a = chain[idx + 1]\n        return {\"next_agent\": next_a, \"loop_done\": False,\n       \
+          \         \"reason\": f\"{active_agent} done, advancing to {next_a}\"}\n\n    return {\"next_agent\": \"done\",\
+          \ \"loop_done\": True,\n            \"reason\": \"End of chain\"}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4898,11 +4770,10 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "def main(active_agent: str, existing_memory: str) -> dict:\n    error_msg\
-          \ = f\"[ERROR] The {active_agent} agent encountered an error and could not\
-          \ complete its task. The workflow has been stopped.\"\n    sep = \"\\n---\\\
-          n\"\n    updated_memory = (existing_memory + sep + error_msg) if existing_memory\
-          \ else error_msg\n    return {\"updated_memory\": updated_memory}\n"
+        code: "def main(active_agent: str, existing_memory: str) -> dict:\n    error_msg = f\"[ERROR] The {active_agent} agent\
+          \ encountered an error and could not complete its task. The workflow has been stopped.\"\n    sep = \"\\n---\\n\"\
+          \n    updated_memory = (existing_memory + sep + error_msg) if existing_memory else error_msg\n    return {\"updated_memory\"\
+          : updated_memory}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4983,48 +4854,38 @@ workflow:
         agent_parameters:
           instruction:
             type: constant
-            value: "You are a friendly assistant that summarizes what happened during\
-              \ an Avni configuration workflow.\n\n  \n\n  ## Step 0: Check for pipeline\
-              \ gate questions\n  Look in the agent memory for [GATE ERROR] entries.\
-              \ If found:\n  - These are validation errors that the pipeline found.\
-              \ The agent should have addressed them, but if they persist, explain\
-              \ them to the user's input before the pipeline can continue.\n  - Present\
-              \ each error clearly and explain what needs fixing.\n  - Do NOT summarize\
-              \ the workflow as if it's done — it's paused waiting for input.\n  -\
-              \ Format: \"Before we can proceed, I need your input on a few items:\"\
-              \ then list each question with numbered options.\n  - End with: \"The\
-              \ system will attempt to fix these on the next run.\"\n  - If [QUESTION]\
-              \ entries exist, SKIP all other summary steps.\n\n  ## Step 1: Get the\
-              \ full activity log\n  Call `get_agent_logs` with the conversation_id\
-              \ to retrieve the structured activity log. This is more\n  reliable\
-              \ than the agent memory text below.\n\n  ## Step 2: Determine upload\
-              \ status\n\n  Look for these in the agent log entries:\n  - **Uploaded**:\
-              \ Any entry with phase=\"upload\" and status=\"success\", OR action\
-              \ contains \"uploaded\n  successfully\" or \"Bundle uploaded\"\n  -\
-              \ **NOT uploaded**: No such entry exists\n\n  Also check the agent memory\
-              \ for backup signals:\n  <agent_log>\n  {{#conversation.agent_memory#}}\n\
-              \  </agent_log>\n\n  Look for [UPLOAD_SUCCESS] tag or \"upload_bundle\"\
-              \ / \"uploaded successfully\" in the memory text.\n\n  Do NOT guess.\
-              \ If you cannot find an explicit upload indicator in either source,\
-              \ say the bundle was NOT\n  uploaded.\n\n  ## Step 3: Write the summary\n\
-              \n  1. Check if the log contains entries with status=\"error\". If yes,\
-              \ explain what went wrong simply and\n  suggest retry.\n  2. Check if\
-              \ the log contains ROUTE_TO entries that were NOT followed by a successful\
-              \ upload. Tell the\n  user what was found and what fix was attempted.\n\
-              \  3. **If uploaded**: Start with \"Your bundle has been uploaded to\
-              \ Avni successfully.\" Then summarize what\n   was built in 3-5 bullet\
-              \ points. Next steps: review forms in Avni, set up locations and users.\n\
-              \  4. **If NOT uploaded**: Start with \"Your bundle has been generated\
-              \ but is NOT yet uploaded to Avni.\"\n  Explain what happened and what\
-              \ the user should do (retry, or ask the assistant to upload).\n  5.\
-              \ Keep it under 200 words, use markdown.\n  6. Do NOT dump raw data\
-              \ or technical details.\n  7. Do NOT say \"ready to deploy\" — either\
-              \ it IS deployed (uploaded) or it is NOT."
+            value: "You are a friendly assistant that summarizes what happened during an Avni configuration workflow.\n\n\
+              \  \n\n  ## Step 0: Check for pipeline gate questions\n  Look in the agent memory for [GATE ERROR] entries.\
+              \ If found:\n  - These are validation errors that the pipeline found. The agent should have addressed them,\
+              \ but if they persist, explain them to the user's input before the pipeline can continue.\n  - Present each\
+              \ error clearly and explain what needs fixing.\n  - Do NOT summarize the workflow as if it's done — it's paused\
+              \ waiting for input.\n  - Format: \"Before we can proceed, I need your input on a few items:\" then list each\
+              \ question with numbered options.\n  - End with: \"The system will attempt to fix these on the next run.\"\n\
+              \  - If [QUESTION] entries exist, SKIP all other summary steps.\n\n  ## Step 1: Get the full activity log\n\
+              \  Call `get_agent_logs` with the conversation_id to retrieve the structured activity log. This is more\n  reliable\
+              \ than the agent memory text below.\n\n  ## Step 2: Determine upload status\n\n  Look for these in the agent\
+              \ log entries:\n  - **Uploaded**: Any entry with phase=\"upload\" and status=\"success\", OR action contains\
+              \ \"uploaded\n  successfully\" or \"Bundle uploaded\"\n  - **NOT uploaded**: No such entry exists\n\n  Also\
+              \ check the agent memory for backup signals:\n  <agent_log>\n  {{#conversation.agent_memory#}}\n  </agent_log>\n\
+              \n  Look for [UPLOAD_SUCCESS] tag or \"upload_bundle\" / \"uploaded successfully\" in the memory text.\n\n \
+              \ Do NOT guess. If you cannot find an explicit upload indicator in either source, say the bundle was NOT\n \
+              \ uploaded.\n\n  ## Step 3: Write the summary\n\n  1. Check if the log contains entries with status=\"error\"\
+              . If yes, explain what went wrong simply and\n  suggest retry.\n  2. Check if the log contains ROUTE_TO entries\
+              \ that were NOT followed by a successful upload. Tell the\n  user what was found and what fix was attempted.\n\
+              \  3. **If uploaded**: Start with \"Your bundle has been uploaded to Avni successfully.\" Then summarize what\n\
+              \   was built in 3-5 bullet points. Next steps: review forms in Avni, set up locations and users.\n  4. **If\
+              \ NOT uploaded**: Start with \"Your bundle has been generated but is NOT yet uploaded to Avni.\"\n  Explain\
+              \ what happened and what the user should do (retry, or ask the assistant to upload).\n  5. Keep it under 200\
+              \ words, use markdown.\n  6. Do NOT dump raw data or technical details.\n  7. Do NOT say \"ready to deploy\"\
+              \ — either it IS deployed (uploaded) or it is NOT."
           model:
             type: constant
             value:
               completion_params:
                 max_tokens: 10240
+                cache_system_message: true
+                cache_tool_definitions: true
+                cache_tool_results: true
               mode: chat
               model: claude-haiku-4-5-20251001
               model_type: llm
@@ -5038,16 +4899,13 @@ workflow:
             value:
             - enabled: true
               extra:
-                description: 'Returns all structured log entries for the conversation.
-                  Use this at the
+                description: 'Returns all structured log entries for the conversation. Use this at the
 
-                  START of your work to check what previous agents have already done
-                  — look
+                  START of your work to check what previous agents have already done — look
 
                   for phase/status entries like spec_generation:success, bundle_config:success,
 
-                  rules_generation:success, upload:success to avoid redoing completed
-                  work.
+                  rules_generation:success, upload:success to avoid redoing completed work.
 
                   '
               parameters:
@@ -5059,16 +4917,13 @@ workflow:
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
               provider_show_name: Avni AI Staging SubAgents Openapi
               settings: {}
-              tool_description: 'Returns all structured log entries for the conversation.
-                Use this at the
+              tool_description: 'Returns all structured log entries for the conversation. Use this at the
 
-                START of your work to check what previous agents have already done
-                — look
+                START of your work to check what previous agents have already done — look
 
                 for phase/status entries like spec_generation:success, bundle_config:success,
 
-                rules_generation:success, upload:success to avoid redoing completed
-                work.
+                rules_generation:success, upload:success to avoid redoing completed work.
 
                 '
               tool_label: get_agent_logs
@@ -5184,29 +5039,21 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
-          \ str,\n         active_agent: str) -> dict:\n    has_errors = False\n \
-          \   gate_output = \"\"\n    last_gate_status = \"not_run\"\n    last_gate_errors_str\
-          \ = \"\"\n    last_gate_warnings_str = \"\"\n    try:\n        parsed =\
-          \ json.loads(gate_body) if gate_body else {}\n        errors = parsed.get(\"\
-          errors\", []) or []\n        warnings = parsed.get(\"warnings\", []) or\
-          \ []\n        next_action = parsed.get(\"next_action\", \"\")\n        has_errors\
-          \ = len(errors) > 0\n        last_gate_errors_str = chr(10).join(str(e)\
-          \ for e in errors)\n        last_gate_warnings_str = chr(10).join(str(w)\
-          \ for w in warnings)\n        if next_action == \"user_input_needed\":\n\
-          \            has_errors = False\n            last_gate_status = \"user_input_needed\"\
-          \n        elif has_errors:\n            last_gate_status = \"errors\"\n\
-          \        else:\n            last_gate_status = \"ok\"\n        parts = []\n\
-          \        for err in errors:\n            parts.append(\"[GATE ERROR] \"\
-          \ + str(err))\n        for warn in warnings[:5]:\n            parts.append(\"\
-          [GATE WARNING] \" + str(warn))\n        # Always log this gate run so the\
-          \ decider can count attempts.\n        if active_agent:\n            parts.append(\"\
-          [gate-ran:\" + active_agent + \"]\")\n        gate_output = chr(10).join(parts)\n\
-          \    except Exception:\n        pass\n    if gate_status >= 400:\n     \
-          \   has_errors = False\n        last_gate_status = \"errors\"\n        last_gate_errors_str\
-          \ = f\"Gate HTTP {gate_status}\"\n    return {\n        \"has_questions\"\
-          : has_errors,\n        \"gate_output\": gate_output,\n        \"last_gate_status\"\
-          : last_gate_status,\n        \"last_gate_errors\": last_gate_errors_str,\n\
+        code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory: str,\n         active_agent: str) ->\
+          \ dict:\n    has_errors = False\n    gate_output = \"\"\n    last_gate_status = \"not_run\"\n    last_gate_errors_str\
+          \ = \"\"\n    last_gate_warnings_str = \"\"\n    try:\n        parsed = json.loads(gate_body) if gate_body else\
+          \ {}\n        errors = parsed.get(\"errors\", []) or []\n        warnings = parsed.get(\"warnings\", []) or []\n\
+          \        next_action = parsed.get(\"next_action\", \"\")\n        has_errors = len(errors) > 0\n        last_gate_errors_str\
+          \ = chr(10).join(str(e) for e in errors)\n        last_gate_warnings_str = chr(10).join(str(w) for w in warnings)\n\
+          \        if next_action == \"user_input_needed\":\n            has_errors = False\n            last_gate_status\
+          \ = \"user_input_needed\"\n        elif has_errors:\n            last_gate_status = \"errors\"\n        else:\n\
+          \            last_gate_status = \"ok\"\n        parts = []\n        for err in errors:\n            parts.append(\"\
+          [GATE ERROR] \" + str(err))\n        for warn in warnings[:5]:\n            parts.append(\"[GATE WARNING] \" + str(warn))\n\
+          \        # Always log this gate run so the decider can count attempts.\n        if active_agent:\n            parts.append(\"\
+          [gate-ran:\" + active_agent + \"]\")\n        gate_output = chr(10).join(parts)\n    except Exception:\n       \
+          \ pass\n    if gate_status >= 400:\n        has_errors = False\n        last_gate_status = \"errors\"\n        last_gate_errors_str\
+          \ = f\"Gate HTTP {gate_status}\"\n    return {\n        \"has_questions\": has_errors,\n        \"gate_output\"\
+          : gate_output,\n        \"last_gate_status\": last_gate_status,\n        \"last_gate_errors\": last_gate_errors_str,\n\
           \        \"last_gate_warnings\": last_gate_warnings_str,\n    }\n"
         code_language: python3
         isInLoop: true
@@ -5328,45 +5175,31 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\nimport re\n\ndef main(agent_output: str, active_agent:\
-          \ str,\n         current_active_phase: str,\n         current_spec_awaiting:\
-          \ bool,\n         current_pending_ambiguities: list) -> dict:\n    \"\"\"\
-          Parse the structured JSON block emitted at the end of an agent's\n    response\
-          \ and compute new conversation-variable values. Pass-through\n    the current\
-          \ state when no JSON block is found so downstream assigners\n    can overwrite\
-          \ unconditionally without losing state.\n    \"\"\"\n    intent = \"\"\n\
-          \    target_phase = \"\"\n    ambiguities = []\n    applied_changes = []\n\
-          \    reason = \"\"\n    parsed_ok = False\n    payload = None\n    text\
-          \ = agent_output or \"\"\n\n    # Prefer a fenced ```json ... ``` block.\n\
-          \    m = re.search(r\"```json\\s*(\\{.*?\\})\\s*```\", text, re.DOTALL)\n\
-          \    if m:\n        try:\n            payload = json.loads(m.group(1))\n\
-          \        except Exception:\n            payload = None\n\n    # Fall back:\
-          \ last brace-balanced object containing \"intent\".\n    if payload is None:\n\
-          \        for match in reversed(list(\n            re.finditer(r\"\\{[^{}]*\\\
-          \"intent\\\"[^{}]*\\}\", text, re.DOTALL)\n        )):\n            try:\n\
-          \                payload = json.loads(match.group(0))\n                break\n\
-          \            except Exception:\n                continue\n\n    if isinstance(payload,\
-          \ dict):\n        intent = str(payload.get(\"intent\", \"\") or \"\")\n\
-          \        target_phase = str(payload.get(\"target_phase\", \"\") or \"\"\
-          )\n        ambiguities = payload.get(\"ambiguities\", []) or []\n      \
-          \  applied_changes = payload.get(\"applied_changes\", []) or []\n      \
-          \  reason = str(payload.get(\"reason\", \"\") or \"\")\n        parsed_ok\
-          \ = True\n\n    # Computed pass-through outputs.\n    out_active_phase =\
-          \ (\n        target_phase\n        if (parsed_ok and target_phase)\n   \
-          \     else (current_active_phase or \"intake\")\n    )\n    out_spec_awaiting\
-          \ = (\n        bool(parsed_ok and intent == \"ask_user\" and active_agent\
-          \ == \"spec\")\n        if parsed_ok\n        else bool(current_spec_awaiting)\n\
-          \    )\n    out_pending_ambiguities = (\n        ambiguities\n        if\
-          \ (parsed_ok and intent == \"ask_user\")\n        else (current_pending_ambiguities\
-          \ or [])\n    )\n    # Dify cloud does not accept object-typed conversation\
-          \ variables,\n    # so agent_structured is stored as a JSON string. Serialize\
-          \ here.\n    raw_payload_obj = payload if isinstance(payload, dict) else\
-          \ {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    return {\n  \
-          \      \"intent\": intent,\n        \"target_phase\": target_phase,\n  \
-          \      \"ambiguities\": ambiguities,\n        \"applied_changes\": applied_changes,\n\
-          \        \"reason\": reason,\n        \"parsed_ok\": parsed_ok,\n      \
-          \  \"out_active_phase\": out_active_phase,\n        \"out_spec_awaiting\"\
-          : out_spec_awaiting,\n        \"out_pending_ambiguities\": out_pending_ambiguities,\n\
+        code: "import json\nimport re\n\ndef main(agent_output: str, active_agent: str,\n         current_active_phase: str,\n\
+          \         current_spec_awaiting: bool,\n         current_pending_ambiguities: list) -> dict:\n    \"\"\"Parse the\
+          \ structured JSON block emitted at the end of an agent's\n    response and compute new conversation-variable values.\
+          \ Pass-through\n    the current state when no JSON block is found so downstream assigners\n    can overwrite unconditionally\
+          \ without losing state.\n    \"\"\"\n    intent = \"\"\n    target_phase = \"\"\n    ambiguities = []\n    applied_changes\
+          \ = []\n    reason = \"\"\n    parsed_ok = False\n    payload = None\n    text = agent_output or \"\"\n\n    # Prefer\
+          \ a fenced ```json ... ``` block.\n    m = re.search(r\"```json\\s*(\\{.*?\\})\\s*```\", text, re.DOTALL)\n    if\
+          \ m:\n        try:\n            payload = json.loads(m.group(1))\n        except Exception:\n            payload\
+          \ = None\n\n    # Fall back: last brace-balanced object containing \"intent\".\n    if payload is None:\n      \
+          \  for match in reversed(list(\n            re.finditer(r\"\\{[^{}]*\\\"intent\\\"[^{}]*\\}\", text, re.DOTALL)\n\
+          \        )):\n            try:\n                payload = json.loads(match.group(0))\n                break\n  \
+          \          except Exception:\n                continue\n\n    if isinstance(payload, dict):\n        intent = str(payload.get(\"\
+          intent\", \"\") or \"\")\n        target_phase = str(payload.get(\"target_phase\", \"\") or \"\")\n        ambiguities\
+          \ = payload.get(\"ambiguities\", []) or []\n        applied_changes = payload.get(\"applied_changes\", []) or []\n\
+          \        reason = str(payload.get(\"reason\", \"\") or \"\")\n        parsed_ok = True\n\n    # Computed pass-through\
+          \ outputs.\n    out_active_phase = (\n        target_phase\n        if (parsed_ok and target_phase)\n        else\
+          \ (current_active_phase or \"intake\")\n    )\n    out_spec_awaiting = (\n        bool(parsed_ok and intent == \"\
+          ask_user\" and active_agent == \"spec\")\n        if parsed_ok\n        else bool(current_spec_awaiting)\n    )\n\
+          \    out_pending_ambiguities = (\n        ambiguities\n        if (parsed_ok and intent == \"ask_user\")\n     \
+          \   else (current_pending_ambiguities or [])\n    )\n    # Dify cloud does not accept object-typed conversation\
+          \ variables,\n    # so agent_structured is stored as a JSON string. Serialize here.\n    raw_payload_obj = payload\
+          \ if isinstance(payload, dict) else {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    return {\n        \"\
+          intent\": intent,\n        \"target_phase\": target_phase,\n        \"ambiguities\": ambiguities,\n        \"applied_changes\"\
+          : applied_changes,\n        \"reason\": reason,\n        \"parsed_ok\": parsed_ok,\n        \"out_active_phase\"\
+          : out_active_phase,\n        \"out_spec_awaiting\": out_spec_awaiting,\n        \"out_pending_ambiguities\": out_pending_ambiguities,\n\
           \        \"raw_payload\": raw_payload,\n    }\n"
         code_language: python3
         isInLoop: true
@@ -5540,9 +5373,8 @@ workflow:
             - spec_awaiting_user_input
           id: spec-awaiting
           logical_operator: and
-        desc: Short-circuit when a Spec Agent gap-fix question is pending. Bypasses
-          the Orchestrator LLM entirely and re-enters the agent loop with active_agent=spec
-          so the user reply is applied by the Spec Agent.
+        desc: Short-circuit when a Spec Agent gap-fix question is pending. Bypasses the Orchestrator LLM entirely and re-enters
+          the agent loop with active_agent=spec so the user reply is applied by the Spec Agent.
         selected: false
         title: Spec Awaiting Check
         type: if-else
@@ -5560,14 +5392,11 @@ workflow:
       type: custom
       width: 241
     - data:
-        code: "def main(user_query: str) -> dict:\n    \"\"\"Emit constants needed\
-          \ to resume the Spec Agent on a user reply\n    during a pending gap-fix.\
-          \ The downstream assigner copies these into\n    conversation variables\
-          \ so the graph converges with the normal\n    Set-Initial-Agent path at\
-          \ the File Check IF.\n    \"\"\"\n    return {\n        \"active_agent\"\
-          : \"spec\",\n        \"workflow_mode\": \"generic\",\n        \"active_phase\"\
-          : \"spec_correcting\",\n        \"user_last_answer\": user_query or \"\"\
-          ,\n    }\n"
+        code: "def main(user_query: str) -> dict:\n    \"\"\"Emit constants needed to resume the Spec Agent on a user reply\n\
+          \    during a pending gap-fix. The downstream assigner copies these into\n    conversation variables so the graph\
+          \ converges with the normal\n    Set-Initial-Agent path at the File Check IF.\n    \"\"\"\n    return {\n      \
+          \  \"active_agent\": \"spec\",\n        \"workflow_mode\": \"generic\",\n        \"active_phase\": \"spec_correcting\"\
+          ,\n        \"user_last_answer\": user_query or \"\",\n    }\n"
         code_language: python3
         outputs:
           active_agent:
