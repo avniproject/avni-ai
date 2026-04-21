@@ -4557,12 +4557,20 @@ workflow:
           \   if target in valid_targets and not already_rerouted:\n            return\
           \ {\"next_agent\": target, \"loop_done\": False,\n                    \"\
           reason\": f\"Inspector found issues, routing to {target} for fixes\"}\n\n\
-          \    # Detect if agent is asking user a question\n    question_signals =\
-          \ [\"could you\", \"can you please\", \"would you like\",\n            \
-          \         \"please provide\", \"please confirm\", \"please share\",\n  \
-          \                   \"let me know\", \"what would you\", \"which option\"\
-          ,\n                     \"do you want\", \"shall i\"]\n    asking_user =\
-          \ any(q in t for q in question_signals) and t.rstrip().endswith(\"?\")\n\
+          \    # Explicit marker emitted by the Spec Agent's mandatory gap-fix protocol.\
+          \ Authoritative\n    # signal that the agent is waiting on user input — wins\
+          \ over any completion signal.\n    if \"[awaiting_user_input]\" in t:\n \
+          \       return {\"next_agent\": \"done\", \"loop_done\": True,\n         \
+          \       \"reason\": f\"{active_agent} is awaiting user input\"}\n\n    # Detect\
+          \ if agent is asking user a question\n    question_signals = [\"could you\"\
+          , \"can you please\", \"would you like\",\n                     \"please\
+          \ provide\", \"please confirm\", \"please share\",\n                     \"\
+          let me know\", \"what would you\", \"which option\",\n                 \
+          \    \"do you want\", \"shall i\",\n                     \"please answer\"\
+          , \"please choose\", \"please pick\",\n                     \"please select\"\
+          , \"your input\", \"your answer\"]\n    asking_user = any(q in t for q in\
+          \ question_signals) and (\n        t.rstrip().endswith(\"?\") or \"?\" in\
+          \ t\n    )\n\
           \n    # Phase-based completion: check if agent logged success via append_agent_log\n\
           \    phase_map = {\n        \"spec\": \"spec_generation\",\n        \"bundle_config\"\
           : \"bundle_config\",\n        \"rules\": \"rules_generation\",\n       \
