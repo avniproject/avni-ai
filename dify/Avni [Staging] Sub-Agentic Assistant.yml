@@ -1105,18 +1105,38 @@ workflow:
             \ Avni support\", \"Is there a way\", \"How can I\"), it is ALWAYS RAG\
             \ regardless of complexity.\n\n\n### BUNDLE_SETUP — Program Setup from\
             \ Uploaded SRS/Specification Files\n\n**Priority: HIGHEST — evaluate before\
-            \ RAG and ASSISTANT**\n\n**Route BUNDLE_SETUP when ANY of the following:**\n\
-            1. The file upload status above shows files were uploaded (has_files =\
-            \ true)\n2. User's message mentions uploading a file, SRS, scoping sheet,\
-            \ or specification document\n3. `conversation.setup_mode_active == true`\
-            \ — already in an active bundle setup workflow (follow-up turn: \"what\\\
-            's next?\", \"proceed\", \"approve\", etc.)\n3. User explicitly says \"\
-            upload SRS\", \"upload spec\", \"upload field workflow\", \"generate bundle\
-            \ from file\"\n\n**When routing BUNDLE_SETUP, ALWAYS set initial_agent\
-            \ = \\\"spec\\\" and workflow_mode = \\\"generic\\\"**. The spec agent\
-            \ must run first to parse the SRS and extract entities before bundle generation.\n\
-            \n**Do NOT route here for:**\n- Verbal SRS description without a file\
-            \ → ASSISTANT\n- General Avni platform questions → RAG\n\n\n### RAG -\
+            \ RAG and ASSISTANT**\n\n**HARD OVERRIDE — gap-fix continuation (takes\
+            \ precedence over every other rule, including OUT_OF_SCOPE / ASSISTANT /\
+            \ deletion-looking messages):**\nScan the MOST RECENT assistant turn in\
+            \ the conversation history. If it contains the literal token `[AWAITING_USER_INPUT]`\
+            \ anywhere, this user message is a reply to a pending Spec Agent gap-fix\
+            \ question. You MUST route:\n  service = BUNDLE_SETUP\n  initial_agent =\
+            \ spec\n  workflow_mode = generic\n  clarification_needed = false\n  routing_reason\
+            \ = \"Continuation of Spec Agent gap-fix dialog (assistant previously emitted\
+            \ [AWAITING_USER_INPUT]).\"\nApply this rule even when the user's reply\
+            \ is terse (\"remove all\", \"use defaults\", \"option B for all\", \"1:A,\
+            \ 2:B, 3:Remove\", \"yes\", \"no\"), looks like a deletion request, looks\
+            \ out-of-scope, or mentions nothing about Avni. Terse corrections during\
+            \ an active setup are never RAG/ASSISTANT/OUT_OF_SCOPE.\n\n**Route BUNDLE_SETUP\
+            \ when ANY of the following:**\n1. The file upload status above shows files\
+            \ were uploaded (has_files = true)\n2. User's message mentions uploading\
+            \ a file, SRS, scoping sheet, or specification document\n3. The conversation\
+            \ already has BUNDLE_SETUP activity (earlier assistant turns produced spec/bundle/upload\
+            \ output, even if no `[AWAITING_USER_INPUT]` marker), AND the current user\
+            \ message is a short reply or continuation — e.g., \"proceed\", \"approve\"\
+            , \"approved\", \"looks good\", \"yes go ahead\", \"no change\", \"remove\
+            \ X\", \"keep X\", \"option A\", \"1, 2, 3\", \"use defaults\", \"what's\
+            \ next?\", \"continue\", any message under 200 chars that reads as a reply\
+            \ rather than a new question.\n4. User explicitly says \"upload SRS\", \"\
+            upload spec\", \"upload field workflow\", \"generate bundle from file\"\n\
+            \n**When routing BUNDLE_SETUP, ALWAYS set initial_agent = \\\"spec\\\" and\
+            \ workflow_mode = \\\"generic\\\"**. The spec agent must run first to parse\
+            \ the SRS and extract entities before bundle generation. For the HARD OVERRIDE\
+            \ case above, `initial_agent = spec` is non-negotiable — the Spec Agent\
+            \ is the only agent that can apply the user's gap-fix answers.\n\n**Do NOT\
+            \ route here for:**\n- Verbal SRS description without a file (and no prior\
+            \ BUNDLE_SETUP activity) → ASSISTANT\n- General Avni platform questions\
+            \ (when conversation has no active setup) → RAG\n\n\n### RAG -\
             \ Platform Knowledge & Capabilities\n\n\n**Primary Intent**: Learning\
             \ what Avni can/cannot do\n\n\n**Definitive Indicators** (Route to RAG\
             \ even if complex):\n- \"What is Avni?\" → RAG (basic platform knowledge)\n\
