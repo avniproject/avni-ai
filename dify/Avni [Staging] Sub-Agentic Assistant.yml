@@ -2377,7 +2377,7 @@ workflow:
               your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 6
+            value: 8
           model:
             type: constant
             value:
@@ -2844,7 +2844,7 @@ workflow:
               your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 6
+            value: 10
           model:
             type: constant
             value:
@@ -3792,7 +3792,7 @@ workflow:
               successfully" or describe the error. This text is shown to the user.'
           maximum_iterations:
             type: constant
-            value: 5
+            value: 8
           model:
             type: constant
             value:
@@ -4078,7 +4078,7 @@ workflow:
               your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 5
+            value: 10
           model:
             type: constant
             value:
@@ -4719,7 +4719,7 @@ workflow:
           \ in valid_targets and \"[rerouted from inspect]\" not in mem:\n       \
           \     return {\"next_agent\": target, \"loop_done\": False,\n          \
           \          \"reason\": f\"Inspector routing to {target} for fixes\"}\n\n\
-          \    MAX_RETRIES = 2\n    runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
+          \    MAX_RETRIES = 3\n    runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
           )\n\n    if last_gate_status == \"errors\":\n        if runs_so_far < MAX_RETRIES:\n\
           \            return {\"next_agent\": active_agent, \"loop_done\": False,\n\
           \                    \"reason\": (\n                        f\"Gate errors\
