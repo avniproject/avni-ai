@@ -570,9 +570,9 @@ async def handle_validate_entities(request: Request) -> JSONResponse:
         "warning_count": len(warnings),
         "has_errors": len(errors) > 0,
         "has_warnings": len(warnings) > 0,
-        "issues_truncated": (
-            len(errors) > MAX_ERRORS or len(warnings) > MAX_WARNINGS
-        ) if not verbose else False,
+        "issues_truncated": (len(errors) > MAX_ERRORS or len(warnings) > MAX_WARNINGS)
+        if not verbose
+        else False,
     }
 
     if verbose:

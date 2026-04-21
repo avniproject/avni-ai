@@ -141,6 +141,15 @@ workflow:
     - agent_structured
     value: ''
     value_type: string
+  - description: Last agent user-facing text. Exposed outside the loop so answer nodes
+      can echo it.
+    id: 9f4a2c18-3d2d-4d0d-8c9a-6b1e8e2b4a11
+    name: last_agent_message
+    selector:
+    - conversation
+    - last_agent_message
+    value: ''
+    value_type: string
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -4577,6 +4586,15 @@ workflow:
           - conversation
           - agent_memory
           write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000720'
+          - agent_output
+          variable_selector:
+          - conversation
+          - last_agent_message
+          write_mode: over-write
         loop_id: '1800000000700'
         selected: false
         title: State Update
@@ -5032,7 +5050,7 @@ workflow:
       type: custom
       width: 241
     - data:
-        answer: '{{#1800000000720.agent_output#}}'
+        answer: '{{#conversation.last_agent_message#}}'
         selected: false
         title: Ask-User Answer
         type: answer
