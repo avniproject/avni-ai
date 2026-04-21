@@ -2377,7 +2377,7 @@ workflow:
               your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 8
+            value: 12
           model:
             type: constant
             value:
