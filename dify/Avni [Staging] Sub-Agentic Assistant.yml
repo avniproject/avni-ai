@@ -4742,8 +4742,8 @@ workflow:
         - input_type: variable
           operation: over-write
           value:
-          - '1800000000720'
-          - agent_output
+          - '1800000000725'
+          - narrative
           variable_selector:
           - conversation
           - last_agent_message
@@ -5506,13 +5506,18 @@ workflow:
           \ or [])\n    )\n    # Dify cloud does not accept object-typed conversation\
           \ variables,\n    # so agent_structured is stored as a JSON string. Serialize\
           \ here.\n    raw_payload_obj = payload if isinstance(payload, dict) else\
-          \ {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    return {\n  \
-          \      \"intent\": intent,\n        \"target_phase\": target_phase,\n  \
-          \      \"ambiguities\": ambiguities,\n        \"applied_changes\": applied_changes,\n\
-          \        \"reason\": reason,\n        \"parsed_ok\": parsed_ok,\n      \
-          \  \"out_active_phase\": out_active_phase,\n        \"out_spec_awaiting\"\
-          : out_spec_awaiting,\n        \"out_pending_ambiguities\": out_pending_ambiguities,\n\
-          \        \"raw_payload\": raw_payload,\n    }\n"
+          \ {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    # Narrative:\
+          \ agent_output with the structured JSON block removed so the\n    # user-facing\
+          \ answer node (Ask-User Answer) doesn't echo the payload.\n    narrative\
+          \ = re.sub(r\"```json\\s*\\{.*?\\}\\s*```\", \"\", text, flags=re.DOTALL)\n\
+          \    narrative = re.sub(r\"\\{[^{}]*\\\"intent\\\"[^{}]*\\}\\s*$\", \"\"\
+          , narrative, flags=re.DOTALL).rstrip()\n\n    return {\n        \"intent\"\
+          : intent,\n        \"target_phase\": target_phase,\n        \"ambiguities\"\
+          : ambiguities,\n        \"applied_changes\": applied_changes,\n        \"\
+          reason\": reason,\n        \"parsed_ok\": parsed_ok,\n        \"out_active_phase\"\
+          : out_active_phase,\n        \"out_spec_awaiting\": out_spec_awaiting,\n\
+          \        \"out_pending_ambiguities\": out_pending_ambiguities,\n        \"\
+          raw_payload\": raw_payload,\n        \"narrative\": narrative,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5522,6 +5527,8 @@ workflow:
           applied_changes:
             type: array[object]
           intent:
+            type: string
+          narrative:
             type: string
           out_active_phase:
             type: string
