@@ -1202,7 +1202,7 @@ workflow:
         model:
           completion_params:
             temperature: 0
-            cache_system_message: true
+            prompt_caching_system_message: true
           mode: chat
           name: claude-haiku-4-5-20251001
           provider: langgenius/anthropic/anthropic
@@ -1505,7 +1505,7 @@ workflow:
           completion_params:
             max_tokens: 4096
             temperature: 0.3
-            cache_system_message: true
+            prompt_caching_system_message: true
           mode: chat
           name: claude-sonnet-4-6
           provider: langgenius/anthropic/anthropic
@@ -2312,9 +2312,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
-                cache_system_message: true
-                cache_tool_definitions: true
-                cache_tool_results: true
+                prompt_caching_system_message: true
+                prompt_caching_tool_definitions: true
+                prompt_caching_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -2770,9 +2770,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
-                cache_system_message: true
-                cache_tool_definitions: true
-                cache_tool_results: true
+                prompt_caching_system_message: true
+                prompt_caching_tool_definitions: true
+                prompt_caching_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -3184,9 +3184,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
-                cache_system_message: true
-                cache_tool_definitions: true
-                cache_tool_results: true
+                prompt_caching_system_message: true
+                prompt_caching_tool_definitions: true
+                prompt_caching_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -3443,9 +3443,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
-                cache_system_message: true
-                cache_tool_definitions: true
-                cache_tool_results: true
+                prompt_caching_system_message: true
+                prompt_caching_tool_definitions: true
+                prompt_caching_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -3705,9 +3705,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
-                cache_system_message: true
-                cache_tool_definitions: true
-                cache_tool_results: true
+                prompt_caching_system_message: true
+                prompt_caching_tool_definitions: true
+                prompt_caching_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -3985,9 +3985,9 @@ workflow:
               completion_params:
                 max_tokens: 16384
                 temperature: 0.2
-                cache_system_message: true
-                cache_tool_definitions: true
-                cache_tool_results: true
+                prompt_caching_system_message: true
+                prompt_caching_tool_definitions: true
+                prompt_caching_tool_results: true
               mode: chat
               model: claude-sonnet-4-6
               model_type: llm
@@ -4883,9 +4883,9 @@ workflow:
             value:
               completion_params:
                 max_tokens: 10240
-                cache_system_message: true
-                cache_tool_definitions: true
-                cache_tool_results: true
+                prompt_caching_system_message: true
+                prompt_caching_tool_definitions: true
+                prompt_caching_tool_results: true
               mode: chat
               model: claude-haiku-4-5-20251001
               model_type: llm
