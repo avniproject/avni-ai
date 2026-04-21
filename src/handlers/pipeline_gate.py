@@ -169,7 +169,31 @@ async def _validate_after_spec(conversation_id: str) -> dict:
     warnings.extend(validation.get("warnings", []))
 
     ok = len(errors) == 0
-    next_action = "continue" if ok else "fix_required"
+
+    # Classify errors: gap-type errors need a human decision (remove entity vs
+    # add missing pieces), not another agent retry. Returning
+    # next_action="user_input_needed" tells the Gate Parser to set
+    # last_gate_status accordingly, which the Next Agent Decider uses to
+    # break the loop and show the user instead of re-running the agent.
+    gap_error_fragments = (
+        "has no form",
+        "has no enrolmentform",
+        "has no forms, programs, or encounters",
+        "has no subject_type",
+        "has no program_name",
+    )
+    has_gap_errors = any(
+        any(frag in str(e).lower() for frag in gap_error_fragments)
+        for e in errors
+    )
+
+    if ok:
+        next_action = "continue"
+    elif has_gap_errors:
+        next_action = "user_input_needed"
+    else:
+        next_action = "fix_required"
+
     return {
         "ok": ok,
         "errors": errors,
