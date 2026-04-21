@@ -1285,6 +1285,131 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
                     }
                 )
 
+    # ── Structural gap detection (asks the user; fix is entity-level) ─
+    # Entities are the source of truth. Answers to these ambiguities MUST
+    # flow through update_entities_section followed by generate_spec so the
+    # correction survives the next regeneration.
+    subject_types = spec.get("subjectTypes") or []
+    programs = spec.get("programs") or []
+    encounter_types = spec.get("encounterTypes") or []
+
+    referenced_sts: set[str] = set()
+    programs_with_encounters: set[str] = set()
+    for enc in encounter_types:
+        if not isinstance(enc, dict):
+            continue
+        if enc.get("subjectType"):
+            referenced_sts.add(enc["subjectType"])
+        if enc.get("program"):
+            programs_with_encounters.add(enc["program"])
+    for prog in programs:
+        if isinstance(prog, dict) and prog.get("targetSubjectType"):
+            referenced_sts.add(prog["targetSubjectType"])
+
+    form_names_in_spec = [
+        f.get("name")
+        for f in (spec.get("forms") or [])
+        if isinstance(f, dict) and f.get("name")
+    ]
+
+    # Gap 1: subject type with no forms / programs / encounters referencing it.
+    for st in subject_types:
+        if not isinstance(st, dict):
+            continue
+        name = st.get("name", "")
+        if not name:
+            continue
+        has_reg_form = "registrationForm" in st
+        if has_reg_form or name in referenced_sts:
+            continue
+        st_id = name.lower().replace(" ", "_").replace("-", "_")[:30]
+        ambiguities.append(
+            {
+                "id": f"spec_st_{st_id}_unmapped",
+                "section": "subjectTypes",
+                "entity": name,
+                "field": "mapping",
+                "question": (
+                    f"Subject type '{name}' has no registrationForm, program, or "
+                    f"encounter referencing it. How should we handle it?"
+                ),
+                "options": [
+                    "Add a registrationForm for this subject type",
+                    "Remove this subject type",
+                    "Leave as-is (bundle will upload with no form mapping)",
+                ],
+                "default": "Remove this subject type",
+                "target_store": "entities",
+                "target_section": "subject_types",
+            }
+        )
+
+    # Gap 2: encounter type with no form defined.
+    for enc in encounter_types:
+        if not isinstance(enc, dict):
+            continue
+        name = enc.get("name", "")
+        if not name or "form" in enc:
+            continue
+        enc_id = name.lower().replace(" ", "_").replace("-", "_")[:30]
+        options = [
+            "Create a basic form for this encounter",
+            "Remove this encounter type",
+        ]
+        if form_names_in_spec:
+            options.insert(
+                1,
+                f"Map to an existing form (choose from: {', '.join(form_names_in_spec[:10])})",
+            )
+        ambiguities.append(
+            {
+                "id": f"spec_enc_{enc_id}_no_form",
+                "section": "encounterTypes",
+                "entity": name,
+                "field": "form",
+                "question": (
+                    f"Encounter type '{name}' has no form — no formMapping will be "
+                    f"generated. How should we handle it?"
+                ),
+                "options": options,
+                "default": "Remove this encounter type",
+                "target_store": "entities",
+                "target_section": "encounter_types",
+            }
+        )
+
+    # Gap 3: program with no enrolmentForm and no encounters referencing it.
+    for prog in programs:
+        if not isinstance(prog, dict):
+            continue
+        name = prog.get("name", "")
+        if not name:
+            continue
+        if "enrolmentForm" in prog:
+            continue
+        if name in programs_with_encounters:
+            continue
+        prog_id = name.lower().replace(" ", "_").replace("-", "_")[:30]
+        ambiguities.append(
+            {
+                "id": f"spec_prog_{prog_id}_unmapped",
+                "section": "programs",
+                "entity": name,
+                "field": "enrolmentForm",
+                "question": (
+                    f"Program '{name}' has no enrolmentForm and no encounters — "
+                    f"no formMapping will be generated. How should we handle it?"
+                ),
+                "options": [
+                    "Add an enrolmentForm for this program",
+                    "Remove this program",
+                ],
+                "default": "Remove this program",
+                "target_store": "entities",
+                "target_section": "programs",
+            }
+        )
+
     # ── Groups default ────────────────────────────────────────────────
     if not spec.get("groups"):
         spec["groups"] = [{"name": "Everyone"}]

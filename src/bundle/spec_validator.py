@@ -96,6 +96,28 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
         if isinstance(c, dict) and c.get("name")
     }
 
+    # Pre-compute cross-references used by the structural gap checks below.
+    # Programs that have at least one encounter referencing them can still
+    # produce form mappings even without an enrolmentForm, so we only escalate
+    # the "no enrolmentForm" case to an error when there are also no encounters.
+    programs_with_encounters: set[str] = set()
+    referenced_subject_types: set[str] = set()
+    for enc in spec.get("encounterTypes", []):
+        if not isinstance(enc, dict):
+            continue
+        prog_ref = enc.get("program") or ""
+        subj_ref = enc.get("subjectType") or ""
+        if prog_ref:
+            programs_with_encounters.add(prog_ref)
+        if subj_ref:
+            referenced_subject_types.add(subj_ref)
+    for prog in spec.get("programs", []):
+        if not isinstance(prog, dict):
+            continue
+        tst = prog.get("targetSubjectType") or ""
+        if tst:
+            referenced_subject_types.add(tst)
+
     # ── Completeness ───────────────────────────────────────────────
     if not st_names:
         errors.append(
@@ -166,6 +188,19 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
                 warnings,
             )
 
+        # A subject type that no form/program/encounter references produces
+        # no form mapping on upload — catch that here so the spec agent is
+        # re-invoked and the user is asked what to do.
+        has_reg_form = "registrationForm" in st
+        is_referenced = name in referenced_subject_types or _fuzzy_match(
+            name, referenced_subject_types
+        )
+        if not has_reg_form and not is_referenced:
+            errors.append(
+                f"Subject type '{name}' has no forms, programs, or encounters — "
+                f"add a registrationForm, associate a program/encounter, or remove it."
+            )
+
     # ── Programs ───────────────────────────────────────────────────
     seen_prog: set[str] = set()
     for prog in spec.get("programs", []):
@@ -187,8 +222,17 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
                 f"Program '{name}' targetSubjectType '{target}' does not match any defined subject type"
             )
 
+        has_encounter = name in programs_with_encounters or _fuzzy_match(
+            name, programs_with_encounters
+        )
         if "enrolmentForm" not in prog:
-            warnings.append(f"Program '{name}' has no enrolmentForm")
+            if not has_encounter:
+                errors.append(
+                    f"Program '{name}' has no enrolmentForm and no encounters — "
+                    f"add an enrolmentForm, add at least one encounter, or remove the program."
+                )
+            else:
+                warnings.append(f"Program '{name}' has no enrolmentForm")
         else:
             _validate_form_spec(
                 prog["enrolmentForm"], f"enrolmentForm of '{name}'", errors, warnings
@@ -238,7 +282,10 @@ def validate_spec(spec_yaml: str) -> dict[str, Any]:
             )
 
         if "form" not in enc:
-            warnings.append(f"Encounter type '{name}' has no form")
+            errors.append(
+                f"Encounter type '{name}' has no form — add a form, map to an "
+                f"existing form, or remove this encounter type."
+            )
         else:
             _validate_form_spec(
                 enc["form"], f"form of encounter '{name}'", errors, warnings

@@ -1062,10 +1062,10 @@ workflow:
       id: '1711528708197'
       position:
         x: 0
-        y: 839
+        y: 822
       positionAbsolute:
         x: 0
-        y: 839
+        y: 822
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1271,11 +1271,11 @@ workflow:
       height: 86
       id: '1757492907627'
       position:
-        x: 1026
-        y: 881
+        x: 1024
+        y: 864
       positionAbsolute:
-        x: 1026
-        y: 881
+        x: 1024
+        y: 864
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1306,11 +1306,11 @@ workflow:
       height: 50
       id: '1757492907628'
       position:
-        x: 684
-        y: 899
+        x: 683
+        y: 882
       positionAbsolute:
-        x: 684
-        y: 899
+        x: 683
+        y: 882
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1393,11 +1393,11 @@ workflow:
       height: 484
       id: '1757493270484'
       position:
-        x: 1368
-        y: 718
+        x: 1365
+        y: 665
       positionAbsolute:
-        x: 1368
-        y: 718
+        x: 1365
+        y: 665
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1457,11 +1457,11 @@ workflow:
       height: 86
       id: '1757495664531'
       position:
-        x: 1730
-        y: 977
+        x: 1726
+        y: 980
       positionAbsolute:
-        x: 1730
-        y: 977
+        x: 1726
+        y: 980
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1477,11 +1477,11 @@ workflow:
       height: 101
       id: '1757495688732'
       position:
-        x: 2072
-        y: 969
+        x: 2067
+        y: 972
       positionAbsolute:
-        x: 2072
-        y: 969
+        x: 2067
+        y: 972
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1496,11 +1496,11 @@ workflow:
       height: 136
       id: '1758608702077'
       position:
-        x: 1730
-        y: 548
+        x: 1726
+        y: 554
       positionAbsolute:
-        x: 1730
-        y: 548
+        x: 1726
+        y: 554
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1516,11 +1516,11 @@ workflow:
       height: 130
       id: '1758699378772'
       position:
-        x: 1730
-        y: 765
+        x: 1726
+        y: 770
       positionAbsolute:
-        x: 1730
-        y: 765
+        x: 1726
+        y: 770
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1553,10 +1553,10 @@ workflow:
       id: '1758713692744'
       position:
         x: 342
-        y: 880
+        y: 863
       positionAbsolute:
         x: 342
-        y: 880
+        y: 863
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1588,10 +1588,10 @@ workflow:
       height: 110
       id: '1775800000001'
       position:
-        x: 2454
+        x: 2448
         y: 1310
       positionAbsolute:
-        x: 2454
+        x: 2448
         y: 1310
       selected: false
       sourcePosition: right
@@ -1631,10 +1631,10 @@ workflow:
       height: 175
       id: '1775800000002'
       position:
-        x: 2796
+        x: 2789
         y: 1277
       positionAbsolute:
-        x: 2796
+        x: 2789
         y: 1277
       selected: false
       sourcePosition: right
@@ -1674,11 +1674,11 @@ workflow:
       height: 175
       id: '1775648480416'
       position:
-        x: 3158
-        y: 1167
+        x: 3150
+        y: 1168
       positionAbsolute:
-        x: 3158
-        y: 1167
+        x: 3150
+        y: 1168
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1721,10 +1721,10 @@ workflow:
       id: '1775657870619'
       position:
         x: 362
-        y: 1050
+        y: 1031
       positionAbsolute:
         x: 362
-        y: 1050
+        y: 1031
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1749,11 +1749,11 @@ workflow:
       height: 122
       id: '1775719228711'
       position:
-        x: 2092
-        y: 1152
+        x: 2087
+        y: 1153
       positionAbsolute:
-        x: 2092
-        y: 1152
+        x: 2087
+        y: 1153
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1797,11 +1797,11 @@ workflow:
       height: 134
       id: '1800000000040'
       position:
-        x: 1730
-        y: 1145
+        x: 1726
+        y: 1146
       positionAbsolute:
-        x: 1730
-        y: 1145
+        x: 1726
+        y: 1146
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1839,20 +1839,20 @@ workflow:
         start_node_id: 1800000000700start
         title: Agent Loop
         type: loop
-        width: 4000
+        width: 4156
       height: 2452
       id: '1800000000700'
       position:
-        x: 3520
+        x: 3511
         y: 0
       positionAbsolute:
-        x: 3520
+        x: 3511
         y: 0
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 4000
+      width: 4156
       zIndex: 1
     - data:
         desc: ''
@@ -1866,10 +1866,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 60
-        y: 1130
+        y: 1157
       positionAbsolute:
-        x: 3580
-        y: 1130
+        x: 3571
+        y: 1157
       selectable: false
       selected: false
       sourcePosition: right
@@ -1956,10 +1956,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 184
-        y: 972
+        y: 1000
       positionAbsolute:
-        x: 3704
-        y: 972
+        x: 3695
+        y: 1000
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1997,10 +1997,10 @@ workflow:
       id: '1800000000101'
       parentId: '1800000000700'
       position:
-        x: 526
+        x: 525
         y: 60
       positionAbsolute:
-        x: 4046
+        x: 4036
         y: 60
       selected: false
       sourcePosition: right
@@ -2039,11 +2039,11 @@ workflow:
       id: '1800000000201'
       parentId: '1800000000700'
       position:
-        x: 526
-        y: 674
+        x: 525
+        y: 408
       positionAbsolute:
-        x: 4046
-        y: 674
+        x: 4036
+        y: 408
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2081,11 +2081,11 @@ workflow:
       id: '1800000000301'
       parentId: '1800000000700'
       position:
-        x: 526
-        y: 1051
+        x: 525
+        y: 782
       positionAbsolute:
-        x: 4046
-        y: 1051
+        x: 4036
+        y: 782
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2123,11 +2123,11 @@ workflow:
       id: '1800000000401'
       parentId: '1800000000700'
       position:
-        x: 526
-        y: 1384
+        x: 525
+        y: 1632
       positionAbsolute:
-        x: 4046
-        y: 1384
+        x: 4036
+        y: 1632
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2165,11 +2165,11 @@ workflow:
       id: '1800000000501'
       parentId: '1800000000700'
       position:
-        x: 526
-        y: 1711
+        x: 525
+        y: 1958
       positionAbsolute:
-        x: 4046
-        y: 1711
+        x: 4036
+        y: 1958
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2207,11 +2207,11 @@ workflow:
       id: '1800000000601'
       parentId: '1800000000700'
       position:
-        x: 526
-        y: 325
+        x: 525
+        y: 1290
       positionAbsolute:
-        x: 4046
-        y: 325
+        x: 4036
+        y: 1290
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2674,11 +2674,11 @@ workflow:
       id: '1800000000110'
       parentId: '1800000000700'
       position:
-        x: 868
-        y: 79
+        x: 866
+        y: 169
       positionAbsolute:
-        x: 4388
-        y: 79
+        x: 4377
+        y: 169
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3093,11 +3093,11 @@ workflow:
       id: '1800000000210'
       parentId: '1800000000700'
       position:
-        x: 868
-        y: 789
+        x: 866
+        y: 522
       positionAbsolute:
-        x: 4388
-        y: 789
+        x: 4377
+        y: 522
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3357,11 +3357,11 @@ workflow:
       id: '1800000000310'
       parentId: '1800000000700'
       position:
-        x: 868
-        y: 1160
+        x: 866
+        y: 891
       positionAbsolute:
-        x: 4388
-        y: 1160
+        x: 4377
+        y: 891
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3620,11 +3620,11 @@ workflow:
       id: '1800000000410'
       parentId: '1800000000700'
       position:
-        x: 868
-        y: 1493
+        x: 866
+        y: 1575
       positionAbsolute:
-        x: 4388
-        y: 1493
+        x: 4377
+        y: 1575
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3908,11 +3908,11 @@ workflow:
       id: '1800000000510'
       parentId: '1800000000700'
       position:
-        x: 868
-        y: 1826
+        x: 866
+        y: 1906
       positionAbsolute:
-        x: 4388
-        y: 1826
+        x: 4377
+        y: 1906
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4404,11 +4404,11 @@ workflow:
       id: '1800000000610'
       parentId: '1800000000700'
       position:
-        x: 868
-        y: 434
+        x: 866
+        y: 1222
       positionAbsolute:
-        x: 4388
-        y: 434
+        x: 4377
+        y: 1222
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4495,11 +4495,11 @@ workflow:
       id: '1800000000720'
       parentId: '1800000000700'
       position:
-        x: 1250
-        y: 1302
+        x: 1207
+        y: 1156
       positionAbsolute:
-        x: 4770
-        y: 1302
+        x: 4718
+        y: 1156
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4527,11 +4527,11 @@ workflow:
       id: '1800000000730'
       parentId: '1800000000700'
       position:
-        x: 1572
-        y: 1260
+        x: 1528
+        y: 1140
       positionAbsolute:
-        x: 5092
-        y: 1260
+        x: 5039
+        y: 1140
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4644,11 +4644,11 @@ workflow:
       id: '1800000000740'
       parentId: '1800000000700'
       position:
-        x: 1894
-        y: 1302
+        x: 3193
+        y: 1359
       positionAbsolute:
-        x: 5414
-        y: 1302
+        x: 6704
+        y: 1359
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4678,11 +4678,11 @@ workflow:
       id: '1800000000745'
       parentId: '1800000000700'
       position:
-        x: 2216
-        y: 1254
+        x: 3514
+        y: 1311
       positionAbsolute:
-        x: 5736
-        y: 1254
+        x: 7025
+        y: 1311
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4710,11 +4710,11 @@ workflow:
       id: '1800000000751'
       parentId: '1800000000700'
       position:
-        x: 2558
-        y: 1261
+        x: 3855
+        y: 1319
       positionAbsolute:
-        x: 6078
-        y: 1261
+        x: 7366
+        y: 1319
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4742,11 +4742,11 @@ workflow:
       id: '1800000000752'
       parentId: '1800000000700'
       position:
-        x: 2558
-        y: 1405
+        x: 3855
+        y: 1461
       positionAbsolute:
-        x: 6078
-        y: 1405
+        x: 7366
+        y: 1461
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4783,11 +4783,11 @@ workflow:
       id: '1800000000761'
       parentId: '1800000000700'
       position:
-        x: 1250
-        y: 862
+        x: 2190
+        y: 1126
       positionAbsolute:
-        x: 4770
-        y: 862
+        x: 5701
+        y: 1126
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4824,11 +4824,11 @@ workflow:
       id: '1800000000760'
       parentId: '1800000000700'
       position:
-        x: 1572
-        y: 846
+        x: 2511
+        y: 1097
       positionAbsolute:
-        x: 5092
-        y: 846
+        x: 6022
+        y: 1097
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4945,11 +4945,11 @@ workflow:
       height: 186
       id: '1776327635368'
       position:
-        x: 7620
-        y: 1182
+        x: 7767
+        y: 1133
       positionAbsolute:
-        x: 7620
-        y: 1182
+        x: 7767
+        y: 1133
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4964,12 +4964,12 @@ workflow:
       height: 101
       id: '1800000000800'
       position:
-        x: 7962
-        y: 1174
+        x: 8108
+        y: 1175
       positionAbsolute:
-        x: 7962
-        y: 1174
-      selected: true
+        x: 8108
+        y: 1175
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -4983,10 +4983,10 @@ workflow:
       height: 114
       id: '1800000000112'
       position:
-        x: 3520
+        x: 3511
         y: 2532
       positionAbsolute:
-        x: 3520
+        x: 3511
         y: 2532
       selected: false
       sourcePosition: right
@@ -5024,20 +5024,20 @@ workflow:
         type: http-request
         url: '{{#conversation.avni_ai_server_url#}}validate-pipeline-step'
         variables: []
-      height: 177
+      height: 175
       id: '1800000000770'
       parentId: '1800000000700'
       position:
-        x: 1700
-        y: 1260
+        x: 1849
+        y: 1093
       positionAbsolute:
-        x: 5220
-        y: 1260
+        x: 5360
+        y: 1093
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
@@ -5051,17 +5051,17 @@ workflow:
           , [])[:5]:\n            parts.append(\"[GATE WARNING] \" + str(warn))\n\
           \        if has_errors and active_agent:\n            parts.append(\"[gate-retry:\"\
           \ + active_agent + \"]\")\n        gate_output = chr(10).join(parts)\n \
-          \   except Exception:\n        pass\n    if gate_status >= 400:\n       \
-          \ has_errors = False\n    return {\"has_questions\": has_errors, \"gate_output\"\
+          \   except Exception:\n        pass\n    if gate_status >= 400:\n      \
+          \  has_errors = False\n    return {\"has_questions\": has_errors, \"gate_output\"\
           : gate_output}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
         outputs:
-          has_questions:
-            type: boolean
           gate_output:
             type: string
+          has_questions:
+            type: boolean
         selected: false
         title: Gate Parser
         type: code
@@ -5086,20 +5086,20 @@ workflow:
           - active_agent
           value_type: string
           variable: active_agent
-      height: 52
+      height: 50
       id: '1800000000776'
       parentId: '1800000000700'
       position:
-        x: 2020
-        y: 1260
+        x: 2190
+        y: 1335
       positionAbsolute:
-        x: 5540
-        y: 1260
+        x: 5701
+        y: 1335
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         cases:
@@ -5120,20 +5120,20 @@ workflow:
         selected: false
         title: Gate Check
         type: if-else
-      height: 148
+      height: 190
       id: '1800000000777'
       parentId: '1800000000700'
       position:
-        x: 2340
-        y: 1260
+        x: 2511
+        y: 1265
       positionAbsolute:
-        x: 5860
-        y: 1260
+        x: 6022
+        y: 1265
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     - data:
         isInLoop: true
@@ -5152,23 +5152,23 @@ workflow:
         title: Gate Errors to Memory
         type: assigner
         version: '2'
-      height: 84
+      height: 82
       id: '1800000000778'
       parentId: '1800000000700'
       position:
-        x: 2660
-        y: 1200
+        x: 2852
+        y: 1270
       positionAbsolute:
-        x: 6180
-        y: 1200
+        x: 6363
+        y: 1270
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 242
+      width: 241
       zIndex: 1002
     viewport:
-      x: -5006.25
-      y: -334.15
-      zoom: 0.7
+      x: -603.1973290401374
+      y: 80.48523716657438
+      zoom: 0.25
   rag_pipeline_variables: []

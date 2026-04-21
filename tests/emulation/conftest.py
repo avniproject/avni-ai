@@ -66,6 +66,25 @@ async def client():
 
 
 @pytest_asyncio.fixture
+async def staging_client():
+    """HTTP client that hits AVNI_AI_BASE_URL when set, else the in-process ASGI app.
+
+    Used by the LLM-driven emulation tests that want to replay the Dify flow against
+    the real staging avni-ai so we catch drift between tests and production.
+    """
+    base_url = os.environ.get("AVNI_AI_BASE_URL", "").strip()
+    if base_url:
+        async with httpx.AsyncClient(base_url=base_url, timeout=60.0) as c:
+            yield c
+    else:
+        transport = ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://testserver", timeout=60.0
+        ) as c:
+            yield c
+
+
+@pytest_asyncio.fixture
 def conversation_id() -> str:
     """Unique conversation id per test."""
     return f"emu-{uuid.uuid4().hex[:12]}"

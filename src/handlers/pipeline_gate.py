@@ -101,7 +101,16 @@ async def handle_validate_pipeline_step(request: Request) -> JSONResponse:
 
 
 async def _validate_after_spec(conversation_id: str) -> dict:
-    """Validate entities and spec after spec_generation phase."""
+    """Validate entities and spec after spec_generation phase.
+
+    The gate is the single source of truth for whether the spec is shippable.
+    Entities are authoritative (the spec is regenerated from them), so the
+    gate always rebuilds the spec from entities before validating. This way
+    an agent that updates entities via update_entities_section but forgets to
+    call generate_spec still sees a consistent validation result, and the
+    spec store is kept in sync with entities.
+    """
+    from ..bundle.spec_generator import entities_to_spec
     from .entity_handlers import get_entity_store
     from .spec_handlers import get_spec_store
 
@@ -117,11 +126,14 @@ async def _validate_after_spec(conversation_id: str) -> dict:
             "next_action": "fix_required",
         }
 
-    spec_yaml = get_spec_store().get(conversation_id)
-    if not spec_yaml:
+    try:
+        spec_yaml = entities_to_spec(entities, org_name="")
+        get_spec_store().put(conversation_id, spec_yaml)
+    except Exception as exc:
+        logger.exception("gate: failed to regenerate spec from entities")
         return {
             "ok": False,
-            "errors": ["No spec found — generate_spec may not have been called"],
+            "errors": [f"Could not regenerate spec from entities: {exc}"],
             "warnings": [],
             "next_action": "fix_required",
         }
