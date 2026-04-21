@@ -101,10 +101,7 @@ workflow:
     - workflow_mode
     value: ''
     value_type: string
-  - description: 'Flag-driven routing: current state machine phase. Enum — intake,
-      spec_gathering, spec_awaiting_user, spec_correcting, bundle_generating, bundle_correcting,
-      bundle_awaiting_user, rules_generating, reports_generating, inspecting, uploading,
-      completed, failed, rag, assistant, out_of_scope.'
+  - description: Flag-driven routing, current state machine phase.
     id: c5468d0e-dc76-4103-a1b0-c4d1da7fea4b
     name: active_phase
     selector:
@@ -112,8 +109,7 @@ workflow:
     - active_phase
     value: intake
     value_type: string
-  - description: True iff active_phase == spec_awaiting_user. Used by the pre-Orchestrator
-      short-circuit to bypass LLM classification on gap-fix continuation turns.
+  - description: Short-circuit flag for pending Spec Agent gap-fix input.
     id: 1103bd6a-9f6d-4c17-a1ae-2efd2a2a2218
     name: spec_awaiting_user_input
     selector:
@@ -121,9 +117,7 @@ workflow:
     - spec_awaiting_user_input
     value: false
     value_type: boolean
-  - description: 'Structured list of pending ambiguity questions from enrich_spec.
-      Survives across turns so the Spec Agent reading a user reply does not need to
-      refetch. Shape: {id, question, options, target_section, target_store}.'
+  - description: Pending ambiguity questions from enrich_spec.
     id: 07169e52-4142-41fc-b21e-f404065cf936
     name: pending_ambiguities
     selector:
@@ -131,7 +125,7 @@ workflow:
     - pending_ambiguities
     value: []
     value_type: array[object]
-  - description: Last pipeline gate status. Enum — not_run, ok, errors, user_input_needed.
+  - description: Last pipeline gate status.
     id: 2bf03c81-3bea-4703-886f-d34bcc8913bd
     name: last_gate_status
     selector:
@@ -139,56 +133,7 @@ workflow:
     - last_gate_status
     value: not_run
     value_type: string
-  - description: Last gate error snapshot as a newline-separated string (Dify only
-      reliably supports boolean / string / object / array[object] conversation variables).
-    id: 834e8612-cc1b-438b-acba-4b03cc85e67b
-    name: last_gate_errors
-    selector:
-    - conversation
-    - last_gate_errors
-    value: ''
-    value_type: string
-  - description: Last gate warning snapshot as a newline-separated string.
-    id: 70446320-9878-411e-98ad-50245a5211b2
-    name: last_gate_warnings
-    selector:
-    - conversation
-    - last_gate_warnings
-    value: ''
-    value_type: string
-  - description: Raw user reply for the current turn. Populated from sys.query at
-      the start of every user message so downstream agents can read it without re-parsing.
-    id: bbcfe39a-bc8e-4b6c-b042-f7a606366c15
-    name: user_last_answer
-    selector:
-    - conversation
-    - user_last_answer
-    value: ''
-    value_type: string
-  - description: 'Per-agent retry counters, stored as a JSON string because Dify
-      cloud only reliably accepts boolean / string / array[object] for conversation
-      variables. After json.loads (treating empty as {}), shape is
-      spec/bundle_config/rules/reports/inspect/admin -> int. Populated lazily.'
-    id: 23a2d981-fad6-4438-9bb9-c277a1b44c42
-    name: retries
-    selector:
-    - conversation
-    - retries
-    value: ''
-    value_type: string
-  - description: Append-only log of phase transitions as a newline-separated string
-      for observability/debugging.
-    id: 25e6e1af-b1b4-4a33-b700-ebfed3e22069
-    name: phase_history
-    selector:
-    - conversation
-    - phase_history
-    value: ''
-    value_type: string
-  - description: 'Structured payload returned by the most recent agent, stored
-      as a JSON string. After json.loads (treating empty as empty-dict), fields
-      are intent, message, ambiguities, applied_changes, target_phase, reason.
-      Consumed by deterministic IF-ELSE routing nodes.'
+  - description: Last agent structured payload as a JSON string.
     id: f81440ee-c8be-4235-915f-eceb4d47df9f
     name: agent_structured
     selector:
