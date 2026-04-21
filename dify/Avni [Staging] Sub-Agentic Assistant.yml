@@ -997,11 +997,37 @@ workflow:
         isInIteration: false
         isInLoop: false
         sourceType: loop
-        targetType: agent
-      id: 1800000000700-source-1776327635368-target
+        targetType: if-else
+      id: 1800000000700-source-1800000000810-target
       selected: false
       source: '1800000000700'
       sourceHandle: source
+      target: '1800000000810'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1800000000810-awaiting-user-1800000000820-target
+      selected: false
+      source: '1800000000810'
+      sourceHandle: awaiting-user
+      target: '1800000000820'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: agent
+      id: 1800000000810-false-1776327635368-target
+      selected: false
+      source: '1800000000810'
+      sourceHandle: 'false'
       target: '1776327635368'
       targetHandle: target
       type: custom
@@ -4968,6 +4994,57 @@ workflow:
       positionAbsolute:
         x: 9452
         y: 1175
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        cases:
+        - case_id: awaiting-user
+          conditions:
+          - comparison_operator: is
+            id: post-loop-awaiting-check
+            value: true
+            varType: boolean
+            variable_selector:
+            - conversation
+            - spec_awaiting_user_input
+          id: awaiting-user
+          logical_operator: and
+        desc: When the Spec Agent paused waiting for user input, bypass Summarize Results
+          and show the agent's own ambiguity list verbatim. Otherwise go through Summarize
+          Results which produces the upload-status narrative.
+        selected: false
+        title: Post-Loop Router
+        type: if-else
+      height: 146
+      id: '1800000000810'
+      position:
+        x: 8900
+        y: 1100
+      positionAbsolute:
+        x: 8900
+        y: 1100
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        answer: '{{#1800000000720.agent_output#}}'
+        selected: false
+        title: Ask-User Answer
+        type: answer
+        variables: []
+      height: 101
+      id: '1800000000820'
+      position:
+        x: 9200
+        y: 950
+      positionAbsolute:
+        x: 9200
+        y: 950
       selected: false
       sourcePosition: right
       targetPosition: left
