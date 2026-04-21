@@ -1515,14 +1515,18 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
         for p in programs:
             if p.get("name") == target_name:
                 p["showGrowthChart"] = opt_lower.startswith("yes")
-                return f"program '{target_name}': showGrowthChart={p['showGrowthChart']}"
+                return (
+                    f"program '{target_name}': showGrowthChart={p['showGrowthChart']}"
+                )
         return f"program '{target_name}': not found"
 
     # Subject type unmapped
     if amb.get("target_section") == "subject_types" and amb_id.startswith("spec_st_"):
         if "remove" in opt_lower:
             entities["subject_types"] = [
-                s for s in entities.get("subject_types", []) if s.get("name") != target_name
+                s
+                for s in entities.get("subject_types", [])
+                if s.get("name") != target_name
             ]
             return f"subject_type '{target_name}': removed"
         if "registrationform" in opt_lower.replace(" ", ""):
@@ -1540,18 +1544,26 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
     # Encounter type no form
     if amb.get("target_section") == "encounter_types" and amb_id.endswith("_no_form"):
         enc = next(
-            (e for e in entities.get("encounter_types", []) if e.get("name") == target_name),
+            (
+                e
+                for e in entities.get("encounter_types", [])
+                if e.get("name") == target_name
+            ),
             None,
         )
         if "remove" in opt_lower:
             entities["encounter_types"] = [
-                e for e in entities.get("encounter_types", []) if e.get("name") != target_name
+                e
+                for e in entities.get("encounter_types", [])
+                if e.get("name") != target_name
             ]
             return f"encounter_type '{target_name}': removed"
         if "create" in opt_lower and "basic" in opt_lower:
             if enc is None:
                 return f"encounter_type '{target_name}': not found"
-            form_type = "ProgramEncounter" if enc.get("is_program_encounter") else "Encounter"
+            form_type = (
+                "ProgramEncounter" if enc.get("is_program_encounter") else "Encounter"
+            )
             new_form = {
                 "name": target_name,
                 "formType": form_type,
@@ -1585,7 +1597,8 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
                 {
                     "name": f"{target_name} Enrolment",
                     "formType": "ProgramEnrolment",
-                    "subjectType": prog.get("target_subject_type") or prog.get("targetSubjectType"),
+                    "subjectType": prog.get("target_subject_type")
+                    or prog.get("targetSubjectType"),
                     "program": target_name,
                     "sections": [{"name": "Details", "fields": []}],
                 }
@@ -1598,7 +1611,9 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
         for e in entities.get("encounter_types", []):
             if e.get("name") == target_name:
                 e["subject_type"] = matched_option
-                return f"encounter_type '{target_name}': subject_type='{matched_option}'"
+                return (
+                    f"encounter_type '{target_name}': subject_type='{matched_option}'"
+                )
         return f"encounter_type '{target_name}': not found"
 
     # Encounter program
@@ -1685,7 +1700,12 @@ async def handle_apply_ambiguity_answers(request: Request) -> JSONResponse:
         if amb is None:
             unmatched.append(f"{amb_id}: no matching ambiguity")
             continue
-        if not choice or choice.lower() in ("ignore", "skip", "leave as-is", "leave-as-is"):
+        if not choice or choice.lower() in (
+            "ignore",
+            "skip",
+            "leave as-is",
+            "leave-as-is",
+        ):
             ignored.append(f"{amb_id}: skipped")
             continue
         matched_option = _match_option(choice, amb.get("options", []))
