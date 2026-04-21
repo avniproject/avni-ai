@@ -501,9 +501,29 @@ async def handle_store_entities(request: Request) -> JSONResponse:
 async def handle_validate_entities(request: Request) -> JSONResponse:
     """
     POST /validate-entities
-    Body: { "entities": { subject_types, programs, encounter_types, address_levels } }
-      OR: { "conversation_id": "..." }  — looks up entities from store
-    Returns: { entities, issues, error_count, warning_count, issues_summary, has_errors, has_warnings }
+    Body: { "entities": {...} }  OR  { "conversation_id": "..." }
+    Optional: "verbose": true  — include full issues list and issues_summary.
+
+    Default (used in the agent loop):
+      {
+        "issues":        [{"severity","entity_type","message"}, ...] capped at
+                         top-20 errors + top-10 warnings (errors first),
+        "error_count":   int  # actual total (may exceed 20)
+        "warning_count": int  # actual total (may exceed 10)
+        "has_errors":    bool,
+        "has_warnings":  bool,
+        "issues_truncated": bool,   # true if capped
+        "entity_counts": {...}      # when conversation_id used
+      }
+
+    Verbose (verbose=true, for debugging):
+      adds full untruncated issues list and issues_summary text.
+
+    Rationale: the previous response embedded every issue (up to 6-8KB of
+    text) on every call. That payload then stayed in the LLM's context for
+    every subsequent tool-using round, consuming most of the token budget.
+    Capping at 30 items keeps the response under ~2KB without hiding the
+    useful signal (agents can ask for verbose when they need it).
     """
     try:
         body = await request.json()
@@ -512,6 +532,7 @@ async def handle_validate_entities(request: Request) -> JSONResponse:
 
     entities = body.get("entities") or None
     conversation_id = body.get("conversation_id") or None
+    verbose = bool(body.get("verbose", False))
 
     if entities is None and conversation_id:
         entities = _entity_store.get(conversation_id)
@@ -530,26 +551,46 @@ async def handle_validate_entities(request: Request) -> JSONResponse:
     if not isinstance(entities, dict):
         return JSONResponse({"error": "'entities' must be an object"}, status_code=400)
 
-    result = _validate(entities)
+    full = _validate(entities)
+    all_issues = full.get("issues", []) or []
+    errors = [i for i in all_issues if i.get("severity") == "error"]
+    warnings = [i for i in all_issues if i.get("severity") == "warning"]
 
-    # When using conversation_id, don't return the full entities dict — it can
-    # exceed Dify's 64KB tool response buffer and get silently truncated.
-    # Also drop issues_summary (a formatted multiline copy of the issues array) —
-    # the agent reads has_errors/error_count/warning_count/issues directly, and
-    # the duplicate text contributes ~2 400 chars of unnecessary context per call.
+    MAX_ERRORS = 20
+    MAX_WARNINGS = 10
+
+    if verbose:
+        capped_issues = all_issues
+    else:
+        capped_issues = errors[:MAX_ERRORS] + warnings[:MAX_WARNINGS]
+
+    result = {
+        "issues": capped_issues,
+        "error_count": len(errors),
+        "warning_count": len(warnings),
+        "has_errors": len(errors) > 0,
+        "has_warnings": len(warnings) > 0,
+        "issues_truncated": (
+            len(errors) > MAX_ERRORS or len(warnings) > MAX_WARNINGS
+        ) if not verbose else False,
+    }
+
+    if verbose:
+        result["issues_summary"] = full.get("issues_summary", "")
+
     if conversation_id:
-        result.pop("issues_summary", None)
         result["entity_counts"] = {
             k: len(v) if isinstance(v, list) else 1 for k, v in entities.items()
         }
     else:
-        # Legacy: return full entities for callers that need them
         result["entities"] = entities
 
     logger.info(
-        "validate-entities: %d errors, %d warnings",
-        result["error_count"],
-        result["warning_count"],
+        "validate-entities: %d errors, %d warnings (verbose=%s, returned=%d issues)",
+        len(errors),
+        len(warnings),
+        verbose,
+        len(capped_issues),
     )
     return JSONResponse(result)
 
