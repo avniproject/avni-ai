@@ -99,3 +99,7 @@ extract.txt
 conv_har_*.txt
 scratch_*.json
 new_node_exec*.json
+
+# Debug dumps from Dify node exec
+buncle_config_node_exec*.json
+new_node_exec*.json
