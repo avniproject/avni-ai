@@ -1178,10 +1178,10 @@ workflow:
       id: '1711528708197'
       position:
         x: 0
-        y: 822
+        y: 703
       positionAbsolute:
         x: 0
-        y: 822
+        y: 703
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1410,11 +1410,11 @@ workflow:
       height: 86
       id: '1757492907627'
       position:
-        x: 1024
-        y: 864
+        x: 1385
+        y: 756
       positionAbsolute:
-        x: 1024
-        y: 864
+        x: 1385
+        y: 756
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1446,10 +1446,10 @@ workflow:
       id: '1757492907628'
       position:
         x: 683
-        y: 882
+        y: 763
       positionAbsolute:
         x: 683
-        y: 882
+        y: 763
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1532,11 +1532,11 @@ workflow:
       height: 484
       id: '1757493270484'
       position:
-        x: 1365
-        y: 665
+        x: 1746
+        y: 557
       positionAbsolute:
-        x: 1365
-        y: 665
+        x: 1746
+        y: 557
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1596,11 +1596,11 @@ workflow:
       height: 86
       id: '1757495664531'
       position:
-        x: 1726
-        y: 980
+        x: 2107
+        y: 872
       positionAbsolute:
-        x: 1726
-        y: 980
+        x: 2107
+        y: 872
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1616,11 +1616,11 @@ workflow:
       height: 101
       id: '1757495688732'
       position:
-        x: 2067
-        y: 972
+        x: 2448
+        y: 864
       positionAbsolute:
-        x: 2067
-        y: 972
+        x: 2448
+        y: 864
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1635,11 +1635,11 @@ workflow:
       height: 136
       id: '1758608702077'
       position:
-        x: 1726
-        y: 554
+        x: 2107
+        y: 446
       positionAbsolute:
-        x: 1726
-        y: 554
+        x: 2107
+        y: 446
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1655,11 +1655,11 @@ workflow:
       height: 130
       id: '1758699378772'
       position:
-        x: 1726
-        y: 770
+        x: 2107
+        y: 662
       positionAbsolute:
-        x: 1726
-        y: 770
+        x: 2107
+        y: 662
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1692,10 +1692,10 @@ workflow:
       id: '1758713692744'
       position:
         x: 342
-        y: 863
+        y: 744
       positionAbsolute:
         x: 342
-        y: 863
+        y: 744
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1727,10 +1727,10 @@ workflow:
       height: 110
       id: '1775800000001'
       position:
-        x: 2448
+        x: 2829
         y: 1310
       positionAbsolute:
-        x: 2448
+        x: 2829
         y: 1310
       selected: false
       sourcePosition: right
@@ -1770,10 +1770,10 @@ workflow:
       height: 175
       id: '1775800000002'
       position:
-        x: 2789
+        x: 3170
         y: 1277
       positionAbsolute:
-        x: 2789
+        x: 3170
         y: 1277
       selected: false
       sourcePosition: right
@@ -1813,10 +1813,10 @@ workflow:
       height: 175
       id: '1775648480416'
       position:
-        x: 3150
+        x: 3531
         y: 1168
       positionAbsolute:
-        x: 3150
+        x: 3531
         y: 1168
       selected: false
       sourcePosition: right
@@ -1860,10 +1860,10 @@ workflow:
       id: '1775657870619'
       position:
         x: 362
-        y: 1031
+        y: 912
       positionAbsolute:
         x: 362
-        y: 1031
+        y: 912
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1888,10 +1888,10 @@ workflow:
       height: 122
       id: '1775719228711'
       position:
-        x: 2087
+        x: 2468
         y: 1153
       positionAbsolute:
-        x: 2087
+        x: 2468
         y: 1153
       selected: false
       sourcePosition: right
@@ -1936,11 +1936,11 @@ workflow:
       height: 134
       id: '1800000000040'
       position:
-        x: 1726
-        y: 1146
+        x: 2107
+        y: 1038
       positionAbsolute:
-        x: 1726
-        y: 1146
+        x: 2107
+        y: 1038
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1978,20 +1978,20 @@ workflow:
         start_node_id: 1800000000700start
         title: Agent Loop
         type: loop
-        width: 4156
+        width: 5119
       height: 2452
       id: '1800000000700'
       position:
-        x: 3511
+        x: 3892
         y: 0
       positionAbsolute:
-        x: 3511
+        x: 3892
         y: 0
       selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 4156
+      width: 5119
       zIndex: 1
     - data:
         desc: ''
@@ -2007,7 +2007,7 @@ workflow:
         x: 60
         y: 1157
       positionAbsolute:
-        x: 3571
+        x: 3952
         y: 1157
       selectable: false
       selected: false
@@ -2097,7 +2097,7 @@ workflow:
         x: 184
         y: 1000
       positionAbsolute:
-        x: 3695
+        x: 4076
         y: 1000
       selected: false
       sourcePosition: right
@@ -2139,7 +2139,7 @@ workflow:
         x: 525
         y: 60
       positionAbsolute:
-        x: 4036
+        x: 4417
         y: 60
       selected: false
       sourcePosition: right
@@ -2181,7 +2181,7 @@ workflow:
         x: 525
         y: 408
       positionAbsolute:
-        x: 4036
+        x: 4417
         y: 408
       selected: false
       sourcePosition: right
@@ -2223,7 +2223,7 @@ workflow:
         x: 525
         y: 782
       positionAbsolute:
-        x: 4036
+        x: 4417
         y: 782
       selected: false
       sourcePosition: right
@@ -2263,10 +2263,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 525
-        y: 1632
+        y: 1279
       positionAbsolute:
-        x: 4036
-        y: 1632
+        x: 4417
+        y: 1279
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2307,7 +2307,7 @@ workflow:
         x: 525
         y: 1958
       positionAbsolute:
-        x: 4036
+        x: 4417
         y: 1958
       selected: false
       sourcePosition: right
@@ -2347,10 +2347,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 525
-        y: 1290
+        y: 1621
       positionAbsolute:
-        x: 4036
-        y: 1290
+        x: 4417
+        y: 1621
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2816,7 +2816,7 @@ workflow:
         x: 866
         y: 169
       positionAbsolute:
-        x: 4377
+        x: 4758
         y: 169
       selected: false
       sourcePosition: right
@@ -3235,7 +3235,7 @@ workflow:
         x: 866
         y: 522
       positionAbsolute:
-        x: 4377
+        x: 4758
         y: 522
       selected: false
       sourcePosition: right
@@ -3499,7 +3499,7 @@ workflow:
         x: 866
         y: 891
       positionAbsolute:
-        x: 4377
+        x: 4758
         y: 891
       selected: false
       sourcePosition: right
@@ -3760,10 +3760,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 866
-        y: 1575
+        y: 1222
       positionAbsolute:
-        x: 4377
-        y: 1575
+        x: 4758
+        y: 1222
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4050,7 +4050,7 @@ workflow:
         x: 866
         y: 1906
       positionAbsolute:
-        x: 4377
+        x: 4758
         y: 1906
       selected: false
       sourcePosition: right
@@ -4544,10 +4544,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 866
-        y: 1222
+        y: 1553
       positionAbsolute:
-        x: 4377
-        y: 1222
+        x: 4758
+        y: 1553
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4637,7 +4637,7 @@ workflow:
         x: 1207
         y: 1156
       positionAbsolute:
-        x: 4718
+        x: 5099
         y: 1156
       selected: false
       sourcePosition: right
@@ -4666,10 +4666,10 @@ workflow:
       id: '1800000000730'
       parentId: '1800000000700'
       position:
-        x: 1528
+        x: 2170
         y: 1140
       positionAbsolute:
-        x: 5039
+        x: 6062
         y: 1140
       selected: false
       sourcePosition: right
@@ -4678,110 +4678,68 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: |
-          import json
-          import re
-
-          def main(active_agent: str, workflow_mode: str, agent_output: str,
-                   agent_memory: str, last_gate_status: str,
-                   agent_structured: str) -> dict:
-              """Stage B decider: deterministic routing from typed conversation
-              variables. Replaces the old ~60-line keyword-matching logic.
-
-              agent_structured arrives as a JSON-serialized string (Dify cloud
-              does not accept object-typed conversation variables), so we parse
-              it here before reading typed fields.
-
-              Rule order:
-                1. targeted mode  -> done
-                2. intent=ask_user  -> pause (done)
-                3. intent=error     -> pause (done)
-                4. intent=re_route + Inspector  -> branch to re_route_target
-                5. legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])
-                6. gate errors + under retry cap  -> re-run same agent
-                7. gate errors + over retry cap   -> done (fail)
-                8. gate user_input_needed         -> pause
-                9. gate ok / not_run              -> advance in chain
-              """
-              if workflow_mode == "targeted":
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": "Targeted mode — single agent only"}
-
-              struct = {}
-              try:
-                  if agent_structured:
-                      struct = json.loads(agent_structured) or {}
-              except Exception:
-                  struct = {}
-
-              intent = str(struct.get("intent", "") or "")
-
-              if intent == "ask_user":
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"{active_agent} intent=ask_user (structured)"}
-              if intent == "error":
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"{active_agent} intent=error (structured)"}
-
-              if intent == "re_route" and active_agent == "inspect":
-                  target = str(struct.get("re_route_target", "") or "")
-                  valid_targets = ("spec", "bundle_config", "rules", "reports")
-                  if target in valid_targets:
-                      mem_lc = (agent_memory or "").lower()
-                      if "[rerouted from inspect]" not in mem_lc:
-                          return {"next_agent": target, "loop_done": False,
-                                  "reason": f"Inspector re_route -> {target} (structured)"}
-
-              t = (agent_output or "").lower()
-              mem = (agent_memory or "").lower()
-
-              if "[awaiting_user_input]" in t:
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"{active_agent} legacy [AWAITING_USER_INPUT] marker"}
-
-              route_match = re.search(r"\[route_to:(\w+)\]", t)
-              if route_match and active_agent == "inspect":
-                  target = route_match.group(1)
-                  valid_targets = ("spec", "bundle_config", "rules", "reports")
-                  if target in valid_targets and "[rerouted from inspect]" not in mem:
-                      return {"next_agent": target, "loop_done": False,
-                              "reason": f"Inspector routing to {target} for fixes"}
-
-              MAX_RETRIES = 3
-              runs_so_far = mem.count(f"[gate-ran:{active_agent}]")
-
-              if last_gate_status == "errors":
-                  if runs_so_far < MAX_RETRIES:
-                      return {"next_agent": active_agent, "loop_done": False,
-                              "reason": (
-                                  f"Gate errors after {runs_so_far} run(s), "
-                                  f"re-running {active_agent} "
-                                  f"({runs_so_far}/{MAX_RETRIES})"
-                              )}
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": (
-                              f"Gate errors persist after {MAX_RETRIES} retries "
-                              f"of {active_agent}"
-                          )}
-
-              if last_gate_status == "user_input_needed":
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"Gate requests user input from {active_agent}"}
-
-              chain = ["spec", "bundle_config", "rules", "reports", "inspect"]
-              try:
-                  idx = chain.index(active_agent)
-              except ValueError:
-                  return {"next_agent": "done", "loop_done": True,
-                          "reason": f"Unknown agent: {active_agent}"}
-
-              if idx < len(chain) - 1:
-                  next_a = chain[idx + 1]
-                  return {"next_agent": next_a, "loop_done": False,
-                          "reason": f"{active_agent} done, advancing to {next_a}"}
-
-              return {"next_agent": "done", "loop_done": True,
-                      "reason": "End of chain"}
+        code: "import json\nimport re\n\ndef main(active_agent: str, workflow_mode:\
+          \ str, agent_output: str,\n         agent_memory: str, last_gate_status:\
+          \ str,\n         agent_structured: str) -> dict:\n    \"\"\"Stage B decider:\
+          \ deterministic routing from typed conversation\n    variables. Replaces\
+          \ the old ~60-line keyword-matching logic.\n\n    agent_structured arrives\
+          \ as a JSON-serialized string (Dify cloud\n    does not accept object-typed\
+          \ conversation variables), so we parse\n    it here before reading typed\
+          \ fields.\n\n    Rule order:\n      1. targeted mode  -> done\n      2.\
+          \ intent=ask_user  -> pause (done)\n      3. intent=error     -> pause (done)\n\
+          \      4. intent=re_route + Inspector  -> branch to re_route_target\n  \
+          \    5. legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])\n      6. gate\
+          \ errors + under retry cap  -> re-run same agent\n      7. gate errors +\
+          \ over retry cap   -> done (fail)\n      8. gate user_input_needed     \
+          \    -> pause\n      9. gate ok / not_run              -> advance in chain\n\
+          \    \"\"\"\n    if workflow_mode == \"targeted\":\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": \"Targeted\
+          \ mode — single agent only\"}\n\n    struct = {}\n    try:\n        if agent_structured:\n\
+          \            struct = json.loads(agent_structured) or {}\n    except Exception:\n\
+          \        struct = {}\n\n    intent = str(struct.get(\"intent\", \"\") or\
+          \ \"\")\n\n    if intent == \"ask_user\":\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
+          \ intent=ask_user (structured)\"}\n    if intent == \"error\":\n       \
+          \ return {\"next_agent\": \"done\", \"loop_done\": True,\n             \
+          \   \"reason\": f\"{active_agent} intent=error (structured)\"}\n\n    if\
+          \ intent == \"re_route\" and active_agent == \"inspect\":\n        target\
+          \ = str(struct.get(\"re_route_target\", \"\") or \"\")\n        valid_targets\
+          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
+          \ in valid_targets:\n            mem_lc = (agent_memory or \"\").lower()\n\
+          \            if \"[rerouted from inspect]\" not in mem_lc:\n           \
+          \     return {\"next_agent\": target, \"loop_done\": False,\n          \
+          \              \"reason\": f\"Inspector re_route -> {target} (structured)\"\
+          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
+          \ \"\").lower()\n\n    if \"[awaiting_user_input]\" in t:\n        return\
+          \ {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\"\
+          : f\"{active_agent} legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match\
+          \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
+          \ == \"inspect\":\n        target = route_match.group(1)\n        valid_targets\
+          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
+          \ in valid_targets and \"[rerouted from inspect]\" not in mem:\n       \
+          \     return {\"next_agent\": target, \"loop_done\": False,\n          \
+          \          \"reason\": f\"Inspector routing to {target} for fixes\"}\n\n\
+          \    MAX_RETRIES = 3\n    runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
+          )\n\n    if last_gate_status == \"errors\":\n        if runs_so_far < MAX_RETRIES:\n\
+          \            return {\"next_agent\": active_agent, \"loop_done\": False,\n\
+          \                    \"reason\": (\n                        f\"Gate errors\
+          \ after {runs_so_far} run(s), \"\n                        f\"re-running\
+          \ {active_agent} \"\n                        f\"({runs_so_far}/{MAX_RETRIES})\"\
+          \n                    )}\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": (\n                    f\"Gate errors\
+          \ persist after {MAX_RETRIES} retries \"\n                    f\"of {active_agent}\"\
+          \n                )}\n\n    if last_gate_status == \"user_input_needed\"\
+          :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n    \
+          \            \"reason\": f\"Gate requests user input from {active_agent}\"\
+          }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"\
+          inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
+          \ ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\":\
+          \ True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
+          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n   \
+          \     return {\"next_agent\": next_a, \"loop_done\": False,\n          \
+          \      \"reason\": f\"{active_agent} done, advancing to {next_a}\"}\n\n\
+          \    return {\"next_agent\": \"done\", \"loop_done\": True,\n          \
+          \  \"reason\": \"End of chain\"}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4830,11 +4788,11 @@ workflow:
       id: '1800000000740'
       parentId: '1800000000700'
       position:
-        x: 3193
-        y: 1359
+        x: 4156
+        y: 1209
       positionAbsolute:
-        x: 6704
-        y: 1359
+        x: 8048
+        y: 1209
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4864,11 +4822,11 @@ workflow:
       id: '1800000000745'
       parentId: '1800000000700'
       position:
-        x: 3514
-        y: 1311
+        x: 4477
+        y: 1161
       positionAbsolute:
-        x: 7025
-        y: 1311
+        x: 8369
+        y: 1161
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4896,11 +4854,11 @@ workflow:
       id: '1800000000751'
       parentId: '1800000000700'
       position:
-        x: 3855
-        y: 1319
+        x: 4818
+        y: 1311
       positionAbsolute:
-        x: 7366
-        y: 1319
+        x: 8710
+        y: 1311
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4928,11 +4886,11 @@ workflow:
       id: '1800000000752'
       parentId: '1800000000700'
       position:
-        x: 3855
-        y: 1461
+        x: 4818
+        y: 1169
       positionAbsolute:
-        x: 7366
-        y: 1461
+        x: 8710
+        y: 1169
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4969,11 +4927,11 @@ workflow:
       id: '1800000000761'
       parentId: '1800000000700'
       position:
-        x: 2190
-        y: 1126
+        x: 2832
+        y: 1029
       positionAbsolute:
-        x: 5701
-        y: 1126
+        x: 6724
+        y: 1029
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5010,11 +4968,11 @@ workflow:
       id: '1800000000760'
       parentId: '1800000000700'
       position:
-        x: 2511
-        y: 1097
+        x: 3173
+        y: 974
       positionAbsolute:
-        x: 6022
-        y: 1097
+        x: 7065
+        y: 974
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5131,10 +5089,10 @@ workflow:
       height: 186
       id: '1776327635368'
       position:
-        x: 7767
+        x: 9111
         y: 1133
       positionAbsolute:
-        x: 7767
+        x: 9111
         y: 1133
       selected: false
       sourcePosition: right
@@ -5150,10 +5108,10 @@ workflow:
       height: 101
       id: '1800000000800'
       position:
-        x: 8108
+        x: 9452
         y: 1175
       positionAbsolute:
-        x: 8108
+        x: 9452
         y: 1175
       selected: false
       sourcePosition: right
@@ -5169,10 +5127,10 @@ workflow:
       height: 114
       id: '1800000000112'
       position:
-        x: 3511
+        x: 3892
         y: 2532
       positionAbsolute:
-        x: 3511
+        x: 3892
         y: 2532
       selected: false
       sourcePosition: right
@@ -5214,10 +5172,10 @@ workflow:
       id: '1800000000770'
       parentId: '1800000000700'
       position:
-        x: 1849
+        x: 2491
         y: 1093
       positionAbsolute:
-        x: 5360
+        x: 6383
         y: 1093
       selected: false
       sourcePosition: right
@@ -5292,11 +5250,11 @@ workflow:
       id: '1800000000776'
       parentId: '1800000000700'
       position:
-        x: 2190
-        y: 1335
+        x: 2832
+        y: 1185
       positionAbsolute:
-        x: 5701
-        y: 1335
+        x: 6724
+        y: 1185
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5326,11 +5284,11 @@ workflow:
       id: '1800000000777'
       parentId: '1800000000700'
       position:
-        x: 2511
-        y: 1265
+        x: 3474
+        y: 1115
       positionAbsolute:
-        x: 6022
-        y: 1265
+        x: 7366
+        y: 1115
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5358,11 +5316,11 @@ workflow:
       id: '1800000000778'
       parentId: '1800000000700'
       position:
-        x: 2852
-        y: 1270
+        x: 3815
+        y: 1120
       positionAbsolute:
-        x: 6363
-        y: 1270
+        x: 7707
+        y: 1120
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5403,9 +5361,9 @@ workflow:
           \ or [])\n    )\n    # Dify cloud does not accept object-typed conversation\
           \ variables,\n    # so agent_structured is stored as a JSON string. Serialize\
           \ here.\n    raw_payload_obj = payload if isinstance(payload, dict) else\
-          \ {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    return {\n   \
-          \     \"intent\": intent,\n        \"target_phase\": target_phase,\n   \
-          \     \"ambiguities\": ambiguities,\n        \"applied_changes\": applied_changes,\n\
+          \ {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    return {\n  \
+          \      \"intent\": intent,\n        \"target_phase\": target_phase,\n  \
+          \      \"ambiguities\": ambiguities,\n        \"applied_changes\": applied_changes,\n\
           \        \"reason\": reason,\n        \"parsed_ok\": parsed_ok,\n      \
           \  \"out_active_phase\": out_active_phase,\n        \"out_spec_awaiting\"\
           : out_spec_awaiting,\n        \"out_pending_ambiguities\": out_pending_ambiguities,\n\
@@ -5467,11 +5425,11 @@ workflow:
       id: '1800000000725'
       parentId: '1800000000700'
       position:
-        x: 1380
-        y: 1320
+        x: 1528
+        y: 1116
       positionAbsolute:
-        x: 4891
-        y: 1320
+        x: 5420
+        y: 1116
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5526,11 +5484,11 @@ workflow:
       id: '1800000000727'
       parentId: '1800000000700'
       position:
-        x: 1540
-        y: 1320
+        x: 1849
+        y: 1091
       positionAbsolute:
-        x: 5051
-        y: 1320
+        x: 5741
+        y: 1091
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5576,11 +5534,11 @@ workflow:
       id: '1800000000779'
       parentId: '1800000000700'
       position:
-        x: 2352
-        y: 1410
+        x: 3153
+        y: 1142
       positionAbsolute:
-        x: 5863
-        y: 1410
+        x: 7045
+        y: 1142
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5609,11 +5567,11 @@ workflow:
       height: 110
       id: '1800000000045'
       position:
-        x: 850
-        y: 980
+        x: 1024
+        y: 733
       positionAbsolute:
-        x: 850
-        y: 980
+        x: 1024
+        y: 733
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5650,11 +5608,11 @@ workflow:
       height: 110
       id: '1800000000046'
       position:
-        x: 1140
-        y: 880
+        x: 1385
+        y: 922
       positionAbsolute:
-        x: 1140
-        y: 880
+        x: 1385
+        y: 922
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5723,18 +5681,18 @@ workflow:
       height: 225
       id: '1800000000047'
       position:
-        x: 1450
-        y: 880
+        x: 1746
+        y: 1121
       positionAbsolute:
-        x: 1450
-        y: 880
+        x: 1746
+        y: 1121
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 241
     viewport:
-      x: -603.1973290401374
-      y: 80.48523716657438
+      x: -44.56240319427828
+      y: 198.1915893888977
       zoom: 0.25
   rag_pipeline_variables: []
