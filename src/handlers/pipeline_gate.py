@@ -183,8 +183,7 @@ async def _validate_after_spec(conversation_id: str) -> dict:
         "has no program_name",
     )
     has_gap_errors = any(
-        any(frag in str(e).lower() for frag in gap_error_fragments)
-        for e in errors
+        any(frag in str(e).lower() for frag in gap_error_fragments) for e in errors
     )
 
     if ok:
