@@ -101,6 +101,106 @@ workflow:
     - workflow_mode
     value: ''
     value_type: string
+  - description: 'Flag-driven routing: current state machine phase. Enum — intake,
+      spec_gathering, spec_awaiting_user, spec_correcting, bundle_generating,
+      bundle_correcting, bundle_awaiting_user, rules_generating, reports_generating,
+      inspecting, uploading, completed, failed, rag, assistant, out_of_scope.'
+    id: c5468d0e-dc76-4103-a1b0-c4d1da7fea4b
+    name: active_phase
+    selector:
+    - conversation
+    - active_phase
+    value: intake
+    value_type: string
+  - description: 'True iff active_phase == spec_awaiting_user. Used by the pre-Orchestrator
+      short-circuit to bypass LLM classification on gap-fix continuation turns.'
+    id: 1103bd6a-9f6d-4c17-a1ae-2efd2a2a2218
+    name: spec_awaiting_user_input
+    selector:
+    - conversation
+    - spec_awaiting_user_input
+    value: false
+    value_type: boolean
+  - description: 'Structured list of pending ambiguity questions from enrich_spec.
+      Survives across turns so the Spec Agent reading a user reply does not need
+      to refetch. Shape: {id, question, options, target_section, target_store}.'
+    id: 07169e52-4142-41fc-b21e-f404065cf936
+    name: pending_ambiguities
+    selector:
+    - conversation
+    - pending_ambiguities
+    value: []
+    value_type: array[object]
+  - description: 'Last pipeline gate status. Enum — not_run, ok, errors,
+      user_input_needed.'
+    id: 2bf03c81-3bea-4703-886f-d34bcc8913bd
+    name: last_gate_status
+    selector:
+    - conversation
+    - last_gate_status
+    value: not_run
+    value_type: string
+  - description: Last gate error strings (typed snapshot for downstream IF-ELSE
+      routing).
+    id: 834e8612-cc1b-438b-acba-4b03cc85e67b
+    name: last_gate_errors
+    selector:
+    - conversation
+    - last_gate_errors
+    value: []
+    value_type: array[string]
+  - description: Last gate warning strings.
+    id: 70446320-9878-411e-98ad-50245a5211b2
+    name: last_gate_warnings
+    selector:
+    - conversation
+    - last_gate_warnings
+    value: []
+    value_type: array[string]
+  - description: Raw user reply for the current turn. Populated from sys.query at
+      the start of every user message so downstream agents can read it without
+      re-parsing.
+    id: bbcfe39a-bc8e-4b6c-b042-f7a606366c15
+    name: user_last_answer
+    selector:
+    - conversation
+    - user_last_answer
+    value: ''
+    value_type: string
+  - description: 'Per-agent retry counters for the agent-chain loop. Bounded at 3
+      per agent before the phase transitions to failed. Shape: {spec, bundle_config,
+      rules, reports, inspect, admin}, all ints.'
+    id: 23a2d981-fad6-4438-9bb9-c277a1b44c42
+    name: retries
+    selector:
+    - conversation
+    - retries
+    value:
+      spec: 0
+      bundle_config: 0
+      rules: 0
+      reports: 0
+      inspect: 0
+      admin: 0
+    value_type: object
+  - description: Append-only log of phase transitions for observability/debugging.
+    id: 25e6e1af-b1b4-4a33-b700-ebfed3e22069
+    name: phase_history
+    selector:
+    - conversation
+    - phase_history
+    value: []
+    value_type: array[string]
+  - description: Structured payload returned by the most recent agent (intent,
+      message, ambiguities, applied_changes, target_phase, reason). Consumed by
+      deterministic IF-ELSE routing nodes.
+    id: f81440ee-c8be-4235-915f-eceb4d47df9f
+    name: agent_structured
+    selector:
+    - conversation
+    - agent_structured
+    value: {}
+    value_type: object
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -248,11 +348,59 @@ workflow:
         isInLoop: false
         sourceType: code
         targetType: llm
-      id: 1757492907628-source-1757492907627-target
+      id: 1757492907628-source-1800000000045-target
       selected: false
       source: '1757492907628'
       sourceHandle: source
+      target: '1800000000045'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1800000000045-false-1757492907627-target
+      selected: false
+      source: '1800000000045'
+      sourceHandle: 'false'
       target: '1757492907627'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1800000000045-spec-awaiting-1800000000046-target
+      selected: false
+      source: '1800000000045'
+      sourceHandle: spec-awaiting
+      target: '1800000000046'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 1800000000046-source-1800000000047-target
+      selected: false
+      source: '1800000000046'
+      sourceHandle: source
+      target: '1800000000047'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1800000000047-source-1775719228711-target
+      selected: false
+      source: '1800000000047'
+      sourceHandle: source
+      target: '1775719228711'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -845,10 +993,36 @@ workflow:
         isInLoop: true
         loop_id: '1800000000700'
         sourceType: code
-        targetType: assigner
-      id: 1800000000720-source-1800000000730-target
+        targetType: code
+      id: 1800000000720-source-1800000000725-target
       selected: false
       source: '1800000000720'
+      sourceHandle: source
+      target: '1800000000725'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: code
+        targetType: assigner
+      id: 1800000000725-source-1800000000727-target
+      selected: false
+      source: '1800000000725'
+      sourceHandle: source
+      target: '1800000000727'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: assigner
+      id: 1800000000727-source-1800000000730-target
+      selected: false
+      source: '1800000000727'
       sourceHandle: source
       target: '1800000000730'
       targetHandle: target
@@ -963,9 +1137,22 @@ workflow:
         loop_id: '1800000000700'
         sourceType: code
         targetType: if-else
-      id: 1800000000776-source-1800000000777-target
+      id: 1800000000776-source-1800000000779-target
       selected: false
       source: '1800000000776'
+      sourceHandle: source
+      target: '1800000000779'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: if-else
+      id: 1800000000779-source-1800000000777-target
+      selected: false
+      source: '1800000000779'
       sourceHandle: source
       target: '1800000000777'
       targetHandle: target
@@ -5075,20 +5262,53 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\n\ndef main(gate_status: int, gate_body: str, agent_memory:\
-          \ str, active_agent: str) -> dict:\n    has_errors = False\n    gate_output\
-          \ = str()\n    try:\n        parsed = json.loads(gate_body) if gate_body\
-          \ else {}\n        errors = parsed.get(\"errors\", [])\n        next_action\
-          \ = parsed.get(\"next_action\", \"\")\n        has_errors = len(errors)\
-          \ > 0\n        if next_action == \"user_input_needed\":\n            has_errors\
-          \ = False\n        parts = []\n        for err in errors:\n            parts.append(\"\
-          [GATE ERROR] \" + str(err))\n        for warn in parsed.get(\"warnings\"\
-          , [])[:5]:\n            parts.append(\"[GATE WARNING] \" + str(warn))\n\
-          \        # Always log this gate run so the decider can count attempts.\n\
-          \        if active_agent:\n            parts.append(\"[gate-ran:\" + active_agent\
-          \ + \"]\")\n        gate_output = chr(10).join(parts)\n    except Exception:\n\
-          \        pass\n    if gate_status >= 400:\n        has_errors = False\n\
-          \    return {\"has_questions\": has_errors, \"gate_output\": gate_output}\n"
+        code: |
+          import json
+
+          def main(gate_status: int, gate_body: str, agent_memory: str,
+                   active_agent: str) -> dict:
+              has_errors = False
+              gate_output = ""
+              last_gate_status = "not_run"
+              last_gate_errors = []
+              last_gate_warnings = []
+              try:
+                  parsed = json.loads(gate_body) if gate_body else {}
+                  errors = parsed.get("errors", []) or []
+                  warnings = parsed.get("warnings", []) or []
+                  next_action = parsed.get("next_action", "")
+                  has_errors = len(errors) > 0
+                  last_gate_errors = [str(e) for e in errors]
+                  last_gate_warnings = [str(w) for w in warnings]
+                  if next_action == "user_input_needed":
+                      has_errors = False
+                      last_gate_status = "user_input_needed"
+                  elif has_errors:
+                      last_gate_status = "errors"
+                  else:
+                      last_gate_status = "ok"
+                  parts = []
+                  for err in errors:
+                      parts.append("[GATE ERROR] " + str(err))
+                  for warn in warnings[:5]:
+                      parts.append("[GATE WARNING] " + str(warn))
+                  # Always log this gate run so the decider can count attempts.
+                  if active_agent:
+                      parts.append("[gate-ran:" + active_agent + "]")
+                  gate_output = chr(10).join(parts)
+              except Exception:
+                  pass
+              if gate_status >= 400:
+                  has_errors = False
+                  last_gate_status = "errors"
+                  last_gate_errors = [f"Gate HTTP {gate_status}"]
+              return {
+                  "has_questions": has_errors,
+                  "gate_output": gate_output,
+                  "last_gate_status": last_gate_status,
+                  "last_gate_errors": last_gate_errors,
+                  "last_gate_warnings": last_gate_warnings,
+              }
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5097,6 +5317,12 @@ workflow:
             type: string
           has_questions:
             type: boolean
+          last_gate_status:
+            type: string
+          last_gate_errors:
+            type: array[string]
+          last_gate_warnings:
+            type: array[string]
         selected: false
         title: Gate Parser
         type: code
@@ -5202,6 +5428,423 @@ workflow:
       type: custom
       width: 241
       zIndex: 1002
+    - data:
+        code: |
+          import json
+          import re
+
+          def main(agent_output: str, active_agent: str,
+                   current_active_phase: str,
+                   current_spec_awaiting: bool,
+                   current_pending_ambiguities: list) -> dict:
+              """Parse the structured JSON block emitted at the end of an agent's
+              response and compute new conversation-variable values. Pass-through
+              the current state when no JSON block is found so downstream assigners
+              can overwrite unconditionally without losing state.
+              """
+              intent = ""
+              target_phase = ""
+              ambiguities = []
+              applied_changes = []
+              reason = ""
+              parsed_ok = False
+              payload = None
+              text = agent_output or ""
+
+              # Prefer a fenced ```json ... ``` block.
+              m = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
+              if m:
+                  try:
+                      payload = json.loads(m.group(1))
+                  except Exception:
+                      payload = None
+
+              # Fall back: last brace-balanced object containing "intent".
+              if payload is None:
+                  for match in reversed(list(
+                      re.finditer(r"\{[^{}]*\"intent\"[^{}]*\}", text, re.DOTALL)
+                  )):
+                      try:
+                          payload = json.loads(match.group(0))
+                          break
+                      except Exception:
+                          continue
+
+              if isinstance(payload, dict):
+                  intent = str(payload.get("intent", "") or "")
+                  target_phase = str(payload.get("target_phase", "") or "")
+                  ambiguities = payload.get("ambiguities", []) or []
+                  applied_changes = payload.get("applied_changes", []) or []
+                  reason = str(payload.get("reason", "") or "")
+                  parsed_ok = True
+
+              # Computed pass-through outputs.
+              out_active_phase = (
+                  target_phase
+                  if (parsed_ok and target_phase)
+                  else (current_active_phase or "intake")
+              )
+              out_spec_awaiting = (
+                  bool(parsed_ok and intent == "ask_user" and active_agent == "spec")
+                  if parsed_ok
+                  else bool(current_spec_awaiting)
+              )
+              out_pending_ambiguities = (
+                  ambiguities
+                  if (parsed_ok and intent == "ask_user")
+                  else (current_pending_ambiguities or [])
+              )
+              raw_payload = payload if isinstance(payload, dict) else {}
+
+              return {
+                  "intent": intent,
+                  "target_phase": target_phase,
+                  "ambiguities": ambiguities,
+                  "applied_changes": applied_changes,
+                  "reason": reason,
+                  "parsed_ok": parsed_ok,
+                  "out_active_phase": out_active_phase,
+                  "out_spec_awaiting": out_spec_awaiting,
+                  "out_pending_ambiguities": out_pending_ambiguities,
+                  "raw_payload": raw_payload,
+              }
+        code_language: python3
+        isInLoop: true
+        loop_id: '1800000000700'
+        outputs:
+          intent:
+            type: string
+          target_phase:
+            type: string
+          ambiguities:
+            type: array[object]
+          applied_changes:
+            type: array[object]
+          reason:
+            type: string
+          parsed_ok:
+            type: boolean
+          out_active_phase:
+            type: string
+          out_spec_awaiting:
+            type: boolean
+          out_pending_ambiguities:
+            type: array[object]
+          raw_payload:
+            type: object
+        selected: false
+        title: Agent Structured Parser
+        type: code
+        variables:
+        - value_selector:
+          - '1800000000720'
+          - agent_output
+          value_type: string
+          variable: agent_output
+        - value_selector:
+          - conversation
+          - active_agent
+          value_type: string
+          variable: active_agent
+        - value_selector:
+          - conversation
+          - active_phase
+          value_type: string
+          variable: current_active_phase
+        - value_selector:
+          - conversation
+          - spec_awaiting_user_input
+          value_type: boolean
+          variable: current_spec_awaiting
+        - value_selector:
+          - conversation
+          - pending_ambiguities
+          value_type: array[object]
+          variable: current_pending_ambiguities
+      height: 130
+      id: '1800000000725'
+      parentId: '1800000000700'
+      position:
+        x: 1380
+        y: 1320
+      positionAbsolute:
+        x: 4891
+        y: 1320
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000725'
+          - out_active_phase
+          variable_selector:
+          - conversation
+          - active_phase
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000725'
+          - out_spec_awaiting
+          variable_selector:
+          - conversation
+          - spec_awaiting_user_input
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000725'
+          - out_pending_ambiguities
+          variable_selector:
+          - conversation
+          - pending_ambiguities
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000725'
+          - raw_payload
+          variable_selector:
+          - conversation
+          - agent_structured
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000725'
+          - out_active_phase
+          variable_selector:
+          - conversation
+          - phase_history
+          write_mode: append
+        loop_id: '1800000000700'
+        selected: false
+        title: Phase Transition
+        type: assigner
+        version: '2'
+      height: 180
+      id: '1800000000727'
+      parentId: '1800000000700'
+      position:
+        x: 1540
+        y: 1320
+      positionAbsolute:
+        x: 5051
+        y: 1320
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000776'
+          - last_gate_status
+          variable_selector:
+          - conversation
+          - last_gate_status
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000776'
+          - last_gate_errors
+          variable_selector:
+          - conversation
+          - last_gate_errors
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000776'
+          - last_gate_warnings
+          variable_selector:
+          - conversation
+          - last_gate_warnings
+          write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Gate Result
+        type: assigner
+        version: '2'
+      height: 135
+      id: '1800000000779'
+      parentId: '1800000000700'
+      position:
+        x: 2352
+        y: 1410
+      positionAbsolute:
+        x: 5863
+        y: 1410
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        cases:
+        - case_id: spec-awaiting
+          conditions:
+          - comparison_operator: is
+            id: 25f782a3-425d-48e8-9fce-55ee2a5dd745
+            value: true
+            varType: boolean
+            variable_selector:
+            - conversation
+            - spec_awaiting_user_input
+          id: spec-awaiting
+          logical_operator: and
+        desc: 'Short-circuit when a Spec Agent gap-fix question is pending.
+          Bypasses the Orchestrator LLM entirely and re-enters the agent loop
+          with active_agent=spec so the user reply is applied by the Spec Agent.'
+        selected: false
+        title: Spec Awaiting Check
+        type: if-else
+      height: 110
+      id: '1800000000045'
+      position:
+        x: 850
+        y: 980
+      positionAbsolute:
+        x: 850
+        y: 980
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        code: |
+          def main(user_query: str) -> dict:
+              """Emit constants needed to resume the Spec Agent on a user reply
+              during a pending gap-fix. The downstream assigner copies these into
+              conversation variables so the graph converges with the normal
+              Set-Initial-Agent path at the File Check IF.
+              """
+              return {
+                  "active_agent": "spec",
+                  "workflow_mode": "generic",
+                  "active_phase": "spec_correcting",
+                  "user_last_answer": user_query or "",
+              }
+        code_language: python3
+        outputs:
+          active_agent:
+            type: string
+          workflow_mode:
+            type: string
+          active_phase:
+            type: string
+          user_last_answer:
+            type: string
+        selected: false
+        title: Resume Awaiting Values
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - query
+          value_type: string
+          variable: user_query
+      height: 110
+      id: '1800000000046'
+      position:
+        x: 1140
+        y: 880
+      positionAbsolute:
+        x: 1140
+        y: 880
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000046'
+          - active_agent
+          variable_selector:
+          - conversation
+          - active_agent
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000046'
+          - workflow_mode
+          variable_selector:
+          - conversation
+          - workflow_mode
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'True'
+          variable_selector:
+          - conversation
+          - agent_loop_active
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000046'
+          - active_phase
+          variable_selector:
+          - conversation
+          - active_phase
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000046'
+          - user_last_answer
+          variable_selector:
+          - conversation
+          - user_last_answer
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - conversation
+          - 'False'
+          variable_selector:
+          - conversation
+          - spec_awaiting_user_input
+          write_mode: over-write
+        selected: false
+        title: Resume Awaiting Assigner
+        type: assigner
+        version: '2'
+      height: 225
+      id: '1800000000047'
+      position:
+        x: 1450
+        y: 880
+      positionAbsolute:
+        x: 1450
+        y: 880
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
     viewport:
       x: -603.1973290401374
       y: 80.48523716657438

@@ -64,14 +64,53 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 23. **Call `append_agent_log`** at the END with `phase="spec_generation"`, `status="success"` (or `status="error"`), and a summary of what was produced.
 24. **Your final output should summarize** what you did (entities fixed, spec generated, counts) — this goes into Agent Memory for downstream agents. Include key decisions made (e.g. "removed Draft encounter, assigned Leave form to Anganwadi").
 
+25. **Your final output MUST end with a structured JSON block** — see the "Structured output contract" section below. The block is what the workflow routes on; the narrative before it is what the user sees.
+
+### Structured output contract (REQUIRED — at the end of every response)
+
+End every response with a fenced JSON block that the workflow graph parses for routing. The narrative (user-visible markdown) comes first; the JSON block is the last thing in the message.
+
+Exact format:
+
+```json
+{
+  "intent": "ask_user" | "applied_fix" | "phase_complete" | "error",
+  "target_phase": "spec_awaiting_user" | "spec_correcting" | "bundle_generating" | "failed",
+  "ambiguities": [
+    { "id": "...", "question": "...", "options": ["..."],
+      "target_section": "subject_types|programs|encounter_types|forms",
+      "target_store": "entities" }
+  ],
+  "applied_changes": [
+    { "section": "encounter_types", "operation": "remove|update|add",
+      "item_names": ["..."], "reason": "..." }
+  ],
+  "reason": "short, one-line rationale for the router log"
+}
+```
+
+Field rules:
+
+- `intent`:
+  - `ask_user` when you called `enrich_spec` and are presenting ambiguities. `ambiguities` array MUST be populated; `applied_changes` should be `[]`; `target_phase` MUST be `"spec_awaiting_user"`. Do NOT mention `generate_spec`, `stored=true`, or any completion signal anywhere in this turn — the router keys off `intent`, not on text.
+  - `applied_fix` when you successfully edited entities and called `generate_spec`. `applied_changes` array MUST list what you changed; `ambiguities` should be `[]`; `target_phase` is `"bundle_generating"` if you believe the spec is clean, or `"spec_correcting"` if you expect the gate to still flag issues.
+  - `phase_complete` only when you have nothing to change and are handing off. Normally use `applied_fix` instead.
+  - `error` when you hit an unrecoverable condition (e.g., missing auth, SRS unparseable). `reason` describes why.
+- `target_phase`: the phase the workflow should transition to after your turn. Never `null` or omitted.
+- `ambiguities`: copy each entry from `enrich_spec`'s response verbatim (preserve `id`, `question`, `options`, `target_section`, `target_store`). Do not paraphrase.
+- `applied_changes`: one entry per `update_entities_section` call. `item_names` lists the names removed/added/modified in that section.
+- `reason`: one short line — goes into the workflow's phase_history log.
+
+If multiple intents apply (e.g., you fixed some things and still need to ask about others), pick `ask_user` and put the fixes you've already applied into `applied_changes` — the router will still pause for user input.
+
 ### Key rules
 - **Entities are the source of truth; the spec is a projection.** `generate_spec` always reads entities and overwrites the spec. Any structural fix (forms, encounters, programs, subject types) MUST go through `update_entities_section` followed by `generate_spec`. `update_spec_section` is reserved for spec-only fields (settings, reportDashboards metadata) that have no entity counterpart — using it for a structural fix will be wiped out on the next regeneration.
 - **Gap-type gate errors — mandatory protocol.** When Agent Memory contains any `[GATE ERROR]` line whose wording includes `has no form`, `has no enrolmentForm`, or `has no forms, programs, or encounters`, you MUST follow this exact sequence and NOT guess defaults:
   1. Call `enrich_spec(conversation_id=..., sector=...)`. It returns `ambiguities: [...]` — one entry per gap, each with `question`, `options`, `target_store="entities"`, and `target_section`.
-  2. Produce ONE user-facing message that lists every ambiguity's `question` and its `options` verbatim, and end the message with the EXACT marker `[AWAITING_USER_INPUT]` on its own line, then STOP (do not call any more tools in that turn, and do NOT mention `generate_spec`, `stored=true`, or any other completion signal in this turn — those words trigger the workflow router to advance past you). Wait for the user's reply.
-  3. When the user replies, map each of their answers to the matching ambiguity. For every answer, call `update_entities_section` with `section = ambiguity.target_section` and the corrected items array. Do this for every ambiguity the user answered.
+  2. Produce ONE user-facing message that lists every ambiguity's `question` and its `options` verbatim, then STOP (do not call any more tools in that turn). End the response with the structured JSON block (see "Structured output contract") where `intent: "ask_user"`, `target_phase: "spec_awaiting_user"`, and `ambiguities` contains the full list copied verbatim from `enrich_spec`. The workflow routes on this JSON — not on any text markers — so the marker `[AWAITING_USER_INPUT]` is NO LONGER required. Wait for the user's reply.
+  3. When the user replies, map each of their answers to the matching ambiguity (the same list is available server-side in `conversation.pending_ambiguities`). For every answer, call `update_entities_section` with `section = ambiguity.target_section` and the corrected items array. Do this for every ambiguity the user answered.
   4. Call `generate_spec` exactly once after all entity edits are applied.
-  5. STOP. The gate will re-validate automatically.
+  5. Emit the structured JSON block with `intent: "applied_fix"`, `target_phase: "bundle_generating"` (or `"spec_correcting"` if you expect residual gate errors), and `applied_changes` listing what you changed. STOP. The gate will re-validate automatically.
   Never call `update_spec_section` for these gap fixes — answers must land in entities.
 - **Entities and specs are stored server-side** — after `store_entities` or `generate_spec`, other agents can access them via the same `conversation_id`.
 - **Fix ERRORS only, pass WARNINGS through** — if `validate_entities` returns errors (error_count > 0), fix them. Warnings are handled later by the Config Inspector agent.
@@ -84,7 +123,7 @@ You have access to server-side tools via the Avni AI API. All tools use `convers
 - **Use `conversation_id` on every tool call.**
 - **If re-invoked by the Inspector**: check Agent Memory AND `get_agent_logs` for instructions (e.g., "[ROUTE_TO:spec] missing encounter types"). Focus on fixing the specific issue described, then re-generate spec.
 - **Log phase transitions**: Always log `spec_generation: started` before you begin and `spec_generation: success` when done.
-- **Completion signals**: Your final output MUST mention `generate_spec` and `stored=true` so the Next Agent Decider knows to advance to the next agent. Example: "Called generate_spec — spec stored=true with 3 subject types, 5 programs, 12 encounter types."
+- **Completion signals**: Routing is driven by the structured JSON block at the end of your response (see "Structured output contract"). `intent: "applied_fix"` with `target_phase: "bundle_generating"` tells the workflow to advance to the Bundle Config Agent. `intent: "ask_user"` with `target_phase: "spec_awaiting_user"` tells it to pause for the user. Do NOT rely on free-text keywords to signal completion — the JSON is authoritative.
 
 ---
 
