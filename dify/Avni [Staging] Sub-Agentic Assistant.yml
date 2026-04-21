@@ -165,16 +165,17 @@ workflow:
     - user_last_answer
     value: ''
     value_type: string
-  - description: 'Per-agent retry counters for the agent-chain loop. Bounded at 3
-      per agent before the phase transitions to failed. Shape: {spec, bundle_config,
-      rules, reports, inspect, admin}, all ints. Default empty; populated lazily.'
+  - description: 'Per-agent retry counters, stored as a JSON string because Dify
+      cloud only reliably accepts boolean / string / array[object] for conversation
+      variables. Shape after json.loads: {spec, bundle_config, rules, reports,
+      inspect, admin} -> int.'
     id: 23a2d981-fad6-4438-9bb9-c277a1b44c42
     name: retries
     selector:
     - conversation
     - retries
-    value: {}
-    value_type: object
+    value: '{}'
+    value_type: string
   - description: Append-only log of phase transitions as a newline-separated string
       for observability/debugging.
     id: 25e6e1af-b1b4-4a33-b700-ebfed3e22069
@@ -184,16 +185,17 @@ workflow:
     - phase_history
     value: ''
     value_type: string
-  - description: Structured payload returned by the most recent agent (intent, message,
-      ambiguities, applied_changes, target_phase, reason). Consumed by deterministic
-      IF-ELSE routing nodes.
+  - description: 'Structured payload returned by the most recent agent, stored
+      as a JSON string. Shape after json.loads: intent, message, ambiguities,
+      applied_changes, target_phase, reason. Consumed by deterministic IF-ELSE
+      routing nodes.'
     id: f81440ee-c8be-4235-915f-eceb4d47df9f
     name: agent_structured
     selector:
     - conversation
     - agent_structured
-    value: {}
-    value_type: object
+    value: '{}'
+    value_type: string
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -4731,79 +4733,110 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import re\n\ndef main(active_agent: str, workflow_mode: str, agent_output:\
-          \ str,\n         agent_memory: str, last_gate_status: str,\n         agent_structured:\
-          \ dict) -> dict:\n    \"\"\"Stage B decider: deterministic routing from\
-          \ typed conversation\n    variables. Replaces the old ~60-line keyword-matching\
-          \ logic.\n\n    Inputs:\n      active_agent       conversation.active_agent\n\
-          \      workflow_mode      conversation.workflow_mode\n      agent_output\
-          \       latest agent text (for legacy fallback)\n      agent_memory    \
-          \   conversation.agent_memory (for [gate-ran]\n                        \
-          \ retry counter, still used as the bounded-loop\n                      \
-          \   source of truth)\n      last_gate_status   conversation.last_gate_status\
-          \ — ok | errors |\n                         user_input_needed | not_run\n\
-          \      agent_structured   conversation.agent_structured — last agent's\n\
-          \                         parsed JSON payload (intent, target_phase, ...)\n\
-          \n    Rule order:\n      1. targeted mode  -> done\n      2. intent=ask_user\
-          \  -> pause (done)\n      3. intent=error     -> pause (done)\n      4.\
-          \ legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])\n      5. gate errors\
-          \ + under retry cap  -> re-run same agent\n      6. gate errors + over retry\
-          \ cap   -> done (fail)\n      7. gate user_input_needed          -> pause\n\
-          \      8. gate ok / not_run               -> advance in chain\n    \"\"\"\
-          \n    if workflow_mode == \"targeted\":\n        return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n                \"reason\": \"Targeted\
-          \ mode — single agent only\"}\n\n    intent = \"\"\n    if isinstance(agent_structured,\
-          \ dict):\n        intent = str(agent_structured.get(\"intent\", \"\") or\
-          \ \"\")\n\n    if intent == \"ask_user\":\n        return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
-          \ intent=ask_user (structured)\"}\n    if intent == \"error\":\n       \
-          \ return {\"next_agent\": \"done\", \"loop_done\": True,\n             \
-          \   \"reason\": f\"{active_agent} intent=error (structured)\"}\n\n    #\
-          \ Structured Inspector re_route: typed replacement for [ROUTE_TO:agent].\n\
-          \    if intent == \"re_route\" and active_agent == \"inspect\":\n      \
-          \  target = \"\"\n        if isinstance(agent_structured, dict):\n     \
-          \       target = str(agent_structured.get(\"re_route_target\", \"\") or\
-          \ \"\")\n        valid_targets = (\"spec\", \"bundle_config\", \"rules\"\
-          , \"reports\")\n        if target in valid_targets:\n            mem_lc\
-          \ = (agent_memory or \"\").lower()\n            if \"[rerouted from inspect]\"\
-          \ not in mem_lc:\n                return {\"next_agent\": target, \"loop_done\"\
-          : False,\n                        \"reason\": f\"Inspector re_route -> {target}\
-          \ (structured)\"}\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory\
-          \ or \"\").lower()\n\n    # Legacy fallback 1: pre-Stage-A [AWAITING_USER_INPUT]\
-          \ marker. Kept so\n    # in-flight conversations that started before the\
-          \ prompt update still\n    # route correctly. Safe to remove in Stage D.\n\
-          \    if \"[awaiting_user_input]\" in t:\n        return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
-          \ legacy [AWAITING_USER_INPUT] marker\"}\n\n    # Legacy fallback 2: Inspector\
-          \ text-marker routing. Will be removed in\n    # Stage D once all in-flight\
-          \ conversations drain.\n    route_match = re.search(r\"\\[route_to:(\\w+)\\\
-          ]\", t)\n    if route_match and active_agent == \"inspect\":\n        target\
-          \ = route_match.group(1)\n        valid_targets = (\"spec\", \"bundle_config\"\
-          , \"rules\", \"reports\")\n        if target in valid_targets and \"[rerouted\
-          \ from inspect]\" not in mem:\n            return {\"next_agent\": target,\
-          \ \"loop_done\": False,\n                    \"reason\": f\"Inspector routing\
-          \ to {target} for fixes\"}\n\n    MAX_RETRIES = 3\n    runs_so_far = mem.count(f\"\
-          [gate-ran:{active_agent}]\")\n\n    if last_gate_status == \"errors\":\n\
-          \        if runs_so_far < MAX_RETRIES:\n            return {\"next_agent\"\
-          : active_agent, \"loop_done\": False,\n                    \"reason\": (\n\
-          \                        f\"Gate errors after {runs_so_far} run(s), \"\n\
-          \                        f\"re-running {active_agent} \"\n             \
-          \           f\"({runs_so_far}/{MAX_RETRIES})\"\n                    )}\n\
-          \        return {\"next_agent\": \"done\", \"loop_done\": True,\n      \
-          \          \"reason\": (\n                    f\"Gate errors persist after\
-          \ {MAX_RETRIES} retries \"\n                    f\"of {active_agent}\"\n\
-          \                )}\n\n    if last_gate_status == \"user_input_needed\"\
-          :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n    \
-          \            \"reason\": f\"Gate requests user input from {active_agent}\"\
-          }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"\
-          inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
-          \ ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\":\
-          \ True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
-          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n   \
-          \     return {\"next_agent\": next_a, \"loop_done\": False,\n          \
-          \      \"reason\": f\"{active_agent} done, advancing to {next_a}\"}\n\n\
-          \    return {\"next_agent\": \"done\", \"loop_done\": True,\n          \
-          \  \"reason\": \"End of chain\"}\n"
+        code: |
+          import json
+          import re
+
+          def main(active_agent: str, workflow_mode: str, agent_output: str,
+                   agent_memory: str, last_gate_status: str,
+                   agent_structured: str) -> dict:
+              """Stage B decider: deterministic routing from typed conversation
+              variables. Replaces the old ~60-line keyword-matching logic.
+
+              agent_structured arrives as a JSON-serialized string (Dify cloud
+              does not accept object-typed conversation variables), so we parse
+              it here before reading typed fields.
+
+              Rule order:
+                1. targeted mode  -> done
+                2. intent=ask_user  -> pause (done)
+                3. intent=error     -> pause (done)
+                4. intent=re_route + Inspector  -> branch to re_route_target
+                5. legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])
+                6. gate errors + under retry cap  -> re-run same agent
+                7. gate errors + over retry cap   -> done (fail)
+                8. gate user_input_needed         -> pause
+                9. gate ok / not_run              -> advance in chain
+              """
+              if workflow_mode == "targeted":
+                  return {"next_agent": "done", "loop_done": True,
+                          "reason": "Targeted mode — single agent only"}
+
+              struct = {}
+              try:
+                  if agent_structured:
+                      struct = json.loads(agent_structured) or {}
+              except Exception:
+                  struct = {}
+
+              intent = str(struct.get("intent", "") or "")
+
+              if intent == "ask_user":
+                  return {"next_agent": "done", "loop_done": True,
+                          "reason": f"{active_agent} intent=ask_user (structured)"}
+              if intent == "error":
+                  return {"next_agent": "done", "loop_done": True,
+                          "reason": f"{active_agent} intent=error (structured)"}
+
+              if intent == "re_route" and active_agent == "inspect":
+                  target = str(struct.get("re_route_target", "") or "")
+                  valid_targets = ("spec", "bundle_config", "rules", "reports")
+                  if target in valid_targets:
+                      mem_lc = (agent_memory or "").lower()
+                      if "[rerouted from inspect]" not in mem_lc:
+                          return {"next_agent": target, "loop_done": False,
+                                  "reason": f"Inspector re_route -> {target} (structured)"}
+
+              t = (agent_output or "").lower()
+              mem = (agent_memory or "").lower()
+
+              if "[awaiting_user_input]" in t:
+                  return {"next_agent": "done", "loop_done": True,
+                          "reason": f"{active_agent} legacy [AWAITING_USER_INPUT] marker"}
+
+              route_match = re.search(r"\[route_to:(\w+)\]", t)
+              if route_match and active_agent == "inspect":
+                  target = route_match.group(1)
+                  valid_targets = ("spec", "bundle_config", "rules", "reports")
+                  if target in valid_targets and "[rerouted from inspect]" not in mem:
+                      return {"next_agent": target, "loop_done": False,
+                              "reason": f"Inspector routing to {target} for fixes"}
+
+              MAX_RETRIES = 3
+              runs_so_far = mem.count(f"[gate-ran:{active_agent}]")
+
+              if last_gate_status == "errors":
+                  if runs_so_far < MAX_RETRIES:
+                      return {"next_agent": active_agent, "loop_done": False,
+                              "reason": (
+                                  f"Gate errors after {runs_so_far} run(s), "
+                                  f"re-running {active_agent} "
+                                  f"({runs_so_far}/{MAX_RETRIES})"
+                              )}
+                  return {"next_agent": "done", "loop_done": True,
+                          "reason": (
+                              f"Gate errors persist after {MAX_RETRIES} retries "
+                              f"of {active_agent}"
+                          )}
+
+              if last_gate_status == "user_input_needed":
+                  return {"next_agent": "done", "loop_done": True,
+                          "reason": f"Gate requests user input from {active_agent}"}
+
+              chain = ["spec", "bundle_config", "rules", "reports", "inspect"]
+              try:
+                  idx = chain.index(active_agent)
+              except ValueError:
+                  return {"next_agent": "done", "loop_done": True,
+                          "reason": f"Unknown agent: {active_agent}"}
+
+              if idx < len(chain) - 1:
+                  next_a = chain[idx + 1]
+                  return {"next_agent": next_a, "loop_done": False,
+                          "reason": f"{active_agent} done, advancing to {next_a}"}
+
+              return {"next_agent": "done", "loop_done": True,
+                      "reason": "End of chain"}
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4846,7 +4879,7 @@ workflow:
         - value_selector:
           - conversation
           - agent_structured
-          value_type: object
+          value_type: string
           variable: agent_structured
       height: 50
       id: '1800000000740'
@@ -5422,13 +5455,16 @@ workflow:
           \ == \"spec\")\n        if parsed_ok\n        else bool(current_spec_awaiting)\n\
           \    )\n    out_pending_ambiguities = (\n        ambiguities\n        if\
           \ (parsed_ok and intent == \"ask_user\")\n        else (current_pending_ambiguities\
-          \ or [])\n    )\n    raw_payload = payload if isinstance(payload, dict)\
-          \ else {}\n\n    return {\n        \"intent\": intent,\n        \"target_phase\"\
-          : target_phase,\n        \"ambiguities\": ambiguities,\n        \"applied_changes\"\
-          : applied_changes,\n        \"reason\": reason,\n        \"parsed_ok\":\
-          \ parsed_ok,\n        \"out_active_phase\": out_active_phase,\n        \"\
-          out_spec_awaiting\": out_spec_awaiting,\n        \"out_pending_ambiguities\"\
-          : out_pending_ambiguities,\n        \"raw_payload\": raw_payload,\n    }\n"
+          \ or [])\n    )\n    # Dify cloud does not accept object-typed conversation\
+          \ variables,\n    # so agent_structured is stored as a JSON string. Serialize\
+          \ here.\n    raw_payload_obj = payload if isinstance(payload, dict) else\
+          \ {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    return {\n   \
+          \     \"intent\": intent,\n        \"target_phase\": target_phase,\n   \
+          \     \"ambiguities\": ambiguities,\n        \"applied_changes\": applied_changes,\n\
+          \        \"reason\": reason,\n        \"parsed_ok\": parsed_ok,\n      \
+          \  \"out_active_phase\": out_active_phase,\n        \"out_spec_awaiting\"\
+          : out_spec_awaiting,\n        \"out_pending_ambiguities\": out_pending_ambiguities,\n\
+          \        \"raw_payload\": raw_payload,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5448,7 +5484,7 @@ workflow:
           parsed_ok:
             type: boolean
           raw_payload:
-            type: object
+            type: string
           reason:
             type: string
           target_phase:
