@@ -10,12 +10,12 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/anthropic:0.3.8@6706e34565fb2c560cc3641c888b7f4e34288928df913e92241bd6d4f830a0cf
+    marketplace_plugin_unique_identifier: langgenius/anthropic:0.3.10@4c9f48873be942854bc7c73965ce6f9266fa4985ac426fb88e5001dfa744649c
     version: null
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/openai:0.2.10@7ca552fb9e48caa4deddfdef5aa71c200d06d03c26c2e8bb428b3250101b9cb3
+    marketplace_plugin_unique_identifier: langgenius/openai:0.3.6@4875322dafae33f1125b31c0fbf66cdb089f09f2dbbcda65d4e605ee7043bb23
     version: null
 kind: app
 version: 0.6.0
@@ -2760,7 +2760,7 @@ workflow:
             enabled: true
             size: 5
         output_schema: null
-        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        plugin_unique_identifier: langgenius/agent:0.0.34@4b41a374567eb7cb226ee2f851513794566956008f1166c63205efc921be72d8
         selected: false
         title: Spec Agent
         tool_node_version: '2'
@@ -3174,7 +3174,7 @@ workflow:
             enabled: true
             size: 5
         output_schema: null
-        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        plugin_unique_identifier: langgenius/agent:0.0.34@4b41a374567eb7cb226ee2f851513794566956008f1166c63205efc921be72d8
         selected: false
         title: Bundle Config Agent
         tool_node_version: '2'
@@ -3433,7 +3433,7 @@ workflow:
             enabled: true
             size: 5
         output_schema: null
-        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        plugin_unique_identifier: langgenius/agent:0.0.34@4b41a374567eb7cb226ee2f851513794566956008f1166c63205efc921be72d8
         selected: false
         title: Rules Agent
         tool_node_version: '2'
@@ -3693,7 +3693,7 @@ workflow:
             enabled: true
             size: 5
         output_schema: null
-        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        plugin_unique_identifier: langgenius/agent:0.0.34@4b41a374567eb7cb226ee2f851513794566956008f1166c63205efc921be72d8
         selected: false
         title: Reports Agent
         tool_node_version: '2'
@@ -3975,7 +3975,7 @@ workflow:
             enabled: true
             size: 5
         output_schema: null
-        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        plugin_unique_identifier: langgenius/agent:0.0.34@4b41a374567eb7cb226ee2f851513794566956008f1166c63205efc921be72d8
         selected: false
         title: Config Inspector
         tool_node_version: '2'
@@ -4471,7 +4471,7 @@ workflow:
             enabled: true
             size: 5
         output_schema: null
-        plugin_unique_identifier: langgenius/agent:0.0.14@26958a0e80a10655ce73812bdb7c35a66ce7b16f5ac346d298bda17ff85efd1e
+        plugin_unique_identifier: langgenius/agent:0.0.34@4b41a374567eb7cb226ee2f851513794566956008f1166c63205efc921be72d8
         selected: false
         title: Admin Agent
         tool_node_version: '2'
