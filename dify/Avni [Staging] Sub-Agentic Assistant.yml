@@ -5647,7 +5647,7 @@ workflow:
           - agent_structured
           write_mode: over-write
         - input_type: variable
-          operation: over-write
+          operation: append
           value:
           - '1800000000725'
           - out_active_phase
