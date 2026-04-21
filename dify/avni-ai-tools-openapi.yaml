@@ -1377,6 +1377,81 @@ paths:
         '404':
           description: No stored spec for conversation_id
 
+  /apply-ambiguity-answers:
+    post:
+      operationId: apply_ambiguity_answers
+      summary: Bulk-apply user answers to enrich_spec ambiguities
+      description: |
+        Fans out the user's answers to all enrich_spec ambiguities in one
+        server-side call. Matches each answer by id, resolves the chosen
+        option, and mutates entities + regenerates the spec atomically.
+
+        Supports:
+          - Applying a specific option (e.g. "Yes", "Create basic form",
+            "Remove this encounter type"). The choice string is matched
+            fuzzily against the ambiguity's options.
+          - Ignoring/skipping — pass choice=null, "", "ignore", "skip",
+            or "leave as-is" to make no mutation for that ambiguity.
+
+        Prefer this over multi-round update_entities_section + generate_spec
+        when the user replies to enrich_spec ambiguities in bulk — avoids
+        echoing large item arrays through the LLM.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - answers
+              properties:
+                conversation_id:
+                  type: string
+                sector:
+                  type: string
+                  description: Sector for re-deriving sector-specific ambiguities (e.g. MCH, Nutrition)
+                answers:
+                  type: array
+                  description: One entry per user answer
+                  items:
+                    type: object
+                    required:
+                      - id
+                    properties:
+                      id:
+                        type: string
+                        description: Ambiguity id from enrich_spec (e.g. spec_enc_delivery_no_form)
+                      choice:
+                        type: string
+                        nullable: true
+                        description: User's picked option text, or null/ignore/skip to leave as-is
+      responses:
+        '200':
+          description: Summary of applied / ignored / unmatched answers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  applied_count: { type: integer }
+                  ignored_count: { type: integer }
+                  unmatched_count: { type: integer }
+                  applied:
+                    type: array
+                    items: { type: string }
+                  ignored:
+                    type: array
+                    items: { type: string }
+                  unmatched:
+                    type: array
+                    items: { type: string }
+                  entity_counts:
+                    type: object
+        '404':
+          description: No entities for conversation_id
+
   /validate-pipeline-step:
     post:
       operationId: validate_pipeline_step

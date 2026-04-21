@@ -1472,6 +1472,263 @@ async def handle_enrich_spec(request: Request) -> JSONResponse:
     )
 
 
+def _match_option(choice: str, options: list[str]) -> str | None:
+    """Fuzzy-match a user's choice string to one of the ambiguity's options.
+
+    Case-insensitive; returns the first option whose first 4 significant words
+    are a prefix of the choice (or vice versa). This lets the agent pass
+    terse user replies like "Create basic form" / "Remove" / "Yes" and still
+    resolve to the full option text.
+    """
+    if not choice:
+        return None
+    c = choice.strip().lower()
+    if not c:
+        return None
+    for opt in options:
+        o = opt.strip().lower()
+        if c == o or c in o or o.startswith(c) or c.startswith(o[:20]):
+            return opt
+    # Word-overlap fallback
+    c_words = set(c.split())
+    best_opt, best_score = None, 0
+    for opt in options:
+        o_words = set(opt.strip().lower().split())
+        score = len(c_words & o_words)
+        if score > best_score:
+            best_opt, best_score = opt, score
+    return best_opt if best_score >= 2 else None
+
+
+def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> str:
+    """Mutate entities in-place based on the matched option for an ambiguity.
+
+    Returns a one-line description of what was applied.
+    """
+    amb_id = amb.get("id", "")
+    target_name = amb.get("entity", "")
+    opt_lower = matched_option.lower()
+
+    # showGrowthChart on program
+    if amb_id.endswith("_showGrowthChart"):
+        programs = entities.setdefault("programs", [])
+        for p in programs:
+            if p.get("name") == target_name:
+                p["showGrowthChart"] = opt_lower.startswith("yes")
+                return f"program '{target_name}': showGrowthChart={p['showGrowthChart']}"
+        return f"program '{target_name}': not found"
+
+    # Subject type unmapped
+    if amb.get("target_section") == "subject_types" and amb_id.startswith("spec_st_"):
+        if "remove" in opt_lower:
+            entities["subject_types"] = [
+                s for s in entities.get("subject_types", []) if s.get("name") != target_name
+            ]
+            return f"subject_type '{target_name}': removed"
+        if "registrationform" in opt_lower.replace(" ", ""):
+            entities.setdefault("forms", []).append(
+                {
+                    "name": f"{target_name} Registration",
+                    "formType": "IndividualProfile",
+                    "subjectType": target_name,
+                    "sections": [{"name": "Details", "fields": []}],
+                }
+            )
+            return f"subject_type '{target_name}': added basic registrationForm"
+        return f"subject_type '{target_name}': left as-is"
+
+    # Encounter type no form
+    if amb.get("target_section") == "encounter_types" and amb_id.endswith("_no_form"):
+        enc = next(
+            (e for e in entities.get("encounter_types", []) if e.get("name") == target_name),
+            None,
+        )
+        if "remove" in opt_lower:
+            entities["encounter_types"] = [
+                e for e in entities.get("encounter_types", []) if e.get("name") != target_name
+            ]
+            return f"encounter_type '{target_name}': removed"
+        if "create" in opt_lower and "basic" in opt_lower:
+            if enc is None:
+                return f"encounter_type '{target_name}': not found"
+            form_type = "ProgramEncounter" if enc.get("is_program_encounter") else "Encounter"
+            new_form = {
+                "name": target_name,
+                "formType": form_type,
+                "subjectType": enc.get("subject_type"),
+                "encounterType": target_name,
+                "sections": [{"name": "Details", "fields": []}],
+            }
+            if enc.get("program_name"):
+                new_form["program"] = enc["program_name"]
+            entities.setdefault("forms", []).append(new_form)
+            return f"encounter_type '{target_name}': added basic {form_type} form"
+        if "map to an existing" in opt_lower:
+            return f"encounter_type '{target_name}': map-to-existing requires extra input (skipped)"
+        return f"encounter_type '{target_name}': unmatched action"
+
+    # Program unmapped (no enrolmentForm)
+    if amb.get("target_section") == "programs" and amb_id.startswith("spec_prog_"):
+        prog = next(
+            (p for p in entities.get("programs", []) if p.get("name") == target_name),
+            None,
+        )
+        if "remove" in opt_lower:
+            entities["programs"] = [
+                p for p in entities.get("programs", []) if p.get("name") != target_name
+            ]
+            return f"program '{target_name}': removed"
+        if "enrolmentform" in opt_lower.replace(" ", ""):
+            if prog is None:
+                return f"program '{target_name}': not found"
+            entities.setdefault("forms", []).append(
+                {
+                    "name": f"{target_name} Enrolment",
+                    "formType": "ProgramEnrolment",
+                    "subjectType": prog.get("target_subject_type") or prog.get("targetSubjectType"),
+                    "program": target_name,
+                    "sections": [{"name": "Details", "fields": []}],
+                }
+            )
+            return f"program '{target_name}': added basic enrolmentForm"
+        return f"program '{target_name}': unmatched action"
+
+    # Encounter missing subject_type
+    if amb_id.endswith("_subjectType"):
+        for e in entities.get("encounter_types", []):
+            if e.get("name") == target_name:
+                e["subject_type"] = matched_option
+                return f"encounter_type '{target_name}': subject_type='{matched_option}'"
+        return f"encounter_type '{target_name}': not found"
+
+    # Encounter program
+    if amb_id.endswith("_program"):
+        for e in entities.get("encounter_types", []):
+            if e.get("name") == target_name:
+                if "no program" in opt_lower:
+                    e["is_program_encounter"] = False
+                    e["program_name"] = ""
+                    return f"encounter_type '{target_name}': general encounter"
+                e["program_name"] = matched_option
+                e["is_program_encounter"] = True
+                return f"encounter_type '{target_name}': program='{matched_option}'"
+        return f"encounter_type '{target_name}': not found"
+
+    return f"[{amb_id}]: handler not implemented"
+
+
+async def handle_apply_ambiguity_answers(request: Request) -> JSONResponse:
+    """
+    POST /apply-ambiguity-answers
+    Body: {
+      "conversation_id": "...",
+      "sector": "nutrition",          # optional, for re-deriving sector-specific ambiguities
+      "answers": [
+        {"id": "prog_enrich_showGrowthChart",      "choice": "Yes"},
+        {"id": "spec_st_school_unmapped",          "choice": "Remove"},
+        {"id": "spec_enc_career_guidance_no_form", "choice": "Create basic form"},
+        {"id": "spec_enc_delivery_no_form",        "choice": "ignore"}
+      ]
+    }
+
+    Re-derives the current ambiguity list from entities+spec, matches each
+    incoming id to an ambiguity, applies the chosen option deterministically
+    to BOTH the entities store and the regenerated spec YAML (stored as a
+    single transaction). Skips answers with choice in {null, "", "ignore",
+    "skip"}.
+
+    Returns a compact summary; no large payloads are echoed through the LLM.
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+
+    conversation_id = body.get("conversation_id")
+    answers = body.get("answers", [])
+    sector = body.get("sector", "")
+    if not conversation_id:
+        return JSONResponse({"error": "Missing conversation_id"}, status_code=400)
+    if not isinstance(answers, list):
+        return JSONResponse({"error": "'answers' must be a list"}, status_code=400)
+
+    entities = _entity_store.get(conversation_id)
+    if entities is None:
+        return JSONResponse(
+            {"error": f"No entities for conversation_id={conversation_id}"},
+            status_code=404,
+        )
+
+    # Regenerate current spec so ambiguity detection runs against an up-to-date
+    # projection of entities — keeps entities and spec in lockstep.
+    try:
+        spec_yaml = entities_to_spec(entities, org_name="")
+    except Exception as exc:
+        return JSONResponse(
+            {"error": f"Could not regenerate spec from entities: {exc}"},
+            status_code=500,
+        )
+
+    enrich_result = enrich_spec_with_defaults(spec_yaml, sector)
+    current_ambs = {a["id"]: a for a in enrich_result.get("ambiguities", [])}
+
+    applied: list[str] = []
+    ignored: list[str] = []
+    unmatched: list[str] = []
+
+    for ans in answers:
+        if not isinstance(ans, dict):
+            continue
+        amb_id = ans.get("id", "")
+        choice = (ans.get("choice") or "").strip()
+        amb = current_ambs.get(amb_id)
+        if amb is None:
+            unmatched.append(f"{amb_id}: no matching ambiguity")
+            continue
+        if not choice or choice.lower() in ("ignore", "skip", "leave as-is", "leave-as-is"):
+            ignored.append(f"{amb_id}: skipped")
+            continue
+        matched_option = _match_option(choice, amb.get("options", []))
+        if matched_option is None:
+            unmatched.append(f"{amb_id}: choice '{choice}' did not match any option")
+            continue
+        applied.append(_apply_ambiguity_answer(entities, amb, matched_option))
+
+    # Persist entities, regenerate spec, persist spec.
+    _entity_store.put(conversation_id, entities)
+    try:
+        new_spec = entities_to_spec(entities, org_name="")
+        _spec_store.put(conversation_id, new_spec)
+    except Exception as exc:
+        return JSONResponse(
+            {"error": f"Could not regenerate spec after applying answers: {exc}"},
+            status_code=500,
+        )
+
+    logger.info(
+        "apply-ambiguity-answers: conv=%s applied=%d ignored=%d unmatched=%d",
+        conversation_id[:8],
+        len(applied),
+        len(ignored),
+        len(unmatched),
+    )
+
+    return JSONResponse(
+        {
+            "ok": True,
+            "applied_count": len(applied),
+            "ignored_count": len(ignored),
+            "unmatched_count": len(unmatched),
+            "applied": applied,
+            "ignored": ignored,
+            "unmatched": unmatched,
+            "entity_counts": {
+                k: len(v) if isinstance(v, list) else 1 for k, v in entities.items()
+            },
+        }
+    )
+
+
 async def handle_get_spec_format(request: Request) -> JSONResponse:
     """
     GET /spec-format?section=subjectTypes

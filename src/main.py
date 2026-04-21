@@ -55,6 +55,7 @@ from .handlers.spec_handlers import (
     handle_bundle_to_spec,
     handle_get_spec_format,
     handle_enrich_spec,
+    handle_apply_ambiguity_answers,
 )
 from .handlers.pipeline_gate import handle_validate_pipeline_step
 from .handlers.sandbox_handlers import handle_execute_python, handle_read_silo_file
@@ -414,6 +415,10 @@ async def create_server():
     @server.custom_route("/enrich-spec", methods=["POST"])
     async def enrich_spec_endpoint(request: Request):
         return await handle_enrich_spec(request)
+
+    @server.custom_route("/apply-ambiguity-answers", methods=["POST"])
+    async def apply_ambiguity_answers_endpoint(request: Request):
+        return await handle_apply_ambiguity_answers(request)
 
     # --- Bundle Generation ---
     @server.custom_route("/generate-bundle", methods=["POST"])

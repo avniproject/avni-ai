@@ -19,10 +19,10 @@ Produce a valid Avni YAML spec from an uploaded SRS, or apply user-directed corr
 
 ## Gap-fix protocol (MANDATORY for gap-type gate errors)
 
-1. Call `enrich_spec(conversation_id, sector)`. Returns `ambiguities: [...]` — one per gap, each with `question`, `options`, `target_section`, `target_store="entities"`.
+1. Call `enrich_spec(conversation_id, sector)`. Returns `ambiguities: [...]` — one per gap, each with `id`, `question`, `options`, `target_section`, `target_store="entities"`.
 2. Produce ONE user-facing message that lists every ambiguity's `question` and `options` verbatim. **STOP after this message.** Wait for the user's reply.
-3. When the user replies, map each answer to the matching ambiguity. For every answer, call `update_entities_section` with `section = ambiguity.target_section` and the corrected items array. Entities is the source of truth — never use `update_spec_section` for forms/encounters/programs/subjectTypes.
-4. Call `generate_spec` exactly once after all entity edits are applied.
+3. When the user replies, build an answers array — one `{id, choice}` per ambiguity — and call **`apply_ambiguity_answers(conversation_id, sector, answers)`** ONCE. The server re-derives ambiguities, matches each `choice` against the options (fuzzy, case-insensitive), applies the mutation to entities, and regenerates the spec atomically. `choice: null | "" | "ignore" | "skip" | "leave as-is"` skips that ambiguity.
+4. Do NOT call `update_entities_section` + `generate_spec` for bulk gap-answer sets — that echoes huge item arrays through the LLM and has timed out on long replies. Use `apply_ambiguity_answers` instead.
 5. STOP. The gate will re-validate automatically. If residual gap errors remain, you will be re-invoked — repeat from step 1.
 
 ---
@@ -84,6 +84,7 @@ Field rules:
 | `generate_spec` | Regenerate YAML spec from current entities. |
 | `get_spec` / `get_spec_section` / `update_spec_section` | Spec reads; `update_spec_section` is ONLY for spec-only fields (`settings`, `reportDashboards` metadata) — never for structural fixes. |
 | `enrich_spec` | Smart defaults + structural gap detection. Returns `ambiguities` for gap-fix protocol. |
+| `apply_ambiguity_answers` | Bulk-apply user answers to `enrich_spec` ambiguities in one server call. Preferred over `update_entities_section` for gap-answer sets. |
 | `get_spec_format` | Reference schema for a section. |
 | `execute_python` / `read_silo_file` | Complex transformations (rare). |
 
