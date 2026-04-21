@@ -5507,24 +5507,6 @@ workflow:
           - conversation
           - last_gate_status
           write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000776'
-          - last_gate_errors
-          variable_selector:
-          - conversation
-          - last_gate_errors
-          write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000776'
-          - last_gate_warnings
-          variable_selector:
-          - conversation
-          - last_gate_warnings
-          write_mode: over-write
         loop_id: '1800000000700'
         selected: false
         title: Gate Result
@@ -5655,15 +5637,6 @@ workflow:
           variable_selector:
           - conversation
           - active_phase
-          write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000046'
-          - user_last_answer
-          variable_selector:
-          - conversation
-          - user_last_answer
           write_mode: over-write
         - input_type: variable
           operation: over-write
