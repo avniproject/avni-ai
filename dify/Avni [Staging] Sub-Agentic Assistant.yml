@@ -4563,11 +4563,18 @@ workflow:
           \     agent_output: str, agent_memory: str) -> dict:\n    if workflow_mode\
           \ == \"targeted\":\n        return {\"next_agent\": \"done\", \"loop_done\"\
           : True,\n                \"reason\": \"Targeted mode — single agent only\"\
-          }\n\n    # If gate reported errors, re-run same agent (once)\n    mem =\
-          \ (agent_memory or \"\").lower()\n    if \"[gate error]\" in mem and f\"\
-          [gate-retry:{active_agent}]\" not in mem:\n        return {\"next_agent\"\
-          : active_agent, \"loop_done\": False,\n                \"reason\": f\"Gate\
-          \ errors found, re-running {active_agent}\"}\n\n    t = (agent_output or\
+          }\n\n    # Count gate runs for this agent so retry is bounded.\n    # The\
+          \ Gate Parser appends \"[gate-ran:<agent>]\" to agent_memory each time it\n\
+          \    # parses, and the \"Gate Errors to Memory\" assigner flows gate_output\
+          \ into\n    # conversation.agent_memory. The previous implementation tagged\
+          \ memory\n    # with \"[gate-retry:spec]\" on the very first gate parse,\
+          \ so the decider\n    # would refuse to re-run spec even once. Counting\
+          \ runs is unambiguous.\n    mem = (agent_memory or \"\").lower()\n    MAX_RETRIES\
+          \ = 3\n    runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\")\n    if\
+          \ \"[gate error]\" in mem and runs_so_far < MAX_RETRIES:\n        return\
+          \ {\"next_agent\": active_agent, \"loop_done\": False,\n                \"\
+          reason\": f\"Gate errors after {runs_so_far} run(s), re-running {active_agent}\
+          \ (retry {runs_so_far}/{MAX_RETRIES})\"}\n\n    t = (agent_output or\
           \ \"\").lower()\n    mem = (agent_memory or \"\").lower()\n    has_output\
           \ = len(t.strip()) > 50\n\n    # Inspector backward routing: [ROUTE_TO:agent_name]\n\
           \    route_match = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match\
@@ -5077,11 +5084,11 @@ workflow:
           \ = False\n        parts = []\n        for err in errors:\n            parts.append(\"\
           [GATE ERROR] \" + str(err))\n        for warn in parsed.get(\"warnings\"\
           , [])[:5]:\n            parts.append(\"[GATE WARNING] \" + str(warn))\n\
-          \        if has_errors and active_agent:\n            parts.append(\"[gate-retry:\"\
-          \ + active_agent + \"]\")\n        gate_output = chr(10).join(parts)\n \
-          \   except Exception:\n        pass\n    if gate_status >= 400:\n      \
-          \  has_errors = False\n    return {\"has_questions\": has_errors, \"gate_output\"\
-          : gate_output}\n"
+          \        # Always log this gate run so the decider can count attempts.\n\
+          \        if active_agent:\n            parts.append(\"[gate-ran:\" + active_agent\
+          \ + \"]\")\n        gate_output = chr(10).join(parts)\n    except Exception:\n\
+          \        pass\n    if gate_status >= 400:\n        has_errors = False\n\
+          \    return {\"has_questions\": has_errors, \"gate_output\": gate_output}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
