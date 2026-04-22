@@ -37,6 +37,16 @@ workflow:
     - 'False'
     value: false
     value_type: boolean
+  - description: Empty-string constant used by assigners to reset per-turn scratch
+      variables (agent_structured, active_agent). Dify top-level assigners prefer
+      input_type=variable with a reference selector over inline constants.
+    id: 5f3a1c0e-9b6d-4d12-a7f4-8c2e91d56031
+    name: empty_string
+    selector:
+    - conversation
+    - empty_string
+    value: ''
+    value_type: string
   - description: ''
     id: c6cba07c-9187-4228-842f-42a0e3f2f709
     name: org_name
@@ -2038,16 +2048,20 @@ workflow:
           - conversation
           - org_name
           write_mode: over-write
-        - input_type: constant
+        - input_type: variable
           operation: over-write
-          value: ''
+          value:
+          - conversation
+          - empty_string
           variable_selector:
           - conversation
           - agent_structured
           write_mode: over-write
-        - input_type: constant
+        - input_type: variable
           operation: over-write
-          value: ''
+          value:
+          - conversation
+          - empty_string
           variable_selector:
           - conversation
           - active_agent
