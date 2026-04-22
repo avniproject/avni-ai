@@ -42,6 +42,7 @@ from .handlers.entity_handlers import (
     handle_put_entities_section,
     handle_store_srs_text,
     handle_get_srs_text,
+    handle_entity_diff,
 )
 from .handlers.extraction_handlers import handle_parse_srs_file
 from .auth_store import handle_store_auth_token
@@ -449,6 +450,10 @@ async def create_server():
     @server.custom_route("/entities-section", methods=["PUT"])
     async def put_entities_section_endpoint(request: Request):
         return await handle_put_entities_section(request)
+
+    @server.custom_route("/entity-diff", methods=["GET"])
+    async def entity_diff_endpoint(request: Request):
+        return await handle_entity_diff(request)
 
     # --- Bundle File Inspection ---
     @server.custom_route("/bundle-files", methods=["GET"])

@@ -1308,6 +1308,57 @@ paths:
         '404':
           description: No log entries found for conversation_id
 
+  /entity-diff:
+    get:
+      operationId: entity_diff
+      summary: Per-turn state diff — entities vs last-uploaded baseline
+      description: |
+        Returns the state of entities relative to the baseline snapshot held
+        by the bundle store (the snapshot that produced the last successful
+        upload / reconcile). Always 200 — missing entities or bundle land in
+        the 'fresh' or 'pre_bundle' phases.
+
+        Consumed by the Dify Agent Loop's Question Classifier to decide which
+        agent to run next, without re-running Rules / Reports on unchanged
+        state. Agents may also call it directly when they need the full
+        detailed diff (e.g. to know which forms changed).
+
+        phase_hint values:
+          fresh       — no entities stored yet (new conversation)
+          pre_bundle  — entities parsed but no bundle generated
+          stable      — entities match the last-uploaded baseline exactly
+          dirty       — entities have been mutated since last upload
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Diff state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  phase_hint:
+                    type: string
+                    enum: [fresh, pre_bundle, stable, dirty]
+                  affected_sections:
+                    type: array
+                    items: {type: string}
+                  entity_diff:
+                    type: object
+                    description: Per-section {added, removed, modified} name lists
+                  spec_diff:
+                    type: object
+                    description: Spec-level additions/removals on enrolmentForm / exitForm / registrationForm
+                  summary:
+                    type: string
+                    description: ≤500-char human-readable summary for LLM consumption
+        '400':
+          description: Missing conversation_id
+
   /enrich-spec:
     post:
       operationId: enrich_spec

@@ -102,6 +102,216 @@ def _invalidate_bundle(conversation_id: str) -> bool:
         return False
 
 
+# ---------------------------------------------------------------------------
+# Entity diff — compares current entities against the baseline snapshot held
+# by the bundle store (set at the last successful generate_bundle/reconcile).
+# Used by the Dify Agent Loop's Question Classifier to decide routing without
+# re-running Rules/Reports on unchanged state.
+# ---------------------------------------------------------------------------
+
+_DIFFABLE_SECTIONS = (
+    "subject_types",
+    "programs",
+    "encounter_types",
+    "forms",
+    "address_levels",
+)
+
+
+def _index_by_name(items: list) -> dict:
+    return {i.get("name"): i for i in items if isinstance(i, dict) and i.get("name")}
+
+
+def _entity_section_diff(old_items: list, new_items: list) -> dict:
+    """Compare two lists of named entities (by 'name'). Returns
+    {added: [names], removed: [names], modified: [names]}. Modified = same
+    name, different dict content. Cheap: single-level name lookup, no
+    recursive field diff beyond equality."""
+    old_idx = _index_by_name(old_items or [])
+    new_idx = _index_by_name(new_items or [])
+    old_names = set(old_idx)
+    new_names = set(new_idx)
+    added = sorted(new_names - old_names)
+    removed = sorted(old_names - new_names)
+    modified = sorted(n for n in (old_names & new_names) if old_idx[n] != new_idx[n])
+    return {"added": added, "removed": removed, "modified": modified}
+
+
+def _spec_top_level_diff(baseline_entities: dict, current_entities: dict) -> dict:
+    """Derive a spec-level diff by regenerating both specs and comparing
+    programs[*].enrolmentForm/exitForm and subjectTypes[*].registrationForm.
+    Cheap because entities_to_spec is deterministic and fast."""
+    if not baseline_entities or not current_entities:
+        return {}
+    try:
+        from ..bundle.spec_generator import entities_to_spec
+        import yaml as _yaml
+
+        old_spec = (
+            _yaml.safe_load(entities_to_spec(baseline_entities, org_name="")) or {}
+        )
+        new_spec = (
+            _yaml.safe_load(entities_to_spec(current_entities, org_name="")) or {}
+        )
+    except Exception:
+        return {}
+
+    diffs: dict[str, list] = {"programs": [], "subject_types": []}
+    old_progs = {
+        p.get("name"): p
+        for p in (old_spec.get("programs") or [])
+        if isinstance(p, dict)
+    }
+    new_progs = {
+        p.get("name"): p
+        for p in (new_spec.get("programs") or [])
+        if isinstance(p, dict)
+    }
+    for name, new_p in new_progs.items():
+        old_p = old_progs.get(name, {})
+        for fld in ("enrolmentForm", "exitForm"):
+            if fld in new_p and fld not in old_p:
+                diffs["programs"].append(f"{name}.{fld} added")
+            elif fld in old_p and fld not in new_p:
+                diffs["programs"].append(f"{name}.{fld} removed")
+
+    old_sts = {
+        s.get("name"): s
+        for s in (old_spec.get("subjectTypes") or [])
+        if isinstance(s, dict)
+    }
+    new_sts = {
+        s.get("name"): s
+        for s in (new_spec.get("subjectTypes") or [])
+        if isinstance(s, dict)
+    }
+    for name, new_s in new_sts.items():
+        old_s = old_sts.get(name, {})
+        if "registrationForm" in new_s and "registrationForm" not in old_s:
+            diffs["subject_types"].append(f"{name}.registrationForm added")
+        elif "registrationForm" in old_s and "registrationForm" not in new_s:
+            diffs["subject_types"].append(f"{name}.registrationForm removed")
+
+    return {k: v for k, v in diffs.items() if v}
+
+
+def _build_summary(
+    phase: str, entity_diff: dict, spec_diff: dict, current_counts: dict
+) -> str:
+    """Produce a ≤500-char human-readable string for the classifier prompt."""
+    if phase == "fresh":
+        return "No entities stored yet. User is starting a new configuration."
+    if phase == "pre_bundle":
+        parts = ", ".join(f"{n} {k}" for k, n in current_counts.items() if n)
+        return f"Entities parsed ({parts}). No bundle generated yet."
+    if phase == "stable":
+        return "No changes since last upload."
+    # dirty
+    fragments: list[str] = []
+    for section in _DIFFABLE_SECTIONS:
+        d = entity_diff.get(section, {})
+        bits = []
+        if d.get("added"):
+            bits.append(f"+{len(d['added'])}")
+        if d.get("removed"):
+            bits.append(f"-{len(d['removed'])}")
+        if d.get("modified"):
+            bits.append(f"~{len(d['modified'])}")
+        if bits:
+            names = (
+                (d.get("added") or [])
+                + (d.get("modified") or [])
+                + ([f"-{n}" for n in (d.get("removed") or [])])
+            )
+            sample = ", ".join(names[:3])
+            more = "" if len(names) <= 3 else f" +{len(names) - 3} more"
+            fragments.append(f"{section} ({'/'.join(bits)}: {sample}{more})")
+    spec_bits = [x for section_list in spec_diff.values() for x in section_list][:3]
+    spec_suffix = (" Spec: " + "; ".join(spec_bits)) if spec_bits else ""
+    out = "Since last upload: " + "; ".join(fragments) + "." + spec_suffix
+    return out[:500]
+
+
+async def handle_entity_diff(request: Request) -> JSONResponse:
+    """
+    GET /entity-diff?conversation_id=<id>
+
+    Always-200 endpoint that returns the state of entities relative to the
+    baseline snapshot held by the bundle store (set at the last successful
+    generate_bundle / reconcile).
+
+    Response shape:
+      {
+        phase_hint: "fresh" | "pre_bundle" | "stable" | "dirty",
+        affected_sections: ["forms", "programs", ...],
+        entity_diff: { <section>: {added, removed, modified}, ... },
+        spec_diff:   { programs: ["Enrich.enrolmentForm added", ...], ... },
+        summary:     "Since last upload: forms (+1 ~0 -0: Enrich Enrolment)."
+      }
+
+    Consumed by the Dify Agent Loop's Question Classifier. Never 404s — a
+    missing entity or bundle just lands in the `fresh` / `pre_bundle` branch.
+    """
+    conversation_id = request.query_params.get("conversation_id")
+    if not conversation_id:
+        return JSONResponse(
+            {"error": "Missing 'conversation_id' query param"}, status_code=400
+        )
+
+    current = _entity_store.get(conversation_id)
+
+    baseline = None
+    try:
+        from .bundle_handlers import get_bundle_store
+
+        bundle_entry = get_bundle_store().get(conversation_id)
+        if bundle_entry is not None:
+            baseline = bundle_entry.get("baseline_entities")
+    except Exception:
+        logger.exception("entity-diff: bundle store access failed")
+
+    # Phase classification
+    if not current:
+        phase = "fresh"
+    elif not baseline:
+        phase = "pre_bundle"
+    else:
+        phase = "stable"  # may flip to "dirty" below
+
+    entity_diff: dict = {}
+    affected: list[str] = []
+    if current and baseline:
+        for section in _DIFFABLE_SECTIONS:
+            d = _entity_section_diff(
+                baseline.get(section, []), current.get(section, [])
+            )
+            if d["added"] or d["removed"] or d["modified"]:
+                entity_diff[section] = d
+                affected.append(section)
+        if affected:
+            phase = "dirty"
+
+    spec_diff: dict = {}
+    if phase == "dirty":
+        spec_diff = _spec_top_level_diff(baseline or {}, current or {})
+
+    current_counts = {
+        section: len(current.get(section, []) or []) if current else 0
+        for section in _DIFFABLE_SECTIONS
+    }
+    summary = _build_summary(phase, entity_diff, spec_diff, current_counts)
+
+    return JSONResponse(
+        {
+            "phase_hint": phase,
+            "affected_sections": affected,
+            "entity_diff": entity_diff,
+            "spec_diff": spec_diff,
+            "summary": summary,
+        }
+    )
+
+
 async def handle_store_srs_text(request: Request) -> JSONResponse:
     """
     POST /store-srs-text

@@ -150,6 +150,25 @@ workflow:
     - last_agent_message
     value: ''
     value_type: string
+  - description: Compact human-readable diff summary from /entity-diff, refreshed every
+      loop iteration by the Diff Assigner. Consumed by the Question Classifier.
+    id: 4a3e1b02-7c42-4b8a-92d1-0a1e7f9c2a11
+    name: turn_diff_summary
+    selector:
+    - conversation
+    - turn_diff_summary
+    value: ''
+    value_type: string
+  - description: One of fresh/pre_bundle/stable/dirty — lifecycle state of entities vs
+      last-uploaded baseline. Written by Diff Assigner, used as a rubric by the
+      Question Classifier.
+    id: 7d8c34f1-a912-4e6f-b3c5-2e5b84f6a21c
+    name: phase_hint
+    selector:
+    - conversation
+    - phase_hint
+    value: fresh
+    value_type: string
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -502,10 +521,62 @@ workflow:
         isInLoop: true
         loop_id: '1800000000700'
         sourceType: loop-start
-        targetType: if-else
-      id: 1800000000700start-source-1800000000710-target
+        targetType: http-request
+      id: 1800000000700start-source-1800000000712-target
       selected: false
       source: 1800000000700start
+      sourceHandle: source
+      target: '1800000000712'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: http-request
+        targetType: code
+      id: 1800000000712-source-1800000000713-target
+      selected: false
+      source: '1800000000712'
+      sourceHandle: source
+      target: '1800000000713'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: http-request
+        targetType: answer
+      id: 1800000000712-fail-branch-1800000000713-target
+      selected: false
+      source: '1800000000712'
+      sourceHandle: fail-branch
+      target: '1800000000713'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: code
+        targetType: assigner
+      id: 1800000000713-source-1800000000714-target
+      selected: false
+      source: '1800000000713'
+      sourceHandle: source
+      target: '1800000000714'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: question-classifier
+      id: 1800000000714-source-1800000000710-target
+      selected: false
+      source: '1800000000714'
       sourceHandle: source
       target: '1800000000710'
       targetHandle: target
@@ -514,12 +585,25 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: http-request
-      id: 1800000000710-dispatch-spec-1800000000101-target
+        sourceType: question-classifier
+        targetType: assigner
+      id: 1800000000710-1-1800000000715-target
       selected: false
       source: '1800000000710'
-      sourceHandle: dispatch-spec
+      sourceHandle: '1'
+      target: '1800000000715'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: http-request
+      id: 1800000000715-source-1800000000101-target
+      selected: false
+      source: '1800000000715'
+      sourceHandle: source
       target: '1800000000101'
       targetHandle: target
       type: custom
@@ -527,12 +611,25 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: http-request
-      id: 1800000000710-dispatch-bundle-config-1800000000201-target
+        sourceType: question-classifier
+        targetType: assigner
+      id: 1800000000710-2-1800000000716-target
       selected: false
       source: '1800000000710'
-      sourceHandle: dispatch-bundle-config
+      sourceHandle: '2'
+      target: '1800000000716'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: http-request
+      id: 1800000000716-source-1800000000201-target
+      selected: false
+      source: '1800000000716'
+      sourceHandle: source
       target: '1800000000201'
       targetHandle: target
       type: custom
@@ -540,12 +637,25 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: http-request
-      id: 1800000000710-dispatch-rules-1800000000301-target
+        sourceType: question-classifier
+        targetType: assigner
+      id: 1800000000710-3-1800000000717-target
       selected: false
       source: '1800000000710'
-      sourceHandle: dispatch-rules
+      sourceHandle: '3'
+      target: '1800000000717'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: http-request
+      id: 1800000000717-source-1800000000301-target
+      selected: false
+      source: '1800000000717'
+      sourceHandle: source
       target: '1800000000301'
       targetHandle: target
       type: custom
@@ -553,12 +663,25 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: http-request
-      id: 1800000000710-dispatch-reports-1800000000401-target
+        sourceType: question-classifier
+        targetType: assigner
+      id: 1800000000710-4-1800000000718-target
       selected: false
       source: '1800000000710'
-      sourceHandle: dispatch-reports
+      sourceHandle: '4'
+      target: '1800000000718'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: http-request
+      id: 1800000000718-source-1800000000401-target
+      selected: false
+      source: '1800000000718'
+      sourceHandle: source
       target: '1800000000401'
       targetHandle: target
       type: custom
@@ -566,12 +689,25 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: http-request
-      id: 1800000000710-dispatch-inspect-1800000000501-target
+        sourceType: question-classifier
+        targetType: assigner
+      id: 1800000000710-5-1800000000719-target
       selected: false
       source: '1800000000710'
-      sourceHandle: dispatch-inspect
+      sourceHandle: '5'
+      target: '1800000000719'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: http-request
+      id: 1800000000719-source-1800000000501-target
+      selected: false
+      source: '1800000000719'
+      sourceHandle: source
       target: '1800000000501'
       targetHandle: target
       type: custom
@@ -579,12 +715,25 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: http-request
-      id: 1800000000710-dispatch-admin-1800000000601-target
+        sourceType: question-classifier
+        targetType: assigner
+      id: 1800000000710-6-1800000000721-target
       selected: false
       source: '1800000000710'
-      sourceHandle: dispatch-admin
+      sourceHandle: '6'
+      target: '1800000000721'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: true
+        loop_id: '1800000000700'
+        sourceType: assigner
+        targetType: http-request
+      id: 1800000000721-source-1800000000601-target
+      selected: false
+      source: '1800000000721'
+      sourceHandle: source
       target: '1800000000601'
       targetHandle: target
       type: custom
@@ -592,12 +741,12 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: if-else
+        sourceType: question-classifier
         targetType: code
-      id: 1800000000710-false-1800000000720-target
+      id: 1800000000710-7-1800000000720-target
       selected: false
       source: '1800000000710'
-      sourceHandle: 'false'
+      sourceHandle: '7'
       target: '1800000000720'
       targetHandle: target
       type: custom
@@ -2054,81 +2203,37 @@ workflow:
       width: 44
       zIndex: 1002
     - data:
-        cases:
-        - case_id: dispatch-spec
-          conditions:
-          - comparison_operator: is
-            id: fb4db41d-7c66-4527-a8dd-14c4db83b4ac
-            value: spec
-            varType: string
-            variable_selector:
-            - conversation
-            - active_agent
-          id: dispatch-spec
-          logical_operator: and
-        - case_id: dispatch-bundle-config
-          conditions:
-          - comparison_operator: is
-            id: b6837b40-e213-494d-8d55-cfc6f97a2861
-            value: bundle_config
-            varType: string
-            variable_selector:
-            - conversation
-            - active_agent
-          id: dispatch-bundle-config
-          logical_operator: and
-        - case_id: dispatch-rules
-          conditions:
-          - comparison_operator: is
-            id: f1f9d6d2-27a3-4374-984e-854d53b71595
-            value: rules
-            varType: string
-            variable_selector:
-            - conversation
-            - active_agent
-          id: dispatch-rules
-          logical_operator: and
-        - case_id: dispatch-reports
-          conditions:
-          - comparison_operator: is
-            id: 6366d54a-6309-4686-940f-529d821f5ba9
-            value: reports
-            varType: string
-            variable_selector:
-            - conversation
-            - active_agent
-          id: dispatch-reports
-          logical_operator: and
-        - case_id: dispatch-inspect
-          conditions:
-          - comparison_operator: is
-            id: fdf911b5-3c56-4bf0-a69f-ed75d5f5e237
-            value: inspect
-            varType: string
-            variable_selector:
-            - conversation
-            - active_agent
-          id: dispatch-inspect
-          logical_operator: and
-        - case_id: dispatch-admin
-          conditions:
-          - comparison_operator: is
-            id: afe3f421-0d0b-4367-b96b-37d80d813f6b
-            value: admin
-            varType: string
-            variable_selector:
-            - conversation
-            - active_agent
-          id: dispatch-admin
-          logical_operator: and
-        desc: ''
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        desc: Fetches per-turn entity+spec diff from /entity-diff. Always returns
+          200 with {phase_hint, summary, ...}. Feeds the Question Classifier so
+          it can skip unneeded agents on post-upload corrections.
+        error_strategy: fail-branch
+        headers: ''
         isInLoop: true
         loop_id: '1800000000700'
+        method: get
+        params: 'conversation_id:{{#sys.conversation_id#}}'
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 100
         selected: false
-        title: Agent Dispatcher
-        type: if-else
-      height: 362
-      id: '1800000000710'
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 5
+        title: Diff Fetch
+        type: http-request
+        url: '{{#conversation.avni_ai_server_url#}}entity-diff'
+        variables: []
+      height: 106
+      id: '1800000000712'
       parentId: '1800000000700'
       position:
         x: 184
@@ -2141,6 +2246,374 @@ workflow:
       targetPosition: left
       type: custom
       width: 241
+      zIndex: 1002
+    - data:
+        code: "import json\n\ndef main(body: str) -> dict:\n    \"\"\"Parse Diff\
+          \ Fetch JSON body. Always returns a safe dict so downstream nodes\n   \
+          \ never blow up on transient failures.\"\"\"\n    phase_hint = \"fresh\"\
+          \n    summary = \"\"\n    try:\n        parsed = json.loads(body) if body\
+          \ else {}\n        phase_hint = str(parsed.get(\"phase_hint\") or \"fresh\"\
+          )\n        summary = str(parsed.get(\"summary\") or \"\")\n    except Exception:\n\
+          \        pass\n    return {\n        \"phase_hint\": phase_hint,\n    \
+          \    \"summary\": summary,\n    }\n"
+        code_language: python3
+        isInLoop: true
+        loop_id: '1800000000700'
+        outputs:
+          phase_hint:
+            type: string
+          summary:
+            type: string
+        selected: false
+        title: Diff Parser
+        type: code
+        variables:
+        - value_selector:
+          - '1800000000712'
+          - body
+          value_type: string
+          variable: body
+      height: 80
+      id: '1800000000713'
+      parentId: '1800000000700'
+      position:
+        x: 370
+        y: 1000
+      positionAbsolute:
+        x: 4262
+        y: 1000
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        desc: Writes phase_hint + summary from Diff Parser to conversation vars so
+          the Question Classifier (and any other node) can read them.
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000713'
+          - phase_hint
+          variable_selector:
+          - conversation
+          - phase_hint
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000713'
+          - summary
+          variable_selector:
+          - conversation
+          - turn_diff_summary
+          write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Diff Assigner
+        type: assigner
+        version: '2'
+      height: 104
+      id: '1800000000714'
+      parentId: '1800000000700'
+      position:
+        x: 556
+        y: 1000
+      positionAbsolute:
+        x: 4448
+        y: 1000
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        classes:
+        - id: '1'
+          name: spec
+        - id: '2'
+          name: bundle_config
+        - id: '3'
+          name: rules
+        - id: '4'
+          name: reports
+        - id: '5'
+          name: inspect
+        - id: '6'
+          name: admin
+        - id: '7'
+          name: done
+        desc: LLM-driven routing. Replaces the old active_agent-based IF-ELSE dispatcher.
+          Reads user query + phase_hint + turn_diff_summary + agent_memory + last_gate_status
+          and picks the next agent (or 'done' to end the loop iteration).
+        instructions: "Pick exactly one class for the next agent to run.\n\n## Classes\n\
+          - `spec`          — parse SRS, fix entity errors, handle spec-level corrections,\
+          \ answer ambiguities. Use for: file uploads, structural config changes\
+          \ (add/remove subject/program/encounter/form), field renames.\n- `bundle_config`\
+          \ — regenerate/reconcile bundle and upload. Use for: post-spec-change\
+          \ (phase_hint=dirty after spec ran), or initial bundle build (phase_hint=pre_bundle).\n\
+          - `rules`         — generate skip-logic / decision / visit-schedule rules\
+          \ on forms. Use for: rules-related asks, or right after forms/encounter_types\
+          \ changed AND rules have not yet been written for those forms.\n- `reports`\
+          \      — add dashboards / report cards. Use for: dashboard or card asks,\
+          \ or when programs/subject_types/encounter_types changed AND reports\
+          \ not yet aligned.\n- `inspect`       — validate config end-to-end, then\
+          \ upload. Use for: final validation on the first-run pipeline.\n- `admin`\
+          \         — location hierarchy, user accounts, catchments, delete-implementation.\
+          \ Use for: org-admin asks.\n- `done`          — end this loop iteration.\
+          \ Use for: approval/thanks/continue with stable phase and nothing outstanding.\n\
+          \n## Signal priority (evaluate top-down, first match wins)\n1. `last_gate_status\
+          \ == errors` → pick the SAME agent as last iteration (retry). Read agent_memory's\
+          \ most recent `[agent-name]` tag.\n2. User message looks like a new file\
+          \ upload / parse request / 'build my config' → `spec`.\n3. `phase_hint\
+          \ == fresh` (no entities) → `spec`.\n4. `phase_hint == pre_bundle` (entities\
+          \ parsed, no bundle) → `bundle_config`.\n5. User message explicitly asks\
+          \ for dashboards/report cards/charts → `reports`.\n6. User message explicitly\
+          \ asks for skip logic / validations / decision rules → `rules`.\n7. User\
+          \ message asks about locations/users/catchments/upload/delete-implementation\
+          \ → `admin`.\n8. `phase_hint == dirty` AND agent memory shows bundle_config\
+          \ has NOT run since the dirty mutation → `bundle_config`.\n9. `phase_hint\
+          \ == dirty` AND only forms/encounter_types changed → `rules`.\n10. `phase_hint\
+          \ == dirty` AND only subject_types/programs changed → `reports`.\n11.\
+          \ `phase_hint == stable` AND user said approval/thanks/continue → `done`.\n\
+          12. `phase_hint == stable` AND user asks about current config → `inspect`.\n\
+          13. Default → `done` (safer than running an unneeded agent).\n\n## Context\n\
+          - User query: `{{#sys.query#}}`\n- Phase hint: `{{#conversation.phase_hint#}}`\n\
+          - Turn diff summary: `{{#conversation.turn_diff_summary#}}`\n- Last gate\
+          \ status: `{{#conversation.last_gate_status#}}`\n- Agent memory (recent):\
+          \ `{{#conversation.agent_memory#}}`\n"
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          window:
+            enabled: false
+            size: 0
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        query_variable_selector:
+        - sys
+        - query
+        selected: false
+        title: Question Classifier
+        topics:
+        - spec
+        - bundle_config
+        - rules
+        - reports
+        - inspect
+        - admin
+        - done
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 300
+      id: '1800000000710'
+      parentId: '1800000000700'
+      position:
+        x: 742
+        y: 1000
+      positionAbsolute:
+        x: 4634
+        y: 1000
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        desc: Write class name to conversation.active_agent so Output Collector,
+          Pipeline Gate, Gate Parser, etc. continue to work without changes.
+        isInLoop: true
+        items:
+        - input_type: constant
+          operation: over-write
+          value: spec
+          variable_selector:
+          - conversation
+          - active_agent
+          write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Set active spec
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1800000000715'
+      parentId: '1800000000700'
+      position:
+        x: 900
+        y: 900
+      positionAbsolute:
+        x: 4792
+        y: 900
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 180
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInLoop: true
+        items:
+        - input_type: constant
+          operation: over-write
+          value: bundle_config
+          variable_selector:
+          - conversation
+          - active_agent
+          write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Set active bundle_config
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1800000000716'
+      parentId: '1800000000700'
+      position:
+        x: 900
+        y: 1000
+      positionAbsolute:
+        x: 4792
+        y: 1000
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 180
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInLoop: true
+        items:
+        - input_type: constant
+          operation: over-write
+          value: rules
+          variable_selector:
+          - conversation
+          - active_agent
+          write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Set active rules
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1800000000717'
+      parentId: '1800000000700'
+      position:
+        x: 900
+        y: 1100
+      positionAbsolute:
+        x: 4792
+        y: 1100
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 180
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInLoop: true
+        items:
+        - input_type: constant
+          operation: over-write
+          value: reports
+          variable_selector:
+          - conversation
+          - active_agent
+          write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Set active reports
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1800000000718'
+      parentId: '1800000000700'
+      position:
+        x: 900
+        y: 1200
+      positionAbsolute:
+        x: 4792
+        y: 1200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 180
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInLoop: true
+        items:
+        - input_type: constant
+          operation: over-write
+          value: inspect
+          variable_selector:
+          - conversation
+          - active_agent
+          write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Set active inspect
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1800000000719'
+      parentId: '1800000000700'
+      position:
+        x: 900
+        y: 1300
+      positionAbsolute:
+        x: 4792
+        y: 1300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 180
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInLoop: true
+        items:
+        - input_type: constant
+          operation: over-write
+          value: admin
+          variable_selector:
+          - conversation
+          - active_agent
+          write_mode: over-write
+        loop_id: '1800000000700'
+        selected: false
+        title: Set active admin
+        type: assigner
+        version: '2'
+      height: 82
+      id: '1800000000721'
+      parentId: '1800000000700'
+      position:
+        x: 900
+        y: 1400
+      positionAbsolute:
+        x: 4792
+        y: 1400
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 180
       zIndex: 1002
     - data:
         authorization:
@@ -4774,69 +5247,39 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\nimport re\n\ndef main(active_agent: str, workflow_mode:\
-          \ str, agent_output: str,\n         agent_memory: str, last_gate_status:\
-          \ str,\n         agent_structured: str) -> dict:\n    \"\"\"Stage B decider:\
-          \ deterministic routing from typed conversation\n    variables. Replaces\
-          \ the old ~60-line keyword-matching logic.\n\n    agent_structured arrives\
-          \ as a JSON-serialized string (Dify cloud\n    does not accept object-typed\
-          \ conversation variables), so we parse\n    it here before reading typed\
-          \ fields.\n\n    Rule order:\n      1. targeted mode  -> done\n      2.\
-          \ intent=ask_user  -> pause (done)\n      3. intent=error     -> pause (done)\n\
-          \      4. intent=re_route + Inspector  -> branch to re_route_target\n  \
-          \    5. legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])\n      6. gate\
-          \ errors + under retry cap  -> re-run same agent\n      7. gate errors +\
-          \ over retry cap   -> done (fail)\n      8. gate user_input_needed     \
-          \    -> pause\n      9. gate ok / not_run              -> advance in chain\n\
-          \    \"\"\"\n    if workflow_mode == \"targeted\":\n        return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n                \"reason\": \"Targeted\
-          \ mode — single agent only\"}\n\n    struct = {}\n    try:\n        if agent_structured:\n\
-          \            struct = json.loads(agent_structured) or {}\n    except Exception:\n\
-          \        struct = {}\n\n    intent = str(struct.get(\"intent\", \"\") or\
-          \ \"\")\n\n    if intent == \"ask_user\":\n        return {\"next_agent\"\
-          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
-          \ intent=ask_user (structured)\"}\n    if intent == \"error\":\n       \
-          \ return {\"next_agent\": \"done\", \"loop_done\": True,\n             \
-          \   \"reason\": f\"{active_agent} intent=error (structured)\"}\n\n    if\
-          \ intent == \"re_route\" and active_agent == \"inspect\":\n        target\
-          \ = str(struct.get(\"re_route_target\", \"\") or \"\")\n        valid_targets\
-          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
-          \ in valid_targets:\n            mem_lc = (agent_memory or \"\").lower()\n\
-          \            if \"[rerouted from inspect]\" not in mem_lc:\n           \
-          \     return {\"next_agent\": target, \"loop_done\": False,\n          \
-          \              \"reason\": f\"Inspector re_route -> {target} (structured)\"\
-          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
-          \ \"\").lower()\n\n    if \"[awaiting_user_input]\"\
-          \ in t:\n        return\
-          \ {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\"\
-          : f\"{active_agent} legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match\
-          \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
-          \ == \"inspect\":\n        target = route_match.group(1)\n        valid_targets\
-          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
-          \ in valid_targets and \"[rerouted from inspect]\" not in mem:\n       \
-          \     return {\"next_agent\": target, \"loop_done\": False,\n          \
-          \          \"reason\": f\"Inspector routing to {target} for fixes\"}\n\n\
-          \    MAX_RETRIES = 3\n    runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
-          )\n\n    if last_gate_status == \"errors\":\n        if runs_so_far < MAX_RETRIES:\n\
-          \            return {\"next_agent\": active_agent, \"loop_done\": False,\n\
-          \                    \"reason\": (\n                        f\"Gate errors\
-          \ after {runs_so_far} run(s), \"\n                        f\"re-running\
-          \ {active_agent} \"\n                        f\"({runs_so_far}/{MAX_RETRIES})\"\
-          \n                    )}\n        return {\"next_agent\": \"done\", \"loop_done\"\
-          : True,\n                \"reason\": (\n                    f\"Gate errors\
-          \ persist after {MAX_RETRIES} retries \"\n                    f\"of {active_agent}\"\
-          \n                )}\n\n    if last_gate_status == \"user_input_needed\"\
-          :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n    \
-          \            \"reason\": f\"Gate requests user input from {active_agent}\"\
-          }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"\
-          inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
-          \ ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\":\
-          \ True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
-          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n   \
-          \     return {\"next_agent\": next_a, \"loop_done\": False,\n          \
-          \      \"reason\": f\"{active_agent} done, advancing to {next_a}\"}\n\n\
-          \    return {\"next_agent\": \"done\", \"loop_done\": True,\n          \
-          \  \"reason\": \"End of chain\"}\n"
+        code: "import json\n\ndef main(active_agent: str, workflow_mode: str,\n  \
+          \       agent_output: str, agent_memory: str,\n         last_gate_status:\
+          \ str, agent_structured: str) -> dict:\n    \"\"\"Decides only loop_done\
+          \ — the Question Classifier at the top of\n    the next loop iteration\
+          \ picks which agent runs next.\n\n    Rules:\n      targeted mode\
+          \        -> done\n      intent=ask_user        -> done (pause for user)\n\
+          \      intent=error           -> done (fail)\n      gate user_input_needed\
+          \ -> done (pause)\n      gate errors + over retry cap -> done (fail)\n\
+          \      else                   -> continue; classifier picks next\n\n  \
+          \  next_agent is kept in the output schema for backwards compat but is\n\
+          \    always \"\" — downstream consumers should read\n    conversation.agent_structured\
+          \ instead.\n    \"\"\"\n    if workflow_mode == \"targeted\":\n        return\
+          \ {\"loop_done\": True, \"next_agent\": \"\",\n                \"reason\"\
+          : \"Targeted mode — single agent only\"}\n\n    struct = {}\n    try:\n\
+          \        if agent_structured:\n            struct = json.loads(agent_structured)\
+          \ or {}\n    except Exception:\n        struct = {}\n    intent = str(struct.get(\"\
+          intent\", \"\") or \"\")\n\n    if intent in (\"ask_user\", \"error\"):\n\
+          \        return {\"loop_done\": True, \"next_agent\": \"\",\n          \
+          \      \"reason\": f\"{active_agent} intent={intent}\"}\n\n    if last_gate_status\
+          \ == \"user_input_needed\":\n        return {\"loop_done\": True, \"next_agent\"\
+          : \"\",\n                \"reason\": f\"Gate requests user input from {active_agent}\"\
+          }\n\n    if last_gate_status == \"errors\":\n        mem = (agent_memory\
+          \ or \"\").lower()\n        runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
+          )\n        MAX_RETRIES = 3\n        if runs_so_far >= MAX_RETRIES:\n   \
+          \         return {\"loop_done\": True, \"next_agent\": \"\",\n         \
+          \           \"reason\": (\n                        f\"Gate errors persist\
+          \ after {MAX_RETRIES} retries of {active_agent}\"\n                    )}\n\
+          \        return {\"loop_done\": False, \"next_agent\": \"\",\n         \
+          \       \"reason\": (\n                    f\"Gate errors after {runs_so_far}\
+          \ run(s) of {active_agent}; \"\n                    f\"classifier will\
+          \ pick retry agent\"\n                )}\n\n    return {\"loop_done\": False,\
+          \ \"next_agent\": \"\",\n            \"reason\": \"classifier-driven advance\"\
+          }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'

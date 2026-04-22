@@ -37,6 +37,7 @@ ALLOWED_ORPHAN_TOOLS = {
     "validate_entities",
     "get_srs_text",
     "apply_entity_corrections",
+    "entity_diff",  # called by Dify workflow graph (Diff Fetch node), not by an agent
     "get_existing_config",
     "generate_spec",
     "get_spec",

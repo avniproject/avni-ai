@@ -205,6 +205,14 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
                 status_code=400,
             )
 
+    # Snapshot the entities in their CURRENT (snake_case) shape BEFORE
+    # normalising to camelCase — the entity-diff endpoint compares against
+    # `_entity_store` which stores snake_case, so baseline must match that
+    # shape to produce a correct diff.
+    import copy as _copy
+
+    baseline_snapshot = _copy.deepcopy(entities)
+
     # Normalise snake_case keys (sent by Dify) to camelCase (used internally)
     _key_map = {
         "subject_types": "subjectTypes",
@@ -259,14 +267,12 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
             }
 
             combined_flags = list(theirs_result.get("flags", [])) + list(merge_flags)
-            import copy as _copy
-
             _bundle_store.put(
                 conversation_id,
                 zip_b64,
                 merged_bundle,
                 combined_flags,
-                baseline_entities=_copy.deepcopy(entities),
+                baseline_entities=baseline_snapshot,
             )
             logger.info(
                 "generate-bundle: reconciled for conversation_id=%s merge_flags=%d",
@@ -313,14 +319,12 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
         if conversation_id:
             # Store bundle server-side; do NOT return bundle_zip_b64 to LLM.
             # Snapshot entities as baseline for future three-way reconciles.
-            import copy as _copy
-
             _bundle_store.put(
                 conversation_id,
                 zip_b64,
                 result["bundle"],
                 flags,
-                baseline_entities=_copy.deepcopy(entities),
+                baseline_entities=baseline_snapshot,
             )
             logger.info(
                 "generate-bundle: stored bundle for conversation_id=%s zip_b64_len=%d flags=%d",
