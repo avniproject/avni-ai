@@ -4806,14 +4806,15 @@ workflow:
           \     return {\"next_agent\": target, \"loop_done\": False,\n          \
           \              \"reason\": f\"Inspector re_route -> {target} (structured)\"\
           }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
-          \ \"\").lower()\n\n    # Post-upload short-circuit: if bundle_config (or any\n\
-          \    # agent) just uploaded successfully, the pipeline's job is done.\n \
-          \   # Running rules/reports/inspect again on an already-uploaded bundle\n\
-          \    # pays for LLM passes that produce no new artifacts and risks stream\n\
-          \    # drops from the accumulated agent-memory prompt bloat.\n    if \"[upload_success]\"\
-          \ in t or \"[upload_success]\" in mem:\n        return {\"next_agent\":\
-          \ \"done\", \"loop_done\": True,\n                \"reason\": f\"Upload\
-          \ succeeded in {active_agent} — pipeline complete\"}\n\n    if \"[awaiting_user_input]\"\
+          \ \"\").lower()\n\n    # Post-upload short-circuit: if the CURRENT agent's\n\
+          \    # output contains [UPLOAD_SUCCESS], this turn's work is done.\n    #\
+          \ We check agent_output only, NEVER agent_memory — memory persists\n    #\
+          \ across turns within a conversation, so checking it would cause any\n  \
+          \  # later user correction (e.g. 'fix the Enrich colour') to stop after\n\
+          \    # just one agent run simply because a prior turn had uploaded.\n   \
+          \ if \"[upload_success]\" in t:\n        return {\"next_agent\": \"done\"\
+          , \"loop_done\": True,\n                \"reason\": f\"Upload succeeded\
+          \ in {active_agent} — pipeline complete\"}\n\n    if \"[awaiting_user_input]\"\
           \ in t:\n        return\
           \ {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\"\
           : f\"{active_agent} legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match\
