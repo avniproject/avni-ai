@@ -4650,21 +4650,16 @@ workflow:
           \ = \"[UPLOAD_SUCCESS] \"\n    elif \"upload_bundle\" in t_lower and \"\
           error\" not in t_lower:\n        status_prefix = \"[UPLOAD_ATTEMPTED] \"\
           \n    elif \"[error]\" in t_lower or \"status=error\" in t_lower:\n    \
-          \    status_prefix = \"[ERROR] \"\n\n    # Strip the structured ```json```\
-          \ routing block — it is parsed and\n    # stored separately on conversation.agent_structured,\
-          \ so echoing it\n    # into agent_memory is pure context bloat for downstream\
-          \ agents.\n    compact = re.sub(r\"```json\\s*\\{.*?\\}\\s*```\", \"\",\
-          \ agent_text, flags=re.DOTALL).rstrip()\n\n    # Tighter per-agent cap (1500\
-          \ chars) — downstream agents need the\n    # gist, not the full narrative.\
-          \ Keeps loop-wide instruction under 10k.\n    entry = \"[\" + active_agent\
-          \ + \"] \" + status_prefix + compact[:1500]\n    sep = chr(10) + \"---\"\
-          \ + chr(10)\n    memory_entry = (existing_memory + sep + entry) if existing_memory\
-          \ else entry\n\n    # Cap total memory at 12000 chars (down from 25000)\
-          \ to keep the\n    # downstream agent prompt under the streaming-timeout\
-          \ danger zone.\n    if len(memory_entry) > 12000:\n        memory_entry =\
-          \ memory_entry[:3000] + chr(10) + \"...[earlier entries truncated]...\"\
-          \ + chr(10) + memory_entry[-9000:]\n\n    return {\n        \"memory_entry\"\
-          : memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
+          \    status_prefix = \"[ERROR] \"\n\n    # Smart truncation: keep more text\
+          \ (3000 chars) per agent\n    entry = \"[\" + active_agent + \"] \" + status_prefix\
+          \ + agent_text[:3000]\n    sep = chr(10) + \"---\" + chr(10)\n    memory_entry\
+          \ = (existing_memory + sep + entry) if existing_memory else entry\n\n  \
+          \  # Cap total memory to 25000 chars to prevent context overflow\n    #\
+          \ Keep first 5000 (early agents) + last 20000 (recent work)\n    if len(memory_entry)\
+          \ > 25000:\n        memory_entry = memory_entry[:5000] + chr(10) + \"...[earlier\
+          \ entries truncated]...\" + chr(10) + memory_entry[-20000:]\n\n    return\
+          \ {\n        \"memory_entry\": memory_entry,\n        \"agent_output\":\
+          \ agent_text,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -4806,8 +4801,7 @@ workflow:
           \     return {\"next_agent\": target, \"loop_done\": False,\n          \
           \              \"reason\": f\"Inspector re_route -> {target} (structured)\"\
           }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
-          \ \"\").lower()\n\n    if \"[awaiting_user_input]\"\
-          \ in t:\n        return\
+          \ \"\").lower()\n\n    if \"[awaiting_user_input]\" in t:\n        return\
           \ {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\"\
           : f\"{active_agent} legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match\
           \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
