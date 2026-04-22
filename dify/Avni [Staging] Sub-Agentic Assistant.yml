@@ -2396,6 +2396,8 @@ A. If last_agent_structured is a JSON with intent=applied_fix OR intent=phase_co
    - phase_hint=pre_bundle → bundle_config
    - phase_hint=pre_spec → spec
 
+A2. If last_agent_structured is a JSON with intent=re_route AND it carries re_route_target ∈ {spec, bundle_config, rules, reports, inspect}, pick that re_route_target. Inspector uses this to hand control back to an earlier agent when it finds something upstream needs correcting.
+
 B. last_gate_status=errors → pick last_active_agent (retry).
 
 C. phase_hint=fresh → spec.
@@ -2423,7 +2425,12 @@ L. PIPELINE PROGRESSION (the primary happy-path for first-time setups). When pha
    - agent_memory contains '[inspect]'                         → done     (pipeline complete)
    On subsequent turns (post-upload corrections), memory already contains [rules]/[reports]/[inspect] from the prior turn, so this rule correctly skips re-running them — the correction flow exits after bundle_config reconciles.
 
-K. Default → done.
+K. Phase-driven default (use when no rule above matched). Route by phase_hint so ambiguous input never silently drops pending work:
+   - phase_hint=fresh     → spec
+   - phase_hint=pre_spec  → spec
+   - phase_hint=pre_bundle → bundle_config
+   - phase_hint=dirty     → bundle_config
+   - phase_hint=stable    → done
 
 Return exactly one class name from: spec, bundle_config, rules, reports, inspect, admin, done."
         memory:
@@ -2440,6 +2447,14 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
         query_variable_selector:
         - sys
         - query
+        error_strategy: default-value
+        default_value:
+        - key: class_name
+          type: string
+          value: done
+        - key: class_id
+          type: string
+          value: '7'
         selected: false
         title: Question Classifier
         topics:
@@ -5301,9 +5316,12 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
           \ the top of the NEXT loop iteration.\n    \"\"\"\n    if workflow_mode\
           \ == \"targeted\":\n        return {\"loop_done\": True, \"next_agent\"\
           : \"\",\n                \"reason\": \"Targeted mode — single agent only\"\
-          }\n\n    if classifier_pick == \"done\":\n        return {\"loop_done\"\
-          : True, \"next_agent\": \"\",\n                \"reason\": \"Classifier\
-          \ chose 'done' — pipeline complete for this turn\"}\n\n    struct = {}\n\
+          }\n\n    if classifier_pick == \"done\" or not classifier_pick:\n      \
+          \  return {\"loop_done\": True, \"next_agent\": \"\",\n                \"\
+          reason\": (\n                    \"Classifier chose 'done' — pipeline complete\
+          \ for this turn\"\n                    if classifier_pick == \"done\"\n\
+          \                    else \"Classifier returned no pick (likely fail-branch\
+          \ default); exiting loop safely\"\n                )}\n\n    struct = {}\n\
           \    try:\n        if agent_structured:\n            struct = json.loads(agent_structured)\
           \ or {}\n    except Exception:\n        struct = {}\n    intent = str(struct.get(\"\
           intent\", \"\") or \"\")\n\n    if intent in (\"ask_user\", \"error\"):\n\

@@ -100,7 +100,11 @@ def _call_classifier(user_query: str, state: dict[str, str]) -> dict:
     )
     text = resp.content[0].text
     if "```" in text:
-        text = text.split("```json", 1)[-1] if "```json" in text else text.split("```", 1)[-1]
+        text = (
+            text.split("```json", 1)[-1]
+            if "```json" in text
+            else text.split("```", 1)[-1]
+        )
         text = text.rsplit("```", 1)[0]
     parsed = _json.loads(text.strip())
     if isinstance(parsed, list):
@@ -182,7 +186,10 @@ def test_post_spec_applied_fix_dirty_picks_bundle_config():
     assert pick.get("category_name") == "bundle_config", pick
 
 
-def test_post_bundle_config_stable_picks_done():
+def test_post_bundle_config_stable_picks_rules_via_L():
+    """After bundle_config finishes on a first-time run, Rule L advances
+    through the pipeline. Memory has [bundle_config] but not [rules] →
+    classifier picks rules."""
     pick = _call_classifier(
         user_query="Setup avni using scoping srs docs uploaded here",
         state={
@@ -191,7 +198,24 @@ def test_post_bundle_config_stable_picks_done():
             "agent_structured": '{"intent":"phase_complete","target_phase":"completed"}',
             "last_gate_status": "ok",
             "turn_diff_summary": "No changes since last upload.",
-            "agent_memory": "[spec]...[bundle_config] UPLOAD_SUCCESS",
+            "agent_memory": "[spec] applied ambiguities\n---\n[bundle_config] bundle generated",
+        },
+    )
+    assert pick.get("category_name") == "rules", pick
+
+
+def test_full_pipeline_complete_memory_picks_done():
+    """Memory shows spec → bundle_config → rules → reports → inspect all
+    ran. Rule L: memory contains [inspect] → done."""
+    pick = _call_classifier(
+        user_query="Setup avni using scoping srs docs uploaded here",
+        state={
+            "phase_hint": "stable",
+            "active_agent": "inspect",
+            "agent_structured": '{"intent":"phase_complete","target_phase":"completed"}',
+            "last_gate_status": "ok",
+            "turn_diff_summary": "No changes since last upload.",
+            "agent_memory": "[spec] ...\n---\n[bundle_config] ...\n---\n[rules] ...\n---\n[reports] ...\n---\n[inspect] UPLOAD_SUCCESS",
         },
     )
     assert pick.get("category_name") == "done", pick
@@ -235,6 +259,105 @@ def test_user_asks_for_report_card():
         },
     )
     assert pick.get("category_name") == "reports", pick
+
+
+# ---------------------------------------------------------------------------
+# RULE L: pipeline progression through Rules → Reports → Inspect
+# ---------------------------------------------------------------------------
+
+
+def test_L_progression_rules_to_reports():
+    pick = _call_classifier(
+        user_query="Setup avni using scoping srs docs uploaded here",
+        state={
+            "phase_hint": "stable",
+            "active_agent": "rules",
+            "agent_structured": '{"intent":"phase_complete"}',
+            "last_gate_status": "ok",
+            "turn_diff_summary": "No changes since last upload.",
+            "agent_memory": "[spec] ...\n---\n[bundle_config] ...\n---\n[rules] attached skip logic",
+        },
+    )
+    assert pick.get("category_name") == "reports", pick
+
+
+def test_L_progression_reports_to_inspect():
+    pick = _call_classifier(
+        user_query="Setup avni using scoping srs docs uploaded here",
+        state={
+            "phase_hint": "stable",
+            "active_agent": "reports",
+            "agent_structured": '{"intent":"phase_complete"}',
+            "last_gate_status": "ok",
+            "turn_diff_summary": "No changes since last upload.",
+            "agent_memory": "[spec]...[bundle_config]...[rules]...[reports] 18 cards added",
+        },
+    )
+    assert pick.get("category_name") == "inspect", pick
+
+
+# ---------------------------------------------------------------------------
+# RULE M: explicit upload-retry routing
+# ---------------------------------------------------------------------------
+
+
+def test_explicit_upload_request_routes_to_inspect():
+    """User asks to re-upload after pipeline already completed. Rule M →
+    inspect (which re-validates and uploads)."""
+    pick = _call_classifier(
+        user_query="upload the bundle again",
+        state={
+            "phase_hint": "stable",
+            "active_agent": "inspect",
+            "agent_structured": "",
+            "last_gate_status": "ok",
+            "turn_diff_summary": "No changes since last upload.",
+            "agent_memory": "[spec]...[bundle_config]...[rules]...[reports]...[inspect] UPLOAD_SUCCESS",
+        },
+    )
+    assert pick.get("category_name") == "inspect", pick
+
+
+# ---------------------------------------------------------------------------
+# RULE A2: Inspector re_route
+# ---------------------------------------------------------------------------
+
+
+def test_inspector_reroute_to_spec():
+    pick = _call_classifier(
+        user_query="",
+        state={
+            "phase_hint": "stable",
+            "active_agent": "inspect",
+            "agent_structured": '{"intent":"re_route","re_route_target":"spec","reason":"missing Enrich enrolmentForm"}',
+            "last_gate_status": "ok",
+            "turn_diff_summary": "No changes since last upload.",
+            "agent_memory": "[inspect] found gap",
+        },
+    )
+    assert pick.get("category_name") == "spec", pick
+
+
+# ---------------------------------------------------------------------------
+# RULE K: phase-driven default fallback
+# ---------------------------------------------------------------------------
+
+
+def test_default_fallback_on_pre_spec_routes_to_spec():
+    """Empty / ambiguous user query with phase=pre_spec should NOT silently
+    drop into done. Rule K maps phase→agent so work advances."""
+    pick = _call_classifier(
+        user_query="",
+        state={
+            "phase_hint": "pre_spec",
+            "active_agent": "",
+            "agent_structured": "",
+            "last_gate_status": "not_run",
+            "turn_diff_summary": "Entities parsed. Spec not yet generated.",
+            "agent_memory": "",
+        },
+    )
+    assert pick.get("category_name") == "spec", pick
 
 
 def test_stable_phase_with_approval_picks_done():

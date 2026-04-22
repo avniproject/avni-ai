@@ -1667,23 +1667,59 @@ def _apply_ambiguity_answer(entities: dict, amb: dict, matched_option: str) -> s
                 ),
                 None,
             )
+            subject_type_name = prog.get("target_subject_type") or prog.get(
+                "targetSubjectType"
+            )
+            messages: list[str] = []
+
             if orphan is not None:
                 orphan["program"] = target_name
-                orphan["subjectType"] = prog.get("target_subject_type") or prog.get(
-                    "targetSubjectType"
+                orphan["subjectType"] = subject_type_name
+                messages.append(
+                    f"adopted existing enrolmentForm '{orphan.get('name')}'"
                 )
-                return f"program '{target_name}': adopted existing enrolmentForm '{orphan.get('name')}'"
-            forms.append(
-                {
-                    "name": f"{target_name} Enrolment",
-                    "formType": "ProgramEnrolment",
-                    "subjectType": prog.get("target_subject_type")
-                    or prog.get("targetSubjectType"),
-                    "program": target_name,
-                    "sections": [{"name": "Details", "fields": []}],
-                }
+            else:
+                forms.append(
+                    {
+                        "name": f"{target_name} Enrolment",
+                        "formType": "ProgramEnrolment",
+                        "subjectType": subject_type_name,
+                        "program": target_name,
+                        "sections": [{"name": "Details", "fields": []}],
+                    }
+                )
+                messages.append("added basic enrolmentForm")
+
+            # Also add a placeholder exitForm unless one already exists.
+            # Programs require both forms for a complete mapping; otherwise
+            # enrich_spec's next run flags the missing exitForm as a gap
+            # and the user cycles through "add exit form?" ambiguity
+            # needlessly. Pair-creation keeps the user flow tight.
+            existing_exit = next(
+                (
+                    f
+                    for f in forms
+                    if f.get("formType") == "ProgramExit"
+                    and (
+                        f.get("program") == target_name
+                        or target_name.lower() in (f.get("name") or "").lower()
+                    )
+                ),
+                None,
             )
-            return f"program '{target_name}': added basic enrolmentForm"
+            if existing_exit is None:
+                forms.append(
+                    {
+                        "name": f"{target_name} Exit",
+                        "formType": "ProgramExit",
+                        "subjectType": subject_type_name,
+                        "program": target_name,
+                        "sections": [{"name": "Details", "fields": []}],
+                    }
+                )
+                messages.append("added basic exitForm")
+
+            return f"program '{target_name}': " + ", ".join(messages)
         return f"program '{target_name}': unmatched action"
 
     # Encounter missing subject_type
