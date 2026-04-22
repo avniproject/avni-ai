@@ -55,6 +55,16 @@ workflow:
     - pending_ambiguities_status
     value: none
     value_type: string
+  - description: Deterministic pipeline progression hint computed by the Diff Parser
+      from agent_memory ledger markers. When non-empty, the Question Classifier picks
+      it verbatim — moves pipeline ordering out of unreliable LLM substring matching.
+    id: 8e4c1b09-3f5a-4d6e-b8f1-2a9c7d3e5f10
+    name: pipeline_next_hint
+    selector:
+    - conversation
+    - pipeline_next_hint
+    value: ''
+    value_type: string
   - description: ''
     id: c6cba07c-9187-4228-842f-42a0e3f2f709
     name: org_name
@@ -2295,15 +2305,29 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\n\ndef main(body: str) -> dict:\n    \"\"\"Parse Diff Fetch\
-          \ JSON body. The classifier reads phase_hint and diff_summary\n    directly\
-          \ from conversation variables via its instruction template,\n    so this\
-          \ node's job is just to surface two fields downstream.\"\"\"\n    phase_hint\
-          \ = \"fresh\"\n    summary = \"\"\n    try:\n        parsed = json.loads(body)\
-          \ if body else {}\n        phase_hint = str(parsed.get(\"phase_hint\") or\
-          \ \"fresh\")\n        summary = str(parsed.get(\"summary\") or \"\")\n \
-          \   except Exception:\n        pass\n    return {\n        \"phase_hint\"\
-          : phase_hint,\n        \"summary\": summary,\n    }\n"
+        code: "import json\n\ndef main(body: str, agent_memory: str) -> dict:\n  \
+          \  \"\"\"Parse Diff Fetch JSON body AND compute a deterministic\n    pipeline_next_hint\
+          \ from agent_memory ledger markers.\n\n    Happy-path auto-progression:\
+          \ bundle_config -> inspect -> done.\n    Rules and Reports are intentionally\
+          \ NOT auto-progressed — they still\n    have flakiness issues and are only\
+          \ invoked when the user explicitly\n    asks for skip logic / validations\
+          \ / dashboards / report cards.\n\n    Pipeline progression is computed here\
+          \ — not reasoned by the LLM —\n    because Haiku is unreliable at strict\
+          \ bracketed-marker substring\n    matching over agent_memory.\"\"\"\n   \
+          \ phase_hint = \"fresh\"\n    summary = \"\"\n    try:\n        parsed =\
+          \ json.loads(body) if body else {}\n        phase_hint = str(parsed.get(\"\
+          phase_hint\") or \"fresh\")\n        summary = str(parsed.get(\"summary\"\
+          ) or \"\")\n    except Exception:\n        pass\n\n    mem = agent_memory\
+          \ or \"\"\n    pipeline_next_hint = \"\"\n    # Only emit a hint when entities\
+          \ are stable vs the last upload —\n    # a dirty/pre_spec/pre_bundle state\
+          \ means the user (or an agent)\n    # still has structural work to reconcile,\
+          \ and the classifier should\n    # handle that via its phase-based rules,\
+          \ not this ledger.\n    if phase_hint == \"stable\":\n        has_bundle\
+          \  = \"[bundle_config]\" in mem\n        has_inspect = \"[inspect]\" in\
+          \ mem\n        if has_bundle and not has_inspect:\n            pipeline_next_hint\
+          \ = \"inspect\"\n\n    return {\n        \"phase_hint\": phase_hint,\n \
+          \       \"summary\": summary,\n        \"pipeline_next_hint\": pipeline_next_hint,\n\
+          \    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -2311,6 +2335,8 @@ workflow:
           phase_hint:
             type: string
           summary:
+            type: string
+          pipeline_next_hint:
             type: string
         selected: false
         title: Diff Parser
@@ -2321,6 +2347,11 @@ workflow:
           - body
           value_type: string
           variable: body
+        - value_selector:
+          - conversation
+          - agent_memory
+          value_type: string
+          variable: agent_memory
       height: 50
       id: '1800000000713'
       parentId: '1800000000700'
@@ -2337,8 +2368,9 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        desc: Writes phase_hint + summary from Diff Parser to conversation vars so
-          the Question Classifier (and any other node) can read them.
+        desc: Writes phase_hint + summary + pipeline_next_hint from Diff Parser to
+          conversation vars so the Question Classifier (and any other node) can read
+          them.
         isInLoop: true
         items:
         - input_type: variable
@@ -2358,6 +2390,15 @@ workflow:
           variable_selector:
           - conversation
           - turn_diff_summary
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000713'
+          - pipeline_next_hint
+          variable_selector:
+          - conversation
+          - pipeline_next_hint
           write_mode: over-write
         loop_id: '1800000000700'
         selected: false
@@ -2410,76 +2451,73 @@ workflow:
           \ {{#conversation.phase_hint#}}\n- last_active_agent: {{#conversation.active_agent#}}\n\
           - last_agent_structured: {{#conversation.agent_structured#}}\n- last_gate_status:\
           \ {{#conversation.last_gate_status#}}\n- pending_ambiguities_status: {{#conversation.pending_ambiguities_status#}}\n\
-          - turn_diff_summary: {{#conversation.turn_diff_summary#}}\n- agent_memory\
-          \ (recent): {{#conversation.agent_memory#}}\n\n## Rules (apply top-down,\
-          \ first match wins)\n\nP1. [AMBIGUITY ANSWERS — highest priority]\n    If\
-          \ pending_ambiguities_status == 'pending' → spec.\n    The user's current\
-          \ message is almost certainly answering the prior turn's ask_user questions.\n\
-          \    Spec Agent owns applying them via apply_ambiguity_answers.\n    This\
-          \ rule overrides A, E, and K. Applies regardless of last_agent_structured\
-          \ intent,\n    regardless of phase_hint (including pre_bundle), and regardless\
-          \ of last_active_agent.\n    Routing elsewhere (especially bundle_config)\
-          \ forces the wrong agent to do Spec's job\n    via put_bundle_file and produces\
-          \ malformed cancellation forms.\n\nP2. [STRUCTURAL CHANGE REQUEST]\n   \
-          \ If the user's message contains a structural-change signal\n    AND phase_hint\
-          \ ∈ {pre_bundle, dirty}\n    → spec.\n    Structural-change signals (match\
-          \ intent, not exact wording):\n      - \"add\" / \"new\" / \"create\" a\
-          \ form, field, question, concept, encounter,\n        program, subject type,\
-          \ or entity\n      - \"rename\" any entity or field\n      - \"remove\"\
-          \ / \"delete\" a field or form (NOT \"delete implementation\" — that's admin,\
-          \ rule H)\n      - \"change the <encounter|program|subject|form structure>\"\
-          \n      - \"split\" or \"merge\" forms/concepts\n      - any request that\
-          \ alters the entity graph or form schema\n    Non-qualifying (do NOT trigger\
-          \ P2): label text changes, display-order tweaks,\n    color/styling, help-text\
-          \ edits, translation updates — these are bundle-config territory.\n    This\
-          \ rule overrides A (its pre_bundle and dirty sub-clauses) and E.\n\nA. \
+          - pipeline_next_hint: {{#conversation.pipeline_next_hint#}}\n- turn_diff_summary:\
+          \ {{#conversation.turn_diff_summary#}}\n- agent_memory (recent): {{#conversation.agent_memory#}}\n\
+          \n## Rules (apply top-down, first match wins)\n\nP1. [AMBIGUITY ANSWERS\
+          \ — highest priority]\n    If pending_ambiguities_status == 'pending' →\
+          \ spec.\n    The user's current message is almost certainly answering the\
+          \ prior turn's ask_user questions.\n    Spec Agent owns applying them via\
+          \ apply_ambiguity_answers.\n    This rule overrides A, E, K, and L. Applies\
+          \ regardless of last_agent_structured intent,\n    regardless of phase_hint\
+          \ (including pre_bundle), and regardless of last_active_agent.\n    Routing\
+          \ elsewhere (especially bundle_config) forces the wrong agent to do Spec's\
+          \ job\n    via put_bundle_file and produces malformed cancellation forms.\n\
+          \nP2. [STRUCTURAL CHANGE REQUEST]\n    If the user's message contains a\
+          \ structural-change signal\n    AND phase_hint ∈ {pre_bundle, dirty, stable}\n\
+          \    → spec.\n    Structural-change signals (match intent, not exact wording):\n\
+          \      - \"add\" / \"new\" / \"create\" a form, field, question, concept,\
+          \ encounter,\n        program, subject type, or entity\n      - \"rename\"\
+          \ any entity or field\n      - \"remove\" / \"delete\" a field or form (NOT\
+          \ \"delete implementation\" — that's admin, rule H)\n      - \"change the\
+          \ <encounter|program|subject|form structure>\"\n      - \"split\" or \"\
+          merge\" forms/concepts\n      - any request that alters the entity graph\
+          \ or form schema\n    Non-qualifying (do NOT trigger P2): label text changes,\
+          \ display-order tweaks,\n    color/styling, help-text edits, translation\
+          \ updates — these are bundle-config territory.\n    This rule overrides\
+          \ A, E, and L.\n\nA2. If last_agent_structured is a JSON with intent=re_route\
+          \ AND it carries\n    re_route_target ∈ {spec, bundle_config, inspect},\n\
+          \    pick that re_route_target.\n    (re_route_target=rules/reports is ignored\
+          \ — those agents are not in the\n    happy-path auto-flow. User must ask\
+          \ explicitly via rule F/G.)\n\nB.  last_gate_status=errors → pick last_active_agent\
+          \ (retry).\n\n## Explicit user-intent overrides (apply before pipeline hint)\n\
+          \nJ.  phase_hint=stable AND the user explicitly says: 'approved' / 'looks\
+          \ good' /\n    'thanks' / 'done' / 'no change needed' → done.\n    User\
+          \ is explicitly stopping — respect that even if pipeline_next_hint is set.\n\
+          \    Note: 'proceed' / 'continue' / 'go ahead' are NOT approval — they mean\
+          \ advance\n    the pipeline, which rule L handles.\n\nF.  User message asks\
+          \ for dashboards / report cards / charts → reports.\n    (Opt-in only —\
+          \ the happy path does not run reports.)\n\nG.  User message asks for skip\
+          \ logic / decision rule / validation → rules.\n    (Opt-in only — the happy\
+          \ path does not run rules.)\n\nH.  User message asks about locations / users\
+          \ / catchments / delete-implementation\n    → admin. (Do NOT route bundle-upload\
+          \ requests here — see rule M.)\n\nM.  User message explicitly says 'upload\
+          \ the bundle' / 'publish' / 'deploy' /\n    'push to avni' / 're-upload'\
+          \ / 'upload again' → inspect.\n    Inspector validates and uploads. Use\
+          \ this rule for retry/rework scenarios when\n    the user wants a fresh\
+          \ upload.\n\n## Pipeline progression (authoritative when user intent is\
+          \ neutral)\n\nL.  [PIPELINE PROGRESSION — DETERMINISTIC HINT]\n    If pipeline_next_hint\
+          \ is a non-empty string, pick it verbatim.\n    This hint is computed deterministically\
+          \ by the Diff Parser code node\n    from agent_memory ledger markers. The\
+          \ happy-path flow is:\n      spec → bundle_config → inspect → done.\n  \
+          \  Rules and Reports are NOT in auto-progression — they run only when the\n\
+          \    user explicitly requests them (rules F/G above, which fire first).\n\
+          \    Trust pipeline_next_hint unconditionally when set; it only fires on\n\
+          \    phase_hint=stable and accounts for what has/hasn't run yet.\n\nA. \
           \ If last_agent_structured is a JSON with intent=applied_fix OR intent=phase_complete,\n\
           \    DO NOT pick last_active_agent again. Advance instead:\n    - phase_hint=dirty\
           \ AND last_active_agent != bundle_config → bundle_config\n    - phase_hint=dirty\
-          \ AND last_active_agent == bundle_config → follow pipeline progression (see\
-          \ rule L)\n    - phase_hint=stable → follow pipeline progression (see rule\
-          \ L)\n    - phase_hint=pre_bundle → bundle_config\n    - phase_hint=pre_spec\
-          \ → spec\n\nA2. If last_agent_structured is a JSON with intent=re_route\
-          \ AND it carries\n    re_route_target ∈ {spec, bundle_config, rules, reports,\
-          \ inspect},\n    pick that re_route_target.\n    Inspector uses this to\
-          \ hand control back to an earlier agent when it finds\n    something upstream\
-          \ needs correcting.\n\nB.  last_gate_status=errors → pick last_active_agent\
-          \ (retry).\n\nC.  phase_hint=fresh → spec.\n\nD.  phase_hint=pre_spec →\
-          \ spec.\n    Entities parsed but spec not generated. Spec Agent must run\
-          \ validate_entities,\n    generate_spec, and enrich_spec so ambiguities\
-          \ surface before bundling.\n\nE.  phase_hint=pre_bundle → bundle_config.\n\
-          \    Spec exists, no ambiguities pending (P1 would have fired), no structural\
-          \ change\n    requested (P2 would have fired); safe to proceed to bundling.\n\
-          \nF.  User message asks for dashboards / report cards / charts → reports.\n\
-          \nG.  User message asks for skip logic / decision rule / validation → rules.\n\
-          \nH.  User message asks about locations / users / catchments / delete-implementation\n\
-          \    → admin. (Do NOT route bundle-upload requests here — see rule M.)\n\
-          \nM.  User message explicitly says 'upload the bundle' / 'publish' / 'deploy'\
-          \ /\n    'push to avni' / 're-upload' / 'upload again' → inspect.\n    Inspector\
-          \ validates and uploads. Use this rule for retry/rework scenarios when\n\
-          \    the full pipeline has already completed but the user wants a fresh\
-          \ upload.\n\nI.  phase_hint=dirty AND the user asked for a structural change\
-          \ → spec.\n    (Backstop for P2 in case the signal match was weak but intent\
-          \ is still structural.)\n\nJ.  phase_hint=stable AND the user explicitly\
-          \ says: 'approved' / 'looks good' /\n    'thanks' / 'done' / 'no change\
-          \ needed' → done.\n    Note: 'proceed' / 'continue' / 'go ahead' are NOT\
-          \ approval — they mean advance\n    the pipeline, which rule L handles.\n\
-          \nL.  PIPELINE PROGRESSION (the primary happy-path for first-time setups).\n\
-          \    When phase_hint=stable AND no explicit approval (rule J) yet, advance\
-          \ through\n    the remaining pipeline steps using agent_memory as a ledger\
-          \ so\n    Bundle Config → Rules → Reports → Inspect runs to completion in\
-          \ one turn:\n    - agent_memory contains '[bundle_config]' but NOT '[rules]'\
-          \   → rules    (skip-logic, decision rules on forms)\n    - agent_memory\
-          \ contains '[rules]'         but NOT '[reports]' → reports  (dashboards,\
-          \ report cards)\n    - agent_memory contains '[reports]'       but NOT '[inspect]'\
-          \ → inspect  (final validation + upload)\n    - agent_memory contains '[inspect]'\
-          \                            → done     (pipeline complete)\n    On subsequent\
-          \ turns (post-upload corrections), memory already contains\n    [rules]/[reports]/[inspect]\
-          \ from the prior turn, so this rule correctly skips\n    re-running them\
-          \ — the correction flow exits after bundle_config reconciles.\n\nK.  Phase-driven\
-          \ default (use when no rule above matched).\n    Route by phase_hint so\
-          \ ambiguous input never silently drops pending work:\n    - phase_hint=fresh\
-          \      → spec\n    - phase_hint=pre_spec   → spec\n    - phase_hint=pre_bundle\
+          \ AND last_active_agent == bundle_config → inspect\n    - phase_hint=stable\
+          \ → done (pipeline_next_hint rule L would have already fired if more work\
+          \ remained)\n    - phase_hint=pre_bundle → bundle_config\n    - phase_hint=pre_spec\
+          \ → spec\n\nC.  phase_hint=fresh → spec.\n\nD.  phase_hint=pre_spec → spec.\n\
+          \    Entities parsed but spec not generated. Spec Agent must run validate_entities,\n\
+          \    generate_spec, and enrich_spec so ambiguities surface before bundling.\n\
+          \nE.  phase_hint=pre_bundle → bundle_config.\n    Spec exists, no ambiguities\
+          \ pending (P1 would have fired), no structural change\n    requested (P2\
+          \ would have fired); safe to proceed to bundling.\n\nK.  Phase-driven default\
+          \ (use when no rule above matched).\n    Route by phase_hint so ambiguous\
+          \ input never silently drops pending work:\n    - phase_hint=fresh      →\
+          \ spec\n    - phase_hint=pre_spec   → spec\n    - phase_hint=pre_bundle\
           \ → bundle_config\n    - phase_hint=dirty      → bundle_config\n    - phase_hint=stable\
           \     → done\n\nReturn exactly one class name from: spec, bundle_config,\
           \ rules, reports, inspect, admin, done."
@@ -3909,7 +3947,6 @@ workflow:
             type: constant
             value:
               completion_params:
-                context_1m: true
                 max_tokens: 16384
                 prompt_caching_system_message: true
                 prompt_caching_tool_definitions: true

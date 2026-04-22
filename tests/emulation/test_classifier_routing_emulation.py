@@ -186,10 +186,11 @@ def test_post_spec_applied_fix_dirty_picks_bundle_config():
     assert pick.get("category_name") == "bundle_config", pick
 
 
-def test_post_bundle_config_stable_picks_rules_via_L():
-    """After bundle_config finishes on a first-time run, Rule L advances
-    through the pipeline. Memory has [bundle_config] but not [rules] →
-    classifier picks rules."""
+def test_post_bundle_config_stable_picks_inspect_via_L():
+    """After bundle_config finishes, Rule L (deterministic pipeline hint)
+    advances directly to inspect. Rules/reports are NOT in the happy path —
+    pipeline_next_hint is computed by Diff Parser as 'inspect' whenever
+    memory has [bundle_config] but no [inspect]."""
     pick = _call_classifier(
         user_query="Setup avni using scoping srs docs uploaded here",
         state={
@@ -197,16 +198,18 @@ def test_post_bundle_config_stable_picks_rules_via_L():
             "active_agent": "bundle_config",
             "agent_structured": '{"intent":"phase_complete","target_phase":"completed"}',
             "last_gate_status": "ok",
+            "pipeline_next_hint": "inspect",
             "turn_diff_summary": "No changes since last upload.",
             "agent_memory": "[spec] applied ambiguities\n---\n[bundle_config] bundle generated",
         },
     )
-    assert pick.get("category_name") == "rules", pick
+    assert pick.get("category_name") == "inspect", pick
 
 
 def test_full_pipeline_complete_memory_picks_done():
-    """Memory shows spec → bundle_config → rules → reports → inspect all
-    ran. Rule L: memory contains [inspect] → done."""
+    """Memory shows spec → bundle_config → inspect all ran. pipeline_next_hint
+    is empty (both [bundle_config] and [inspect] are present). With no explicit
+    user approval, Rule A (stable + phase_complete) → done."""
     pick = _call_classifier(
         user_query="Setup avni using scoping srs docs uploaded here",
         state={
@@ -214,8 +217,9 @@ def test_full_pipeline_complete_memory_picks_done():
             "active_agent": "inspect",
             "agent_structured": '{"intent":"phase_complete","target_phase":"completed"}',
             "last_gate_status": "ok",
+            "pipeline_next_hint": "",
             "turn_diff_summary": "No changes since last upload.",
-            "agent_memory": "[spec] ...\n---\n[bundle_config] ...\n---\n[rules] ...\n---\n[reports] ...\n---\n[inspect] UPLOAD_SUCCESS",
+            "agent_memory": "[spec] ...\n---\n[bundle_config] ...\n---\n[inspect] UPLOAD_SUCCESS",
         },
     )
     assert pick.get("category_name") == "done", pick
@@ -262,35 +266,27 @@ def test_user_asks_for_report_card():
 
 
 # ---------------------------------------------------------------------------
-# RULE L: pipeline progression through Rules → Reports → Inspect
+# RULE L: deterministic pipeline progression (happy path: bundle_config → inspect)
+# Rules and Reports are NOT in the happy path — they only run when the user
+# explicitly requests them (rules F/G). After a manual rules/reports invocation
+# the pipeline returns to its baseline: pipeline_next_hint picks inspect as
+# long as [bundle_config] is present and [inspect] is not.
 # ---------------------------------------------------------------------------
 
 
-def test_L_progression_rules_to_reports():
+def test_L_after_manual_rules_invocation_picks_inspect():
+    """User asked for rules explicitly. Rules ran. Bundle is present in
+    memory, inspect is not — pipeline_next_hint='inspect' should fire."""
     pick = _call_classifier(
-        user_query="Setup avni using scoping srs docs uploaded here",
+        user_query="continue",
         state={
             "phase_hint": "stable",
             "active_agent": "rules",
             "agent_structured": '{"intent":"phase_complete"}',
             "last_gate_status": "ok",
+            "pipeline_next_hint": "inspect",
             "turn_diff_summary": "No changes since last upload.",
             "agent_memory": "[spec] ...\n---\n[bundle_config] ...\n---\n[rules] attached skip logic",
-        },
-    )
-    assert pick.get("category_name") == "reports", pick
-
-
-def test_L_progression_reports_to_inspect():
-    pick = _call_classifier(
-        user_query="Setup avni using scoping srs docs uploaded here",
-        state={
-            "phase_hint": "stable",
-            "active_agent": "reports",
-            "agent_structured": '{"intent":"phase_complete"}',
-            "last_gate_status": "ok",
-            "turn_diff_summary": "No changes since last upload.",
-            "agent_memory": "[spec]...[bundle_config]...[rules]...[reports] 18 cards added",
         },
     )
     assert pick.get("category_name") == "inspect", pick
