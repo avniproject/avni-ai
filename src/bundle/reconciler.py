@@ -54,9 +54,7 @@ _LIST_KEYS = (
     "groupDashboards",
 )
 
-_OBJECT_KEYS = (
-    "organisationConfig",
-)
+_OBJECT_KEYS = ("organisationConfig",)
 
 
 # ---------------------------------------------------------------------------
@@ -168,7 +166,11 @@ def _is_uuid_keyed_list(obj: Any) -> bool:
 
 
 def _index_by_uuid(items: list[dict]) -> dict[str, dict]:
-    return {item["uuid"]: item for item in items if isinstance(item, dict) and "uuid" in item}
+    return {
+        item["uuid"]: item
+        for item in items
+        if isinstance(item, dict) and "uuid" in item
+    }
 
 
 def _merge_uuid_keyed_list(
@@ -230,7 +232,11 @@ def _three_way_merge_value(
         # Agent didn't patch this; take theirs.
         return copy.deepcopy(theirs)
 
-    if isinstance(base, dict) and isinstance(patched, dict) and isinstance(theirs, dict):
+    if (
+        isinstance(base, dict)
+        and isinstance(patched, dict)
+        and isinstance(theirs, dict)
+    ):
         return _merge_dict_fields(base, patched, theirs, path, flags)
 
     if (
@@ -256,9 +262,7 @@ def _three_way_merge_value(
 # ---------------------------------------------------------------------------
 
 
-def merge_bundle(
-    base: dict, patched: dict, theirs: dict
-) -> tuple[dict, list[dict]]:
+def merge_bundle(base: dict, patched: dict, theirs: dict) -> tuple[dict, list[dict]]:
     """Three-way merge of whole bundle dicts.
 
     Returns (merged_bundle, flags). `flags` records conflicts and integrity
@@ -305,10 +309,26 @@ def referential_integrity_pass(bundle: dict) -> tuple[dict, list[dict]]:
     flags: list[dict] = []
     result = copy.deepcopy(bundle)
 
-    form_uuids = {f["uuid"] for f in result.get("forms", []) if isinstance(f, dict) and "uuid" in f}
-    st_uuids = {s["uuid"] for s in result.get("subjectTypes", []) if isinstance(s, dict) and "uuid" in s}
-    prog_uuids = {p["uuid"] for p in result.get("programs", []) if isinstance(p, dict) and "uuid" in p}
-    enc_uuids = {e["uuid"] for e in result.get("encounterTypes", []) if isinstance(e, dict) and "uuid" in e}
+    form_uuids = {
+        f["uuid"]
+        for f in result.get("forms", [])
+        if isinstance(f, dict) and "uuid" in f
+    }
+    st_uuids = {
+        s["uuid"]
+        for s in result.get("subjectTypes", [])
+        if isinstance(s, dict) and "uuid" in s
+    }
+    prog_uuids = {
+        p["uuid"]
+        for p in result.get("programs", [])
+        if isinstance(p, dict) and "uuid" in p
+    }
+    enc_uuids = {
+        e["uuid"]
+        for e in result.get("encounterTypes", [])
+        if isinstance(e, dict) and "uuid" in e
+    }
 
     def _mapping_ok(m: dict) -> bool:
         fu = m.get("formUUID")

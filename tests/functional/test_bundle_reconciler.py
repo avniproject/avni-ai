@@ -65,7 +65,10 @@ def test_agent_patch_preserved_when_spec_unchanged():
         {"uuid": "rc2", "name": "Dropout Rate"},
     ]
     merged, flags = merge_bundle(base, patched, theirs)
-    assert [c["name"] for c in merged["reportCards"]] == ["Active Count", "Dropout Rate"]
+    assert [c["name"] for c in merged["reportCards"]] == [
+        "Active Count",
+        "Dropout Rate",
+    ]
     assert flags == []
 
 
@@ -160,12 +163,18 @@ def test_rules_skip_logic_survives_unrelated_spec_change():
     patched_form["formElementGroups"][0]["formElements"][1]["rules"] = [
         {"fact": "Is Pregnant", "op": "==", "value": "Yes"}
     ]
-    patched = {"forms": [patched_form], "formMappings": copy.deepcopy(base["formMappings"])}
+    patched = {
+        "forms": [patched_form],
+        "formMappings": copy.deepcopy(base["formMappings"]),
+    }
 
     # Theirs: spec added a third, unrelated form element "EDD". Existing elements unchanged.
     theirs_form = copy.deepcopy(base_form)
     theirs_form["formElementGroups"][0]["formElements"].append(_fe("u3", "EDD"))
-    theirs = {"forms": [theirs_form], "formMappings": copy.deepcopy(base["formMappings"])}
+    theirs = {
+        "forms": [theirs_form],
+        "formMappings": copy.deepcopy(base["formMappings"]),
+    }
 
     merged, flags = merge_bundle(base, patched, theirs)
     # Three elements present (patch-preserved LMP + spec-added EDD).
@@ -210,9 +219,9 @@ def test_three_way_field_conflict_prefers_patched_and_flags():
 
     merged, flags = merge_bundle(base, patched, theirs)
     assert merged["subjectTypes"][0]["name"] == "Beneficiary"
-    assert any(
-        f["type"] == "merge_conflict" and "name" in f["path"] for f in flags
-    ), flags
+    assert any(f["type"] == "merge_conflict" and "name" in f["path"] for f in flags), (
+        flags
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -244,8 +253,18 @@ def test_referential_integrity_cascades_on_formmapping():
         "subjectTypes": [{"uuid": "s1", "name": "P"}],
         "formMappings": [
             {"uuid": "m1", "formUUID": "f1", "subjectTypeUUID": "s1", "formName": "A"},
-            {"uuid": "m2", "formUUID": "f_gone", "subjectTypeUUID": "s1", "formName": "Gone"},
-            {"uuid": "m3", "formUUID": "f1", "subjectTypeUUID": "s_gone", "formName": "Orphan"},
+            {
+                "uuid": "m2",
+                "formUUID": "f_gone",
+                "subjectTypeUUID": "s1",
+                "formName": "Gone",
+            },
+            {
+                "uuid": "m3",
+                "formUUID": "f1",
+                "subjectTypeUUID": "s_gone",
+                "formName": "Orphan",
+            },
         ],
     }
     cleaned, flags = referential_integrity_pass(bundle)

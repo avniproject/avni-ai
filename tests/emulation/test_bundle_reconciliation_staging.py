@@ -63,7 +63,9 @@ async def test_reconciliation_preserves_report_cards(staging_client: httpx.Async
     assert r.status_code == 200, r.text
     body = r.json()
     assert body.get("success") is True, body
-    assert body.get("reconciled") is not True, "first generate must be full regen, not reconcile"
+    assert body.get("reconciled") is not True, (
+        "first generate must be full regen, not reconcile"
+    )
     initial_summary = body["summary"]
     assert initial_summary["encounterTypes"] >= 1
 
@@ -104,9 +106,9 @@ async def test_reconciliation_preserves_report_cards(staging_client: httpx.Async
     )
     assert r.status_code == 200, r.text
     cards_after_patch = r.json()["content"]
-    assert any(
-        c.get("uuid") == "rc-recon-probe" for c in cards_after_patch
-    ), "put_bundle_file did not persist the reportCards patch"
+    assert any(c.get("uuid") == "rc-recon-probe" for c in cards_after_patch), (
+        "put_bundle_file did not persist the reportCards patch"
+    )
 
     # 5. Mutate entities: add a Followup encounter via PUT /entities-section.
     new_encounters = copy.deepcopy(entities["encounter_types"])
@@ -157,9 +159,7 @@ async def test_reconciliation_preserves_report_cards(staging_client: httpx.Async
     )
     assert r.status_code == 200, r.text
     cards_after_reconcile = r.json()["content"]
-    assert any(
-        c.get("uuid") == "rc-recon-probe" for c in cards_after_reconcile
-    ), (
+    assert any(c.get("uuid") == "rc-recon-probe" for c in cards_after_reconcile), (
         "reconcile wiped the Reports Agent's patched reportCards entry; "
         f"got: {[c.get('uuid') for c in cards_after_reconcile]}"
     )

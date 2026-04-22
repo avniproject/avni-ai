@@ -225,7 +225,9 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
 
         try:
             baseline_entities = existing["baseline_entities"]
-            baseline_norm = {_key_map.get(k, k): v for k, v in baseline_entities.items()}
+            baseline_norm = {
+                _key_map.get(k, k): v for k, v in baseline_entities.items()
+            }
 
             base_gen = BundleGenerator(org_name)
             base_gen.generate(baseline_norm)
