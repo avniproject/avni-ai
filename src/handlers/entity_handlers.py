@@ -201,9 +201,15 @@ def _build_summary(
     """Produce a ≤500-char human-readable string for the classifier prompt."""
     if phase == "fresh":
         return "No entities stored yet. User is starting a new configuration."
+    if phase == "pre_spec":
+        parts = ", ".join(f"{n} {k}" for k, n in current_counts.items() if n)
+        return (
+            f"Entities parsed ({parts}). Spec not yet generated — Spec Agent "
+            "needs to validate, generate_spec, and enrich_spec to surface ambiguities."
+        )
     if phase == "pre_bundle":
         parts = ", ".join(f"{n} {k}" for k, n in current_counts.items() if n)
-        return f"Entities parsed ({parts}). No bundle generated yet."
+        return f"Spec generated ({parts}). No bundle yet — ready for Bundle Config."
     if phase == "stable":
         return "No changes since last upload."
     # dirty
@@ -270,13 +276,35 @@ async def handle_entity_diff(request: Request) -> JSONResponse:
     except Exception:
         logger.exception("entity-diff: bundle store access failed")
 
+    spec_present = False
+    try:
+        from .spec_handlers import get_spec_store
+
+        spec_present = get_spec_store().get(conversation_id) is not None
+    except Exception:
+        logger.exception("entity-diff: spec store access failed")
+
     # Phase classification
+    #   fresh       — no entities (user just started)
+    #   pre_spec    — entities parsed (e.g. by Parse SRS File) but spec NOT
+    #                 yet generated. Spec Agent needs to run: validate,
+    #                 generate_spec, enrich_spec (surfacing ambiguities).
+    #                 Routing to bundle_config here skips the ambiguity flow.
+    #   pre_bundle  — spec exists but no bundle. Bundle Config Agent runs.
+    #   stable      — entities match last-uploaded baseline (may flip to
+    #                 dirty below if any section differs).
+    #   dirty       — entities mutated since last bundle.
+    #
+    # baseline presence implies a prior successful bundle, which in turn
+    # implies a prior spec — so baseline short-circuits past pre_spec/pre_bundle.
     if not current:
         phase = "fresh"
-    elif not baseline:
+    elif baseline:
+        phase = "stable"  # may flip to "dirty" below
+    elif spec_present:
         phase = "pre_bundle"
     else:
-        phase = "stable"  # may flip to "dirty" below
+        phase = "pre_spec"
 
     entity_diff: dict = {}
     affected: list[str] = []

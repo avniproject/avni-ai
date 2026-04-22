@@ -2302,15 +2302,17 @@ workflow:
           \ phase_hint=dirty AND last_active_agent != bundle_config -> bundle_config;\
           \ \"\n        \"phase_hint=dirty AND last_active_agent == bundle_config\
           \ -> done; \"\n        \"phase_hint=stable -> done; phase_hint=pre_bundle\
-          \ -> bundle_config.\\n\"\n        \"B. last_gate_status=errors -> pick\
-          \ last_active_agent (retry).\\n\"\n        \"C. phase_hint=fresh -> spec.\\\
-          n\"\n        \"D. phase_hint=pre_bundle -> bundle_config.\\n\"\n      \
-          \  \"E. User says add report card/dashboard/chart -> reports.\\n\"\n  \
-          \      \"F. User says skip logic/decision rule/validation -> rules.\\\
-          n\"\n        \"G. User asks about locations/users/catchments/delete-implementation\
-          \ -> admin.\\n\"\n        \"H. phase_hint=dirty + user asked for a structural\
-          \ change -> spec.\\n\"\n        \"I. phase_hint=stable + approval/thanks/continue\
-          \ -> done.\\n\"\n        \"J. Default -> done.\"\n    )\n\n    return\
+          \ -> bundle_config; phase_hint=pre_spec -> spec.\\n\"\n        \"B. last_gate_status=errors\
+          \ -> pick last_active_agent (retry).\\n\"\n        \"C. phase_hint=fresh\
+          \ -> spec.\\n\"\n        \"D. phase_hint=pre_spec (entities parsed, spec\
+          \ not generated) -> spec. Needed so enrich_spec can surface ambiguities\
+          \ before bundling.\\n\"\n        \"E. phase_hint=pre_bundle (spec exists,\
+          \ no bundle) -> bundle_config.\\n\"\n        \"F. User says add report\
+          \ card/dashboard/chart -> reports.\\n\"\n        \"G. User says skip logic/decision\
+          \ rule/validation -> rules.\\n\"\n        \"H. User asks about locations/users/catchments/delete-implementation\
+          \ -> admin.\\n\"\n        \"I. phase_hint=dirty + user asked for a structural\
+          \ change -> spec.\\n\"\n        \"J. phase_hint=stable + approval/thanks/continue\
+          \ -> done.\\n\"\n        \"K. Default -> done.\"\n    )\n\n    return\
           \ {\n        \"phase_hint\": phase_hint,\n        \"summary\": summary,\n\
           \        \"classifier_input\": classifier_input,\n    }\n"
         code_language: python3
@@ -2431,10 +2433,10 @@ workflow:
           and picks the next agent (or 'done' to end the loop iteration).
         instruction: "The input_text already contains user message + all routing
           state (phase_hint, last_active_agent, last_agent_intent, last_gate_status,
-          diff_summary) plus the decision rules. Follow rules A-J in the input
-          strictly. Do NOT infer from the user message alone — rule A is the
-          single most important check and must be applied first. Return exactly
-          one class name."
+          diff_summary) plus the labelled decision rules. Follow the rules in the
+          input strictly and in order. Do NOT infer from the user message alone —
+          rule A is the single most important check and must be applied first.
+          Return exactly one class name."
         memory:
           query_prompt_template: '{{#sys.query#}}'
           window:

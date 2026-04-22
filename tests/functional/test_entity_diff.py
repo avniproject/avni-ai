@@ -55,16 +55,41 @@ def test_fresh_phase_no_entities_no_bundle():
     assert "No entities stored" in out["summary"]
 
 
-def test_pre_bundle_phase_entities_stored_no_bundle():
+def test_pre_spec_phase_entities_stored_no_spec():
+    """Entities parsed by Parse SRS File but Spec Agent hasn't generated
+    a spec yet. phase_hint must be pre_spec so the classifier routes to
+    spec (not bundle_config) — otherwise enrich_spec's ambiguity flow
+    gets skipped."""
+    from src.handlers.spec_handlers import _spec_store
+
+    conv = "diff-pre-spec-1"
+    _entity_store._store.pop(conv, None)
+    _bundle_store._store.pop(conv, None)
+    _spec_store._store.pop(conv, None)
+    _entity_store.put(conv, _entities())
+    out = _call(conv)
+    assert out["phase_hint"] == "pre_spec"
+    assert out["affected_sections"] == []
+    assert "parsed" in out["summary"].lower()
+    assert "spec not yet generated" in out["summary"].lower()
+
+
+def test_pre_bundle_phase_spec_generated_no_bundle():
+    """Spec Agent has generated and stored the spec, but Bundle Config hasn't
+    produced a bundle yet. phase_hint=pre_bundle → classifier routes to
+    bundle_config."""
+    from src.handlers.spec_handlers import _spec_store
+
     conv = "diff-pre-bundle-1"
     _entity_store._store.pop(conv, None)
     _bundle_store._store.pop(conv, None)
+    _spec_store._store.pop(conv, None)
     _entity_store.put(conv, _entities())
+    _spec_store.put(conv, "fake: yaml\n")
     out = _call(conv)
     assert out["phase_hint"] == "pre_bundle"
     assert out["affected_sections"] == []
-    assert "parsed" in out["summary"].lower()
-    assert "1 subject_types" in out["summary"] or "1 programs" in out["summary"]
+    assert "spec generated" in out["summary"].lower()
 
 
 def test_stable_phase_entities_match_baseline():

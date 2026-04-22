@@ -71,14 +71,14 @@ def test_full_lifecycle_fresh_to_dirty():
     assert status == 200
     assert body["phase_hint"] == "fresh"
 
-    # Phase B: pre_bundle — entities stored, no bundle
+    # Phase B: pre_spec — entities stored, spec not yet generated
     status, _ = _call(
         handle_store_entities,
         body={"conversation_id": conv, "entities": _entities_v1()},
     )
     assert status == 200
     status, body = _call(handle_entity_diff, query={"conversation_id": conv})
-    assert body["phase_hint"] == "pre_bundle"
+    assert body["phase_hint"] == "pre_spec"
 
     # Phase C: generate bundle → stable
     status, body = _call(

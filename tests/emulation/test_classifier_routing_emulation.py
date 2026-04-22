@@ -134,16 +134,18 @@ def _compose_classifier_input(
         "last_active_agent. Instead: phase_hint=dirty AND last_active_agent != "
         "bundle_config -> bundle_config; phase_hint=dirty AND last_active_agent "
         "== bundle_config -> done; phase_hint=stable -> done; phase_hint=pre_bundle "
-        "-> bundle_config.\n"
+        "-> bundle_config; phase_hint=pre_spec -> spec.\n"
         "B. last_gate_status=errors -> pick last_active_agent (retry).\n"
         "C. phase_hint=fresh -> spec.\n"
-        "D. phase_hint=pre_bundle -> bundle_config.\n"
-        "E. User says add report card/dashboard/chart -> reports.\n"
-        "F. User says skip logic/decision rule/validation -> rules.\n"
-        "G. User asks about locations/users/catchments/delete-implementation -> admin.\n"
-        "H. phase_hint=dirty + user asked for a structural change -> spec.\n"
-        "I. phase_hint=stable + approval/thanks/continue -> done.\n"
-        "J. Default -> done."
+        "D. phase_hint=pre_spec (entities parsed, spec not generated) -> spec. "
+        "Needed so enrich_spec can surface ambiguities before bundling.\n"
+        "E. phase_hint=pre_bundle (spec exists, no bundle) -> bundle_config.\n"
+        "F. User says add report card/dashboard/chart -> reports.\n"
+        "G. User says skip logic/decision rule/validation -> rules.\n"
+        "H. User asks about locations/users/catchments/delete-implementation -> admin.\n"
+        "I. phase_hint=dirty + user asked for a structural change -> spec.\n"
+        "J. phase_hint=stable + approval/thanks/continue -> done.\n"
+        "K. Default -> done."
     )
 
 
@@ -251,17 +253,35 @@ def test_user_asks_for_report_card():
 # ---------------------------------------------------------------------------
 
 
-def test_stuck_iter1_fresh_upload_pre_bundle_picks_bundle_config():
-    """stuck_classifier.json iter 1 exact replay: user uploaded SRS, Parse SRS
-    File already ran and stored entities (phase_hint=pre_bundle). Classifier
-    must route to bundle_config to build the first bundle."""
+def test_stuck_iter1_pre_spec_routes_to_spec():
+    """quick_exit.json regression: Parse SRS File stored entities but the Spec
+    Agent hasn't run yet (no spec generated). phase_hint=pre_spec. Classifier
+    MUST route to spec so enrich_spec can surface ambiguities before bundling.
+    Before the pre_spec split, this case was wrongly phase_hint=pre_bundle and
+    the classifier jumped straight to bundle_config, skipping the entire
+    ambiguity dialog."""
     inp = _compose_classifier_input(
         user_query="Setup avni using scoping srs docs uploaded here",
-        phase_hint="pre_bundle",
-        active_agent="spec",  # residual from prior turn; should NOT trigger RULE A
+        phase_hint="pre_spec",
+        active_agent="spec",  # residual; should NOT trigger RULE A
         agent_structured="",  # turn-start reset cleared it
         last_gate_status="not_run",
-        summary="Entities parsed (2 subject_types, 3 programs, 19 encounters, 28 forms). No bundle generated yet.",
+        summary="Entities parsed (2 subject_types, 3 programs, 19 encounters, 28 forms). Spec not yet generated.",
+    )
+    pick = _call_classifier(inp)
+    assert pick.get("category_name") == "spec", pick
+
+
+def test_pre_bundle_after_spec_routes_to_bundle_config():
+    """After Spec Agent generates spec and resolves ambiguities, phase flips
+    to pre_bundle. Classifier routes to bundle_config."""
+    inp = _compose_classifier_input(
+        user_query="Q1:no, Q2:Yes, Q3:Yes",
+        phase_hint="pre_bundle",
+        active_agent="spec",
+        agent_structured='{"intent":"applied_fix","target_phase":"bundle_generating"}',
+        last_gate_status="ok",
+        summary="Spec generated (2 subject_types, 3 programs, 19 encounters, 28 forms). No bundle yet.",
     )
     pick = _call_classifier(inp)
     assert pick.get("category_name") == "bundle_config", pick
