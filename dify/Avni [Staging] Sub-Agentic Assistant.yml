@@ -2384,6 +2384,7 @@ workflow:
 - last_active_agent: {{#conversation.active_agent#}}
 - last_agent_structured: {{#conversation.agent_structured#}}
 - last_gate_status: {{#conversation.last_gate_status#}}
+- pending_ambiguities: {{#conversation.pending_ambiguities#}}
 - turn_diff_summary: {{#conversation.turn_diff_summary#}}
 - agent_memory (recent): {{#conversation.agent_memory#}}
 
@@ -2397,6 +2398,8 @@ A. If last_agent_structured is a JSON with intent=applied_fix OR intent=phase_co
    - phase_hint=pre_spec → spec
 
 A2. If last_agent_structured is a JSON with intent=re_route AND it carries re_route_target ∈ {spec, bundle_config, rules, reports, inspect}, pick that re_route_target. Inspector uses this to hand control back to an earlier agent when it finds something upstream needs correcting.
+
+A3. If pending_ambiguities is non-empty (a list with items, NOT '[]' or empty string), the user's current message is almost certainly answering the prior turn's ask_user questions → spec. Do NOT pick bundle_config here even if phase_hint=pre_bundle — Spec Agent owns applying ambiguity answers via apply_ambiguity_answers; routing to bundle_config forces it to do Spec's job via put_bundle_file and produces malformed cancellation forms.
 
 B. last_gate_status=errors → pick last_active_agent (retry).
 
@@ -6013,9 +6016,18 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
           \     else (current_active_phase or \"intake\")\n    )\n    out_spec_awaiting\
           \ = (\n        bool(parsed_ok and intent == \"ask_user\" and active_agent\
           \ == \"spec\")\n        if parsed_ok\n        else bool(current_spec_awaiting)\n\
-          \    )\n    out_pending_ambiguities = (\n        ambiguities\n        if\
-          \ (parsed_ok and intent == \"ask_user\")\n        else (current_pending_ambiguities\
-          \ or [])\n    )\n    # Dify cloud does not accept object-typed conversation\
+          \    )\n    # pending_ambiguities lifecycle:\n    #   intent=ask_user\
+          \ → write the new questions list (this turn's ask).\n    #   intent=applied_fix\
+          \ AND active_agent=spec → clear, since the Spec Agent\n    #     just\
+          \ applied the answers (via apply_ambiguity_answers). Leaving them would\n\
+          \    #     make the classifier on the next user message re-route to\
+          \ spec\n    #     thinking ambiguities are still pending.\n    #   anything\
+          \ else → pass current value through unchanged.\n    out_pending_ambiguities\
+          \ = (\n        ambiguities\n        if (parsed_ok and intent == \"ask_user\"\
+          )\n        else []\n        if (\n            parsed_ok\n            and\
+          \ intent in (\"applied_fix\", \"phase_complete\")\n            and active_agent\
+          \ == \"spec\"\n        )\n        else (current_pending_ambiguities or\
+          \ [])\n    )\n    # Dify cloud does not accept object-typed conversation\
           \ variables,\n    # so agent_structured is stored as a JSON string. Serialize\
           \ here.\n    raw_payload_obj = payload if isinstance(payload, dict) else\
           \ {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    # Narrative:\

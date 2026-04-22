@@ -343,6 +343,48 @@ def test_inspector_reroute_to_spec():
 # ---------------------------------------------------------------------------
 
 
+def test_pending_ambiguities_routes_to_spec_not_bundle_config():
+    """2fa57e0e-039d-476f regression: user answered 21 ambiguities, classifier
+    routed to bundle_config instead of spec. bundle_config then tried to apply
+    answers itself via put_bundle_file, creating malformed cancellation forms.
+    Rule A3 must fire: pending_ambiguities non-empty → spec."""
+    pick = _call_classifier(
+        user_query="Q1:no, Q2:yes, Q3:yes, Q4:Remove, Q5-Q20:Create a basic form, Q21:Add basic enrolmentForm",
+        state={
+            "phase_hint": "pre_bundle",  # spec exists from prior turn, no bundle yet
+            "active_agent": "spec",  # set by Resume Awaiting Assigner
+            "agent_structured": "",  # turn-start reset
+            "last_gate_status": "user_input_needed",  # prior turn paused for user
+            "pending_ambiguities": '[{"id":"prog_enrich_showGrowthChart"},{"id":"spec_st_school_unmapped"},{"id":"spec_enc_career_guidance_no_form"}]',
+            "turn_diff_summary": "Spec generated. No bundle yet.",
+            "agent_memory": "[spec] enrich_spec returned 21 ambiguities — presenting to user for resolution.",
+        },
+    )
+    assert pick.get("category_name") == "spec", (
+        f"Expected 'spec' per Rule A3 (user replying to ambiguities). Got {pick}. "
+        f"If this routes to bundle_config, Bundle Config will incorrectly try to "
+        f"apply the answers via put_bundle_file."
+    )
+
+
+def test_empty_pending_ambiguities_pre_bundle_routes_to_bundle_config():
+    """Sanity check: pending_ambiguities is '[]' (cleared), phase=pre_bundle →
+    still route to bundle_config (Rule E). Rule A3 must NOT trigger on empty."""
+    pick = _call_classifier(
+        user_query="continue",
+        state={
+            "phase_hint": "pre_bundle",
+            "active_agent": "spec",
+            "agent_structured": '{"intent":"applied_fix"}',
+            "last_gate_status": "ok",
+            "pending_ambiguities": "[]",  # cleared after apply_ambiguity_answers
+            "turn_diff_summary": "Spec generated. No bundle yet.",
+            "agent_memory": "[spec] applied 21 answers",
+        },
+    )
+    assert pick.get("category_name") == "bundle_config", pick
+
+
 def test_default_fallback_on_pre_spec_routes_to_spec():
     """Empty / ambiguous user query with phase=pre_spec should NOT silently
     drop into done. Rule K maps phase→agent so work advances."""
