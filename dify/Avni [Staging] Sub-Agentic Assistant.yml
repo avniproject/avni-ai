@@ -2391,8 +2391,8 @@ workflow:
 
 A. If last_agent_structured is a JSON with intent=applied_fix OR intent=phase_complete, DO NOT pick last_active_agent again. Advance instead:
    - phase_hint=dirty AND last_active_agent != bundle_config → bundle_config
-   - phase_hint=dirty AND last_active_agent == bundle_config → done
-   - phase_hint=stable → done
+   - phase_hint=dirty AND last_active_agent == bundle_config → follow pipeline progression (see rule L)
+   - phase_hint=stable → follow pipeline progression (see rule L)
    - phase_hint=pre_bundle → bundle_config
    - phase_hint=pre_spec → spec
 
@@ -2408,11 +2408,20 @@ F. User message asks for dashboards / report cards / charts → reports.
 
 G. User message asks for skip logic / decision rule / validation → rules.
 
-H. User message asks about locations / users / catchments / delete-implementation → admin.
+H. User message asks about locations / users / catchments / delete-implementation → admin. (Do NOT route bundle-upload requests here — see rule M.)
+
+M. User message explicitly says 'upload the bundle' / 'publish' / 'deploy' / 'push to avni' / 're-upload' / 'upload again' → inspect. Inspector validates and uploads. Use this rule for retry/rework scenarios when the full pipeline has already completed but the user wants a fresh upload.
 
 I. phase_hint=dirty AND the user asked for a structural change → spec.
 
-J. phase_hint=stable AND the user says approval / thanks / continue / looks good → done.
+J. phase_hint=stable AND the user explicitly says: 'approved' / 'looks good' / 'thanks' / 'done' / 'no change needed' → done. Note: 'proceed' / 'continue' / 'go ahead' are NOT approval — they mean advance the pipeline, which rule L handles.
+
+L. PIPELINE PROGRESSION (the primary happy-path for first-time setups). When phase_hint=stable AND no explicit approval (rule J) yet, advance through the remaining pipeline steps using agent_memory as a ledger so Bundle Config → Rules → Reports → Inspect runs to completion in one conversation turn:
+   - agent_memory contains '[bundle_config]' but NOT '[rules]' → rules    (skip-logic, decision rules on forms)
+   - agent_memory contains '[rules]' but NOT '[reports]'      → reports  (dashboards, report cards)
+   - agent_memory contains '[reports]' but NOT '[inspect]'    → inspect  (final validation + upload)
+   - agent_memory contains '[inspect]'                         → done     (pipeline complete)
+   On subsequent turns (post-upload corrections), memory already contains [rules]/[reports]/[inspect] from the prior turn, so this rule correctly skips re-running them — the correction flow exits after bundle_config reconciles.
 
 K. Default → done.
 
