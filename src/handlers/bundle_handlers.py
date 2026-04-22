@@ -45,9 +45,19 @@ class _BundleStore:
         zip_b64: str,
         bundle_dict: dict,
         flags: list[dict] | None = None,
+        baseline_entities: dict | None = None,
     ) -> None:
+        """Store a bundle. `baseline_entities` is a snapshot of the entities
+        that produced this bundle; used as the base for three-way merge when
+        entities later mutate. Clears the stale flag."""
         self._store[conversation_id] = (
-            {"zip_b64": zip_b64, "bundle": bundle_dict, "flags": flags or []},
+            {
+                "zip_b64": zip_b64,
+                "bundle": bundle_dict,
+                "flags": flags or [],
+                "baseline_entities": baseline_entities,
+                "stale": False,
+            },
             time.time() + _BUNDLE_STORE_TTL,
         )
 
@@ -60,6 +70,42 @@ class _BundleStore:
             del self._store[conversation_id]
             return None
         return data
+
+    def mark_stale(self, conversation_id: str) -> bool:
+        """Flag the cached bundle as needing reconciliation. Returns True if
+        there was a bundle to mark, False otherwise. Unlike a delete, the
+        bundle (and all agent patches) stay in place until the next
+        generate_bundle call merges in the new entity state."""
+        entry = self._store.get(conversation_id)
+        if entry is None:
+            return False
+        data, expiry = entry
+        data["stale"] = True
+        self._store[conversation_id] = (data, expiry)
+        return True
+
+    def is_stale(self, conversation_id: str) -> bool:
+        data = self.get(conversation_id)
+        return bool(data and data.get("stale"))
+
+    def update_bundle(
+        self,
+        conversation_id: str,
+        zip_b64: str,
+        bundle_dict: dict,
+        flags: list[dict] | None = None,
+    ) -> None:
+        """Update the bundle payload without touching baseline_entities or
+        stale. Used by put_bundle_file which patches the bundle in place."""
+        entry = self._store.get(conversation_id)
+        if entry is None:
+            return
+        data, expiry = entry
+        data["zip_b64"] = zip_b64
+        data["bundle"] = bundle_dict
+        if flags is not None:
+            data["flags"] = flags
+        self._store[conversation_id] = (data, expiry)
 
     def cleanup(self) -> int:
         now = time.time()
@@ -102,12 +148,14 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
     force = body.get("force", False)
     entities = body.get("entities")
 
-    # Noop if a bundle already exists — prevents wiping surgical changes
-    # made by downstream agents (bundle_config, rules, reports).
-    # Pass force=true to explicitly regenerate when needed.
+    # Branch on existing bundle state:
+    #   not stale  → noop (protect agent patches)
+    #   stale      → three-way reconcile against new entities
+    #   force=True → full regen (user-requested)
+    existing = None
     if not force and conversation_id:
         existing = _bundle_store.get(conversation_id)
-        if existing:
+        if existing and not existing.get("stale"):
             bundle = existing["bundle"]
             summary = {
                 "concepts": len(bundle.get("concepts", [])),
@@ -119,7 +167,7 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
                 "groups": len(bundle.get("groups", [])),
             }
             logger.info(
-                "generate-bundle: noop — bundle already exists for conversation_id=%s "
+                "generate-bundle: noop — bundle fresh for conversation_id=%s "
                 "(pass force=true to regenerate)",
                 conversation_id,
             )
@@ -167,6 +215,79 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
 
     org_name = body.get("org_name", "Unknown Organization")
 
+    # Reconcile path: bundle is stale AND we have a baseline to diff against.
+    # Three-way merge preserves every Rules/Reports/Bundle-Config agent patch
+    # on files the entity delta didn't touch. Cache miss on baseline_entities
+    # falls through to full regen — losing patches, but acceptable as a
+    # one-time cost for conversations that predate this change.
+    if existing and existing.get("stale") and existing.get("baseline_entities"):
+        from ..bundle.reconciler import merge_bundle
+
+        try:
+            baseline_entities = existing["baseline_entities"]
+            baseline_norm = {_key_map.get(k, k): v for k, v in baseline_entities.items()}
+
+            base_gen = BundleGenerator(org_name)
+            base_gen.generate(baseline_norm)
+            base_bundle = base_gen.bundle
+
+            theirs_gen = BundleGenerator(org_name)
+            theirs_result = theirs_gen.generate(entities)
+            theirs_bundle = theirs_gen.bundle
+
+            merged_bundle, merge_flags = merge_bundle(
+                base_bundle, existing["bundle"], theirs_bundle
+            )
+
+            # Serialize merged bundle through a generator so to_zip_bytes sees
+            # the merged state.
+            out_gen = BundleGenerator(org_name)
+            out_gen.bundle = merged_bundle
+            zip_bytes = out_gen.to_zip_bytes()
+            zip_b64 = base64.b64encode(zip_bytes).decode("ascii")
+
+            summary = {
+                "concepts": len(merged_bundle.get("concepts", [])),
+                "forms": len(merged_bundle.get("forms", [])),
+                "subjectTypes": len(merged_bundle.get("subjectTypes", [])),
+                "programs": len(merged_bundle.get("programs", [])),
+                "encounterTypes": len(merged_bundle.get("encounterTypes", [])),
+                "formMappings": len(merged_bundle.get("formMappings", [])),
+                "groups": len(merged_bundle.get("groups", [])),
+            }
+
+            combined_flags = list(theirs_result.get("flags", [])) + list(merge_flags)
+            import copy as _copy
+
+            _bundle_store.put(
+                conversation_id,
+                zip_b64,
+                merged_bundle,
+                combined_flags,
+                baseline_entities=_copy.deepcopy(entities),
+            )
+            logger.info(
+                "generate-bundle: reconciled for conversation_id=%s merge_flags=%d",
+                conversation_id,
+                len(merge_flags),
+            )
+            resp_recon: dict[str, Any] = {
+                "success": True,
+                "stored": True,
+                "reconciled": True,
+                "validation": theirs_result["validation"],
+                "confidence": theirs_result["confidence"],
+                "summary": summary,
+            }
+            if combined_flags:
+                resp_recon["flags"] = combined_flags
+            return JSONResponse(resp_recon)
+        except Exception:
+            logger.exception(
+                "generate-bundle: reconcile failed, falling back to full regen"
+            )
+            # fall through to full regen below
+
     try:
         generator = BundleGenerator(org_name)
         result = generator.generate(entities)
@@ -188,8 +309,17 @@ async def handle_generate_bundle(request: Request) -> JSONResponse:
         flags = result.get("flags", [])
 
         if conversation_id:
-            # Store bundle server-side; do NOT return bundle_zip_b64 to LLM
-            _bundle_store.put(conversation_id, zip_b64, result["bundle"], flags)
+            # Store bundle server-side; do NOT return bundle_zip_b64 to LLM.
+            # Snapshot entities as baseline for future three-way reconciles.
+            import copy as _copy
+
+            _bundle_store.put(
+                conversation_id,
+                zip_b64,
+                result["bundle"],
+                flags,
+                baseline_entities=_copy.deepcopy(entities),
+            )
             logger.info(
                 "generate-bundle: stored bundle for conversation_id=%s zip_b64_len=%d flags=%d",
                 conversation_id,
@@ -933,7 +1063,9 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
                     bundle_dict[key] = synced
         except (json.JSONDecodeError, UnicodeDecodeError):
             pass  # non-JSON file, skip sync
-        _bundle_store.put(conversation_id, new_zip_b64, bundle_dict)
+        # update_bundle keeps baseline_entities + stale state intact;
+        # put() would wipe them and break the reconcile on next generate.
+        _bundle_store.update_bundle(conversation_id, new_zip_b64, bundle_dict)
         logger.info(
             "put-bundle-file: updated filename=%s for conversation_id=%s new_size=%d",
             filename,

@@ -88,6 +88,20 @@ class _SrsTextStore:
 _srs_text_store = _SrsTextStore()
 
 
+def _invalidate_bundle(conversation_id: str) -> bool:
+    """Mark the cached bundle as stale so the next generate_bundle runs a
+    three-way reconcile against the new entities. Does NOT drop the bundle —
+    existing agent patches (Rules/Reports/Bundle Config) stay until reconcile.
+    Returns True if there was a bundle to mark."""
+    try:
+        from .bundle_handlers import get_bundle_store
+
+        return get_bundle_store().mark_stale(conversation_id)
+    except Exception:
+        logger.exception("bundle invalidation failed for %s", conversation_id)
+        return False
+
+
 async def handle_store_srs_text(request: Request) -> JSONResponse:
     """
     POST /store-srs-text
@@ -637,6 +651,8 @@ async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
     # Write back to store so subsequent calls see the updated entities
     if conversation_id:
         _entity_store.put(conversation_id, updated)
+        if corrections:
+            _invalidate_bundle(conversation_id)
 
     logger.info("apply-entity-corrections: applied %d corrections", len(corrections))
 
@@ -747,6 +763,7 @@ async def handle_put_entities_section(request: Request) -> JSONResponse:
 
     entities[section] = items
     _entity_store.put(conversation_id, entities)
+    _invalidate_bundle(conversation_id)
     logger.info(
         "put-entities-section: updated section=%s count=%d for conversation_id=%s",
         section,

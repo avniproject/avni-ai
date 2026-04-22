@@ -1795,12 +1795,21 @@ async def handle_apply_ambiguity_answers(request: Request) -> JSONResponse:
             status_code=500,
         )
 
+    # Mark any cached bundle as stale so the next generate_bundle reconciles
+    # the new entity state while preserving agent patches.
+    bundle_invalidated = False
+    if applied:
+        from .entity_handlers import _invalidate_bundle
+
+        bundle_invalidated = _invalidate_bundle(conversation_id)
+
     logger.info(
-        "apply-ambiguity-answers: conv=%s applied=%d ignored=%d unmatched=%d",
+        "apply-ambiguity-answers: conv=%s applied=%d ignored=%d unmatched=%d bundle_invalidated=%s",
         conversation_id[:8],
         len(applied),
         len(ignored),
         len(unmatched),
+        bundle_invalidated,
     )
 
     return JSONResponse(
@@ -1812,6 +1821,7 @@ async def handle_apply_ambiguity_answers(request: Request) -> JSONResponse:
             "applied": applied,
             "ignored": ignored,
             "unmatched": unmatched,
+            "bundle_invalidated": bundle_invalidated,
             "entity_counts": {
                 k: len(v) if isinstance(v, list) else 1 for k, v in entities.items()
             },
