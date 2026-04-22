@@ -13,7 +13,6 @@ against the scenarios we hit in production traces:
 
 from __future__ import annotations
 
-import json
 
 import pytest
 import yaml
@@ -58,17 +57,24 @@ def _call(nad, **overrides):
 def test_classifier_done_exits_loop(nad_main):
     """stuck_classifier.json regression: 10 iterations of 'done' because NAD
     ignored classifier_pick. After the fix, 'done' → loop_done=True."""
-    r = _call(nad_main, classifier_pick="done", active_agent="bundle_config",
-              agent_structured='{"intent":"phase_complete"}')
+    r = _call(
+        nad_main,
+        classifier_pick="done",
+        active_agent="bundle_config",
+        agent_structured='{"intent":"phase_complete"}',
+    )
     assert r["loop_done"] is True
     assert "done" in r["reason"].lower()
 
 
 def test_classifier_done_even_with_dirty_state(nad_main):
     """Even if phase-like signals suggest continuation, classifier 'done' wins."""
-    r = _call(nad_main, classifier_pick="done",
-              agent_structured='{"intent":"applied_fix"}',
-              active_agent="spec")
+    r = _call(
+        nad_main,
+        classifier_pick="done",
+        agent_structured='{"intent":"applied_fix"}',
+        active_agent="spec",
+    )
     assert r["loop_done"] is True
 
 
