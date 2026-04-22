@@ -151,8 +151,11 @@ def entities_to_spec(entities: dict[str, Any], org_name: str = "") -> str:
                 prog_spec["enrolmentEligibilityCheckDeclarativeRule"] = prog[
                     "enrolmentEligibilityCheckDeclarativeRule"
                 ]
-            if prog.get("showGrowthChart"):
-                prog_spec["showGrowthChart"] = True
+            # Preserve explicit False too — stripping it would make enrich_spec
+            # re-flag the same showGrowthChart ambiguity every turn, causing a
+            # classifier-routing loop.
+            if "showGrowthChart" in prog:
+                prog_spec["showGrowthChart"] = bool(prog["showGrowthChart"])
 
             enrolment_form = _find_form(
                 entities.get("forms", []),
