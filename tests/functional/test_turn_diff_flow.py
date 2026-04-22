@@ -1,8 +1,8 @@
-"""End-to-end simulation of the classifier routing flow.
+"""End-to-end exercise of the /entity-diff endpoint's lifecycle reporting.
 
 Drives the server through: store-entities → generate-bundle → mutate-entities
-→ entity-diff. Asserts the diff reports each lifecycle phase correctly so the
-Dify Question Classifier has accurate signal to route on.
+→ entity-diff. Asserts the diff reports each lifecycle phase correctly so any
+caller (agent tool or Dify workflow node) has accurate signal to route on.
 """
 
 from __future__ import annotations

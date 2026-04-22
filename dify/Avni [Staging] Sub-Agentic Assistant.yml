@@ -37,34 +37,6 @@ workflow:
     - 'False'
     value: false
     value_type: boolean
-  - description: Empty-string constant used by assigners to reset per-turn scratch
-      variables (agent_structured, active_agent). Dify top-level assigners prefer
-      input_type=variable with a reference selector over inline constants.
-    id: 5f3a1c0e-9b6d-4d12-a7f4-8c2e91d56031
-    name: empty_string
-    selector:
-    - conversation
-    - empty_string
-    value: ''
-    value_type: string
-  - description: ''
-    id: 3c9a6f18-b4d2-4e85-a0f3-7d1c5b8e4912
-    name: pending_ambiguities_status
-    selector:
-    - conversation
-    - pending_ambiguities_status
-    value: none
-    value_type: string
-  - description: Deterministic pipeline progression hint computed by the Diff Parser
-      from agent_memory ledger markers. When non-empty, the Question Classifier picks
-      it verbatim — moves pipeline ordering out of unreliable LLM substring matching.
-    id: 8e4c1b09-3f5a-4d6e-b8f1-2a9c7d3e5f10
-    name: pipeline_next_hint
-    selector:
-    - conversation
-    - pipeline_next_hint
-    value: ''
-    value_type: string
   - description: ''
     id: c6cba07c-9187-4228-842f-42a0e3f2f709
     name: org_name
@@ -178,25 +150,6 @@ workflow:
     - last_agent_message
     value: ''
     value_type: string
-  - description: Compact human-readable diff summary from /entity-diff, refreshed
-      every loop iteration by the Diff Assigner. Consumed by the Question Classifier.
-    id: 4a3e1b02-7c42-4b8a-92d1-0a1e7f9c2a11
-    name: turn_diff_summary
-    selector:
-    - conversation
-    - turn_diff_summary
-    value: ''
-    value_type: string
-  - description: One of fresh/pre_bundle/stable/dirty — lifecycle state of entities
-      vs last-uploaded baseline. Written by Diff Assigner, used as a rubric by the
-      Question Classifier.
-    id: 7d8c34f1-a912-4e6f-b3c5-2e5b84f6a21c
-    name: phase_hint
-    selector:
-    - conversation
-    - phase_hint
-    value: fresh
-    value_type: string
   environment_variables:
   - description: ''
     id: 16bf6bae-2ad7-483e-a226-add93e02d738
@@ -220,17 +173,6 @@ workflow:
       allowed_file_upload_methods:
       - local_file
       enabled: true
-      fileUploadConfig:
-        attachment_image_file_size_limit: 2
-        audio_file_size_limit: 50
-        batch_count_limit: 5
-        file_size_limit: 15
-        file_upload_limit: 50
-        image_file_batch_limit: 10
-        image_file_size_limit: 10
-        single_chunk_attachment_limit: 10
-        video_file_size_limit: 100
-        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -560,62 +502,10 @@ workflow:
         isInLoop: true
         loop_id: '1800000000700'
         sourceType: loop-start
-        targetType: http-request
-      id: 1800000000700start-source-1800000000712-target
+        targetType: if-else
+      id: 1800000000700start-source-1800000000710-target
       selected: false
       source: 1800000000700start
-      sourceHandle: source
-      target: '1800000000712'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: http-request
-        targetType: code
-      id: 1800000000712-source-1800000000713-target
-      selected: false
-      source: '1800000000712'
-      sourceHandle: source
-      target: '1800000000713'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: http-request
-        targetType: answer
-      id: 1800000000712-fail-branch-1800000000713-target
-      selected: false
-      source: '1800000000712'
-      sourceHandle: fail-branch
-      target: '1800000000713'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: code
-        targetType: assigner
-      id: 1800000000713-source-1800000000714-target
-      selected: false
-      source: '1800000000713'
-      sourceHandle: source
-      target: '1800000000714'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: assigner
-        targetType: question-classifier
-      id: 1800000000714-source-1800000000710-target
-      selected: false
-      source: '1800000000714'
       sourceHandle: source
       target: '1800000000710'
       targetHandle: target
@@ -624,25 +514,12 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: question-classifier
-        targetType: assigner
-      id: 1800000000710-1-1800000000715-target
+        sourceType: if-else
+        targetType: http-request
+      id: 1800000000710-dispatch-spec-1800000000101-target
       selected: false
       source: '1800000000710'
-      sourceHandle: '1'
-      target: '1800000000715'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: assigner
-        targetType: http-request
-      id: 1800000000715-source-1800000000101-target
-      selected: false
-      source: '1800000000715'
-      sourceHandle: source
+      sourceHandle: dispatch-spec
       target: '1800000000101'
       targetHandle: target
       type: custom
@@ -650,25 +527,12 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: question-classifier
-        targetType: assigner
-      id: 1800000000710-2-1800000000716-target
+        sourceType: if-else
+        targetType: http-request
+      id: 1800000000710-dispatch-bundle-config-1800000000201-target
       selected: false
       source: '1800000000710'
-      sourceHandle: '2'
-      target: '1800000000716'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: assigner
-        targetType: http-request
-      id: 1800000000716-source-1800000000201-target
-      selected: false
-      source: '1800000000716'
-      sourceHandle: source
+      sourceHandle: dispatch-bundle-config
       target: '1800000000201'
       targetHandle: target
       type: custom
@@ -676,25 +540,12 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: question-classifier
-        targetType: assigner
-      id: 1800000000710-3-1800000000717-target
+        sourceType: if-else
+        targetType: http-request
+      id: 1800000000710-dispatch-rules-1800000000301-target
       selected: false
       source: '1800000000710'
-      sourceHandle: '3'
-      target: '1800000000717'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: assigner
-        targetType: http-request
-      id: 1800000000717-source-1800000000301-target
-      selected: false
-      source: '1800000000717'
-      sourceHandle: source
+      sourceHandle: dispatch-rules
       target: '1800000000301'
       targetHandle: target
       type: custom
@@ -702,25 +553,12 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: question-classifier
-        targetType: assigner
-      id: 1800000000710-4-1800000000718-target
+        sourceType: if-else
+        targetType: http-request
+      id: 1800000000710-dispatch-reports-1800000000401-target
       selected: false
       source: '1800000000710'
-      sourceHandle: '4'
-      target: '1800000000718'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: assigner
-        targetType: http-request
-      id: 1800000000718-source-1800000000401-target
-      selected: false
-      source: '1800000000718'
-      sourceHandle: source
+      sourceHandle: dispatch-reports
       target: '1800000000401'
       targetHandle: target
       type: custom
@@ -728,25 +566,12 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: question-classifier
-        targetType: assigner
-      id: 1800000000710-5-1800000000719-target
+        sourceType: if-else
+        targetType: http-request
+      id: 1800000000710-dispatch-inspect-1800000000501-target
       selected: false
       source: '1800000000710'
-      sourceHandle: '5'
-      target: '1800000000719'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: assigner
-        targetType: http-request
-      id: 1800000000719-source-1800000000501-target
-      selected: false
-      source: '1800000000719'
-      sourceHandle: source
+      sourceHandle: dispatch-inspect
       target: '1800000000501'
       targetHandle: target
       type: custom
@@ -754,25 +579,12 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: question-classifier
-        targetType: assigner
-      id: 1800000000710-6-1800000000721-target
+        sourceType: if-else
+        targetType: http-request
+      id: 1800000000710-dispatch-admin-1800000000601-target
       selected: false
       source: '1800000000710'
-      sourceHandle: '6'
-      target: '1800000000721'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: assigner
-        targetType: http-request
-      id: 1800000000721-source-1800000000601-target
-      selected: false
-      source: '1800000000721'
-      sourceHandle: source
+      sourceHandle: dispatch-admin
       target: '1800000000601'
       targetHandle: target
       type: custom
@@ -780,12 +592,12 @@ workflow:
     - data:
         isInLoop: true
         loop_id: '1800000000700'
-        sourceType: question-classifier
+        sourceType: if-else
         targetType: code
-      id: 1800000000710-7-1800000000720-target
+      id: 1800000000710-false-1800000000720-target
       selected: false
       source: '1800000000710'
-      sourceHandle: '7'
+      sourceHandle: 'false'
       target: '1800000000720'
       targetHandle: target
       type: custom
@@ -1401,10 +1213,10 @@ workflow:
       id: '1711528708197'
       position:
         x: 0
-        y: 1917
+        y: 703
       positionAbsolute:
         x: 0
-        y: 1917
+        y: 703
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1635,10 +1447,10 @@ workflow:
       id: '1757492907627'
       position:
         x: 1385
-        y: 1970
+        y: 756
       positionAbsolute:
         x: 1385
-        y: 1970
+        y: 756
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1670,10 +1482,10 @@ workflow:
       id: '1757492907628'
       position:
         x: 683
-        y: 1977
+        y: 763
       positionAbsolute:
         x: 683
-        y: 1977
+        y: 763
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1757,10 +1569,10 @@ workflow:
       id: '1757493270484'
       position:
         x: 1746
-        y: 1771
+        y: 557
       positionAbsolute:
         x: 1746
-        y: 1771
+        y: 557
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1822,10 +1634,10 @@ workflow:
       id: '1757495664531'
       position:
         x: 2107
-        y: 2086
+        y: 872
       positionAbsolute:
         x: 2107
-        y: 2086
+        y: 872
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1842,10 +1654,10 @@ workflow:
       id: '1757495688732'
       position:
         x: 2448
-        y: 2078
+        y: 864
       positionAbsolute:
         x: 2448
-        y: 2078
+        y: 864
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1861,10 +1673,10 @@ workflow:
       id: '1758608702077'
       position:
         x: 2107
-        y: 1660
+        y: 446
       positionAbsolute:
         x: 2107
-        y: 1660
+        y: 446
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1881,10 +1693,10 @@ workflow:
       id: '1758699378772'
       position:
         x: 2107
-        y: 1876
+        y: 662
       positionAbsolute:
         x: 2107
-        y: 1876
+        y: 662
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1917,10 +1729,10 @@ workflow:
       id: '1758713692744'
       position:
         x: 342
-        y: 1958
+        y: 744
       positionAbsolute:
         x: 342
-        y: 1958
+        y: 744
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1953,10 +1765,10 @@ workflow:
       id: '1775800000001'
       position:
         x: 2829
-        y: 2524
+        y: 1310
       positionAbsolute:
         x: 2829
-        y: 2524
+        y: 1310
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1996,10 +1808,10 @@ workflow:
       id: '1775800000002'
       position:
         x: 3170
-        y: 2491
+        y: 1277
       positionAbsolute:
         x: 3170
-        y: 2491
+        y: 1277
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2039,10 +1851,10 @@ workflow:
       id: '1775648480416'
       position:
         x: 3531
-        y: 2382
+        y: 1168
       positionAbsolute:
         x: 3531
-        y: 2382
+        y: 1168
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2077,36 +1889,18 @@ workflow:
           - conversation
           - org_name
           write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - conversation
-          - empty_string
-          variable_selector:
-          - conversation
-          - agent_structured
-          write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - conversation
-          - empty_string
-          variable_selector:
-          - conversation
-          - active_agent
-          write_mode: over-write
         selected: false
         title: Conversation Variables Assigner
         type: assigner
         version: '2'
-      height: 186
+      height: 134
       id: '1775657870619'
       position:
         x: 362
-        y: 2126
+        y: 912
       positionAbsolute:
         x: 362
-        y: 2126
+        y: 912
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2132,10 +1926,10 @@ workflow:
       id: '1775719228711'
       position:
         x: 2468
-        y: 2367
+        y: 1153
       positionAbsolute:
         x: 2468
-        y: 2367
+        y: 1153
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2180,10 +1974,10 @@ workflow:
       id: '1800000000040'
       position:
         x: 2107
-        y: 2252
+        y: 1038
       positionAbsolute:
         x: 2107
-        y: 2252
+        y: 1038
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2221,20 +2015,20 @@ workflow:
         start_node_id: 1800000000700start
         title: Agent Loop
         type: loop
-        width: 6362
+        width: 5119
       height: 2452
       id: '1800000000700'
       position:
-        x: 3932.7561446536047
-        y: 1190
+        x: 3892
+        y: 0
       positionAbsolute:
-        x: 3932.7561446536047
-        y: 1190
-      selected: false
+        x: 3892
+        y: 0
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 6362
+      width: 5119
       zIndex: 1
     - data:
         desc: ''
@@ -2248,10 +2042,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 60
-        y: 1152
+        y: 1157
       positionAbsolute:
-        x: 3992.7561446536047
-        y: 2342
+        x: 3952
+        y: 1157
       selectable: false
       selected: false
       sourcePosition: right
@@ -2260,491 +2054,88 @@ workflow:
       width: 44
       zIndex: 1002
     - data:
-        authorization:
-          config: null
-          type: no-auth
-        body:
-          data: []
-          type: none
-        desc: Fetches per-turn entity+spec diff from /entity-diff. Always returns
-          200 with {phase_hint, summary, ...}. Feeds the Question Classifier so it
-          can skip unneeded agents on post-upload corrections.
-        error_strategy: fail-branch
-        headers: ''
+        cases:
+        - case_id: dispatch-spec
+          conditions:
+          - comparison_operator: is
+            id: fb4db41d-7c66-4527-a8dd-14c4db83b4ac
+            value: spec
+            varType: string
+            variable_selector:
+            - conversation
+            - active_agent
+          id: dispatch-spec
+          logical_operator: and
+        - case_id: dispatch-bundle-config
+          conditions:
+          - comparison_operator: is
+            id: b6837b40-e213-494d-8d55-cfc6f97a2861
+            value: bundle_config
+            varType: string
+            variable_selector:
+            - conversation
+            - active_agent
+          id: dispatch-bundle-config
+          logical_operator: and
+        - case_id: dispatch-rules
+          conditions:
+          - comparison_operator: is
+            id: f1f9d6d2-27a3-4374-984e-854d53b71595
+            value: rules
+            varType: string
+            variable_selector:
+            - conversation
+            - active_agent
+          id: dispatch-rules
+          logical_operator: and
+        - case_id: dispatch-reports
+          conditions:
+          - comparison_operator: is
+            id: 6366d54a-6309-4686-940f-529d821f5ba9
+            value: reports
+            varType: string
+            variable_selector:
+            - conversation
+            - active_agent
+          id: dispatch-reports
+          logical_operator: and
+        - case_id: dispatch-inspect
+          conditions:
+          - comparison_operator: is
+            id: fdf911b5-3c56-4bf0-a69f-ed75d5f5e237
+            value: inspect
+            varType: string
+            variable_selector:
+            - conversation
+            - active_agent
+          id: dispatch-inspect
+          logical_operator: and
+        - case_id: dispatch-admin
+          conditions:
+          - comparison_operator: is
+            id: afe3f421-0d0b-4367-b96b-37d80d813f6b
+            value: admin
+            varType: string
+            variable_selector:
+            - conversation
+            - active_agent
+          id: dispatch-admin
+          logical_operator: and
+        desc: ''
         isInLoop: true
         loop_id: '1800000000700'
-        method: get
-        params: conversation_id:{{#sys.conversation_id#}}
-        retry_config:
-          max_retries: 1
-          retry_enabled: true
-          retry_interval: 100
         selected: false
-        ssl_verify: true
-        timeout:
-          max_connect_timeout: 5
-          max_read_timeout: 10
-          max_write_timeout: 5
-        title: Diff Fetch
-        type: http-request
-        url: '{{#conversation.avni_ai_server_url#}}entity-diff'
-        variables: []
-      height: 283
-      id: '1800000000712'
-      parentId: '1800000000700'
-      position:
-        x: 184
-        y: 1123
-      positionAbsolute:
-        x: 4116.756144653605
-        y: 2313
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        code: "import json\n\ndef main(body: str, agent_memory: str) -> dict:\n  \
-          \  \"\"\"Parse Diff Fetch JSON body AND compute a deterministic\n    pipeline_next_hint\
-          \ from agent_memory ledger markers.\n\n    Happy-path auto-progression:\
-          \ bundle_config -> inspect -> done.\n    Rules and Reports are intentionally\
-          \ NOT auto-progressed — they still\n    have flakiness issues and are only\
-          \ invoked when the user explicitly\n    asks for skip logic / validations\
-          \ / dashboards / report cards.\n\n    Pipeline progression is computed here\
-          \ — not reasoned by the LLM —\n    because Haiku is unreliable at strict\
-          \ bracketed-marker substring\n    matching over agent_memory.\"\"\"\n   \
-          \ phase_hint = \"fresh\"\n    summary = \"\"\n    try:\n        parsed =\
-          \ json.loads(body) if body else {}\n        phase_hint = str(parsed.get(\"\
-          phase_hint\") or \"fresh\")\n        summary = str(parsed.get(\"summary\"\
-          ) or \"\")\n    except Exception:\n        pass\n\n    mem = agent_memory\
-          \ or \"\"\n    pipeline_next_hint = \"\"\n    # Only emit a hint when entities\
-          \ are stable vs the last upload —\n    # a dirty/pre_spec/pre_bundle state\
-          \ means the user (or an agent)\n    # still has structural work to reconcile,\
-          \ and the classifier should\n    # handle that via its phase-based rules,\
-          \ not this ledger.\n    if phase_hint == \"stable\":\n        has_bundle\
-          \  = \"[bundle_config]\" in mem\n        has_inspect = \"[inspect]\" in\
-          \ mem\n        if has_bundle and not has_inspect:\n            pipeline_next_hint\
-          \ = \"inspect\"\n\n    return {\n        \"phase_hint\": phase_hint,\n \
-          \       \"summary\": summary,\n        \"pipeline_next_hint\": pipeline_next_hint,\n\
-          \    }\n"
-        code_language: python3
-        isInLoop: true
-        loop_id: '1800000000700'
-        outputs:
-          phase_hint:
-            type: string
-          summary:
-            type: string
-          pipeline_next_hint:
-            type: string
-        selected: false
-        title: Diff Parser
-        type: code
-        variables:
-        - value_selector:
-          - '1800000000712'
-          - body
-          value_type: string
-          variable: body
-        - value_selector:
-          - conversation
-          - agent_memory
-          value_type: string
-          variable: agent_memory
-      height: 50
-      id: '1800000000713'
-      parentId: '1800000000700'
-      position:
-        x: 525
-        y: 1141
-      positionAbsolute:
-        x: 4457.756144653605
-        y: 2331
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        desc: Writes phase_hint + summary + pipeline_next_hint from Diff Parser to
-          conversation vars so the Question Classifier (and any other node) can read
-          them.
-        isInLoop: true
-        items:
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000713'
-          - phase_hint
-          variable_selector:
-          - conversation
-          - phase_hint
-          write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000713'
-          - summary
-          variable_selector:
-          - conversation
-          - turn_diff_summary
-          write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000713'
-          - pipeline_next_hint
-          variable_selector:
-          - conversation
-          - pipeline_next_hint
-          write_mode: over-write
-        loop_id: '1800000000700'
-        selected: false
-        title: Diff Assigner
-        type: assigner
-        version: '2'
-      height: 184
-      id: '1800000000714'
-      parentId: '1800000000700'
-      position:
-        x: 846
-        y: 1129
-      positionAbsolute:
-        x: 4778.756144653605
-        y: 2319
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        classes:
-        - id: '1'
-          name: spec
-        - id: '2'
-          name: bundle_config
-        - id: '3'
-          name: rules
-        - id: '4'
-          name: reports
-        - id: '5'
-          name: inspect
-        - id: '6'
-          name: admin
-        - id: '7'
-          name: done
-        default_value:
-        - key: class_name
-          type: string
-          value: done
-        - key: class_id
-          type: string
-          value: '7'
-        desc: LLM-driven routing. Replaces the old active_agent-based IF-ELSE dispatcher.
-          Reads user query + phase_hint + turn_diff_summary + agent_memory + last_gate_status
-          and picks the next agent (or 'done' to end the loop iteration).
-        error_strategy: default-value
-        instruction: "## Routing state (from conversation variables)\n- phase_hint:\
-          \ {{#conversation.phase_hint#}}\n- last_active_agent: {{#conversation.active_agent#}}\n\
-          - last_agent_structured: {{#conversation.agent_structured#}}\n- last_gate_status:\
-          \ {{#conversation.last_gate_status#}}\n- pending_ambiguities_status: {{#conversation.pending_ambiguities_status#}}\n\
-          - pipeline_next_hint: {{#conversation.pipeline_next_hint#}}\n- turn_diff_summary:\
-          \ {{#conversation.turn_diff_summary#}}\n- agent_memory (recent): {{#conversation.agent_memory#}}\n\
-          \n## Rules (apply top-down, first match wins)\n\nP1. [AMBIGUITY ANSWERS\
-          \ — highest priority]\n    If pending_ambiguities_status == 'pending' →\
-          \ spec.\n    The user's current message is almost certainly answering the\
-          \ prior turn's ask_user questions.\n    Spec Agent owns applying them via\
-          \ apply_ambiguity_answers.\n    This rule overrides A, E, K, and L. Applies\
-          \ regardless of last_agent_structured intent,\n    regardless of phase_hint\
-          \ (including pre_bundle), and regardless of last_active_agent.\n    Routing\
-          \ elsewhere (especially bundle_config) forces the wrong agent to do Spec's\
-          \ job\n    via put_bundle_file and produces malformed cancellation forms.\n\
-          \nP2. [STRUCTURAL CHANGE REQUEST]\n    If the user's message contains a\
-          \ structural-change signal\n    AND phase_hint ∈ {pre_bundle, dirty, stable}\n\
-          \    → spec.\n    Structural-change signals (match intent, not exact wording):\n\
-          \      - \"add\" / \"new\" / \"create\" a form, field, question, concept,\
-          \ encounter,\n        program, subject type, or entity\n      - \"rename\"\
-          \ any entity or field\n      - \"remove\" / \"delete\" a field or form (NOT\
-          \ \"delete implementation\" — that's admin, rule H)\n      - \"change the\
-          \ <encounter|program|subject|form structure>\"\n      - \"split\" or \"\
-          merge\" forms/concepts\n      - any request that alters the entity graph\
-          \ or form schema\n    Non-qualifying (do NOT trigger P2): label text changes,\
-          \ display-order tweaks,\n    color/styling, help-text edits, translation\
-          \ updates — these are bundle-config territory.\n    This rule overrides\
-          \ A, E, and L.\n\nA2. If last_agent_structured is a JSON with intent=re_route\
-          \ AND it carries\n    re_route_target ∈ {spec, bundle_config, inspect},\n\
-          \    pick that re_route_target.\n    (re_route_target=rules/reports is ignored\
-          \ — those agents are not in the\n    happy-path auto-flow. User must ask\
-          \ explicitly via rule F/G.)\n\nB.  last_gate_status=errors → pick last_active_agent\
-          \ (retry).\n\n## Explicit user-intent overrides (apply before pipeline hint)\n\
-          \nJ.  phase_hint=stable AND the user explicitly says: 'approved' / 'looks\
-          \ good' /\n    'thanks' / 'done' / 'no change needed' → done.\n    User\
-          \ is explicitly stopping — respect that even if pipeline_next_hint is set.\n\
-          \    Note: 'proceed' / 'continue' / 'go ahead' are NOT approval — they mean\
-          \ advance\n    the pipeline, which rule L handles.\n\nF.  User message asks\
-          \ for dashboards / report cards / charts → reports.\n    (Opt-in only —\
-          \ the happy path does not run reports.)\n\nG.  User message asks for skip\
-          \ logic / decision rule / validation → rules.\n    (Opt-in only — the happy\
-          \ path does not run rules.)\n\nH.  User message asks about locations / users\
-          \ / catchments / delete-implementation\n    → admin. (Do NOT route bundle-upload\
-          \ requests here — see rule M.)\n\nM.  User message explicitly says 'upload\
-          \ the bundle' / 'publish' / 'deploy' /\n    'push to avni' / 're-upload'\
-          \ / 'upload again' → inspect.\n    Inspector validates and uploads. Use\
-          \ this rule for retry/rework scenarios when\n    the user wants a fresh\
-          \ upload.\n\n## Pipeline progression (authoritative when user intent is\
-          \ neutral)\n\nL.  [PIPELINE PROGRESSION — DETERMINISTIC HINT]\n    If pipeline_next_hint\
-          \ is a non-empty string, pick it verbatim.\n    This hint is computed deterministically\
-          \ by the Diff Parser code node\n    from agent_memory ledger markers. The\
-          \ happy-path flow is:\n      spec → bundle_config → inspect → done.\n  \
-          \  Rules and Reports are NOT in auto-progression — they run only when the\n\
-          \    user explicitly requests them (rules F/G above, which fire first).\n\
-          \    Trust pipeline_next_hint unconditionally when set; it only fires on\n\
-          \    phase_hint=stable and accounts for what has/hasn't run yet.\n\nA. \
-          \ If last_agent_structured is a JSON with intent=applied_fix OR intent=phase_complete,\n\
-          \    DO NOT pick last_active_agent again. Advance instead:\n    - phase_hint=dirty\
-          \ AND last_active_agent != bundle_config → bundle_config\n    - phase_hint=dirty\
-          \ AND last_active_agent == bundle_config → inspect\n    - phase_hint=stable\
-          \ → done (pipeline_next_hint rule L would have already fired if more work\
-          \ remained)\n    - phase_hint=pre_bundle → bundle_config\n    - phase_hint=pre_spec\
-          \ → spec\n\nC.  phase_hint=fresh → spec.\n\nD.  phase_hint=pre_spec → spec.\n\
-          \    Entities parsed but spec not generated. Spec Agent must run validate_entities,\n\
-          \    generate_spec, and enrich_spec so ambiguities surface before bundling.\n\
-          \nE.  phase_hint=pre_bundle → bundle_config.\n    Spec exists, no ambiguities\
-          \ pending (P1 would have fired), no structural change\n    requested (P2\
-          \ would have fired); safe to proceed to bundling.\n\nK.  Phase-driven default\
-          \ (use when no rule above matched).\n    Route by phase_hint so ambiguous\
-          \ input never silently drops pending work:\n    - phase_hint=fresh      →\
-          \ spec\n    - phase_hint=pre_spec   → spec\n    - phase_hint=pre_bundle\
-          \ → bundle_config\n    - phase_hint=dirty      → bundle_config\n    - phase_hint=stable\
-          \     → done\n\nReturn exactly one class name from: spec, bundle_config,\
-          \ rules, reports, inspect, admin, done."
-        instructions: ''
-        memory:
-          query_prompt_template: '{{#sys.query#}}'
-          window:
-            enabled: false
-            size: 0
-        model:
-          completion_params:
-            temperature: 0
-          mode: chat
-          name: claude-haiku-4-5-20251001
-          provider: langgenius/anthropic/anthropic
-        query_variable_selector:
-        - sys
-        - query
-        selected: false
-        title: Question Classifier
-        topics:
-        - spec
-        - bundle_config
-        - rules
-        - reports
-        - inspect
-        - admin
-        - done
-        type: question-classifier
-        vision:
-          enabled: false
-      height: 482
+        title: Agent Dispatcher
+        type: if-else
+      height: 362
       id: '1800000000710'
       parentId: '1800000000700'
       position:
-        x: 1167
-        y: 1031
+        x: 184
+        y: 1000
       positionAbsolute:
-        x: 5099.756144653605
-        y: 2221
-      selected: true
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        desc: Write class name to conversation.active_agent so Output Collector, Pipeline
-          Gate, Gate Parser, etc. continue to work without changes.
-        isInLoop: true
-        items:
-        - input_type: constant
-          operation: over-write
-          value: spec
-          variable_selector:
-          - conversation
-          - active_agent
-          write_mode: over-write
-        loop_id: '1800000000700'
-        selected: false
-        title: Set active spec
-        type: assigner
-        version: '2'
-      height: 174
-      id: '1800000000715'
-      parentId: '1800000000700'
-      position:
-        x: 1508
-        y: 121
-      positionAbsolute:
-        x: 5440.756144653605
-        y: 1311
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        desc: ''
-        isInLoop: true
-        items:
-        - input_type: constant
-          operation: over-write
-          value: bundle_config
-          variable_selector:
-          - conversation
-          - active_agent
-          write_mode: over-write
-        loop_id: '1800000000700'
-        selected: false
-        title: Set active bundle_config
-        type: assigner
-        version: '2'
-      height: 82
-      id: '1800000000716'
-      parentId: '1800000000700'
-      position:
-        x: 1508
-        y: 477
-      positionAbsolute:
-        x: 5440.756144653605
-        y: 1667
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        desc: ''
-        isInLoop: true
-        items:
-        - input_type: constant
-          operation: over-write
-          value: rules
-          variable_selector:
-          - conversation
-          - active_agent
-          write_mode: over-write
-        loop_id: '1800000000700'
-        selected: false
-        title: Set active rules
-        type: assigner
-        version: '2'
-      height: 82
-      id: '1800000000717'
-      parentId: '1800000000700'
-      position:
-        x: 1508
-        y: 843
-      positionAbsolute:
-        x: 5440.756144653605
-        y: 2033
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        desc: ''
-        isInLoop: true
-        items:
-        - input_type: constant
-          operation: over-write
-          value: reports
-          variable_selector:
-          - conversation
-          - active_agent
-          write_mode: over-write
-        loop_id: '1800000000700'
-        selected: false
-        title: Set active reports
-        type: assigner
-        version: '2'
-      height: 82
-      id: '1800000000718'
-      parentId: '1800000000700'
-      position:
-        x: 1508
-        y: 1340
-      positionAbsolute:
-        x: 5440.756144653605
-        y: 2530
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        desc: ''
-        isInLoop: true
-        items:
-        - input_type: constant
-          operation: over-write
-          value: inspect
-          variable_selector:
-          - conversation
-          - active_agent
-          write_mode: over-write
-        loop_id: '1800000000700'
-        selected: false
-        title: Set active inspect
-        type: assigner
-        version: '2'
-      height: 82
-      id: '1800000000719'
-      parentId: '1800000000700'
-      position:
-        x: 1508
-        y: 2027
-      positionAbsolute:
-        x: 5440.756144653605
-        y: 3217
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 241
-      zIndex: 1002
-    - data:
-        desc: ''
-        isInLoop: true
-        items:
-        - input_type: constant
-          operation: over-write
-          value: admin
-          variable_selector:
-          - conversation
-          - active_agent
-          write_mode: over-write
-        loop_id: '1800000000700'
-        selected: false
-        title: Set active admin
-        type: assigner
-        version: '2'
-      height: 82
-      id: '1800000000721'
-      parentId: '1800000000700'
-      position:
-        x: 1508
-        y: 1682
-      positionAbsolute:
-        x: 5440.756144653605
-        y: 2872
+        x: 4076
+        y: 1000
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2782,11 +2173,11 @@ workflow:
       id: '1800000000101'
       parentId: '1800000000700'
       position:
-        x: 1768
+        x: 525
         y: 60
       positionAbsolute:
-        x: 5700.756144653605
-        y: 1250
+        x: 4417
+        y: 60
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2824,11 +2215,11 @@ workflow:
       id: '1800000000201'
       parentId: '1800000000700'
       position:
-        x: 1768
+        x: 525
         y: 408
       positionAbsolute:
-        x: 5700.756144653605
-        y: 1598
+        x: 4417
+        y: 408
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2866,11 +2257,11 @@ workflow:
       id: '1800000000301'
       parentId: '1800000000700'
       position:
-        x: 1768
+        x: 525
         y: 782
       positionAbsolute:
-        x: 5700.756144653605
-        y: 1972
+        x: 4417
+        y: 782
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2908,11 +2299,11 @@ workflow:
       id: '1800000000401'
       parentId: '1800000000700'
       position:
-        x: 1768
+        x: 525
         y: 1279
       positionAbsolute:
-        x: 5700.756144653605
-        y: 2469
+        x: 4417
+        y: 1279
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2950,11 +2341,11 @@ workflow:
       id: '1800000000501'
       parentId: '1800000000700'
       position:
-        x: 1768
+        x: 525
         y: 1958
       positionAbsolute:
-        x: 5700.756144653605
-        y: 3148
+        x: 4417
+        y: 1958
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2992,11 +2383,11 @@ workflow:
       id: '1800000000601'
       parentId: '1800000000700'
       position:
-        x: 1768
+        x: 525
         y: 1621
       positionAbsolute:
-        x: 5700.756144653605
-        y: 2811
+        x: 4417
+        y: 1621
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3443,15 +2834,15 @@ workflow:
                   one server call. Updates entities AND regenerates the spec atomically.
                   choice="ignore" or null skips.
               parameters:
-                answers:
-                  auto: 1
-                  value: null
                 conversation_id:
                   auto: 0
                   value:
                     type: mixed
                     value: '{{#sys.conversation_id#}}'
                 sector:
+                  auto: 1
+                  value: null
+                answers:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
@@ -3489,11 +2880,11 @@ workflow:
       id: '1800000000110'
       parentId: '1800000000700'
       position:
-        x: 2109
+        x: 866
         y: 169
       positionAbsolute:
-        x: 6041.756144653605
-        y: 1359
+        x: 4758
+        y: 169
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -3911,11 +3302,11 @@ workflow:
       id: '1800000000210'
       parentId: '1800000000700'
       position:
-        x: 2109
+        x: 866
         y: 522
       positionAbsolute:
-        x: 6041.756144653605
-        y: 1712
+        x: 4758
+        y: 522
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4178,11 +3569,11 @@ workflow:
       id: '1800000000310'
       parentId: '1800000000700'
       position:
-        x: 2109
+        x: 866
         y: 891
       positionAbsolute:
-        x: 6041.756144653605
-        y: 2081
+        x: 4758
+        y: 891
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4444,11 +3835,11 @@ workflow:
       id: '1800000000410'
       parentId: '1800000000700'
       position:
-        x: 2109
+        x: 866
         y: 1222
       positionAbsolute:
-        x: 6041.756144653605
-        y: 2412
+        x: 4758
+        y: 1222
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4735,11 +4126,11 @@ workflow:
       id: '1800000000510'
       parentId: '1800000000700'
       position:
-        x: 2109
+        x: 866
         y: 1906
       positionAbsolute:
-        x: 6041.756144653605
-        y: 3096
+        x: 4758
+        y: 1906
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5234,11 +4625,11 @@ workflow:
       id: '1800000000610'
       parentId: '1800000000700'
       position:
-        x: 2109
+        x: 866
         y: 1553
       positionAbsolute:
-        x: 6041.756144653605
-        y: 2743
+        x: 4758
+        y: 1553
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5270,8 +4661,8 @@ workflow:
           \ + chr(10)\n    memory_entry = (existing_memory + sep + entry) if existing_memory\
           \ else entry\n\n    # Cap total memory at 12000 chars (down from 25000)\
           \ to keep the\n    # downstream agent prompt under the streaming-timeout\
-          \ danger zone.\n    if len(memory_entry) > 12000:\n        memory_entry\
-          \ = memory_entry[:3000] + chr(10) + \"...[earlier entries truncated]...\"\
+          \ danger zone.\n    if len(memory_entry) > 12000:\n        memory_entry =\
+          \ memory_entry[:3000] + chr(10) + \"...[earlier entries truncated]...\"\
           \ + chr(10) + memory_entry[-9000:]\n\n    return {\n        \"memory_entry\"\
           : memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
         code_language: python3
@@ -5330,11 +4721,11 @@ workflow:
       id: '1800000000720'
       parentId: '1800000000700'
       position:
-        x: 2450
+        x: 1207
         y: 1156
       positionAbsolute:
-        x: 6382.756144653605
-        y: 2346
+        x: 5099
+        y: 1156
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5371,11 +4762,11 @@ workflow:
       id: '1800000000730'
       parentId: '1800000000700'
       position:
-        x: 3413
-        y: 1127
+        x: 2170
+        y: 1140
       positionAbsolute:
-        x: 7345.756144653605
-        y: 2317
+        x: 6062
+        y: 1140
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5383,45 +4774,69 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\n\ndef main(active_agent: str, workflow_mode: str,\n  \
-          \       agent_output: str, agent_memory: str,\n         last_gate_status:\
-          \ str, agent_structured: str,\n         classifier_pick: str) -> dict:\n\
-          \    \"\"\"Decides loop_done based on classifier pick + agent outcome.\n\
-          \n    Rules (first match wins):\n      targeted mode                   \
-          \     -> done\n      classifier_pick == 'done'            -> done (pipeline\
-          \ complete this turn)\n      intent == 'ask_user' or 'error'      -> done\
-          \ (pause/fail)\n      gate user_input_needed               -> done (pause)\n\
-          \      gate errors + over retry cap         -> done (fail)\n      else \
-          \                                -> continue\n\n    next_agent is always\
-          \ \"\" — downstream routing is done by the\n    Question Classifier at the\
-          \ top of the NEXT loop iteration.\n    \"\"\"\n    if workflow_mode == \"\
-          targeted\":\n        return {\"loop_done\": True, \"next_agent\": \"\",\n\
-          \                \"reason\": \"Targeted mode — single agent only\"}\n\n\
-          \    if classifier_pick == \"done\" or not classifier_pick:\n        return\
-          \ {\"loop_done\": True, \"next_agent\": \"\",\n                \"reason\"\
-          : (\n                    \"Classifier chose 'done' — pipeline complete for\
-          \ this turn\"\n                    if classifier_pick == \"done\"\n    \
-          \                else \"Classifier returned no pick (likely fail-branch\
-          \ default); exiting loop safely\"\n                )}\n\n    struct = {}\n\
-          \    try:\n        if agent_structured:\n            struct = json.loads(agent_structured)\
-          \ or {}\n    except Exception:\n        struct = {}\n    intent = str(struct.get(\"\
-          intent\", \"\") or \"\")\n\n    if intent in (\"ask_user\", \"error\"):\n\
-          \        return {\"loop_done\": True, \"next_agent\": \"\",\n          \
-          \      \"reason\": f\"{active_agent} intent={intent}\"}\n\n    if last_gate_status\
-          \ == \"user_input_needed\":\n        return {\"loop_done\": True, \"next_agent\"\
-          : \"\",\n                \"reason\": f\"Gate requests user input from {active_agent}\"\
-          }\n\n    if last_gate_status == \"errors\":\n        mem = (agent_memory\
-          \ or \"\").lower()\n        runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
-          )\n        MAX_RETRIES = 3\n        if runs_so_far >= MAX_RETRIES:\n   \
-          \         return {\"loop_done\": True, \"next_agent\": \"\",\n         \
-          \           \"reason\": (\n                        f\"Gate errors persist\
-          \ after {MAX_RETRIES} retries of {active_agent}\"\n                    )}\n\
-          \        return {\"loop_done\": False, \"next_agent\": \"\",\n         \
-          \       \"reason\": (\n                    f\"Gate errors after {runs_so_far}\
-          \ run(s) of {active_agent}; \"\n                    f\"classifier will pick\
-          \ retry agent\"\n                )}\n\n    return {\"loop_done\": False,\
-          \ \"next_agent\": \"\",\n            \"reason\": \"classifier-driven advance\"\
-          }\n"
+        code: "import json\nimport re\n\ndef main(active_agent: str, workflow_mode:\
+          \ str, agent_output: str,\n         agent_memory: str, last_gate_status:\
+          \ str,\n         agent_structured: str) -> dict:\n    \"\"\"Stage B decider:\
+          \ deterministic routing from typed conversation\n    variables. Replaces\
+          \ the old ~60-line keyword-matching logic.\n\n    agent_structured arrives\
+          \ as a JSON-serialized string (Dify cloud\n    does not accept object-typed\
+          \ conversation variables), so we parse\n    it here before reading typed\
+          \ fields.\n\n    Rule order:\n      1. targeted mode  -> done\n      2.\
+          \ intent=ask_user  -> pause (done)\n      3. intent=error     -> pause (done)\n\
+          \      4. intent=re_route + Inspector  -> branch to re_route_target\n  \
+          \    5. legacy markers ([AWAITING_USER_INPUT], [ROUTE_TO:x])\n      6. gate\
+          \ errors + under retry cap  -> re-run same agent\n      7. gate errors +\
+          \ over retry cap   -> done (fail)\n      8. gate user_input_needed     \
+          \    -> pause\n      9. gate ok / not_run              -> advance in chain\n\
+          \    \"\"\"\n    if workflow_mode == \"targeted\":\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": \"Targeted\
+          \ mode — single agent only\"}\n\n    struct = {}\n    try:\n        if agent_structured:\n\
+          \            struct = json.loads(agent_structured) or {}\n    except Exception:\n\
+          \        struct = {}\n\n    intent = str(struct.get(\"intent\", \"\") or\
+          \ \"\")\n\n    if intent == \"ask_user\":\n        return {\"next_agent\"\
+          : \"done\", \"loop_done\": True,\n                \"reason\": f\"{active_agent}\
+          \ intent=ask_user (structured)\"}\n    if intent == \"error\":\n       \
+          \ return {\"next_agent\": \"done\", \"loop_done\": True,\n             \
+          \   \"reason\": f\"{active_agent} intent=error (structured)\"}\n\n    if\
+          \ intent == \"re_route\" and active_agent == \"inspect\":\n        target\
+          \ = str(struct.get(\"re_route_target\", \"\") or \"\")\n        valid_targets\
+          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
+          \ in valid_targets:\n            mem_lc = (agent_memory or \"\").lower()\n\
+          \            if \"[rerouted from inspect]\" not in mem_lc:\n           \
+          \     return {\"next_agent\": target, \"loop_done\": False,\n          \
+          \              \"reason\": f\"Inspector re_route -> {target} (structured)\"\
+          }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
+          \ \"\").lower()\n\n    if \"[awaiting_user_input]\"\
+          \ in t:\n        return\
+          \ {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\"\
+          : f\"{active_agent} legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match\
+          \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
+          \ == \"inspect\":\n        target = route_match.group(1)\n        valid_targets\
+          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
+          \ in valid_targets and \"[rerouted from inspect]\" not in mem:\n       \
+          \     return {\"next_agent\": target, \"loop_done\": False,\n          \
+          \          \"reason\": f\"Inspector routing to {target} for fixes\"}\n\n\
+          \    MAX_RETRIES = 3\n    runs_so_far = mem.count(f\"[gate-ran:{active_agent}]\"\
+          )\n\n    if last_gate_status == \"errors\":\n        if runs_so_far < MAX_RETRIES:\n\
+          \            return {\"next_agent\": active_agent, \"loop_done\": False,\n\
+          \                    \"reason\": (\n                        f\"Gate errors\
+          \ after {runs_so_far} run(s), \"\n                        f\"re-running\
+          \ {active_agent} \"\n                        f\"({runs_so_far}/{MAX_RETRIES})\"\
+          \n                    )}\n        return {\"next_agent\": \"done\", \"loop_done\"\
+          : True,\n                \"reason\": (\n                    f\"Gate errors\
+          \ persist after {MAX_RETRIES} retries \"\n                    f\"of {active_agent}\"\
+          \n                )}\n\n    if last_gate_status == \"user_input_needed\"\
+          :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n    \
+          \            \"reason\": f\"Gate requests user input from {active_agent}\"\
+          }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"\
+          inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
+          \ ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\":\
+          \ True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
+          }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n   \
+          \     return {\"next_agent\": next_a, \"loop_done\": False,\n          \
+          \      \"reason\": f\"{active_agent} done, advancing to {next_a}\"}\n\n\
+          \    return {\"next_agent\": \"done\", \"loop_done\": True,\n          \
+          \  \"reason\": \"End of chain\"}\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5466,20 +4881,15 @@ workflow:
           - agent_structured
           value_type: string
           variable: agent_structured
-        - value_selector:
-          - '1800000000710'
-          - class_name
-          value_type: string
-          variable: classifier_pick
       height: 50
       id: '1800000000740'
       parentId: '1800000000700'
       position:
-        x: 5399
+        x: 4156
         y: 1209
       positionAbsolute:
-        x: 9331.756144653606
-        y: 2399
+        x: 8048
+        y: 1209
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5509,11 +4919,11 @@ workflow:
       id: '1800000000745'
       parentId: '1800000000700'
       position:
-        x: 5720
+        x: 4477
         y: 1161
       positionAbsolute:
-        x: 9652.756144653606
-        y: 2351
+        x: 8369
+        y: 1161
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5541,11 +4951,11 @@ workflow:
       id: '1800000000751'
       parentId: '1800000000700'
       position:
-        x: 6061
-        y: 1169
+        x: 4818
+        y: 1311
       positionAbsolute:
-        x: 9993.756144653606
-        y: 2359
+        x: 8710
+        y: 1311
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5553,28 +4963,31 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        desc: No-op assigner kept as the "continue" branch of Loop Done Check. Under
-          the classifier-driven design, active_agent is set per iteration by the 'Set
-          active <X>' assigners between classifier and prompt-fetch; we must NOT clobber
-          it here with NAD.next_agent (which is always "" in the trimmed NAD) — that
-          blanked active_agent mid-loop and made the next iteration's Diff Parser
-          report last_active_agent=<none>.
         isInLoop: true
-        items: []
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000740'
+          - next_agent
+          variable_selector:
+          - conversation
+          - active_agent
+          write_mode: over-write
         loop_id: '1800000000700'
         selected: false
         title: Continue Loop
         type: assigner
         version: '2'
-      height: 286
+      height: 82
       id: '1800000000752'
       parentId: '1800000000700'
       position:
-        x: 6061
-        y: 1311
+        x: 4818
+        y: 1169
       positionAbsolute:
-        x: 9993.756144653606
-        y: 2501
+        x: 8710
+        y: 1169
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5611,11 +5024,11 @@ workflow:
       id: '1800000000761'
       parentId: '1800000000700'
       position:
-        x: 4075
+        x: 2832
         y: 1029
       positionAbsolute:
-        x: 8007.756144653605
-        y: 2219
+        x: 6724
+        y: 1029
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5652,11 +5065,11 @@ workflow:
       id: '1800000000760'
       parentId: '1800000000700'
       position:
-        x: 4416
+        x: 3173
         y: 974
       positionAbsolute:
-        x: 8348.756144653606
-        y: 2164
+        x: 7065
+        y: 974
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5776,11 +5189,11 @@ workflow:
       height: 186
       id: '1776327635368'
       position:
-        x: 10715
-        y: 1371
+        x: 9111
+        y: 1133
       positionAbsolute:
-        x: 10715
-        y: 1371
+        x: 9111
+        y: 1133
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5795,11 +5208,11 @@ workflow:
       height: 101
       id: '1800000000800'
       position:
-        x: 11056
-        y: 1413
+        x: 9452
+        y: 1175
       positionAbsolute:
-        x: 11056
-        y: 1413
+        x: 9452
+        y: 1175
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5824,14 +5237,14 @@ workflow:
         selected: false
         title: Post-Loop Router
         type: if-else
-      height: 254
+      height: 146
       id: '1800000000810'
       position:
-        x: 10354
-        y: 1153
+        x: 8900
+        y: 1100
       positionAbsolute:
-        x: 10354
-        y: 1153
+        x: 8900
+        y: 1100
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5843,14 +5256,14 @@ workflow:
         title: Ask-User Answer
         type: answer
         variables: []
-      height: 102
+      height: 101
       id: '1800000000820'
       position:
-        x: 10715
-        y: 1190
+        x: 9200
+        y: 950
       positionAbsolute:
-        x: 10715
-        y: 1190
+        x: 9200
+        y: 950
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5910,11 +5323,11 @@ workflow:
       id: '1800000000770'
       parentId: '1800000000700'
       position:
-        x: 3734
+        x: 2491
         y: 1093
       positionAbsolute:
-        x: 7666.756144653605
-        y: 2283
+        x: 6383
+        y: 1093
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5988,11 +5401,11 @@ workflow:
       id: '1800000000776'
       parentId: '1800000000700'
       position:
-        x: 4075
+        x: 2832
         y: 1185
       positionAbsolute:
-        x: 8007.756144653605
-        y: 2375
+        x: 6724
+        y: 1185
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -6022,11 +5435,11 @@ workflow:
       id: '1800000000777'
       parentId: '1800000000700'
       position:
-        x: 4717
+        x: 3474
         y: 1115
       positionAbsolute:
-        x: 8649.756144653606
-        y: 2305
+        x: 7366
+        y: 1115
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -6054,11 +5467,11 @@ workflow:
       id: '1800000000778'
       parentId: '1800000000700'
       position:
-        x: 5058
+        x: 3815
         y: 1120
       positionAbsolute:
-        x: 8990.756144653606
-        y: 2310
+        x: 7707
+        y: 1120
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -6094,36 +5507,23 @@ workflow:
           \     else (current_active_phase or \"intake\")\n    )\n    out_spec_awaiting\
           \ = (\n        bool(parsed_ok and intent == \"ask_user\" and active_agent\
           \ == \"spec\")\n        if parsed_ok\n        else bool(current_spec_awaiting)\n\
-          \    )\n    # pending_ambiguities lifecycle:\n    #   intent=ask_user →\
-          \ write the new questions list (this turn's ask).\n    #   intent=applied_fix\
-          \ AND active_agent=spec → clear, since the Spec Agent\n    #     just applied\
-          \ the answers (via apply_ambiguity_answers). Leaving them would\n    # \
-          \    make the classifier on the next user message re-route to spec\n   \
-          \ #     thinking ambiguities are still pending.\n    #   anything else →\
-          \ pass current value through unchanged.\n    out_pending_ambiguities = (\n\
-          \        ambiguities\n        if (parsed_ok and intent == \"ask_user\")\n\
-          \        else []\n        if (\n            parsed_ok\n            and intent\
-          \ in (\"applied_fix\", \"phase_complete\")\n            and active_agent\
-          \ == \"spec\"\n        )\n        else (current_pending_ambiguities or [])\n\
-          \    )\n    # Dify cloud does not accept object-typed conversation variables,\n\
-          \    # so agent_structured is stored as a JSON string. Serialize here.\n\
-          \    raw_payload_obj = payload if isinstance(payload, dict) else {}\n  \
-          \  raw_payload = json.dumps(raw_payload_obj)\n\n    # Narrative: agent_output\
-          \ with the structured JSON block removed so the\n    # user-facing answer\
-          \ node (Ask-User Answer) doesn't echo the payload.\n    narrative = re.sub(r\"\
-          ```json\\s*\\{.*?\\}\\s*```\", \"\", text, flags=re.DOTALL)\n    narrative\
-          \ = re.sub(r\"\\{[^{}]*\\\"intent\\\"[^{}]*\\}\\s*$\", \"\", narrative,\
-          \ flags=re.DOTALL).rstrip()\n\n    # String mirror of pending_ambiguities\
-          \ for classifier instruction templates\n    # (Dify does not interpolate\
-          \ array[object] vars into strings).\n    out_pending_status = \"pending\"\
-          \ if out_pending_ambiguities else \"none\"\n\n    return {\n        \"intent\"\
+          \    )\n    out_pending_ambiguities = (\n        ambiguities\n        if\
+          \ (parsed_ok and intent == \"ask_user\")\n        else (current_pending_ambiguities\
+          \ or [])\n    )\n    # Dify cloud does not accept object-typed conversation\
+          \ variables,\n    # so agent_structured is stored as a JSON string. Serialize\
+          \ here.\n    raw_payload_obj = payload if isinstance(payload, dict) else\
+          \ {}\n    raw_payload = json.dumps(raw_payload_obj)\n\n    # Narrative:\
+          \ agent_output with the structured JSON block removed so the\n    # user-facing\
+          \ answer node (Ask-User Answer) doesn't echo the payload.\n    narrative\
+          \ = re.sub(r\"```json\\s*\\{.*?\\}\\s*```\", \"\", text, flags=re.DOTALL)\n\
+          \    narrative = re.sub(r\"\\{[^{}]*\\\"intent\\\"[^{}]*\\}\\s*$\", \"\"\
+          , narrative, flags=re.DOTALL).rstrip()\n\n    return {\n        \"intent\"\
           : intent,\n        \"target_phase\": target_phase,\n        \"ambiguities\"\
           : ambiguities,\n        \"applied_changes\": applied_changes,\n        \"\
           reason\": reason,\n        \"parsed_ok\": parsed_ok,\n        \"out_active_phase\"\
           : out_active_phase,\n        \"out_spec_awaiting\": out_spec_awaiting,\n\
-          \        \"out_pending_ambiguities\": out_pending_ambiguities,\n       \
-          \ \"out_pending_status\": out_pending_status,\n        \"raw_payload\":\
-          \ raw_payload,\n        \"narrative\": narrative,\n    }\n"
+          \        \"out_pending_ambiguities\": out_pending_ambiguities,\n        \"\
+          raw_payload\": raw_payload,\n        \"narrative\": narrative,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -6140,8 +5540,6 @@ workflow:
             type: string
           out_pending_ambiguities:
             type: array[object]
-          out_pending_status:
-            type: string
           out_spec_awaiting:
             type: boolean
           parsed_ok:
@@ -6181,15 +5579,15 @@ workflow:
           - pending_ambiguities
           value_type: array[object]
           variable: current_pending_ambiguities
-      height: 50
+      height: 130
       id: '1800000000725'
       parentId: '1800000000700'
       position:
-        x: 2771
+        x: 1528
         y: 1116
       positionAbsolute:
-        x: 6703.756144653605
-        y: 2306
+        x: 5420
+        y: 1116
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -6230,15 +5628,6 @@ workflow:
           operation: over-write
           value:
           - '1800000000725'
-          - out_pending_status
-          variable_selector:
-          - conversation
-          - pending_ambiguities_status
-          write_mode: over-write
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000725'
           - raw_payload
           variable_selector:
           - conversation
@@ -6249,15 +5638,15 @@ workflow:
         title: Phase Transition
         type: assigner
         version: '2'
-      height: 186
+      height: 180
       id: '1800000000727'
       parentId: '1800000000700'
       position:
-        x: 3092
+        x: 1849
         y: 1091
       positionAbsolute:
-        x: 7024.756144653605
-        y: 2281
+        x: 5741
+        y: 1091
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -6281,15 +5670,15 @@ workflow:
         title: Gate Result
         type: assigner
         version: '2'
-      height: 82
+      height: 135
       id: '1800000000779'
       parentId: '1800000000700'
       position:
-        x: 4396
+        x: 3153
         y: 1142
       positionAbsolute:
-        x: 8328.756144653606
-        y: 2332
+        x: 7045
+        y: 1142
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -6315,14 +5704,14 @@ workflow:
         selected: false
         title: Spec Awaiting Check
         type: if-else
-      height: 254
+      height: 110
       id: '1800000000045'
       position:
         x: 1024
-        y: 1947
+        y: 733
       positionAbsolute:
         x: 1024
-        y: 1947
+        y: 733
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -6356,14 +5745,14 @@ workflow:
           - query
           value_type: string
           variable: user_query
-      height: 50
+      height: 110
       id: '1800000000046'
       position:
         x: 1385
-        y: 2136
+        y: 922
       positionAbsolute:
         x: 1385
-        y: 2136
+        y: 922
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -6420,21 +5809,21 @@ workflow:
         title: Resume Awaiting Assigner
         type: assigner
         version: '2'
-      height: 186
+      height: 225
       id: '1800000000047'
       position:
         x: 1746
-        y: 2335
+        y: 1121
       positionAbsolute:
         x: 1746
-        y: 2335
+        y: 1121
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 241
     viewport:
-      x: -2393.841745565116
-      y: -77.83589626757464
-      zoom: 0.2725219653348648
+      x: -1741.625
+      y: 14.625
+      zoom: 0.25
   rag_pipeline_variables: []
