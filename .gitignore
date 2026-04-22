@@ -104,3 +104,11 @@ new_node_exec*.json
 buncle_config_node_exec*.json
 new_node_exec*.json
 cons_node_exec*.json
+
+# More Dify node-exec dumps
+*_node_exec*.json
+stuck_*.json
+quick_*.json
+spec_agent_*.json
+enrol_form_*.json
+reconciler_*.json
