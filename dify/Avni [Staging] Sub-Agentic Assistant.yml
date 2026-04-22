@@ -3439,7 +3439,7 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
               your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 10
+            value: 20
           model:
             type: constant
             value:
@@ -3861,7 +3861,7 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
               your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 5
+            value: 20
           model:
             type: constant
             value:
@@ -4128,7 +4128,7 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
               your plan before acting: "I will call X to do Y".'
           maximum_iterations:
             type: constant
-            value: 5
+            value: 20
           model:
             type: constant
             value:
