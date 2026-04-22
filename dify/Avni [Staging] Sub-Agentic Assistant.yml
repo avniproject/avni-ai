@@ -47,6 +47,18 @@ workflow:
     - empty_string
     value: ''
     value_type: string
+  - description: String mirror of pending_ambiguities for classifier instruction
+      templates. Dify's question-classifier does not interpolate array[object]
+      typed vars into the instruction string, so we mirror the pending state as
+      a scalar. Values - 'none' (no pending questions) or 'pending' (prior turn's
+      ask_user left ambiguities awaiting user reply).
+    id: 3c9a6f18-b4d2-4e85-a0f3-7d1c5b8e4912
+    name: pending_ambiguities_status
+    selector:
+    - conversation
+    - pending_ambiguities_status
+    value: none
+    value_type: string
   - description: ''
     id: c6cba07c-9187-4228-842f-42a0e3f2f709
     name: org_name
@@ -2384,7 +2396,7 @@ workflow:
 - last_active_agent: {{#conversation.active_agent#}}
 - last_agent_structured: {{#conversation.agent_structured#}}
 - last_gate_status: {{#conversation.last_gate_status#}}
-- pending_ambiguities: {{#conversation.pending_ambiguities#}}
+- pending_ambiguities_status: {{#conversation.pending_ambiguities_status#}}
 - turn_diff_summary: {{#conversation.turn_diff_summary#}}
 - agent_memory (recent): {{#conversation.agent_memory#}}
 
@@ -2399,7 +2411,7 @@ A. If last_agent_structured is a JSON with intent=applied_fix OR intent=phase_co
 
 A2. If last_agent_structured is a JSON with intent=re_route AND it carries re_route_target ∈ {spec, bundle_config, rules, reports, inspect}, pick that re_route_target. Inspector uses this to hand control back to an earlier agent when it finds something upstream needs correcting.
 
-A3. If pending_ambiguities is non-empty (a list with items, NOT '[]' or empty string), the user's current message is almost certainly answering the prior turn's ask_user questions → spec. Do NOT pick bundle_config here even if phase_hint=pre_bundle — Spec Agent owns applying ambiguity answers via apply_ambiguity_answers; routing to bundle_config forces it to do Spec's job via put_bundle_file and produces malformed cancellation forms.
+A3. If pending_ambiguities_status == 'pending', the user's current message is almost certainly answering the prior turn's ask_user questions → spec. Do NOT pick bundle_config here even if phase_hint=pre_bundle — Spec Agent owns applying ambiguity answers via apply_ambiguity_answers; routing to bundle_config forces it to do Spec's job via put_bundle_file and produces malformed cancellation forms.
 
 B. last_gate_status=errors → pick last_active_agent (retry).
 
@@ -6035,13 +6047,17 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
           \ answer node (Ask-User Answer) doesn't echo the payload.\n    narrative\
           \ = re.sub(r\"```json\\s*\\{.*?\\}\\s*```\", \"\", text, flags=re.DOTALL)\n\
           \    narrative = re.sub(r\"\\{[^{}]*\\\"intent\\\"[^{}]*\\}\\s*$\", \"\"\
-          , narrative, flags=re.DOTALL).rstrip()\n\n    return {\n        \"intent\"\
+          , narrative, flags=re.DOTALL).rstrip()\n\n    # String mirror of pending_ambiguities\
+          \ for classifier instruction templates\n    # (Dify does not interpolate\
+          \ array[object] vars into strings).\n    out_pending_status = \"pending\"\
+          \ if out_pending_ambiguities else \"none\"\n\n    return {\n        \"intent\"\
           : intent,\n        \"target_phase\": target_phase,\n        \"ambiguities\"\
           : ambiguities,\n        \"applied_changes\": applied_changes,\n        \"\
           reason\": reason,\n        \"parsed_ok\": parsed_ok,\n        \"out_active_phase\"\
           : out_active_phase,\n        \"out_spec_awaiting\": out_spec_awaiting,\n\
           \        \"out_pending_ambiguities\": out_pending_ambiguities,\n        \"\
-          raw_payload\": raw_payload,\n        \"narrative\": narrative,\n    }\n"
+          out_pending_status\": out_pending_status,\n        \"raw_payload\": raw_payload,\n\
+          \        \"narrative\": narrative,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -6058,6 +6074,8 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
             type: string
           out_pending_ambiguities:
             type: array[object]
+          out_pending_status:
+            type: string
           out_spec_awaiting:
             type: boolean
           parsed_ok:
@@ -6141,6 +6159,15 @@ Return exactly one class name from: spec, bundle_config, rules, reports, inspect
           variable_selector:
           - conversation
           - pending_ambiguities
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1800000000725'
+          - out_pending_status
+          variable_selector:
+          - conversation
+          - pending_ambiguities_status
           write_mode: over-write
         - input_type: variable
           operation: over-write

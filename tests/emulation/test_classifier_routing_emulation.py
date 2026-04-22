@@ -355,7 +355,7 @@ def test_pending_ambiguities_routes_to_spec_not_bundle_config():
             "active_agent": "spec",  # set by Resume Awaiting Assigner
             "agent_structured": "",  # turn-start reset
             "last_gate_status": "user_input_needed",  # prior turn paused for user
-            "pending_ambiguities": '[{"id":"prog_enrich_showGrowthChart"},{"id":"spec_st_school_unmapped"},{"id":"spec_enc_career_guidance_no_form"}]',
+            "pending_ambiguities_status": "pending",
             "turn_diff_summary": "Spec generated. No bundle yet.",
             "agent_memory": "[spec] enrich_spec returned 21 ambiguities — presenting to user for resolution.",
         },
@@ -377,7 +377,7 @@ def test_empty_pending_ambiguities_pre_bundle_routes_to_bundle_config():
             "active_agent": "spec",
             "agent_structured": '{"intent":"applied_fix"}',
             "last_gate_status": "ok",
-            "pending_ambiguities": "[]",  # cleared after apply_ambiguity_answers
+            "pending_ambiguities_status": "none",
             "turn_diff_summary": "Spec generated. No bundle yet.",
             "agent_memory": "[spec] applied 21 answers",
         },
