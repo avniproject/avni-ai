@@ -61,10 +61,6 @@ class _BundleStore:
             return None
         return data
 
-    def delete(self, conversation_id: str) -> bool:
-        """Invalidate a cached bundle. Returns True if an entry existed."""
-        return self._store.pop(conversation_id, None) is not None
-
     def cleanup(self) -> int:
         now = time.time()
         expired = [k for k, (_, exp) in self._store.items() if now > exp]

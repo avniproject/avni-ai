@@ -1795,23 +1795,12 @@ async def handle_apply_ambiguity_answers(request: Request) -> JSONResponse:
             status_code=500,
         )
 
-    # Invalidate any previously-generated bundle. generate_bundle is a noop
-    # when a bundle already exists (to protect surgical bundle_config edits),
-    # so without this drop the user's ambiguity answers would never reach
-    # the bundle even though entities + spec were updated correctly.
-    bundle_invalidated = False
-    if applied:
-        from .entity_handlers import _invalidate_bundle
-
-        bundle_invalidated = _invalidate_bundle(conversation_id)
-
     logger.info(
-        "apply-ambiguity-answers: conv=%s applied=%d ignored=%d unmatched=%d bundle_invalidated=%s",
+        "apply-ambiguity-answers: conv=%s applied=%d ignored=%d unmatched=%d",
         conversation_id[:8],
         len(applied),
         len(ignored),
         len(unmatched),
-        bundle_invalidated,
     )
 
     return JSONResponse(
@@ -1823,7 +1812,6 @@ async def handle_apply_ambiguity_answers(request: Request) -> JSONResponse:
             "applied": applied,
             "ignored": ignored,
             "unmatched": unmatched,
-            "bundle_invalidated": bundle_invalidated,
             "entity_counts": {
                 k: len(v) if isinstance(v, list) else 1 for k, v in entities.items()
             },

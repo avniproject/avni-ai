@@ -88,25 +88,6 @@ class _SrsTextStore:
 _srs_text_store = _SrsTextStore()
 
 
-def _invalidate_bundle(conversation_id: str) -> bool:
-    """Drop any cached bundle for this conversation.
-
-    Entities are the source of truth; the bundle is a projection. Any
-    entity mutation after a bundle has been generated must drop the cached
-    bundle so the next generate_bundle call produces output that reflects
-    the new entities — otherwise generate_bundle short-circuits with
-    `already_existed=True` and the agent never sees the user's fix in the
-    bundle.
-    """
-    try:
-        from .bundle_handlers import get_bundle_store
-
-        return get_bundle_store().delete(conversation_id)
-    except Exception:
-        logger.exception("bundle invalidation failed for %s", conversation_id)
-        return False
-
-
 async def handle_store_srs_text(request: Request) -> JSONResponse:
     """
     POST /store-srs-text
@@ -656,8 +637,6 @@ async def handle_apply_entity_corrections(request: Request) -> JSONResponse:
     # Write back to store so subsequent calls see the updated entities
     if conversation_id:
         _entity_store.put(conversation_id, updated)
-        if corrections:
-            _invalidate_bundle(conversation_id)
 
     logger.info("apply-entity-corrections: applied %d corrections", len(corrections))
 
@@ -768,7 +747,6 @@ async def handle_put_entities_section(request: Request) -> JSONResponse:
 
     entities[section] = items
     _entity_store.put(conversation_id, entities)
-    _invalidate_bundle(conversation_id)
     logger.info(
         "put-entities-section: updated section=%s count=%d for conversation_id=%s",
         section,
