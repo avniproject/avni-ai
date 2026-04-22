@@ -2276,45 +2276,15 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\n\ndef main(body: str, user_query: str, active_agent:\
-          \ str,\n         agent_structured: str, last_gate_status: str) -> dict:\n\
-          \    \"\"\"Parse Diff Fetch JSON body AND compose a state-rich query\n\
-          \    string for the Question Classifier. The classifier's\n    query_variable_selector\
-          \ points at classifier_input, so the model\n    sees user message + live\
-          \ state on every iteration — avoids the\n    'sys.query doesn't change,\
-          \ classifier keeps picking spec' loop.\n    \"\"\"\n    phase_hint = \"\
-          fresh\"\n    summary = \"\"\n    try:\n        parsed = json.loads(body)\
-          \ if body else {}\n        phase_hint = str(parsed.get(\"phase_hint\")\
-          \ or \"fresh\")\n        summary = str(parsed.get(\"summary\") or \"\"\
-          )\n    except Exception:\n        pass\n\n    # Pull last agent's structured\
-          \ intent from conversation.agent_structured\n    last_intent = \"\"\n \
-          \   try:\n        if agent_structured:\n            struct = json.loads(agent_structured)\
-          \ or {}\n            last_intent = str(struct.get(\"intent\") or \"\"\
-          )\n    except Exception:\n        pass\n\n    # Compose a plain-English\
-          \ context block the classifier can reason over.\n    classifier_input\
-          \ = (\n        f\"User message: {user_query}\\n\"\n        f\"phase_hint:\
-          \ {phase_hint}\\n\"\n        f\"last_active_agent: {active_agent or '<none>'}\\\
-          n\"\n        f\"last_agent_intent: {last_intent or '<none>'}\\n\"\n   \
-          \     f\"last_gate_status: {last_gate_status or 'not_run'}\\n\"\n     \
-          \   f\"diff_summary: {summary}\\n\\n\"\n        \"Pick ONE class. Rules\
-          \ (first match wins):\\n\"\n        \"A. If last_agent_intent is applied_fix\
-          \ or phase_complete, DO NOT pick last_active_agent. \"\n        \"Instead:\
-          \ phase_hint=dirty AND last_active_agent != bundle_config -> bundle_config;\
-          \ \"\n        \"phase_hint=dirty AND last_active_agent == bundle_config\
-          \ -> done; \"\n        \"phase_hint=stable -> done; phase_hint=pre_bundle\
-          \ -> bundle_config; phase_hint=pre_spec -> spec.\\n\"\n        \"B. last_gate_status=errors\
-          \ -> pick last_active_agent (retry).\\n\"\n        \"C. phase_hint=fresh\
-          \ -> spec.\\n\"\n        \"D. phase_hint=pre_spec (entities parsed, spec\
-          \ not generated) -> spec. Needed so enrich_spec can surface ambiguities\
-          \ before bundling.\\n\"\n        \"E. phase_hint=pre_bundle (spec exists,\
-          \ no bundle) -> bundle_config.\\n\"\n        \"F. User says add report\
-          \ card/dashboard/chart -> reports.\\n\"\n        \"G. User says skip logic/decision\
-          \ rule/validation -> rules.\\n\"\n        \"H. User asks about locations/users/catchments/delete-implementation\
-          \ -> admin.\\n\"\n        \"I. phase_hint=dirty + user asked for a structural\
-          \ change -> spec.\\n\"\n        \"J. phase_hint=stable + approval/thanks/continue\
-          \ -> done.\\n\"\n        \"K. Default -> done.\"\n    )\n\n    return\
-          \ {\n        \"phase_hint\": phase_hint,\n        \"summary\": summary,\n\
-          \        \"classifier_input\": classifier_input,\n    }\n"
+        code: "import json\n\ndef main(body: str) -> dict:\n    \"\"\"Parse Diff\
+          \ Fetch JSON body. The classifier reads phase_hint and diff_summary\n\
+          \    directly from conversation variables via its instruction template,\n\
+          \    so this node's job is just to surface two fields downstream.\"\"\"\
+          \n    phase_hint = \"fresh\"\n    summary = \"\"\n    try:\n        parsed\
+          \ = json.loads(body) if body else {}\n        phase_hint = str(parsed.get(\"\
+          phase_hint\") or \"fresh\")\n        summary = str(parsed.get(\"summary\"\
+          ) or \"\")\n    except Exception:\n        pass\n    return {\n        \"\
+          phase_hint\": phase_hint,\n        \"summary\": summary,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -2322,8 +2292,6 @@ workflow:
           phase_hint:
             type: string
           summary:
-            type: string
-          classifier_input:
             type: string
         selected: false
         title: Diff Parser
@@ -2334,26 +2302,6 @@ workflow:
           - body
           value_type: string
           variable: body
-        - value_selector:
-          - sys
-          - query
-          value_type: string
-          variable: user_query
-        - value_selector:
-          - conversation
-          - active_agent
-          value_type: string
-          variable: active_agent
-        - value_selector:
-          - conversation
-          - agent_structured
-          value_type: string
-          variable: agent_structured
-        - value_selector:
-          - conversation
-          - last_gate_status
-          value_type: string
-          variable: last_gate_status
       height: 80
       id: '1800000000713'
       parentId: '1800000000700'
@@ -2431,12 +2379,44 @@ workflow:
         desc: LLM-driven routing. Replaces the old active_agent-based IF-ELSE dispatcher.
           Reads user query + phase_hint + turn_diff_summary + agent_memory + last_gate_status
           and picks the next agent (or 'done' to end the loop iteration).
-        instruction: "The input_text already contains user message + all routing
-          state (phase_hint, last_active_agent, last_agent_intent, last_gate_status,
-          diff_summary) plus the labelled decision rules. Follow the rules in the
-          input strictly and in order. Do NOT infer from the user message alone —
-          rule A is the single most important check and must be applied first.
-          Return exactly one class name."
+        instruction: "## Routing state (from conversation variables)
+- phase_hint: {{#conversation.phase_hint#}}
+- last_active_agent: {{#conversation.active_agent#}}
+- last_agent_structured: {{#conversation.agent_structured#}}
+- last_gate_status: {{#conversation.last_gate_status#}}
+- turn_diff_summary: {{#conversation.turn_diff_summary#}}
+- agent_memory (recent): {{#conversation.agent_memory#}}
+
+## Rules (apply top-down, first match wins)
+
+A. If last_agent_structured is a JSON with intent=applied_fix OR intent=phase_complete, DO NOT pick last_active_agent again. Advance instead:
+   - phase_hint=dirty AND last_active_agent != bundle_config → bundle_config
+   - phase_hint=dirty AND last_active_agent == bundle_config → done
+   - phase_hint=stable → done
+   - phase_hint=pre_bundle → bundle_config
+   - phase_hint=pre_spec → spec
+
+B. last_gate_status=errors → pick last_active_agent (retry).
+
+C. phase_hint=fresh → spec.
+
+D. phase_hint=pre_spec → spec. Entities parsed but spec not generated. Spec Agent must run validate_entities, generate_spec, and enrich_spec so ambiguities surface before bundling.
+
+E. phase_hint=pre_bundle → bundle_config. Spec exists but no bundle yet.
+
+F. User message asks for dashboards / report cards / charts → reports.
+
+G. User message asks for skip logic / decision rule / validation → rules.
+
+H. User message asks about locations / users / catchments / delete-implementation → admin.
+
+I. phase_hint=dirty AND the user asked for a structural change → spec.
+
+J. phase_hint=stable AND the user says approval / thanks / continue / looks good → done.
+
+K. Default → done.
+
+Return exactly one class name from: spec, bundle_config, rules, reports, inspect, admin, done."
         memory:
           query_prompt_template: '{{#sys.query#}}'
           window:
@@ -2449,8 +2429,8 @@ workflow:
           name: claude-haiku-4-5-20251001
           provider: langgenius/anthropic/anthropic
         query_variable_selector:
-        - '1800000000713'
-        - classifier_input
+        - sys
+        - query
         selected: false
         title: Question Classifier
         topics:
