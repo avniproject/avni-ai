@@ -1378,7 +1378,11 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
             }
         )
 
-    # Gap 3: program with no enrolmentForm and no encounters referencing it.
+    # Gap 3: program with no enrolmentForm. Surface regardless of whether the
+    # program has encounters — encounters provide per-visit mappings, not an
+    # enrolment mapping, and users commonly want a (possibly empty) enrolment
+    # form so field workers can enrol subjects into the program. Empty
+    # enrolment forms are valid in Avni.
     for prog in programs:
         if not isinstance(prog, dict):
             continue
@@ -1387,24 +1391,30 @@ def enrich_spec_with_defaults(spec_yaml: str, sector: str = "") -> dict:
             continue
         if "enrolmentForm" in prog:
             continue
-        if name in programs_with_encounters:
-            continue
         prog_id = name.lower().replace(" ", "_").replace("-", "_")[:30]
+        has_encs = name in programs_with_encounters
+        question = (
+            f"Program '{name}' has no enrolmentForm. "
+            f"{'Encounters exist for this program, but an enrolment form lets field workers register subjects into the program' if has_encs else 'No encounters reference this program either'}. "
+            "How should we handle it?"
+        )
         ambiguities.append(
             {
                 "id": f"spec_prog_{prog_id}_unmapped",
                 "section": "programs",
                 "entity": name,
                 "field": "enrolmentForm",
-                "question": (
-                    f"Program '{name}' has no enrolmentForm and no encounters — "
-                    f"no formMapping will be generated. How should we handle it?"
-                ),
+                "question": question,
                 "options": [
                     "Add an enrolmentForm for this program",
+                    "Leave as-is (no enrolment mapping)",
                     "Remove this program",
                 ],
-                "default": "Remove this program",
+                "default": (
+                    "Leave as-is (no enrolment mapping)"
+                    if has_encs
+                    else "Remove this program"
+                ),
                 "target_store": "entities",
                 "target_section": "programs",
             }
@@ -1770,11 +1780,12 @@ async def handle_apply_ambiguity_answers(request: Request) -> JSONResponse:
         if amb is None:
             unmatched.append(f"{amb_id}: no matching ambiguity")
             continue
-        if not choice or choice.lower() in (
-            "ignore",
-            "skip",
-            "leave as-is",
-            "leave-as-is",
+        choice_lc = choice.lower() if choice else ""
+        if (
+            not choice
+            or choice_lc in ("ignore", "skip")
+            or choice_lc.startswith("leave as-is")
+            or choice_lc.startswith("leave-as-is")
         ):
             ignored.append(f"{amb_id}: skipped")
             continue

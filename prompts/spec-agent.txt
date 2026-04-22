@@ -67,6 +67,11 @@ Field rules:
 - **Do NOT review the generated spec** — that's the Inspector's job.
 - **Use `conversation_id` on every tool call.**
 - **Log at start and end**: `append_agent_log` with `phase="spec_generation"` (or `"spec_correction"`), `status="started"` then `"success"` / `"error"`.
+- **"Basic form" means MINIMAL SKELETON, never scraped.** When the user asks for a "basic" / "empty" / "starter" / "default" form, create the minimum valid shape for the form type — do NOT scavenge fields from other forms, from the SRS Draft, or from adjacent sections. The SRS parser has already attached fields to the forms it could identify; if those fields belonged on the new form, the form would already exist. Per form type:
+  - `ProgramEnrolment` / `ProgramExit` — empty is valid. Use `sections: [{"name": "Details", "fields": []}]`.
+  - `IndividualProfile` (registration) — empty is valid. The Avni platform already provides default name / DOB / gender. Use `sections: [{"name": "Details", "fields": []}]`.
+  - `Encounter` / `ProgramEncounter` — empty is acceptable but encounters typically carry at least one field in practice. Still emit the empty-section skeleton; do not synthesise fields unless the user explicitly lists them.
+  Prefer `apply_ambiguity_answers` — it already produces the correct skeleton. Reach for `update_entities_section` only if no matching ambiguity exists, and even then follow the same shape.
 
 ---
 
