@@ -2262,14 +2262,43 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
-        code: "import json\n\ndef main(body: str) -> dict:\n    \"\"\"Parse Diff\
-          \ Fetch JSON body. Always returns a safe dict so downstream nodes\n   \
-          \ never blow up on transient failures.\"\"\"\n    phase_hint = \"fresh\"\
-          \n    summary = \"\"\n    try:\n        parsed = json.loads(body) if body\
-          \ else {}\n        phase_hint = str(parsed.get(\"phase_hint\") or \"fresh\"\
-          )\n        summary = str(parsed.get(\"summary\") or \"\")\n    except Exception:\n\
-          \        pass\n    return {\n        \"phase_hint\": phase_hint,\n    \
-          \    \"summary\": summary,\n    }\n"
+        code: "import json\n\ndef main(body: str, user_query: str, active_agent:\
+          \ str,\n         agent_structured: str, last_gate_status: str) -> dict:\n\
+          \    \"\"\"Parse Diff Fetch JSON body AND compose a state-rich query\n\
+          \    string for the Question Classifier. The classifier's\n    query_variable_selector\
+          \ points at classifier_input, so the model\n    sees user message + live\
+          \ state on every iteration — avoids the\n    'sys.query doesn't change,\
+          \ classifier keeps picking spec' loop.\n    \"\"\"\n    phase_hint = \"\
+          fresh\"\n    summary = \"\"\n    try:\n        parsed = json.loads(body)\
+          \ if body else {}\n        phase_hint = str(parsed.get(\"phase_hint\")\
+          \ or \"fresh\")\n        summary = str(parsed.get(\"summary\") or \"\"\
+          )\n    except Exception:\n        pass\n\n    # Pull last agent's structured\
+          \ intent from conversation.agent_structured\n    last_intent = \"\"\n \
+          \   try:\n        if agent_structured:\n            struct = json.loads(agent_structured)\
+          \ or {}\n            last_intent = str(struct.get(\"intent\") or \"\"\
+          )\n    except Exception:\n        pass\n\n    # Compose a plain-English\
+          \ context block the classifier can reason over.\n    classifier_input\
+          \ = (\n        f\"User message: {user_query}\\n\"\n        f\"phase_hint:\
+          \ {phase_hint}\\n\"\n        f\"last_active_agent: {active_agent or '<none>'}\\\
+          n\"\n        f\"last_agent_intent: {last_intent or '<none>'}\\n\"\n   \
+          \     f\"last_gate_status: {last_gate_status or 'not_run'}\\n\"\n     \
+          \   f\"diff_summary: {summary}\\n\\n\"\n        \"Pick ONE class. Rules\
+          \ (first match wins):\\n\"\n        \"A. If last_agent_intent is applied_fix\
+          \ or phase_complete, DO NOT pick last_active_agent. \"\n        \"Instead:\
+          \ phase_hint=dirty AND last_active_agent != bundle_config -> bundle_config;\
+          \ \"\n        \"phase_hint=dirty AND last_active_agent == bundle_config\
+          \ -> done; \"\n        \"phase_hint=stable -> done; phase_hint=pre_bundle\
+          \ -> bundle_config.\\n\"\n        \"B. last_gate_status=errors -> pick\
+          \ last_active_agent (retry).\\n\"\n        \"C. phase_hint=fresh -> spec.\\\
+          n\"\n        \"D. phase_hint=pre_bundle -> bundle_config.\\n\"\n      \
+          \  \"E. User says add report card/dashboard/chart -> reports.\\n\"\n  \
+          \      \"F. User says skip logic/decision rule/validation -> rules.\\\
+          n\"\n        \"G. User asks about locations/users/catchments/delete-implementation\
+          \ -> admin.\\n\"\n        \"H. phase_hint=dirty + user asked for a structural\
+          \ change -> spec.\\n\"\n        \"I. phase_hint=stable + approval/thanks/continue\
+          \ -> done.\\n\"\n        \"J. Default -> done.\"\n    )\n\n    return\
+          \ {\n        \"phase_hint\": phase_hint,\n        \"summary\": summary,\n\
+          \        \"classifier_input\": classifier_input,\n    }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -2277,6 +2306,8 @@ workflow:
           phase_hint:
             type: string
           summary:
+            type: string
+          classifier_input:
             type: string
         selected: false
         title: Diff Parser
@@ -2287,6 +2318,26 @@ workflow:
           - body
           value_type: string
           variable: body
+        - value_selector:
+          - sys
+          - query
+          value_type: string
+          variable: user_query
+        - value_selector:
+          - conversation
+          - active_agent
+          value_type: string
+          variable: active_agent
+        - value_selector:
+          - conversation
+          - agent_structured
+          value_type: string
+          variable: agent_structured
+        - value_selector:
+          - conversation
+          - last_gate_status
+          value_type: string
+          variable: last_gate_status
       height: 80
       id: '1800000000713'
       parentId: '1800000000700'
@@ -2364,60 +2415,12 @@ workflow:
         desc: LLM-driven routing. Replaces the old active_agent-based IF-ELSE dispatcher.
           Reads user query + phase_hint + turn_diff_summary + agent_memory + last_gate_status
           and picks the next agent (or 'done' to end the loop iteration).
-        instructions: "Pick exactly one class for the next agent to run.\n\n##\
-          \ RULE 0 — HIGHEST PRIORITY — DO NOT RE-PICK A JUST-COMPLETED AGENT\n\
-          If `last_agent_intent` is `applied_fix` or `phase_complete`, the agent\
-          \ in `last_active_agent` just finished its work successfully THIS LOOP\
-          \ ITERATION. DO NOT pick that same agent again. Advance instead:\n- If\
-          \ phase_hint == `dirty` AND last_active_agent != `bundle_config` →\
-          \ `bundle_config`\n- If phase_hint == `dirty` AND last_active_agent ==\
-          \ `bundle_config` → `done` (bundle just reconciled; nothing else to\
-          \ do unless memory shows rules/reports haven't run this pipeline)\n-\
-          \ If phase_hint == `stable` → `done`\n- If phase_hint == `pre_bundle`\
-          \ → `bundle_config`\n- If phase_hint == `fresh` → `done` (unexpected; log\
-          \ and exit)\nOnly after this check fails (e.g. last_agent_intent is empty,\
-          \ `ask_user`, `error`, or missing) should you fall through to the rules\
-          \ below.\n\n## Classes\n- `spec`          — parse SRS, fix entity errors,\
-          \ handle spec-level corrections, answer ambiguities. Use for: file uploads,\
-          \ structural config changes (add/remove subject/program/encounter/form),\
-          \ field renames.\n- `bundle_config` — regenerate/reconcile bundle and\
-          \ upload. Use for: post-spec-change (phase_hint=dirty after spec ran),\
-          \ or initial bundle build (phase_hint=pre_bundle).\n- `rules`         —\
-          \ generate skip-logic / decision / visit-schedule rules on forms. Use\
-          \ for: rules-related asks, or right after forms/encounter_types changed\
-          \ AND rules have not yet been written for those forms.\n- `reports`     \
-          \  — add dashboards / report cards. Use for: dashboard or card asks, or\
-          \ when programs/subject_types/encounter_types changed AND reports not\
-          \ yet aligned.\n- `inspect`       — validate config end-to-end, then upload.\
-          \ Use for: final validation on the first-run pipeline.\n- `admin`       \
-          \   — location hierarchy, user accounts, catchments, delete-implementation.\
-          \ Use for: org-admin asks.\n- `done`          — end this loop iteration.\
-          \ Use for: approval/thanks/continue with stable phase and nothing outstanding.\n\
-          \n## Signal priority (evaluate top-down, first match wins — only after\
-          \ RULE 0 does not apply)\n1. `last_gate_status == errors` → pick the\
-          \ SAME agent as last iteration (retry). Read `last_active_agent`.\n2. User\
-          \ message looks like a new file upload / parse request / 'build my config'\
-          \ AND last_active_agent != spec → `spec`.\n3. `phase_hint == fresh` (no\
-          \ entities) → `spec`.\n4. `phase_hint == pre_bundle` (entities parsed,\
-          \ no bundle) → `bundle_config`.\n5. User message explicitly asks for\
-          \ dashboards/report cards/charts AND last_active_agent != reports → `reports`.\n\
-          6. User message explicitly asks for skip logic / validations / decision\
-          \ rules AND last_active_agent != rules → `rules`.\n7. User message asks\
-          \ about locations/users/catchments/upload/delete-implementation → `admin`.\n\
-          8. `phase_hint == dirty` AND agent memory shows bundle_config has NOT\
-          \ run since the dirty mutation → `bundle_config`.\n9. `phase_hint == dirty`\
-          \ AND only forms/encounter_types changed → `rules`.\n10. `phase_hint ==\
-          \ dirty` AND only subject_types/programs changed → `reports`.\n11. `phase_hint\
-          \ == stable` AND user said approval/thanks/continue → `done`.\n12. `phase_hint\
-          \ == stable` AND user asks about current config → `inspect`.\n13. Default\
-          \ → `done` (safer than running an unneeded agent).\n\n## Context (read\
-          \ these verbatim)\n- User query: `{{#sys.query#}}`\n- last_active_agent:\
-          \ `{{#conversation.active_agent#}}`\n- last_agent_intent: parse `intent`\
-          \ field from `{{#conversation.agent_structured#}}` (JSON string; will\
-          \ be empty on the very first iteration of a turn)\n- phase_hint: `{{#conversation.phase_hint#}}`\n\
-          - Turn diff summary: `{{#conversation.turn_diff_summary#}}`\n- Last gate\
-          \ status: `{{#conversation.last_gate_status#}}`\n- Agent memory (recent):\
-          \ `{{#conversation.agent_memory#}}`\n"
+        instruction: "The input_text already contains user message + all routing
+          state (phase_hint, last_active_agent, last_agent_intent, last_gate_status,
+          diff_summary) plus the decision rules. Follow rules A-J in the input
+          strictly. Do NOT infer from the user message alone — rule A is the
+          single most important check and must be applied first. Return exactly
+          one class name."
         memory:
           query_prompt_template: '{{#sys.query#}}'
           window:
@@ -2430,8 +2433,8 @@ workflow:
           name: claude-haiku-4-5-20251001
           provider: langgenius/anthropic/anthropic
         query_variable_selector:
-        - sys
-        - query
+        - '1800000000713'
+        - classifier_input
         selected: false
         title: Question Classifier
         topics:
