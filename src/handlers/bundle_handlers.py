@@ -1051,14 +1051,25 @@ async def handle_put_bundle_file(request: Request) -> JSONResponse:
         new_zip_b64 = base64.b64encode(new_zip_bytes).decode("ascii")
 
         # Re-store: update zip_b64 AND sync the in-memory bundle dict
-        # so validators see the changes (not stale data)
+        # so validators + reconciler see the changes (not stale data).
+        # Some ZIP filenames are singular while bundle_dict keys are plural
+        # (reportCard.json ↔ reportCards, groupPrivilege.json ↔ groupPrivileges,
+        # reportDashboard.json ↔ reportDashboards) — map them explicitly so
+        # the sync is not silently skipped.
+        _FILENAME_TO_KEY = {
+            "reportCard.json": "reportCards",
+            "reportDashboard.json": "reportDashboards",
+            "groupPrivilege.json": "groupPrivileges",
+        }
         bundle_dict = stored["bundle"]
         try:
             if filename.endswith(".json"):
                 synced = json.loads(file_bytes.decode("utf-8"))
-                key = filename.replace(".json", "").split("/")[
-                    -1
-                ]  # handle forms/X.json
+                key = _FILENAME_TO_KEY.get(filename)
+                if key is None:
+                    key = filename.replace(".json", "").split("/")[
+                        -1
+                    ]  # handle forms/X.json
                 if key in bundle_dict:
                     bundle_dict[key] = synced
         except (json.JSONDecodeError, UnicodeDecodeError):
