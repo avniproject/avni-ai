@@ -5298,19 +5298,22 @@ workflow:
     - data:
         code: "import json\n\ndef main(active_agent: str, workflow_mode: str,\n  \
           \       agent_output: str, agent_memory: str,\n         last_gate_status:\
-          \ str, agent_structured: str) -> dict:\n    \"\"\"Decides only loop_done\
-          \ — the Question Classifier at the top of\n    the next loop iteration\
-          \ picks which agent runs next.\n\n    Rules:\n      targeted mode\
-          \        -> done\n      intent=ask_user        -> done (pause for user)\n\
-          \      intent=error           -> done (fail)\n      gate user_input_needed\
-          \ -> done (pause)\n      gate errors + over retry cap -> done (fail)\n\
-          \      else                   -> continue; classifier picks next\n\n  \
-          \  next_agent is kept in the output schema for backwards compat but is\n\
-          \    always \"\" — downstream consumers should read\n    conversation.agent_structured\
-          \ instead.\n    \"\"\"\n    if workflow_mode == \"targeted\":\n        return\
-          \ {\"loop_done\": True, \"next_agent\": \"\",\n                \"reason\"\
-          : \"Targeted mode — single agent only\"}\n\n    struct = {}\n    try:\n\
-          \        if agent_structured:\n            struct = json.loads(agent_structured)\
+          \ str, agent_structured: str,\n         classifier_pick: str) -> dict:\n\
+          \    \"\"\"Decides loop_done based on classifier pick + agent outcome.\n\
+          \n    Rules (first match wins):\n      targeted mode                        ->\
+          \ done\n      classifier_pick == 'done'            -> done (pipeline\
+          \ complete this turn)\n      intent == 'ask_user' or 'error'      -> done\
+          \ (pause/fail)\n      gate user_input_needed               -> done (pause)\n\
+          \      gate errors + over retry cap         -> done (fail)\n      else \
+          \                                -> continue\n\n    next_agent is always\
+          \ \"\" — downstream routing is done by the\n    Question Classifier at\
+          \ the top of the NEXT loop iteration.\n    \"\"\"\n    if workflow_mode\
+          \ == \"targeted\":\n        return {\"loop_done\": True, \"next_agent\"\
+          : \"\",\n                \"reason\": \"Targeted mode — single agent only\"\
+          }\n\n    if classifier_pick == \"done\":\n        return {\"loop_done\"\
+          : True, \"next_agent\": \"\",\n                \"reason\": \"Classifier\
+          \ chose 'done' — pipeline complete for this turn\"}\n\n    struct = {}\n\
+          \    try:\n        if agent_structured:\n            struct = json.loads(agent_structured)\
           \ or {}\n    except Exception:\n        struct = {}\n    intent = str(struct.get(\"\
           intent\", \"\") or \"\")\n\n    if intent in (\"ask_user\", \"error\"):\n\
           \        return {\"loop_done\": True, \"next_agent\": \"\",\n          \
@@ -5373,6 +5376,11 @@ workflow:
           - agent_structured
           value_type: string
           variable: agent_structured
+        - value_selector:
+          - '1800000000710'
+          - class_name
+          value_type: string
+          variable: classifier_pick
       height: 50
       id: '1800000000740'
       parentId: '1800000000700'
@@ -5455,17 +5463,14 @@ workflow:
       width: 241
       zIndex: 1002
     - data:
+        desc: No-op assigner kept as the "continue" branch of Loop Done Check.
+          Under the classifier-driven design, active_agent is set per iteration
+          by the 'Set active <X>' assigners between classifier and prompt-fetch;
+          we must NOT clobber it here with NAD.next_agent (which is always ""
+          in the trimmed NAD) — that blanked active_agent mid-loop and made
+          the next iteration's Diff Parser report last_active_agent=<none>.
         isInLoop: true
-        items:
-        - input_type: variable
-          operation: over-write
-          value:
-          - '1800000000740'
-          - next_agent
-          variable_selector:
-          - conversation
-          - active_agent
-          write_mode: over-write
+        items: []
         loop_id: '1800000000700'
         selected: false
         title: Continue Loop
