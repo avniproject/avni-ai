@@ -244,3 +244,58 @@ def test_user_asks_for_report_card():
     )
     pick = _call_classifier(inp)
     assert pick.get("category_name") == "reports", pick
+
+
+# ---------------------------------------------------------------------------
+# Regression replays from stuck_classifier.json
+# ---------------------------------------------------------------------------
+
+
+def test_stuck_iter1_fresh_upload_pre_bundle_picks_bundle_config():
+    """stuck_classifier.json iter 1 exact replay: user uploaded SRS, Parse SRS
+    File already ran and stored entities (phase_hint=pre_bundle). Classifier
+    must route to bundle_config to build the first bundle."""
+    inp = _compose_classifier_input(
+        user_query="Setup avni using scoping srs docs uploaded here",
+        phase_hint="pre_bundle",
+        active_agent="spec",  # residual from prior turn; should NOT trigger RULE A
+        agent_structured="",  # turn-start reset cleared it
+        last_gate_status="not_run",
+        summary="Entities parsed (2 subject_types, 3 programs, 19 encounters, 28 forms). No bundle generated yet.",
+    )
+    pick = _call_classifier(inp)
+    assert pick.get("category_name") == "bundle_config", pick
+
+
+def test_stuck_iter2_after_bundle_config_phase_complete_picks_done():
+    """stuck_classifier.json iter 2 exact replay: bundle_config just ran with
+    intent=phase_complete, baseline reset → phase_hint=stable. Classifier
+    must pick 'done'. (The bug was NOT here — classifier was already picking
+    'done'; NAD wasn't honoring it, so the loop spun. This test guards
+    against the classifier regressing.)"""
+    inp = _compose_classifier_input(
+        user_query="Setup avni using scoping srs docs uploaded here",
+        phase_hint="stable",
+        active_agent="",  # blanked by old Continue Loop bug — keeping inputs faithful
+        agent_structured='{"intent":"phase_complete","target_phase":"completed"}',
+        last_gate_status="ok",
+        summary="No changes since last upload.",
+    )
+    pick = _call_classifier(inp)
+    assert pick.get("category_name") == "done", pick
+
+
+def test_stuck_iter2_with_active_agent_preserved_still_picks_done():
+    """Post-fix (Continue Loop no longer blanks active_agent): the same iter 2
+    state but with last_active_agent correctly preserved as 'bundle_config'.
+    RULE A: stable + last_active_agent=bundle_config + phase_complete → done."""
+    inp = _compose_classifier_input(
+        user_query="Setup avni using scoping srs docs uploaded here",
+        phase_hint="stable",
+        active_agent="bundle_config",
+        agent_structured='{"intent":"phase_complete","target_phase":"completed"}',
+        last_gate_status="ok",
+        summary="No changes since last upload.",
+    )
+    pick = _call_classifier(inp)
+    assert pick.get("category_name") == "done", pick
