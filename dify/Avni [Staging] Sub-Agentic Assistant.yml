@@ -173,6 +173,17 @@ workflow:
       allowed_file_upload_methods:
       - local_file
       enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
       image:
         enabled: false
         number_limits: 3
@@ -1213,10 +1224,10 @@ workflow:
       id: '1711528708197'
       position:
         x: 0
-        y: 703
+        y: 1917
       positionAbsolute:
         x: 0
-        y: 703
+        y: 1917
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1447,10 +1458,10 @@ workflow:
       id: '1757492907627'
       position:
         x: 1385
-        y: 756
+        y: 1970
       positionAbsolute:
         x: 1385
-        y: 756
+        y: 1970
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1482,10 +1493,10 @@ workflow:
       id: '1757492907628'
       position:
         x: 683
-        y: 763
+        y: 1977
       positionAbsolute:
         x: 683
-        y: 763
+        y: 1977
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1569,10 +1580,10 @@ workflow:
       id: '1757493270484'
       position:
         x: 1746
-        y: 557
+        y: 1771
       positionAbsolute:
         x: 1746
-        y: 557
+        y: 1771
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1634,10 +1645,10 @@ workflow:
       id: '1757495664531'
       position:
         x: 2107
-        y: 872
+        y: 2086
       positionAbsolute:
         x: 2107
-        y: 872
+        y: 2086
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1654,10 +1665,10 @@ workflow:
       id: '1757495688732'
       position:
         x: 2448
-        y: 864
+        y: 2078
       positionAbsolute:
         x: 2448
-        y: 864
+        y: 2078
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1673,10 +1684,10 @@ workflow:
       id: '1758608702077'
       position:
         x: 2107
-        y: 446
+        y: 1660
       positionAbsolute:
         x: 2107
-        y: 446
+        y: 1660
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1693,10 +1704,10 @@ workflow:
       id: '1758699378772'
       position:
         x: 2107
-        y: 662
+        y: 1876
       positionAbsolute:
         x: 2107
-        y: 662
+        y: 1876
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1729,10 +1740,10 @@ workflow:
       id: '1758713692744'
       position:
         x: 342
-        y: 744
+        y: 1958
       positionAbsolute:
         x: 342
-        y: 744
+        y: 1958
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1765,10 +1776,10 @@ workflow:
       id: '1775800000001'
       position:
         x: 2829
-        y: 1310
+        y: 2524
       positionAbsolute:
         x: 2829
-        y: 1310
+        y: 2524
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1808,10 +1819,10 @@ workflow:
       id: '1775800000002'
       position:
         x: 3170
-        y: 1277
+        y: 2491
       positionAbsolute:
         x: 3170
-        y: 1277
+        y: 2491
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1851,10 +1862,10 @@ workflow:
       id: '1775648480416'
       position:
         x: 3531
-        y: 1168
+        y: 2382
       positionAbsolute:
         x: 3531
-        y: 1168
+        y: 2382
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1897,10 +1908,10 @@ workflow:
       id: '1775657870619'
       position:
         x: 362
-        y: 912
+        y: 2126
       positionAbsolute:
         x: 362
-        y: 912
+        y: 2126
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1926,10 +1937,10 @@ workflow:
       id: '1775719228711'
       position:
         x: 2468
-        y: 1153
+        y: 2367
       positionAbsolute:
         x: 2468
-        y: 1153
+        y: 2367
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -1974,10 +1985,10 @@ workflow:
       id: '1800000000040'
       position:
         x: 2107
-        y: 1038
+        y: 2252
       positionAbsolute:
         x: 2107
-        y: 1038
+        y: 2252
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -2834,15 +2845,15 @@ workflow:
                   one server call. Updates entities AND regenerates the spec atomically.
                   choice="ignore" or null skips.
               parameters:
+                answers:
+                  auto: 1
+                  value: null
                 conversation_id:
                   auto: 0
                   value:
                     type: mixed
                     value: '{{#sys.conversation_id#}}'
                 sector:
-                  auto: 1
-                  value: null
-                answers:
                   auto: 1
                   value: null
               provider_name: fa71db84-aa31-44cc-95a2-6b5b7961a51e
@@ -4661,8 +4672,8 @@ workflow:
           \ + chr(10)\n    memory_entry = (existing_memory + sep + entry) if existing_memory\
           \ else entry\n\n    # Cap total memory at 12000 chars (down from 25000)\
           \ to keep the\n    # downstream agent prompt under the streaming-timeout\
-          \ danger zone.\n    if len(memory_entry) > 12000:\n        memory_entry =\
-          \ memory_entry[:3000] + chr(10) + \"...[earlier entries truncated]...\"\
+          \ danger zone.\n    if len(memory_entry) > 12000:\n        memory_entry\
+          \ = memory_entry[:3000] + chr(10) + \"...[earlier entries truncated]...\"\
           \ + chr(10) + memory_entry[-9000:]\n\n    return {\n        \"memory_entry\"\
           : memory_entry,\n        \"agent_output\": agent_text,\n    }\n"
         code_language: python3
@@ -4763,10 +4774,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 2170
-        y: 1140
+        y: 1127
       positionAbsolute:
         x: 6062
-        y: 1140
+        y: 1127
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -4806,8 +4817,7 @@ workflow:
           \     return {\"next_agent\": target, \"loop_done\": False,\n          \
           \              \"reason\": f\"Inspector re_route -> {target} (structured)\"\
           }\n\n    t = (agent_output or \"\").lower()\n    mem = (agent_memory or\
-          \ \"\").lower()\n\n    if \"[awaiting_user_input]\"\
-          \ in t:\n        return\
+          \ \"\").lower()\n\n    if \"[awaiting_user_input]\" in t:\n        return\
           \ {\"next_agent\": \"done\", \"loop_done\": True,\n                \"reason\"\
           : f\"{active_agent} legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match\
           \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
@@ -5025,10 +5035,10 @@ workflow:
       parentId: '1800000000700'
       position:
         x: 2832
-        y: 1029
+        y: 1031
       positionAbsolute:
         x: 6724
-        y: 1029
+        y: 1031
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5189,11 +5199,11 @@ workflow:
       height: 186
       id: '1776327635368'
       position:
-        x: 9111
-        y: 1133
+        x: 9472
+        y: 1371
       positionAbsolute:
-        x: 9111
-        y: 1133
+        x: 9472
+        y: 1371
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5208,11 +5218,11 @@ workflow:
       height: 101
       id: '1800000000800'
       position:
-        x: 9452
-        y: 1175
+        x: 9813
+        y: 1413
       positionAbsolute:
-        x: 9452
-        y: 1175
+        x: 9813
+        y: 1413
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5240,11 +5250,11 @@ workflow:
       height: 146
       id: '1800000000810'
       position:
-        x: 8900
-        y: 1100
+        x: 9111
+        y: 1153
       positionAbsolute:
-        x: 8900
-        y: 1100
+        x: 9111
+        y: 1153
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5259,11 +5269,11 @@ workflow:
       height: 101
       id: '1800000000820'
       position:
-        x: 9200
-        y: 950
+        x: 9472
+        y: 1190
       positionAbsolute:
-        x: 9200
-        y: 950
+        x: 9472
+        y: 1190
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5522,8 +5532,9 @@ workflow:
           : ambiguities,\n        \"applied_changes\": applied_changes,\n        \"\
           reason\": reason,\n        \"parsed_ok\": parsed_ok,\n        \"out_active_phase\"\
           : out_active_phase,\n        \"out_spec_awaiting\": out_spec_awaiting,\n\
-          \        \"out_pending_ambiguities\": out_pending_ambiguities,\n        \"\
-          raw_payload\": raw_payload,\n        \"narrative\": narrative,\n    }\n"
+          \        \"out_pending_ambiguities\": out_pending_ambiguities,\n       \
+          \ \"raw_payload\": raw_payload,\n        \"narrative\": narrative,\n   \
+          \ }\n"
         code_language: python3
         isInLoop: true
         loop_id: '1800000000700'
@@ -5638,15 +5649,15 @@ workflow:
         title: Phase Transition
         type: assigner
         version: '2'
-      height: 180
+      height: 160
       id: '1800000000727'
       parentId: '1800000000700'
       position:
         x: 1849
-        y: 1091
+        y: 1101
       positionAbsolute:
         x: 5741
-        y: 1091
+        y: 1101
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5708,10 +5719,10 @@ workflow:
       id: '1800000000045'
       position:
         x: 1024
-        y: 733
+        y: 1947
       positionAbsolute:
         x: 1024
-        y: 733
+        y: 1947
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5749,10 +5760,10 @@ workflow:
       id: '1800000000046'
       position:
         x: 1385
-        y: 922
+        y: 2136
       positionAbsolute:
         x: 1385
-        y: 922
+        y: 2136
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -5813,17 +5824,17 @@ workflow:
       id: '1800000000047'
       position:
         x: 1746
-        y: 1121
+        y: 2335
       positionAbsolute:
         x: 1746
-        y: 1121
+        y: 2335
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 241
     viewport:
-      x: -1741.625
-      y: 14.625
+      x: -1746.125
+      y: 10.875
       zoom: 0.25
   rag_pipeline_variables: []
