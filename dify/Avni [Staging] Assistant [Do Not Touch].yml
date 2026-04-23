@@ -553,32 +553,6 @@ workflow:
         loop_id: '1800000000700'
         sourceType: if-else
         targetType: http-request
-      id: 1800000000710-dispatch-rules-1800000000301-target
-      selected: false
-      source: '1800000000710'
-      sourceHandle: dispatch-rules
-      target: '1800000000301'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: http-request
-      id: 1800000000710-dispatch-reports-1800000000401-target
-      selected: false
-      source: '1800000000710'
-      sourceHandle: dispatch-reports
-      target: '1800000000401'
-      targetHandle: target
-      type: custom
-      zIndex: 1002
-    - data:
-        isInLoop: true
-        loop_id: '1800000000700'
-        sourceType: if-else
-        targetType: http-request
       id: 1800000000710-dispatch-inspect-1800000000501-target
       selected: false
       source: '1800000000710'
@@ -2087,28 +2061,6 @@ workflow:
             - conversation
             - active_agent
           id: dispatch-bundle-config
-          logical_operator: and
-        - case_id: dispatch-rules
-          conditions:
-          - comparison_operator: is
-            id: f1f9d6d2-27a3-4374-984e-854d53b71595
-            value: rules
-            varType: string
-            variable_selector:
-            - conversation
-            - active_agent
-          id: dispatch-rules
-          logical_operator: and
-        - case_id: dispatch-reports
-          conditions:
-          - comparison_operator: is
-            id: 6366d54a-6309-4686-940f-529d821f5ba9
-            value: reports
-            varType: string
-            variable_selector:
-            - conversation
-            - active_agent
-          id: dispatch-reports
           logical_operator: and
         - case_id: dispatch-inspect
           conditions:
@@ -4811,7 +4763,7 @@ workflow:
           \   \"reason\": f\"{active_agent} intent=error (structured)\"}\n\n    if\
           \ intent == \"re_route\" and active_agent == \"inspect\":\n        target\
           \ = str(struct.get(\"re_route_target\", \"\") or \"\")\n        valid_targets\
-          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
+          \ = (\"spec\", \"bundle_config\")\n        if target\
           \ in valid_targets:\n            mem_lc = (agent_memory or \"\").lower()\n\
           \            if \"[rerouted from inspect]\" not in mem_lc:\n           \
           \     return {\"next_agent\": target, \"loop_done\": False,\n          \
@@ -4822,7 +4774,7 @@ workflow:
           : f\"{active_agent} legacy [AWAITING_USER_INPUT] marker\"}\n\n    route_match\
           \ = re.search(r\"\\[route_to:(\\w+)\\]\", t)\n    if route_match and active_agent\
           \ == \"inspect\":\n        target = route_match.group(1)\n        valid_targets\
-          \ = (\"spec\", \"bundle_config\", \"rules\", \"reports\")\n        if target\
+          \ = (\"spec\", \"bundle_config\")\n        if target\
           \ in valid_targets and \"[rerouted from inspect]\" not in mem:\n       \
           \     return {\"next_agent\": target, \"loop_done\": False,\n          \
           \          \"reason\": f\"Inspector routing to {target} for fixes\"}\n\n\
@@ -4838,8 +4790,7 @@ workflow:
           \n                )}\n\n    if last_gate_status == \"user_input_needed\"\
           :\n        return {\"next_agent\": \"done\", \"loop_done\": True,\n    \
           \            \"reason\": f\"Gate requests user input from {active_agent}\"\
-          }\n\n    chain = [\"spec\", \"bundle_config\", \"rules\", \"reports\", \"\
-          inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
+          }\n\n    chain = [\"spec\", \"bundle_config\", \"inspect\"]\n    try:\n        idx = chain.index(active_agent)\n    except\
           \ ValueError:\n        return {\"next_agent\": \"done\", \"loop_done\":\
           \ True,\n                \"reason\": f\"Unknown agent: {active_agent}\"\
           }\n\n    if idx < len(chain) - 1:\n        next_a = chain[idx + 1]\n   \
