@@ -17,6 +17,10 @@ A Function Tool Calling server that provides AI assistants with programmatic acc
   - Implementations
 - Async configuration processing with status tracking
 
+## OpenAPI Documentation
+
+https://editor.swagger.io/?url=https://raw.githubusercontent.com/avniproject/avni-ai/refs/heads/app-configurator-dev/dify/avni-ai-tools-openapi.yaml
+
 ## 📋 Prerequisites
 
 - Python 3.13+
