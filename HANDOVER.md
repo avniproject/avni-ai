@@ -8,7 +8,7 @@
 
 - We built a chat-first Avni configurator as a Dify agentic workflow calling a FastAPI/FastMCP tool service (this repo).
 - Spec → bundle → upload works end-to-end for simple programs. Complex configuration (rules, reports, skip-logic, formElement specials) is brittle, and the Dify orchestration has become difficult to debug and extend.
-- We are re-architecting the orchestration using Claude-managed agents. The tool service, prompts, knowledge base, and domain learnings are assets we keep; the Dify workflow is not.
+- Next we would attempt re-architecting the orchestration using Claude-managed agents. The tool service, prompts, knowledge base, and domain learnings are assets we keep; the Dify workflow is not.
 - This doc tells the next owner what to keep, what to throw away, and what's half-built.
 
 ---
